@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ nhom.ten_nhom }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow"><a href="{{ url_for('dmt.index') }}" style="color:inherit;">Danh mục thuốc</a> / {{ nhom.cha.ten_nhom if nhom.cha }}</div>
+  <h1>{{ nhom.ten_nhom }}</h1>
+</div>
+
+<div class="results-panel">
+  {% if nhom.con %}
+  <div class="category-grid" style="margin:0 0 24px;">
+    {% for con in nhom.con|sort(attribute='ten_nhom') %}
+    <a class="category-card" href="{{ url_for('dmt.xem_nhom', nhom_id=con.id) }}">
+      <h3>{{ con.ten_nhom }}</h3>
+      <p>{{ con.danh_sach_thuoc|length }} thuốc</p>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if danh_sach_thuoc %}
+  <div class="category-grid" style="margin:0; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+    {% for thuoc in danh_sach_thuoc %}
+    <a class="category-card" href="{{ url_for('dmt.xem_thuoc', thuoc_id=thuoc.id) }}" style="flex-direction:row; align-items:center; gap:14px;">
+      {% if thuoc.hinh_anh %}
+      <img src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_thuoc }}" style="width:56px; height:56px; object-fit:cover; border-radius:8px; flex-shrink:0; background:var(--paper-0);">
+      {% endif %}
+      <div>
+        <h3 style="margin:0 0 4px;">{{ thuoc.ten_thuoc }}</h3>
+        <p style="margin:0;">{{ thuoc.hoat_chat or '' }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% elif not nhom.con %}
+  <div class="empty-state">Chưa có thuốc nào trong nhóm này.</div>
+  {% endif %}
+</div>
+{% endblock %}

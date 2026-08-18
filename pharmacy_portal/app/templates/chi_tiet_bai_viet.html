@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ bai_viet.tieu_de }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">{{ bai_viet.danh_muc or 'Thông tin bệnh nhân' }}</div>
+  <h1>{{ bai_viet.tieu_de }}</h1>
+</div>
+<div class="results-panel">
+  <div style="background:var(--paper-50); border:1px solid var(--line-200); border-radius:var(--radius-md); padding:28px; max-width: 760px; white-space: pre-line;">
+    {{ bai_viet.noi_dung }}
+  </div>
+</div>
+{% endblock %}

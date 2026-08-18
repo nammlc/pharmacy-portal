@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Trang chủ{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Khoa Dược &middot; Cổng thông tin nội bộ</div>
+    <h1>Tra cứu thông tin dược nhanh, chính xác</h1>
+    <p>Danh mục thuốc, tương tác, tương hợp - tương kỵ và hướng dẫn sử dụng được cập nhật và kiểm duyệt bởi dược sĩ lâm sàng.</p>
+    <form class="hero-search" action="{{ url_for('dmt.index') }}" method="get">
+      <input type="text" name="q" placeholder="Nhập tên thuốc hoặc hoạt chất...">
+      <button type="submit">Tra cứu</button>
+    </form>
+  </div>
+</section>
+
+<div class="category-grid">
+  <a class="category-card" href="{{ url_for('dmt.index') }}">
+    <div class="category-icon">&#128138;</div>
+    <h3>Danh mục thuốc</h3>
+    <p>Tra cứu thuốc theo nhóm dược lý, đầy đủ thông tin chỉ định, liều dùng.</p>
+  </a>
+
+  <a class="category-card" href="{{ url_for('tttt.index') }}">
+    <div class="category-icon">&#8942;</div>
+    <h3>Thuốc tiêm truyền</h3>
+    <p>Dung môi pha loãng, tốc độ truyền, độ ổn định sau pha.</p>
+  </a>
+
+  <a class="category-card" href="{{ url_for('thtk.index') }}">
+    <div class="category-icon">&#8644;</div>
+    <h3>Tương hợp - Tương kỵ</h3>
+    <p>Kiểm tra khả năng phối hợp/pha chung giữa hai thuốc.</p>
+  </a>
+
+  <a class="category-card" href="{{ url_for('ttt.index') }}">
+    <div class="category-icon">&#9888;</div>
+    <h3>Tương tác thuốc</h3>
+    <p>Mức độ, cơ chế và cách xử trí khi dùng đồng thời.</p>
+  </a>
+
+  <a class="category-card" href="{{ url_for('ttth.index') }}">
+    <div class="category-icon">&#8505;</div>
+    <h3>Thông tin thuốc</h3>
+    <p>Chỉ định, chống chỉ định, liều dùng, tác dụng phụ.</p>
+  </a>
+
+  <a class="category-card" href="{{ url_for('ttbn.index') }}">
+    <div class="category-icon">&#9825;</div>
+    <h3>Thông tin cho bệnh nhân</h3>
+    <p>Hướng dẫn dùng thuốc tại nhà, dễ hiểu cho người bệnh.</p>
+  </a>
+</div>
+{% endblock %}

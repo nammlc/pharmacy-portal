@@ -1,0 +1,41 @@
+# Nhóm thuốc giãn cơ, giải giãn cơ
+
+A- THÔNG TIN CHUNG:
+
+1-Tên biệt dược : ROCURONIUM-BFS
+
+2-Tên hoạt chất: ROCURONIUM BROMID 10MG
+
+3- Thành phần: Rocuronium bromid 10mg. Tá dược: Natri acetat trihydrat, natri clorid, acid acetic băng, nước cất pha tiêm vừa đủ
+
+4-Dạng bào chế: Dung dịch tiêm, trong suốt, đựng trong ống nhựa. pH 2,5-5,5
+
+5- Chỉ định: Hỗ trợ gây mê toàn thân trong đặt nội khí quản và giãn cơ trong phẫu thuật (người lớn và trẻ em 0-8 tuổi). Tạo điều kiện đặt nội khí quản dẫn mê nhanh, hỗ trợ ICU.
+
+6-Cách dùng, liều dùng: Người lớn liều ban đầu 0,6mg/kg tiêm tĩnh mạch nhanh. Liều duy trì 0,1-0,15 hoặc 0,2mg/kg. Trẻ em 3 tháng-12 tuổi: liều ban đầu 0,6mg/kg. Người cao tuổi/suy thận/suy gan: liều duy trì giảm 75-100mcg/kg.
+
+7-Chống chỉ định: Quá mẫn với bất kỳ thuốc chẹn thần kinh-cơ nào. Tiền sử phản ứng quá mẫn với rocuronium hoặc ion bromid.
+
+Link tham khảo chi tiết thuốc: https://pharmog.com/wp/rocuronium-rocuronium-bfs/
+IMG: https://lh3.googleusercontent.com/sitesv/AG8ngQXWHUrs8as_9Y7hAUB9k1dAMmL7KNhk4wOSCTF6XcTOK_HG4UdietEZ2IcyMBIPc4iYee8N--qkbBNV8OOOeFSmDNHjV4RbaPxkwCd2jlxxMqyPbLRys2P2QE7I2S49drhgzYg4ackDPpzsDxnCncIJ8R4k3xZCPXNfnBe6Rsjpg1It_gculmHjya8mKNY=w1280
+===DRUG_END===
+
+A- THÔNG TIN CHUNG:
+
+1-Tên biệt dược : VINSTIGMIN
+
+2-Tên hoạt chất: NEOSTIGMIN METHYLSULFAT 0,5MG
+
+3- Thành phần: Neostigmin methylsulfat 0,5mg. Tá dược: natriclorit, nước cất pha tiêm vừa đủ 1ml
+
+4-Dạng bào chế: Dung dịch tiêm, trong, đóng trong ống thủy tinh hàn kín. pH 4,5-6,5
+
+5- Chỉ định: Bệnh nhược cơ. Bí đái, liệt ruột hậu phẫu thuật. Giải độc quá liều thuốc giãn cơ (metocurin, galamin, tubocurarin...).
+
+6-Cách dùng, liều dùng: Người lớn tiêm bắp 0,022mg/kg (kèm Atropin 0,011mg/kg trước). Trẻ em <12 tuổi: 0,025-0,04mg/kg. Giải độc: 0,03-0,07mg/kg tiêm tĩnh mạch chậm, tối đa người lớn 5mg, trẻ em 2,5mg. Suy thận cần giảm liều.
+
+7-Chống chỉ định: Mẫn cảm với thành phần thuốc. Viêm màng bụng. Tắc ruột và tắc đường tiết niệu cơ học. Phình đại tràng.
+
+Link tham khảo chi tiết thuốc: https://trungtamthuoc.com/thuoc-vinstigmin-05mgml-vinphaco
+IMG: https://lh3.googleusercontent.com/sitesv/AG8ngQUkloJoGFg0laSMYvHGEeDWH1Q_XG4LDtnd-NfYv1d5q1AAtwndlDfgD6wIzCuOx1Nt62UHS5orrRwGByNP2ELx_FCUwCtEIxvEYXc7zlwC4eb6IqEBrsjw-8PoxJEHGIBbn0HSKVTR0Zsw20cS66TkF-E9nV9xp-9Dw1KGbwo2lcqlyj_XkpZYtiR8=w1280
+===DRUG_END===

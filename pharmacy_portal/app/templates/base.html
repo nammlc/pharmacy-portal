@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Cổng Tra Cứu Dược{% endblock %} — BV Đa khoa Tâm Đức Cầu Quan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="{{ url_for('main.trang_chu') }}" class="brand">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo bệnh viện" class="brand-logo">
+      <span class="brand-text">
+        <strong class="brand-primary">KHOA DƯỢC</strong>
+        <small>BVĐK Tâm Đức Cầu Quan</small>
+      </span>
+    </a>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Mở menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="main-nav" id="mainNav">
+      <a href="{{ url_for('main.trang_chu') }}" class="{{ 'active' if request.endpoint == 'main.trang_chu' }}">Trang chủ</a>
+      <a href="{{ url_for('dmt.index') }}" class="{{ 'active' if request.blueprint == 'dmt' }}">Danh mục thuốc</a>
+      <a href="{{ url_for('tttt.index') }}" class="{{ 'active' if request.blueprint == 'tttt' }}">Thuốc tiêm truyền</a>
+      <a href="{{ url_for('thtk.index') }}" class="{{ 'active' if request.blueprint == 'thtk' }}">Tương hợp - Tương kỵ</a>
+      <a href="{{ url_for('ttt.index') }}" class="{{ 'active' if request.blueprint == 'ttt' }}">Tương tác thuốc</a>
+      <a href="{{ url_for('ttth.index') }}" class="{{ 'active' if request.blueprint == 'ttth' }}">Thông tin thuốc</a>
+      <a href="{{ url_for('ttbn.index') }}" class="{{ 'active' if request.blueprint == 'ttbn' }}">Thông tin bệnh nhân</a>
+    </nav>
+  </div>
+</header>
+
+<main class="site-main">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p>Khoa Dược &middot; Bệnh viện Đa khoa Tâm Đức Cầu Quan. Dữ liệu chỉ dùng tham khảo trong nội bộ, luôn đối chiếu với dược thư và quy trình chuyên môn hiện hành.</p>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

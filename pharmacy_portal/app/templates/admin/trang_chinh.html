@@ -1,0 +1,41 @@
+{% extends "admin/base.html" %}
+{% block title %}Tổng quan{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head">
+  <h1>Tổng quan</h1>
+</div>
+
+<div class="stat-grid">
+  <a href="{{ url_for('admin_thuoc.danh_sach') }}" class="stat-card">
+    <div class="stat-value">{{ so_luong.thuoc }}</div>
+    <div class="stat-label">Thuốc trong danh mục</div>
+  </a>
+  <a href="{{ url_for('admin_tttt.danh_sach') }}" class="stat-card">
+    <div class="stat-value">{{ so_luong.tiem_truyen }}</div>
+    <div class="stat-label">Thuốc tiêm truyền</div>
+  </a>
+  <a href="{{ url_for('admin_thtk.danh_sach') }}" class="stat-card">
+    <div class="stat-value">{{ so_luong.tuong_hop_tuong_ky }}</div>
+    <div class="stat-label">Cặp tương hợp - tương kỵ</div>
+  </a>
+  <a href="{{ url_for('admin_ttt.danh_sach') }}" class="stat-card">
+    <div class="stat-value">{{ so_luong.tuong_tac }}</div>
+    <div class="stat-label">Cặp tương tác thuốc</div>
+  </a>
+  <a href="{{ url_for('admin_ttth.danh_sach') }}" class="stat-card">
+    <div class="stat-value">{{ so_luong.thong_tin_thuoc }}</div>
+    <div class="stat-label">Thông tin thuốc chi tiết</div>
+  </a>
+  <a href="{{ url_for('admin_ttbn.danh_sach') }}" class="stat-card">
+    <div class="stat-value">{{ so_luong.benh_nhan }}</div>
+    <div class="stat-label">Bài viết cho bệnh nhân</div>
+  </a>
+</div>
+
+{% if so_luong.thuoc == 0 %}
+<div class="admin-empty" style="margin-top:20px;">
+  Chưa có thuốc nào trong danh mục. <a href="{{ url_for('admin_thuoc.them') }}" style="color:var(--sage-500); font-weight:600;">Thêm thuốc đầu tiên &rarr;</a>
+</div>
+{% endif %}
+{% endblock %}

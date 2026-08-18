@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Quản trị{% endblock %} — Cổng Tra Cứu Dược</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <a href="{{ url_for('admin_dashboard.trang_chinh') }}" class="brand">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="brand-logo brand-logo-sm">
+    </a>
+
+    <a href="{{ url_for('admin_dashboard.trang_chinh') }}" class="{{ 'active' if request.endpoint == 'admin_dashboard.trang_chinh' }}">Tổng quan</a>
+
+    <div class="section-label">Danh mục</div>
+    <a href="{{ url_for('admin_thuoc.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_thuoc' }}">Thuốc</a>
+
+    <div class="section-label">Tra cứu</div>
+    <a href="{{ url_for('admin_tttt.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_tttt' }}">Thuốc tiêm truyền</a>
+    <a href="{{ url_for('admin_thtk.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_thtk' }}">Tương hợp - Tương kỵ</a>
+    <a href="{{ url_for('admin_ttt.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ttt' }}">Tương tác thuốc</a>
+    <a href="{{ url_for('admin_ttth.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ttth' }}">Thông tin thuốc</a>
+
+    <div class="section-label">Nội dung</div>
+    <a href="{{ url_for('admin_ttbn.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ttbn' }}">Bài viết bệnh nhân</a>
+
+    <div class="section-label">Khác</div>
+    <a href="{{ url_for('main.trang_chu') }}" target="_blank">Xem trang công khai &#8599;</a>
+  </aside>
+
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div></div>
+      <div class="user-chip">
+        <span>Xin chào, <strong>{{ current_user.ho_ten or current_user.ten_dang_nhap }}</strong></span>
+        <a href="{{ url_for('admin_auth.doi_mat_khau') }}">Đổi mật khẩu</a>
+        <a class="logout" href="{{ url_for('admin_auth.dang_xuat') }}">Đăng xuất</a>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="flash-list">
+        {% for category, message in messages %}
+        <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="admin-body">
+      {% block admin_content %}{% endblock %}
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

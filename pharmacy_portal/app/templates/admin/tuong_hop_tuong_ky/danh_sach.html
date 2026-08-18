@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+{% block title %}Tương hợp - Tương kỵ{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head">
+  <h1>Tương hợp - Tương kỵ</h1>
+  <a href="{{ url_for('admin_thtk.them') }}" class="btn btn-primary">+ Thêm</a>
+</div>
+
+{% if items %}
+<table class="result-table">
+  <thead><tr><th>Thuốc A</th><th>Thuốc B</th><th>Trạng thái</th><th></th></tr></thead>
+  <tbody>
+    {% for item in items %}
+    <tr>
+      <td>{{ item.thuoc_a.ten_thuoc }}</td>
+      <td>{{ item.thuoc_b.ten_thuoc }}</td>
+      <td><span class="badge-level badge-{{ item.trang_thai }}">{{ item.trang_thai.replace('_',' ') }}</span></td>
+      <td>
+        <div class="table-actions">
+          <a class="btn btn-outline btn-sm" href="{{ url_for('admin_thtk.sua', item_id=item.id) }}">Sửa</a>
+          <form method="POST" action="{{ url_for('admin_thtk.xoa', item_id=item.id) }}" onsubmit="return confirm('Xoá bản ghi này?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger btn-sm">Xoá</button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="admin-empty">Chưa có dữ liệu.</div>
+{% endif %}
+{% endblock %}

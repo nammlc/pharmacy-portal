@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Tra cứu tương tác thuốc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">Tra cứu</div>
+  <h1>Tương tác thuốc</h1>
+  <p>Mức độ, cơ chế và hướng xử trí khi hai thuốc dùng đồng thời.</p>
+</div>
+
+<div class="search-panel">
+  <form class="search-form" method="get">
+    <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên thuốc...">
+    <button type="submit">Tra cứu</button>
+  </form>
+</div>
+
+<div class="results-panel">
+  {% if ket_qua %}
+  <table class="result-table">
+    <thead>
+      <tr>
+        <th>Thuốc A</th>
+        <th>Thuốc B</th>
+        <th>Mức độ</th>
+        <th>Hậu quả lâm sàng</th>
+        <th>Xử trí</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in ket_qua %}
+      <tr>
+        <td>{{ item.thuoc_a.ten_thuoc }}</td>
+        <td>{{ item.thuoc_b.ten_thuoc }}</td>
+        <td><span class="badge-level badge-{{ item.muc_do }}">{{ item.muc_do.replace('_', ' ') }}</span></td>
+        <td>{{ item.hau_qua_lam_sang or '—' }}</td>
+        <td>{{ item.xu_tri or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% elif tu_khoa %}
+  <div class="empty-state">Không tìm thấy tương tác nào liên quan đến "{{ tu_khoa }}".</div>
+  {% else %}
+  <div class="empty-state">Nhập tên thuốc để xem các tương tác liên quan.</div>
+  {% endif %}
+</div>
+{% endblock %}
