@@ -59,7 +59,7 @@
     </tbody>
   </table>
 </div>
-{{ pt(phan_trang, 'admin_ntbv.danh_sach', q=tu_khoa) }}
+{{ pt(phan_trang, 'admin_ntbv.danh_sach', tu_khoa) }}
 {% else %}
 <div class="admin-empty">Không có thuốc nào{% if tu_khoa %} khớp với "{{ tu_khoa }}"{% endif %}.</div>
 {% endif %}

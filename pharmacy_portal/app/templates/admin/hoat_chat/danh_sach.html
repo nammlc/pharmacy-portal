@@ -45,7 +45,7 @@
     </tbody>
   </table>
 </div>
-{{ pt(phan_trang, 'admin_hoat_chat.danh_sach', q=tu_khoa) }}
+{{ pt(phan_trang, 'admin_hoat_chat.danh_sach', tu_khoa) }}
 {% else %}
 <div class="admin-empty">Không có hoạt chất nào{% if tu_khoa %} khớp với "{{ tu_khoa }}"{% endif %}.</div>
 {% endif %}
