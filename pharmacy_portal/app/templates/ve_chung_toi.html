@@ -1,43 +1,330 @@
 {% extends "base.html" %}
-{% block title %}Về chúng tôi{% endblock %}
+{% block title %}{{ d.vct_tieu_de or 'Về chúng tôi' }}{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <div class="eyebrow">Khoa Dược &middot; BVĐK Tâm Đức Cầu Quan</div>
-  <h1>Về chúng tôi</h1>
-  <p>Cổng tra cứu dược được Khoa Dược xây dựng và duy trì để tra cứu thông tin thuốc nhanh, chính xác, phục vụ công tác chuyên môn trong bệnh viện.</p>
-</div>
 
-<div class="results-panel" style="display:flex; flex-direction:column; gap:20px;">
-
-  <div style="background:var(--paper-50); border:1px solid var(--line-200); border-radius:var(--radius-md); padding:26px; max-width:760px;">
-    <h2 style="font-family:var(--font-display); font-size:17px; margin:0 0 10px;">Khoa Dược</h2>
-    <p style="color:var(--text-muted); margin:0; line-height:1.6;">
-      Bệnh viện Đa khoa Tâm Đức Cầu Quan. Dữ liệu trên cổng thông tin chỉ dùng tham khảo nội bộ,
-      luôn đối chiếu với dược thư và quy trình chuyên môn hiện hành trước khi áp dụng lâm sàng.
-    </p>
+<!-- Hero section -->
+<section class="vct-hero">
+  {% if d.vct_hinh_anh_1 %}
+  <div class="vct-hero-img" style="background-image:url('{{ d.vct_hinh_anh_1 }}')"></div>
+  {% else %}
+  <div class="vct-hero-img vct-hero-gradient"></div>
+  {% endif %}
+  <div class="vct-hero-overlay"></div>
+  <div class="vct-hero-content">
+    <div class="vct-eyebrow">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
+    <h1>{{ d.vct_tieu_de or 'Về chúng tôi' }}</h1>
+    {% if d.vct_mo_ta_ngan %}
+    <p>{{ d.vct_mo_ta_ngan }}</p>
+    {% endif %}
   </div>
+</section>
 
-  <div style="background:var(--paper-50); border:1px solid var(--line-200); border-radius:var(--radius-md); padding:26px; max-width:760px;">
-    <h2 style="font-family:var(--font-display); font-size:17px; margin:0 0 16px;">Liên hệ</h2>
+<!-- Giới thiệu + sứ mệnh/tầm nhìn -->
+<section class="vct-main-section">
+  <div class="vct-container">
 
-    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
-      <div style="width:56px; height:56px; border-radius:50%; background:linear-gradient(145deg, var(--navy-600), var(--sky-400)); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:20px; flex-shrink:0;">
-        TVT
+    {% if d.vct_gioi_thieu %}
+    <div class="vct-intro-block">
+      <div class="vct-label">Giới thiệu</div>
+      <p class="vct-intro-text">{{ d.vct_gioi_thieu }}</p>
+    </div>
+    {% endif %}
+
+    {% if d.vct_su_menh or d.vct_tam_nhin %}
+    <div class="vct-cards-row">
+      {% if d.vct_su_menh %}
+      <div class="vct-card">
+        <div class="vct-card-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="vct-card-title">Sứ mệnh</div>
+        <div class="vct-card-text">{{ d.vct_su_menh }}</div>
       </div>
-      <div>
-        <div style="font-weight:700; font-size:15.5px; color:var(--ink-900);">Ds. Tống Văn Tuấn</div>
-        <div style="color:var(--text-muted); font-size:13.5px; margin-top:2px;">Trưởng khoa Dược</div>
+      {% endif %}
+      {% if d.vct_tam_nhin %}
+      <div class="vct-card">
+        <div class="vct-card-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4-4-4 4-4z"/></svg>
+        </div>
+        <div class="vct-card-title">Tầm nhìn</div>
+        <div class="vct-card-text">{{ d.vct_tam_nhin }}</div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Ảnh phụ -->
+    {% if d.vct_hinh_anh_2 %}
+    <div class="vct-photo-block">
+      <img src="{{ d.vct_hinh_anh_2 }}" alt="Hình ảnh khoa dược">
+    </div>
+    {% endif %}
+
+    <!-- Liên hệ -->
+    <div class="vct-contact-block">
+      <div class="vct-label">Liên hệ</div>
+      <div class="vct-contact-card">
+        <div class="vct-contact-avatar">
+          {{ (d.vct_ten_lien_he or 'K')[0]|upper }}
+        </div>
+        <div class="vct-contact-info">
+          {% if d.vct_ten_lien_he %}
+          <div class="vct-contact-name">{{ d.vct_ten_lien_he }}</div>
+          {% endif %}
+          {% if d.vct_chuc_vu_lien_he %}
+          <div class="vct-contact-role">{{ d.vct_chuc_vu_lien_he }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="vct-contact-details">
+        {% if d.vct_dien_thoai %}
+        <a href="tel:{{ d.vct_dien_thoai|replace(' ','') }}" class="vct-contact-row">
+          <span class="vct-contact-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17.07z"/></svg>
+          </span>
+          {{ d.vct_dien_thoai }}
+        </a>
+        {% endif %}
+        {% if d.vct_email %}
+        <a href="mailto:{{ d.vct_email }}" class="vct-contact-row">
+          <span class="vct-contact-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </span>
+          {{ d.vct_email }}
+        </a>
+        {% endif %}
+        {% if d.vct_dia_chi %}
+        <div class="vct-contact-row">
+          <span class="vct-contact-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </span>
+          {{ d.vct_dia_chi }}
+        </div>
+        {% endif %}
       </div>
     </div>
 
-    <div style="margin-top:18px; padding-top:18px; border-top:1px solid var(--line-100); display:flex; flex-direction:column; gap:10px;">
-      <a href="tel:0977755119" style="display:flex; align-items:center; gap:10px; color:var(--ink-900); font-weight:600; font-size:14.5px;">
-        <span style="width:34px; height:34px; border-radius:var(--radius-sm); background:var(--paper-0); display:flex; align-items:center; justify-content:center; flex-shrink:0;">&#128222;</span>
-        0977 755 119
-      </a>
+    <!-- Disclaimer -->
+    <div class="vct-disclaimer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Dữ liệu trên cổng thông tin chỉ dùng tham khảo nội bộ. Luôn đối chiếu với dược thư và quy trình chuyên môn hiện hành trước khi áp dụng lâm sàng.
     </div>
-  </div>
 
-</div>
+  </div>
+</section>
+
+<style>
+/* Hero */
+.vct-hero {
+  position: relative;
+  height: 380px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+.vct-hero-img {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 6s ease;
+}
+.vct-hero-img:hover { transform: scale(1.03); }
+.vct-hero-gradient {
+  background: linear-gradient(135deg, var(--ink-900) 0%, var(--navy-600) 60%, var(--sky-400) 100%);
+}
+.vct-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(11,31,58,0.85) 0%, rgba(11,31,58,0.3) 60%, transparent 100%);
+}
+.vct-hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 40px 48px;
+  max-width: 800px;
+}
+.vct-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sky-400);
+  margin-bottom: 10px;
+}
+.vct-hero-content h1 {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 4vw, 42px);
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 12px;
+  line-height: 1.15;
+}
+.vct-hero-content p {
+  color: rgba(255,255,255,0.82);
+  font-size: 15.5px;
+  max-width: 560px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Main section */
+.vct-main-section { padding: 56px 0 80px; }
+.vct-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.vct-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--navy-600);
+  margin-bottom: 14px;
+}
+
+/* Giới thiệu */
+.vct-intro-block {}
+.vct-intro-text {
+  font-size: 16.5px;
+  line-height: 1.75;
+  color: var(--ink-900);
+  border-left: 3px solid var(--navy-500);
+  padding-left: 20px;
+  margin: 0;
+}
+
+/* Cards sứ mệnh/tầm nhìn */
+.vct-cards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.vct-card {
+  background: var(--paper-50);
+  border: 1px solid var(--line-200);
+  border-radius: 14px;
+  padding: 26px 24px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.vct-card:hover { border-color: var(--navy-500); box-shadow: 0 4px 16px rgba(26,77,143,0.08); }
+.vct-card-icon {
+  width: 44px; height: 44px;
+  background: var(--sage-100);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--navy-600);
+  margin-bottom: 14px;
+}
+.vct-card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink-900);
+  margin-bottom: 8px;
+}
+.vct-card-text {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+/* Ảnh phụ */
+.vct-photo-block img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+}
+
+/* Liên hệ */
+.vct-contact-block {}
+.vct-contact-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--paper-50);
+  border: 1px solid var(--line-200);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 12px;
+}
+.vct-contact-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--navy-600), var(--sky-400));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.vct-contact-name {
+  font-weight: 700;
+  font-size: 15.5px;
+  color: var(--ink-900);
+}
+.vct-contact-role {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+.vct-contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 0;
+}
+.vct-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14.5px;
+  color: var(--ink-900);
+  font-weight: 500;
+  text-decoration: none;
+}
+a.vct-contact-row:hover { color: var(--navy-500); }
+.vct-contact-icon {
+  width: 36px; height: 36px;
+  background: var(--paper-50);
+  border: 1px solid var(--line-200);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--navy-600);
+  flex-shrink: 0;
+}
+
+/* Disclaimer */
+.vct-disclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--sage-100);
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: var(--navy-600);
+  line-height: 1.6;
+}
+.vct-disclaimer svg { flex-shrink: 0; margin-top: 2px; }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .vct-hero { height: 280px; }
+  .vct-hero-content { padding: 24px 20px; }
+  .vct-container { gap: 36px; padding: 0 16px; }
+  .vct-cards-row { grid-template-columns: 1fr; }
+  .vct-main-section { padding: 36px 0 60px; }
+}
+</style>
 {% endblock %}

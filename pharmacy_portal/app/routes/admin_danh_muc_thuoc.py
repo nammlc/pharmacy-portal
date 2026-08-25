@@ -45,12 +45,12 @@ def them():
         thuoc.nhom_thuoc_id = form.nhom_thuoc_id.data or None
         thuoc.hoat_chat_id = form.hoat_chat_id.data or None
         db.session.add(thuoc)
-        db.session.flush()  # lấy thuoc.id trước khi upload
+        db.session.flush()
 
         file_anh = request.files.get("file_anh")
         if file_anh and file_anh.filename:
             try:
-                url = upload_anh_danh_muc_thuoc(file_anh, public_id=f"dmt_{thuoc.id}")
+                url = upload_anh_danh_muc_thuoc(file_anh)
                 if url:
                     thuoc.hinh_anh = url
             except ValueError as e:
@@ -80,21 +80,15 @@ def sua(thuoc_id):
         thuoc.nhom_thuoc_id = form.nhom_thuoc_id.data or None
         thuoc.hoat_chat_id = form.hoat_chat_id.data or None
 
-        # --- Xử lý ảnh: ảnh mới luôn được ưu tiên, tự xoá ảnh cũ trên
-        # Cloudinary trước khi thay để tránh rác. Checkbox "xoá ảnh" chỉ
-        # có tác dụng khi KHÔNG có ảnh mới đi kèm.
         file_anh = request.files.get("file_anh")
-        anh_moi_url = None
         if file_anh and file_anh.filename:
+            # upload_anh_danh_muc_thuoc tự xoá url_cu trước khi upload mới
             try:
-                anh_moi_url = upload_anh_danh_muc_thuoc(file_anh, public_id=f"dmt_{thuoc.id}")
+                url_moi = upload_anh_danh_muc_thuoc(file_anh, url_cu=thuoc.hinh_anh)
+                if url_moi:
+                    thuoc.hinh_anh = url_moi
             except ValueError as e:
                 flash(str(e), "warning")
-
-        if anh_moi_url:
-            if thuoc.hinh_anh and thuoc.hinh_anh != anh_moi_url:
-                xoa_anh_cloudinary(thuoc.hinh_anh)
-            thuoc.hinh_anh = anh_moi_url
         elif request.form.get("xoa_anh") and thuoc.hinh_anh:
             xoa_anh_cloudinary(thuoc.hinh_anh)
             thuoc.hinh_anh = None
@@ -102,7 +96,8 @@ def sua(thuoc_id):
         db.session.commit()
         flash(f'Đã cập nhật "{thuoc.ten_biet_duoc}".', "success")
         return redirect(url_for("admin_dmt.danh_sach"))
-    return render_template("admin/danh_muc_thuoc/form.html", form=form, tieu_de="Sửa thuốc — Danh mục thuốc", thuoc=thuoc)
+    return render_template("admin/danh_muc_thuoc/form.html", form=form,
+                           tieu_de="Sửa thuốc — Danh mục thuốc", thuoc=thuoc)
 
 
 @bp.route("/<int:thuoc_id>/xoa", methods=["POST"])

@@ -203,3 +203,29 @@ class ThongTinBenhNhan(db.Model):
     danh_muc = db.Column(db.String(150))               # vd: dùng thuốc tại nhà, dinh dưỡng...
     noi_dung = db.Column(db.Text, nullable=False)
     ngay_dang = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class CaiDat(db.Model):
+    """Lưu cài đặt hệ thống dạng key-value, dùng cho trang Về chúng tôi và các nội dung tĩnh."""
+    __tablename__ = "cai_dat"
+
+    id = db.Column(db.Integer, primary_key=True)
+    khoa = db.Column(db.String(100), unique=True, nullable=False, index=True)
+    gia_tri = db.Column(db.Text)
+    ngay_cap_nhat = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @classmethod
+    def lay(cls, khoa: str, mac_dinh: str = "") -> str:
+        """Lấy giá trị theo key, trả về mac_dinh nếu chưa có."""
+        obj = cls.query.filter_by(khoa=khoa).first()
+        return obj.gia_tri if obj and obj.gia_tri else mac_dinh
+
+    @classmethod
+    def dat(cls, khoa: str, gia_tri: str):
+        """Ghi hoặc cập nhật một key."""
+        obj = cls.query.filter_by(khoa=khoa).first()
+        if obj:
+            obj.gia_tri = gia_tri
+        else:
+            obj = cls(khoa=khoa, gia_tri=gia_tri)
+            db.session.add(obj)
