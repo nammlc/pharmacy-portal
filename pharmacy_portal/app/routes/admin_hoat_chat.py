@@ -11,11 +11,15 @@ bp = Blueprint("admin_hoat_chat", __name__, url_prefix="/admin/hoat-chat")
 @login_required
 def danh_sach():
     tu_khoa = request.args.get("q", "").strip()
+    trang = request.args.get("trang", 1, type=int)
     query = HoatChat.query
     if tu_khoa:
         query = query.filter(HoatChat.ten_hoat_chat.ilike(f"%{tu_khoa}%"))
-    danh_sach_hc = query.order_by(HoatChat.ten_hoat_chat).all()
-    return render_template("admin/hoat_chat/danh_sach.html", danh_sach_hc=danh_sach_hc, tu_khoa=tu_khoa)
+    phan_trang = query.order_by(HoatChat.ten_hoat_chat).paginate(page=trang, per_page=10, error_out=False)
+    return render_template("admin/hoat_chat/danh_sach.html",
+                           danh_sach_hc=phan_trang.items,
+                           phan_trang=phan_trang,
+                           tu_khoa=tu_khoa)
 
 
 @bp.route("/them", methods=["GET", "POST"])

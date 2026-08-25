@@ -11,8 +11,13 @@ bp = Blueprint("admin_ttbn", __name__, url_prefix="/admin/thong-tin-benh-nhan")
 @bp.route("/")
 @login_required
 def danh_sach():
-    items = ThongTinBenhNhan.query.order_by(ThongTinBenhNhan.ngay_dang.desc()).all()
-    return render_template("admin/benh_nhan/danh_sach.html", items=items)
+    from flask import request as req
+    trang = req.args.get("trang", 1, type=int)
+    phan_trang = (ThongTinBenhNhan.query
+                  .order_by(ThongTinBenhNhan.ngay_dang.desc())
+                  .paginate(page=trang, per_page=10, error_out=False))
+    return render_template("admin/benh_nhan/danh_sach.html",
+                           items=phan_trang.items, phan_trang=phan_trang)
 
 
 @bp.route("/them", methods=["GET", "POST"])

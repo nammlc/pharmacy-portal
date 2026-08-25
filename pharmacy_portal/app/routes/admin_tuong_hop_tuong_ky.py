@@ -17,8 +17,11 @@ def _gan_lua_chon_thuoc(form):
 @bp.route("/")
 @login_required
 def danh_sach():
-    items = TuongHopTuongKy.query.all()
-    return render_template("admin/tuong_hop_tuong_ky/danh_sach.html", items=items)
+    from flask import request as req
+    trang = req.args.get("trang", 1, type=int)
+    phan_trang = TuongHopTuongKy.query.paginate(page=trang, per_page=10, error_out=False)
+    return render_template("admin/tuong_hop_tuong_ky/danh_sach.html",
+                           items=phan_trang.items, phan_trang=phan_trang)
 
 
 @bp.route("/them", methods=["GET", "POST"])

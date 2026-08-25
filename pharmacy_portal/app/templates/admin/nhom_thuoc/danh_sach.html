@@ -1,42 +1,63 @@
 {% extends "admin/base.html" %}
+{% from "admin/_phan_trang.html" import render as pt %}
 {% block title %}Nhóm thuốc{% endblock %}
-
 {% block admin_content %}
 <div class="admin-page-head">
-  <h1>Nhóm thuốc</h1>
-  <a href="{{ url_for('admin_nhom_thuoc.them') }}" class="btn btn-primary">+ Thêm nhóm thuốc</a>
+  <div>
+    <h1>Nhóm thuốc</h1>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">{{ phan_trang.total }} nhóm</p>
+  </div>
+  <a href="{{ url_for('admin_nhom_thuoc.them') }}" class="btn btn-primary">+ Thêm nhóm</a>
 </div>
 
 {% if danh_sach_nhom %}
-<table class="result-table">
-  <thead>
-    <tr><th>Tên nhóm</th><th>Dùng cho</th><th>Thứ tự</th><th></th></tr>
-  </thead>
-  <tbody>
-    {% for n in danh_sach_nhom %}
-    <tr>
-      <td><strong>{{ n.ten_nhom }}</strong></td>
-      <td>
-        {% if n.loai == 'nha_thuoc_bv' %}
-        <span class="badge-level badge-chua_xac_dinh">Nhà thuốc BV</span>
-        {% else %}
-        <span class="badge-level badge-tuong_hop">Danh mục thuốc</span>
-        {% endif %}
-      </td>
-      <td>{{ n.thu_tu }}</td>
-      <td>
-        <div class="table-actions">
-          <a class="btn btn-outline btn-sm" href="{{ url_for('admin_nhom_thuoc.sua', nhom_id=n.id) }}">Sửa</a>
-          <form method="POST" action="{{ url_for('admin_nhom_thuoc.xoa', nhom_id=n.id) }}" onsubmit="return confirm('Xoá nhóm thuốc này?');">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="btn btn-danger btn-sm">Xoá</button>
-          </form>
-        </div>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="adm-table-wrap">
+  <table class="adm-table">
+    <thead>
+      <tr>
+        <th style="width:40px;">#</th>
+        <th style="width:42px;"></th>
+        <th>Tên nhóm</th>
+        <th>Loại</th>
+        <th>Thứ tự</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for n in danh_sach_nhom %}
+      <tr>
+        <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
+        <td>
+          {% if n.hinh_anh %}
+          <img src="{{ n.hinh_anh }}" class="adm-thumb" alt="">
+          {% else %}
+          <span class="adm-thumb-placeholder">📂</span>
+          {% endif %}
+        </td>
+        <td><strong>{{ n.ten_nhom }}</strong></td>
+        <td>
+          {% if n.loai == 'danh_muc_thuoc' %}
+          <span class="adm-badge">Danh mục thuốc</span>
+          {% else %}
+          <span class="adm-badge adm-badge-alt">Nhà thuốc BV</span>
+          {% endif %}
+        </td>
+        <td style="color:var(--text-muted);">{{ n.thu_tu or 0 }}</td>
+        <td class="td-actions">
+          <div class="row-act">
+            <a href="{{ url_for('admin_nhom_thuoc.sua', nhom_id=n.id) }}">Sửa</a>
+            <form method="POST" action="{{ url_for('admin_nhom_thuoc.xoa', nhom_id=n.id) }}" onsubmit="return confirm('Xoá nhóm này?');" style="display:contents;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="act-del">Xoá</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{{ pt(phan_trang, 'admin_nhom_thuoc.danh_sach') }}
 {% else %}
 <div class="admin-empty">Chưa có nhóm thuốc nào.</div>
 {% endif %}

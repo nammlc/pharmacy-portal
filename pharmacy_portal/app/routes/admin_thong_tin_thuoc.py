@@ -15,8 +15,13 @@ def _gan_lua_chon_thuoc(form):
 @bp.route("/")
 @login_required
 def danh_sach():
-    items = ThongTinThuoc.query.join(Thuoc).order_by(Thuoc.ten_thuoc).all()
-    return render_template("admin/thong_tin_thuoc/danh_sach.html", items=items)
+    from flask import request as req
+    trang = req.args.get("trang", 1, type=int)
+    phan_trang = (ThongTinThuoc.query.join(Thuoc)
+                  .order_by(Thuoc.ten_thuoc)
+                  .paginate(page=trang, per_page=10, error_out=False))
+    return render_template("admin/thong_tin_thuoc/danh_sach.html",
+                           items=phan_trang.items, phan_trang=phan_trang)
 
 
 @bp.route("/them", methods=["GET", "POST"])

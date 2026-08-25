@@ -22,11 +22,15 @@ def _nap_lua_chon(form):
 @login_required
 def danh_sach():
     tu_khoa = request.args.get("q", "").strip()
+    trang = request.args.get("trang", 1, type=int)
     query = NhaThuocBV.query
     if tu_khoa:
         query = query.filter(NhaThuocBV.ten_biet_duoc.ilike(f"%{tu_khoa}%"))
-    ds = query.order_by(NhaThuocBV.ten_biet_duoc).all()
-    return render_template("admin/nha_thuoc_bv/danh_sach.html", danh_sach_thuoc=ds, tu_khoa=tu_khoa)
+    phan_trang = query.order_by(NhaThuocBV.ten_biet_duoc).paginate(page=trang, per_page=10, error_out=False)
+    return render_template("admin/nha_thuoc_bv/danh_sach.html",
+                           danh_sach_thuoc=phan_trang.items,
+                           phan_trang=phan_trang,
+                           tu_khoa=tu_khoa)
 
 
 @bp.route("/them", methods=["GET", "POST"])

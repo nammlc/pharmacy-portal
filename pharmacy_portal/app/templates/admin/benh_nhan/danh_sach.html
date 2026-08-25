@@ -1,33 +1,42 @@
 {% extends "admin/base.html" %}
+{% from "admin/_phan_trang.html" import render as pt %}
 {% block title %}Bài viết bệnh nhân{% endblock %}
-
 {% block admin_content %}
 <div class="admin-page-head">
-  <h1>Bài viết cho bệnh nhân</h1>
+  <div>
+    <h1>Bài viết bệnh nhân</h1>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">{{ phan_trang.total }} bài viết</p>
+  </div>
   <a href="{{ url_for('admin_ttbn.them') }}" class="btn btn-primary">+ Thêm bài viết</a>
 </div>
-
 {% if items %}
-<table class="result-table">
-  <thead><tr><th>Tiêu đề</th><th>Danh mục</th><th></th></tr></thead>
-  <tbody>
-    {% for item in items %}
-    <tr>
-      <td><strong>{{ item.tieu_de }}</strong></td>
-      <td>{{ item.danh_muc or '—' }}</td>
-      <td>
-        <div class="table-actions">
-          <a class="btn btn-outline btn-sm" href="{{ url_for('admin_ttbn.sua', item_id=item.id) }}">Sửa</a>
-          <form method="POST" action="{{ url_for('admin_ttbn.xoa', item_id=item.id) }}" onsubmit="return confirm('Xoá bài viết này?');">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="btn btn-danger btn-sm">Xoá</button>
-          </form>
-        </div>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="adm-table-wrap">
+  <table class="adm-table">
+    <thead>
+      <tr><th style="width:40px;">#</th><th>Tiêu đề</th><th>Danh mục</th><th>Ngày đăng</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
+        <td><strong>{{ item.tieu_de }}</strong></td>
+        <td>{% if item.danh_muc %}<span class="adm-badge">{{ item.danh_muc }}</span>{% else %}—{% endif %}</td>
+        <td style="color:var(--text-muted);white-space:nowrap;">{{ item.ngay_dang.strftime('%d/%m/%Y') if item.ngay_dang else '—' }}</td>
+        <td class="td-actions">
+          <div class="row-act">
+            <a href="{{ url_for('admin_ttbn.sua', item_id=item.id) }}">Sửa</a>
+            <form method="POST" action="{{ url_for('admin_ttbn.xoa', item_id=item.id) }}" onsubmit="return confirm('Xoá bài viết này?');" style="display:contents;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="act-del">Xoá</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{{ pt(phan_trang, 'admin_ttbn.danh_sach') }}
 {% else %}
 <div class="admin-empty">Chưa có bài viết nào.</div>
 {% endif %}

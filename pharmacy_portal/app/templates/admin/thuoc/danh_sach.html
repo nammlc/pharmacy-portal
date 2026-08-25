@@ -1,43 +1,66 @@
 {% extends "admin/base.html" %}
-{% block title %}Thuốc (dữ liệu tra cứu){% endblock %}
-
+{% from "admin/_phan_trang.html" import render as pt %}
+{% block title %}Thuốc tra cứu{% endblock %}
 {% block admin_content %}
 <div class="admin-page-head">
-  <h1>Thuốc (dữ liệu tra cứu)</h1>
+  <div>
+    <h1>Thuốc (dữ liệu tra cứu)</h1>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">{{ phan_trang.total }} thuốc</p>
+  </div>
   <a href="{{ url_for('admin_thuoc.them') }}" class="btn btn-primary">+ Thêm thuốc</a>
 </div>
 
-<form method="get" class="search-form" style="margin-bottom:18px; padding:0;">
+<form method="get" class="adm-search-row">
   <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm theo tên thuốc...">
-  <button type="submit" class="btn btn-outline">Tìm</button>
+  <button type="submit" class="btn btn-outline btn-sm">Tìm</button>
+  {% if tu_khoa %}<a href="{{ url_for('admin_thuoc.danh_sach') }}" class="btn btn-outline btn-sm">✕ Xoá</a>{% endif %}
 </form>
 
 {% if danh_sach_thuoc %}
-<table class="result-table">
-  <thead>
-    <tr><th>Tên thuốc</th><th>Hoạt chất</th><th>Hàm lượng</th><th>Dạng bào chế</th><th></th></tr>
-  </thead>
-  <tbody>
-    {% for t in danh_sach_thuoc %}
-    <tr>
-      <td><strong>{{ t.ten_thuoc }}</strong></td>
-      <td>{{ t.hoat_chat or '—' }}</td>
-      <td>{{ t.ham_luong or '—' }}</td>
-      <td>{{ t.dang_bao_che or '—' }}</td>
-      <td>
-        <div class="table-actions">
-          <a class="btn btn-outline btn-sm" href="{{ url_for('admin_thuoc.sua', thuoc_id=t.id) }}">Sửa</a>
-          <form method="POST" action="{{ url_for('admin_thuoc.xoa', thuoc_id=t.id) }}" onsubmit="return confirm('Xoá thuốc này? Toàn bộ dữ liệu tương tác/tương kỵ/tiêm truyền liên quan cũng sẽ bị xoá.');">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="btn btn-danger btn-sm">Xoá</button>
-          </form>
-        </div>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="adm-table-wrap">
+  <table class="adm-table">
+    <thead>
+      <tr>
+        <th style="width:40px;">#</th>
+        <th style="width:42px;"></th>
+        <th>Tên thuốc</th>
+        <th>Hoạt chất</th>
+        <th>Hàm lượng</th>
+        <th>Dạng BC</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in danh_sach_thuoc %}
+      <tr>
+        <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
+        <td>
+          {% if t.hinh_anh %}
+          <img src="{{ t.hinh_anh }}" class="adm-thumb" alt="">
+          {% else %}
+          <span class="adm-thumb-placeholder">🔬</span>
+          {% endif %}
+        </td>
+        <td><strong>{{ t.ten_thuoc }}</strong></td>
+        <td style="color:var(--text-muted);">{{ t.hoat_chat or '—' }}</td>
+        <td style="color:var(--text-muted);">{{ t.ham_luong or '—' }}</td>
+        <td style="color:var(--text-muted);">{{ t.dang_bao_che or '—' }}</td>
+        <td class="td-actions">
+          <div class="row-act">
+            <a href="{{ url_for('admin_thuoc.sua', thuoc_id=t.id) }}">Sửa</a>
+            <form method="POST" action="{{ url_for('admin_thuoc.xoa', thuoc_id=t.id) }}" onsubmit="return confirm('Xoá thuốc này và toàn bộ dữ liệu liên quan?');" style="display:contents;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="act-del">Xoá</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{{ pt(phan_trang, 'admin_thuoc.danh_sach', q=tu_khoa) }}
 {% else %}
-<div class="admin-empty">Chưa có thuốc nào{% if tu_khoa %} khớp với "{{ tu_khoa }}"{% endif %}.</div>
+<div class="admin-empty">Không có thuốc nào{% if tu_khoa %} khớp với "{{ tu_khoa }}"{% endif %}.</div>
 {% endif %}
 {% endblock %}

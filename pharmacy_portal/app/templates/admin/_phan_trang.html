@@ -1,0 +1,32 @@
+{% macro render(phan_trang, endpoint, **kwargs) %}
+{% if phan_trang and phan_trang.pages > 1 %}
+<div class="adm-pt">
+  <span class="adm-pt-info">{{ phan_trang.total }} mục · trang {{ phan_trang.page }}/{{ phan_trang.pages }}</span>
+  <div class="adm-pt-btns">
+    {% if phan_trang.has_prev %}
+    <a href="{{ url_for(endpoint, trang=phan_trang.prev_num, **kwargs) }}" class="adm-pt-btn">‹</a>
+    {% else %}
+    <span class="adm-pt-btn adm-pt-dis">‹</span>
+    {% endif %}
+
+    {% for p in phan_trang.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=1) %}
+      {% if p %}
+        {% if p == phan_trang.page %}
+        <span class="adm-pt-btn adm-pt-cur">{{ p }}</span>
+        {% else %}
+        <a href="{{ url_for(endpoint, trang=p, **kwargs) }}" class="adm-pt-btn">{{ p }}</a>
+        {% endif %}
+      {% else %}
+      <span class="adm-pt-ell">…</span>
+      {% endif %}
+    {% endfor %}
+
+    {% if phan_trang.has_next %}
+    <a href="{{ url_for(endpoint, trang=phan_trang.next_num, **kwargs) }}" class="adm-pt-btn">›</a>
+    {% else %}
+    <span class="adm-pt-btn adm-pt-dis">›</span>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endmacro %}
