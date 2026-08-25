@@ -3,6 +3,7 @@ from flask_login import login_required
 from app import db
 from app.models.models import DanhMucThuoc, NhomThuoc, HoatChat
 from app.forms import DanhMucThuocForm, _tuy_chon_rong
+from app.utils.lam_sach_html import lam_sach_html
 from app.utils.upload_anh import upload_anh_danh_muc_thuoc, xoa_anh_cloudinary
 
 bp = Blueprint("admin_dmt", __name__, url_prefix="/admin/danh-muc-thuoc")
@@ -37,6 +38,10 @@ def them():
     if form.validate_on_submit():
         thuoc = DanhMucThuoc()
         form.populate_obj(thuoc)
+        thuoc.thanh_phan = lam_sach_html(thuoc.thanh_phan)
+        thuoc.chi_dinh = lam_sach_html(thuoc.chi_dinh)
+        thuoc.chong_chi_dinh = lam_sach_html(thuoc.chong_chi_dinh)
+        thuoc.cach_dung_lieu_dung = lam_sach_html(thuoc.cach_dung_lieu_dung)
         thuoc.nhom_thuoc_id = form.nhom_thuoc_id.data or None
         thuoc.hoat_chat_id = form.hoat_chat_id.data or None
         db.session.add(thuoc)
@@ -68,19 +73,29 @@ def sua(thuoc_id):
         form.hoat_chat_id.data = thuoc.hoat_chat_id or 0
     if form.validate_on_submit():
         form.populate_obj(thuoc)
+        thuoc.thanh_phan = lam_sach_html(thuoc.thanh_phan)
+        thuoc.chi_dinh = lam_sach_html(thuoc.chi_dinh)
+        thuoc.chong_chi_dinh = lam_sach_html(thuoc.chong_chi_dinh)
+        thuoc.cach_dung_lieu_dung = lam_sach_html(thuoc.cach_dung_lieu_dung)
         thuoc.nhom_thuoc_id = form.nhom_thuoc_id.data or None
         thuoc.hoat_chat_id = form.hoat_chat_id.data or None
 
+        # --- Xử lý ảnh: ảnh mới luôn được ưu tiên, tự xoá ảnh cũ trên
+        # Cloudinary trước khi thay để tránh rác. Checkbox "xoá ảnh" chỉ
+        # có tác dụng khi KHÔNG có ảnh mới đi kèm.
         file_anh = request.files.get("file_anh")
+        anh_moi_url = None
         if file_anh and file_anh.filename:
             try:
-                url = upload_anh_danh_muc_thuoc(file_anh, public_id=f"dmt_{thuoc.id}")
-                if url:
-                    thuoc.hinh_anh = url
+                anh_moi_url = upload_anh_danh_muc_thuoc(file_anh, public_id=f"dmt_{thuoc.id}")
             except ValueError as e:
                 flash(str(e), "warning")
 
-        if request.form.get("xoa_anh") and thuoc.hinh_anh:
+        if anh_moi_url:
+            if thuoc.hinh_anh and thuoc.hinh_anh != anh_moi_url:
+                xoa_anh_cloudinary(thuoc.hinh_anh)
+            thuoc.hinh_anh = anh_moi_url
+        elif request.form.get("xoa_anh") and thuoc.hinh_anh:
             xoa_anh_cloudinary(thuoc.hinh_anh)
             thuoc.hinh_anh = None
 

@@ -56,18 +56,22 @@ def sua(nhom_id):
         nhom.loai = form.loai.data
         nhom.thu_tu = _so_nguyen(form.thu_tu.data)
 
-        # Xử lý upload ảnh mới
+        # --- Xử lý ảnh: ảnh mới luôn được ưu tiên, tự xoá ảnh cũ trên
+        # Cloudinary trước khi thay để tránh rác. Checkbox "xoá ảnh" chỉ
+        # có tác dụng khi KHÔNG có ảnh mới đi kèm.
         file_anh = request.files.get("file_anh")
+        anh_moi_url = None
         if file_anh and file_anh.filename:
             try:
-                url = upload_anh_nhom_thuoc(file_anh, public_id=f"nhom_{nhom.id}")
-                if url:
-                    nhom.hinh_anh = url
+                anh_moi_url = upload_anh_nhom_thuoc(file_anh, public_id=f"nhom_{nhom.id}")
             except ValueError as e:
                 flash(str(e), "warning")
 
-        # Xoá ảnh nếu người dùng tích vào checkbox "xoá ảnh"
-        if request.form.get("xoa_anh") and nhom.hinh_anh:
+        if anh_moi_url:
+            if nhom.hinh_anh and nhom.hinh_anh != anh_moi_url:
+                xoa_anh_cloudinary(nhom.hinh_anh)
+            nhom.hinh_anh = anh_moi_url
+        elif request.form.get("xoa_anh") and nhom.hinh_anh:
             xoa_anh_cloudinary(nhom.hinh_anh)
             nhom.hinh_anh = None
 

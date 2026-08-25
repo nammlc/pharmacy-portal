@@ -33,8 +33,8 @@
         <td>{{ item.thuoc_a.ten_thuoc }}</td>
         <td>{{ item.thuoc_b.ten_thuoc }}</td>
         <td><span class="badge-level badge-{{ item.muc_do }}">{{ item.muc_do.replace('_', ' ') }}</span></td>
-        <td>{{ item.hau_qua_lam_sang or '—' }}</td>
-        <td>{{ item.xu_tri or '—' }}</td>
+        <td class="rich-content">{{ (item.hau_qua_lam_sang | safe) if item.hau_qua_lam_sang else '—' }}</td>
+        <td class="rich-content">{{ (item.xu_tri | safe) if item.xu_tri else '—' }}</td>
       </tr>
       {% endfor %}
     </tbody>

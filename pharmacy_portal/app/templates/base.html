@@ -40,6 +40,7 @@
         <a href="{{ url_for('ttt.index') }}" class="{{ 'active' if request.blueprint == 'ttt' }}">Tương tác thuốc</a>
         <a href="{{ url_for('ttth.index') }}" class="{{ 'active' if request.blueprint == 'ttth' }}">Thông tin thuốc</a>
         <a href="{{ url_for('ttbn.index') }}" class="{{ 'active' if request.blueprint == 'ttbn' }}">Thông tin bệnh nhân</a>
+        <a href="{{ url_for('main.ve_chung_toi') }}" class="{{ 'active' if request.endpoint == 'main.ve_chung_toi' }}">Về chúng tôi</a>
       </nav>
     </div>
   </div>

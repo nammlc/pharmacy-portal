@@ -3,6 +3,7 @@ from flask_login import login_required
 from app import db
 from app.models.models import ThuocTiemTruyen, Thuoc
 from app.forms import ThuocTiemTruyenForm
+from app.utils.lam_sach_html import lam_sach_html
 
 bp = Blueprint("admin_tttt", __name__, url_prefix="/admin/thuoc-tiem-truyen")
 
@@ -26,6 +27,7 @@ def them():
     if form.validate_on_submit():
         item = ThuocTiemTruyen()
         form.populate_obj(item)
+        item.canh_bao = lam_sach_html(item.canh_bao)
         db.session.add(item)
         db.session.commit()
         flash("Đã thêm thông tin tiêm truyền.", "success")
@@ -41,6 +43,7 @@ def sua(item_id):
     _gan_lua_chon_thuoc(form)
     if form.validate_on_submit():
         form.populate_obj(item)
+        item.canh_bao = lam_sach_html(item.canh_bao)
         db.session.commit()
         flash("Đã cập nhật.", "success")
         return redirect(url_for("admin_tttt.danh_sach"))

@@ -34,7 +34,7 @@
         <td>{{ item.dung_moi_pha_loang or '—' }}</td>
         <td>{{ item.toc_do_truyen or '—' }}</td>
         <td>{{ item.do_on_dinh or '—' }}</td>
-        <td>{{ item.canh_bao or '—' }}</td>
+        <td class="rich-content">{{ (item.canh_bao | safe) if item.canh_bao else '—' }}</td>
       </tr>
       {% endfor %}
     </tbody>

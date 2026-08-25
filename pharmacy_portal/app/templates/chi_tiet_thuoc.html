@@ -15,12 +15,12 @@
       <tr><td style="color:var(--text-muted);">Nhóm dược lý</td><td>{{ thuoc.nhom_thuoc or '—' }}</td></tr>
       <tr><td style="color:var(--text-muted);">Nhà sản xuất</td><td>{{ thuoc.nha_san_xuat or '—' }}</td></tr>
       {% if thuoc.thong_tin_chi_tiet %}
-      <tr><td style="color:var(--text-muted);">Chỉ định</td><td>{{ thuoc.thong_tin_chi_tiet.chi_dinh or '—' }}</td></tr>
-      <tr><td style="color:var(--text-muted);">Chống chỉ định</td><td>{{ thuoc.thong_tin_chi_tiet.chong_chi_dinh or '—' }}</td></tr>
-      <tr><td style="color:var(--text-muted);">Liều người lớn</td><td>{{ thuoc.thong_tin_chi_tiet.lieu_dung_nguoi_lon or '—' }}</td></tr>
-      <tr><td style="color:var(--text-muted);">Liều trẻ em</td><td>{{ thuoc.thong_tin_chi_tiet.lieu_dung_tre_em or '—' }}</td></tr>
-      <tr><td style="color:var(--text-muted);">Tác dụng phụ</td><td>{{ thuoc.thong_tin_chi_tiet.tac_dung_phu or '—' }}</td></tr>
-      <tr><td style="color:var(--text-muted);">Thận trọng</td><td>{{ thuoc.thong_tin_chi_tiet.than_trong or '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Chỉ định</td><td class="rich-content">{{ (thuoc.thong_tin_chi_tiet.chi_dinh | safe) if thuoc.thong_tin_chi_tiet.chi_dinh else '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Chống chỉ định</td><td class="rich-content">{{ (thuoc.thong_tin_chi_tiet.chong_chi_dinh | safe) if thuoc.thong_tin_chi_tiet.chong_chi_dinh else '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Liều người lớn</td><td class="rich-content">{{ (thuoc.thong_tin_chi_tiet.lieu_dung_nguoi_lon | safe) if thuoc.thong_tin_chi_tiet.lieu_dung_nguoi_lon else '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Liều trẻ em</td><td class="rich-content">{{ (thuoc.thong_tin_chi_tiet.lieu_dung_tre_em | safe) if thuoc.thong_tin_chi_tiet.lieu_dung_tre_em else '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Tác dụng phụ</td><td class="rich-content">{{ (thuoc.thong_tin_chi_tiet.tac_dung_phu | safe) if thuoc.thong_tin_chi_tiet.tac_dung_phu else '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Thận trọng</td><td class="rich-content">{{ (thuoc.thong_tin_chi_tiet.than_trong | safe) if thuoc.thong_tin_chi_tiet.than_trong else '—' }}</td></tr>
       {% endif %}
     </tbody>
   </table>

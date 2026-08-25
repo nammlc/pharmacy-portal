@@ -107,3 +107,46 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+/* ============================================================
+   ADMIN PANEL — trình soạn thảo văn bản kiểu Word (Quill)
+   Tự động gắn vào mọi TextAreaField được đánh dấu [data-rich-editor]
+   (xem app/templates/admin/_macros.html)
+   ============================================================ */
+document.addEventListener("DOMContentLoaded", function () {
+  if (typeof Quill === "undefined") return;
+
+  document.querySelectorAll("[data-rich-editor]").forEach(function (wrap) {
+    var targetId = wrap.getAttribute("data-target");
+    var textarea = targetId ? document.getElementById(targetId) : null;
+    var editorEl = wrap.querySelector(".quill-editor");
+    if (!textarea || !editorEl) return;
+
+    var quill = new Quill(editorEl, {
+      theme: "snow",
+      placeholder: textarea.getAttribute("placeholder") || "",
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, 3, false] }],
+          ["bold", "italic", "underline", "strike"],
+          ["blockquote"],
+          [{ list: "ordered" }, { list: "bullet" }],
+          ["link"],
+          ["clean"],
+        ],
+      },
+    });
+
+    // Nạp nội dung có sẵn khi sửa (textarea đang giữ HTML đã lưu)
+    if (textarea.value) {
+      quill.clipboard.dangerouslyPasteHTML(textarea.value);
+    }
+
+    // Đồng bộ nội dung Quill -> textarea ẩn mỗi khi gõ, để khi submit
+    // form (POST bình thường) textarea gửi đúng HTML mới nhất
+    quill.on("text-change", function () {
+      var html = quill.root.innerHTML;
+      textarea.value = html === "<p><br></p>" ? "" : html;
+    });
+  });
+});

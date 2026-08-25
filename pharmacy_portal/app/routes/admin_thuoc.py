@@ -65,18 +65,22 @@ def sua(thuoc_id):
         thuoc.nha_san_xuat = form.nha_san_xuat.data
         thuoc.so_dang_ky = form.so_dang_ky.data
 
-        # Xử lý upload ảnh mới
+        # --- Xử lý ảnh: ảnh mới luôn được ưu tiên, tự xoá ảnh cũ trên
+        # Cloudinary trước khi thay để tránh rác. Checkbox "xoá ảnh" chỉ
+        # có tác dụng khi KHÔNG có ảnh mới đi kèm.
         file_anh = request.files.get("file_anh")
+        anh_moi_url = None
         if file_anh and file_anh.filename:
             try:
-                url = upload_anh_thuoc(file_anh, public_id=f"thuoc_{thuoc.id}")
-                if url:
-                    thuoc.hinh_anh = url
+                anh_moi_url = upload_anh_thuoc(file_anh, public_id=f"thuoc_{thuoc.id}")
             except ValueError as e:
                 flash(str(e), "warning")
 
-        # Xoá ảnh nếu người dùng tích vào checkbox "xoá ảnh"
-        if request.form.get("xoa_anh") and thuoc.hinh_anh:
+        if anh_moi_url:
+            if thuoc.hinh_anh and thuoc.hinh_anh != anh_moi_url:
+                xoa_anh_cloudinary(thuoc.hinh_anh)
+            thuoc.hinh_anh = anh_moi_url
+        elif request.form.get("xoa_anh") and thuoc.hinh_anh:
             xoa_anh_cloudinary(thuoc.hinh_anh)
             thuoc.hinh_anh = None
 

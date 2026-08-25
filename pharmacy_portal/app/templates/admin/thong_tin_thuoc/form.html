@@ -2,17 +2,14 @@
 {% block title %}{{ tieu_de }}{% endblock %}
 
 {% block admin_content %}
+{% from "admin/_macros.html" import render_field %}
 <div class="admin-page-head"><h1>{{ tieu_de }}</h1></div>
 
 <div class="admin-form-card">
   <form method="POST" novalidate>
     {{ form.hidden_tag() }}
     {% for field in [form.thuoc_id, form.chi_dinh, form.chong_chi_dinh, form.lieu_dung_nguoi_lon, form.lieu_dung_tre_em, form.tac_dung_phu, form.than_trong, form.phu_nu_co_thai_cho_con_bu, form.nguon_tham_khao] %}
-    <div class="form-row">
-      {{ field.label }}
-      {{ field() }}
-      {% for e in field.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
-    </div>
+      {{ render_field(field) }}
     {% endfor %}
     <div class="form-actions">
       {{ form.submit(class="btn btn-primary") }}

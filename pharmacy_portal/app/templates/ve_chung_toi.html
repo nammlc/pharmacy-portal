@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Về chúng tôi{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">Khoa Dược &middot; BVĐK Tâm Đức Cầu Quan</div>
+  <h1>Về chúng tôi</h1>
+  <p>Cổng tra cứu dược được Khoa Dược xây dựng và duy trì để tra cứu thông tin thuốc nhanh, chính xác, phục vụ công tác chuyên môn trong bệnh viện.</p>
+</div>
+
+<div class="results-panel" style="display:flex; flex-direction:column; gap:20px;">
+
+  <div style="background:var(--paper-50); border:1px solid var(--line-200); border-radius:var(--radius-md); padding:26px; max-width:760px;">
+    <h2 style="font-family:var(--font-display); font-size:17px; margin:0 0 10px;">Khoa Dược</h2>
+    <p style="color:var(--text-muted); margin:0; line-height:1.6;">
+      Bệnh viện Đa khoa Tâm Đức Cầu Quan. Dữ liệu trên cổng thông tin chỉ dùng tham khảo nội bộ,
+      luôn đối chiếu với dược thư và quy trình chuyên môn hiện hành trước khi áp dụng lâm sàng.
+    </p>
+  </div>
+
+  <div style="background:var(--paper-50); border:1px solid var(--line-200); border-radius:var(--radius-md); padding:26px; max-width:760px;">
+    <h2 style="font-family:var(--font-display); font-size:17px; margin:0 0 16px;">Liên hệ</h2>
+
+    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+      <div style="width:56px; height:56px; border-radius:50%; background:linear-gradient(145deg, var(--navy-600), var(--sky-400)); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:800; font-size:20px; flex-shrink:0;">
+        TVT
+      </div>
+      <div>
+        <div style="font-weight:700; font-size:15.5px; color:var(--ink-900);">Ds. Tống Văn Tuấn</div>
+        <div style="color:var(--text-muted); font-size:13.5px; margin-top:2px;">Trưởng khoa Dược</div>
+      </div>
+    </div>
+
+    <div style="margin-top:18px; padding-top:18px; border-top:1px solid var(--line-100); display:flex; flex-direction:column; gap:10px;">
+      <a href="tel:0977755119" style="display:flex; align-items:center; gap:10px; color:var(--ink-900); font-weight:600; font-size:14.5px;">
+        <span style="width:34px; height:34px; border-radius:var(--radius-sm); background:var(--paper-0); display:flex; align-items:center; justify-content:center; flex-shrink:0;">&#128222;</span>
+        0977 755 119
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

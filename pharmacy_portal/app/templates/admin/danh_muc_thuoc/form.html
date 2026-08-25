@@ -2,6 +2,7 @@
 {% block title %}{{ tieu_de }}{% endblock %}
 
 {% block admin_content %}
+{% from "admin/_macros.html" import render_field %}
 <div class="admin-page-head"><h1>{{ tieu_de }}</h1></div>
 
 <div class="admin-form-card">
@@ -27,11 +28,7 @@
     </div>
 
     {% for field in [form.thanh_phan, form.chi_dinh, form.chong_chi_dinh, form.cach_dung_lieu_dung] %}
-    <div class="form-row">
-      {{ field.label }}
-      {{ field() }}
-      {% for e in field.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
-    </div>
+      {{ render_field(field) }}
     {% endfor %}
 
     <div class="form-row">
@@ -81,16 +78,23 @@
 
 <script>
   (function () {
-    const input = document.querySelector('input[name="file_anh"]');
-    const wrap  = document.getElementById('preview-wrap');
-    const img   = document.getElementById('preview-img');
+    const input    = document.querySelector('input[name="file_anh"]');
+    const wrap     = document.getElementById('preview-wrap');
+    const img      = document.getElementById('preview-img');
+    const xoaAnh   = document.querySelector('input[name="xoa_anh"]');
     if (!input) return;
     input.addEventListener('change', function () {
       const file = this.files[0];
-      if (!file) { wrap.style.display = 'none'; return; }
+      if (!file) {
+        wrap.style.display = 'none';
+        if (xoaAnh) xoaAnh.disabled = false;
+        return;
+      }
       const reader = new FileReader();
       reader.onload = e => { img.src = e.target.result; wrap.style.display = 'block'; };
       reader.readAsDataURL(file);
+      // Đã chọn ảnh mới -> ảnh mới sẽ tự thay ảnh cũ, không cần tích "xoá ảnh" nữa
+      if (xoaAnh) { xoaAnh.checked = false; xoaAnh.disabled = true; }
     });
   })();
 </script>

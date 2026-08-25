@@ -18,10 +18,10 @@
 
   <table class="result-table" style="flex:1; min-width:280px;">
     <tbody>
-      <tr><td style="width:180px; color:var(--text-muted);">Thành phần</td><td>{{ thuoc.thanh_phan or '—' }}</td></tr>
-      <tr><td style="color:var(--text-muted);">Chỉ định</td><td>{{ thuoc.chi_dinh or '—' }}</td></tr>
-      <tr><td style="color:var(--text-muted);">Cách dùng, liều dùng</td><td>{{ thuoc.cach_dung_lieu_dung or '—' }}</td></tr>
-      <tr><td style="color:var(--text-muted);">Chống chỉ định</td><td>{{ thuoc.chong_chi_dinh or '—' }}</td></tr>
+      <tr><td style="width:180px; color:var(--text-muted);">Thành phần</td><td class="rich-content">{{ (thuoc.thanh_phan | safe) if thuoc.thanh_phan else '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Chỉ định</td><td class="rich-content">{{ (thuoc.chi_dinh | safe) if thuoc.chi_dinh else '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Cách dùng, liều dùng</td><td class="rich-content">{{ (thuoc.cach_dung_lieu_dung | safe) if thuoc.cach_dung_lieu_dung else '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Chống chỉ định</td><td class="rich-content">{{ (thuoc.chong_chi_dinh | safe) if thuoc.chong_chi_dinh else '—' }}</td></tr>
       {% if thuoc.link_chi_tiet %}
       <tr><td style="color:var(--text-muted);">Nguồn tham khảo</td><td><a href="{{ thuoc.link_chi_tiet | chuan_hoa_url }}" target="_blank" rel="noopener" style="color:var(--sage-500);">{{ thuoc.link_chi_tiet }}</a></td></tr>
       {% endif %}

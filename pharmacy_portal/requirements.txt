@@ -8,3 +8,4 @@ python-dotenv==1.0.1
 gunicorn==22.0.0
 cloudinary==1.40.0
 psycopg2-binary==2.9.10
+bleach==6.1.0

@@ -60,16 +60,23 @@
 
 <script>
   (function () {
-    const input = document.querySelector('input[name="file_anh"]');
-    const wrap  = document.getElementById('preview-wrap');
-    const img   = document.getElementById('preview-img');
+    const input    = document.querySelector('input[name="file_anh"]');
+    const wrap     = document.getElementById('preview-wrap');
+    const img      = document.getElementById('preview-img');
+    const xoaAnh   = document.querySelector('input[name="xoa_anh"]');
     if (!input) return;
     input.addEventListener('change', function () {
       const file = this.files[0];
-      if (!file) { wrap.style.display = 'none'; return; }
+      if (!file) {
+        wrap.style.display = 'none';
+        if (xoaAnh) xoaAnh.disabled = false;
+        return;
+      }
       const reader = new FileReader();
       reader.onload = e => { img.src = e.target.result; wrap.style.display = 'block'; };
       reader.readAsDataURL(file);
+      // Đã chọn ảnh mới -> ảnh mới sẽ tự thay ảnh cũ, không cần tích "xoá ảnh" nữa
+      if (xoaAnh) { xoaAnh.checked = false; xoaAnh.disabled = true; }
     });
   })();
 </script>

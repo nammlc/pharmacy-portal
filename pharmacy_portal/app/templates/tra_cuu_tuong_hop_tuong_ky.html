@@ -33,7 +33,7 @@
         <td>{{ item.thuoc_a.ten_thuoc }}</td>
         <td>{{ item.thuoc_b.ten_thuoc }}</td>
         <td><span class="badge-level badge-{{ item.trang_thai }}">{{ item.trang_thai.replace('_', ' ') }}</span></td>
-        <td>{{ item.mo_ta or '—' }}</td>
+        <td class="rich-content">{{ (item.mo_ta | safe) if item.mo_ta else '—' }}</td>
       </tr>
       {% endfor %}
     </tbody>
