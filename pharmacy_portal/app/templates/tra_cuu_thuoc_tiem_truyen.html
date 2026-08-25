@@ -16,7 +16,7 @@
 </div>
 
 <div class="results-panel">
-  {% if ket_qua %}
+  {% if phan_trang.items %}
   <table class="result-table">
     <thead>
       <tr>
@@ -28,7 +28,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for item in ket_qua %}
+      {% for item in phan_trang.items %}
       <tr>
         <td><strong>{{ item.thuoc.ten_thuoc }}</strong><br><span style="color:var(--text-muted); font-size:12.5px;">{{ item.thuoc.hoat_chat or '' }}</span></td>
         <td>{{ item.dung_moi_pha_loang or '—' }}</td>
@@ -39,10 +39,19 @@
       {% endfor %}
     </tbody>
   </table>
+  {% set endpoint = 'tttt.index' %}
+  {% set args = {'q': tu_khoa} %}
+  {% include "_phan_trang.html" with context %}
   {% elif tu_khoa %}
-  <div class="empty-state">Không tìm thấy thuốc phù hợp với "{{ tu_khoa }}".</div>
+  <div class="empty-state">
+    <div class="empty-state-icon">&#128269;</div>
+    Không tìm thấy thuốc phù hợp với "{{ tu_khoa }}".
+  </div>
   {% else %}
-  <div class="empty-state">Nhập tên thuốc hoặc hoạt chất để bắt đầu tra cứu.</div>
+  <div class="empty-state">
+    <div class="empty-state-icon">&#128138;</div>
+    Chưa có dữ liệu thuốc tiêm truyền.
+  </div>
   {% endif %}
 </div>
 {% endblock %}

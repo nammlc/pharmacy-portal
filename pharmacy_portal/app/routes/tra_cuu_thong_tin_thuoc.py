@@ -3,10 +3,13 @@ from app.models.models import Thuoc, ThongTinThuoc
 
 bp = Blueprint("ttth", __name__, url_prefix="/tra-cuu-thong-tin-thuoc")
 
+SO_THUOC_MOI_TRANG = 15
+
 
 @bp.route("/")
 def index():
     tu_khoa = request.args.get("q", "").strip()
+    trang = request.args.get("page", 1, type=int)
 
     query = Thuoc.query
     if tu_khoa:
@@ -14,11 +17,13 @@ def index():
         query = query.filter(
             Thuoc.ten_thuoc.ilike(like_pattern) | Thuoc.hoat_chat.ilike(like_pattern)
         )
-    danh_sach_thuoc = query.order_by(Thuoc.ten_thuoc).limit(50).all()
+    phan_trang = query.order_by(Thuoc.ten_thuoc).paginate(
+        page=trang, per_page=SO_THUOC_MOI_TRANG, error_out=False
+    )
 
     return render_template(
         "tra_cuu_thong_tin_thuoc.html",
-        danh_sach_thuoc=danh_sach_thuoc,
+        phan_trang=phan_trang,
         tu_khoa=tu_khoa,
     )
 

@@ -5,24 +5,26 @@ from app.models.models import NhomThuoc, HoatChat, DanhMucThuoc
 
 bp = Blueprint("dmt", __name__, url_prefix="/danh-muc-thuoc")
 
+SO_THUOC_MOI_TRANG = 12
+
 
 @bp.route("/")
 def index():
     tu_khoa = request.args.get("q", "").strip()
 
     if tu_khoa:
+        trang = request.args.get("page", 1, type=int)
         like_pattern = f"%{tu_khoa}%"
-        ket_qua = (
+        phan_trang = (
             DanhMucThuoc.query.outerjoin(HoatChat, DanhMucThuoc.hoat_chat_id == HoatChat.id)
             .filter(
                 DanhMucThuoc.ten_biet_duoc.ilike(like_pattern)
                 | HoatChat.ten_hoat_chat.ilike(like_pattern)
             )
             .order_by(DanhMucThuoc.ten_biet_duoc)
-            .limit(60)
-            .all()
+            .paginate(page=trang, per_page=SO_THUOC_MOI_TRANG, error_out=False)
         )
-        return render_template("danh_muc_thuoc/tim_kiem.html", ket_qua=ket_qua, tu_khoa=tu_khoa)
+        return render_template("danh_muc_thuoc/tim_kiem.html", phan_trang=phan_trang, tu_khoa=tu_khoa)
 
     nhom_ds = (
         NhomThuoc.query.filter_by(loai="danh_muc_thuoc")
@@ -40,12 +42,13 @@ def index():
 @bp.route("/nhom/<int:nhom_id>")
 def xem_nhom(nhom_id):
     nhom = NhomThuoc.query.get_or_404(nhom_id)
-    danh_sach_thuoc = (
+    trang = request.args.get("page", 1, type=int)
+    phan_trang = (
         DanhMucThuoc.query.filter_by(nhom_thuoc_id=nhom.id)
         .order_by(DanhMucThuoc.ten_biet_duoc)
-        .all()
+        .paginate(page=trang, per_page=SO_THUOC_MOI_TRANG, error_out=False)
     )
-    return render_template("danh_muc_thuoc/nhom.html", nhom=nhom, danh_sach_thuoc=danh_sach_thuoc)
+    return render_template("danh_muc_thuoc/nhom.html", nhom=nhom, phan_trang=phan_trang)
 
 
 @bp.route("/thuoc/<int:thuoc_id>")
