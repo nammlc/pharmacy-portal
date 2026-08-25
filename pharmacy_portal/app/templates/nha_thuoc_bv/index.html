@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Nhà thuốc BV{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">Nhà thuốc BV</div>
+  <h1>Danh mục thuốc — Nhà thuốc Bệnh viện</h1>
+  <p>Chọn một nhóm để xem danh sách thuốc, hoặc tìm nhanh theo tên biệt dược/hoạt chất.</p>
+</div>
+
+<div class="search-panel">
+  <form class="search-form" method="get">
+    <input type="text" name="q" placeholder="Tên biệt dược hoặc hoạt chất...">
+    <button type="submit" class="btn btn-primary">Tìm</button>
+  </form>
+</div>
+
+<div class="results-panel">
+  {% if nhom_ds %}
+  <div class="category-grid" style="margin:0;">
+    {% for nhom in nhom_ds %}
+    <a class="category-card" href="{{ url_for('ntbv.xem_nhom', nhom_id=nhom.id) }}">
+      <h3>{{ nhom.ten_nhom }}</h3>
+      <p>{{ counts.get(nhom.id, 0) }} thuốc</p>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">Chưa có dữ liệu Nhà thuốc BV.</div>
+  {% endif %}
+</div>
+{% endblock %}

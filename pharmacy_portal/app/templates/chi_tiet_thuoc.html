@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ thuoc.ten_thuoc }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">Thông tin thuốc</div>
+  <h1>{{ thuoc.ten_thuoc }}</h1>
+  <p>{{ thuoc.hoat_chat or '' }} {% if thuoc.ham_luong %}&middot; {{ thuoc.ham_luong }}{% endif %}</p>
+</div>
+
+<div class="results-panel">
+  <table class="result-table">
+    <tbody>
+      <tr><td style="width:220px; color:var(--text-muted);">Dạng bào chế</td><td>{{ thuoc.dang_bao_che or '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Nhóm dược lý</td><td>{{ thuoc.nhom_thuoc or '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Nhà sản xuất</td><td>{{ thuoc.nha_san_xuat or '—' }}</td></tr>
+      {% if thuoc.thong_tin_chi_tiet %}
+      <tr><td style="color:var(--text-muted);">Chỉ định</td><td>{{ thuoc.thong_tin_chi_tiet.chi_dinh or '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Chống chỉ định</td><td>{{ thuoc.thong_tin_chi_tiet.chong_chi_dinh or '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Liều người lớn</td><td>{{ thuoc.thong_tin_chi_tiet.lieu_dung_nguoi_lon or '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Liều trẻ em</td><td>{{ thuoc.thong_tin_chi_tiet.lieu_dung_tre_em or '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Tác dụng phụ</td><td>{{ thuoc.thong_tin_chi_tiet.tac_dung_phu or '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Thận trọng</td><td>{{ thuoc.thong_tin_chi_tiet.than_trong or '—' }}</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

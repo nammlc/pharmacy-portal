@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng nhập quản trị — Cổng Tra Cứu Dược</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="login-shell">
+  <div class="login-card">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo bệnh viện" style="width:72px; height:72px; margin:0 auto 16px; display:block;">
+    <h1>Đăng nhập quản trị</h1>
+    <p class="sub">Bệnh viện Đa khoa Tâm Đức Cầu Quan<br>Khoa Dược &middot; Cổng tra cứu thông tin dược</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div style="margin-bottom:16px;">
+        {% for category, message in messages %}
+        <div class="flash-msg flash-{{ 'error' if category == 'error' else category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="form-row">
+        {{ form.ten_dang_nhap.label }}
+        {{ form.ten_dang_nhap(autofocus=true, autocomplete="username") }}
+        {% for e in form.ten_dang_nhap.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+      </div>
+      <div class="form-row">
+        {{ form.mat_khau.label }}
+        {{ form.mat_khau(autocomplete="current-password") }}
+        {% for e in form.mat_khau.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+      </div>
+      {{ form.submit(class="btn btn-primary", style="width:100%; justify-content:center; padding:11px;") }}
+    </form>
+  </div>
+</div>
+
+</body>
+</html>

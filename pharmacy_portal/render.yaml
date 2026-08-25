@@ -1,0 +1,17 @@
+# Cấu hình Render Blueprint (tuỳ chọn) - dùng khi deploy bằng "New +" > "Blueprint"
+# Nếu deploy thủ công qua giao diện Render, có thể bỏ qua file này và
+# nhập Build/Start command trực tiếp trên dashboard (xem README.md).
+services:
+  - type: web
+    name: pharmacy-portal
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn run:app"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DB_TYPE
+        value: sqlite
+      - key: PYTHON_VERSION
+        value: 3.12.0

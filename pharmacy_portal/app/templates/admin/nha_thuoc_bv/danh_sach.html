@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+{% block title %}Nhà thuốc BV{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head">
+  <h1>Nhà thuốc BV</h1>
+  <a href="{{ url_for('admin_ntbv.them') }}" class="btn btn-primary">+ Thêm thuốc</a>
+</div>
+
+<form method="get" class="search-form" style="margin-bottom:18px; padding:0;">
+  <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm theo tên biệt dược...">
+  <button type="submit" class="btn btn-outline">Tìm</button>
+</form>
+
+{% if danh_sach_thuoc %}
+<table class="result-table">
+  <thead>
+    <tr><th>Tên biệt dược</th><th>Hoạt chất</th><th>Nhóm thuốc</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for t in danh_sach_thuoc %}
+    <tr>
+      <td><strong>{{ t.ten_biet_duoc }}</strong></td>
+      <td>{{ t.hoat_chat.ten_hoat_chat if t.hoat_chat else '—' }}</td>
+      <td>{{ t.nhom.ten_nhom if t.nhom else '—' }}</td>
+      <td>
+        <div class="table-actions">
+          <a class="btn btn-outline btn-sm" href="{{ url_for('admin_ntbv.sua', thuoc_id=t.id) }}">Sửa</a>
+          <form method="POST" action="{{ url_for('admin_ntbv.xoa', thuoc_id=t.id) }}" onsubmit="return confirm('Xoá thuốc này khỏi Nhà thuốc BV?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger btn-sm">Xoá</button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="admin-empty">Chưa có thuốc nào trong Nhà thuốc BV{% if tu_khoa %} khớp với "{{ tu_khoa }}"{% endif %}.</div>
+{% endif %}
+{% endblock %}

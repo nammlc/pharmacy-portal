@@ -1,0 +1,76 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ tieu_de }}{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head"><h1>{{ tieu_de }}</h1></div>
+
+<div class="admin-form-card">
+  <form method="POST" enctype="multipart/form-data" novalidate>
+    {{ form.hidden_tag() }}
+
+    {% for field in [form.ten_nhom, form.loai, form.thu_tu] %}
+    <div class="form-row">
+      {{ field.label }}
+      {{ field() }}
+      {% for e in field.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+    {% endfor %}
+
+    {# --- Khối upload ảnh --- #}
+    <div class="form-row">
+      <label>Hình ảnh nhóm thuốc</label>
+
+      {# Hiển thị ảnh hiện tại nếu đang sửa #}
+      {% if nhom and nhom.hinh_anh %}
+      <div style="margin-bottom:10px;">
+        <img src="{{ nhom.hinh_anh }}" alt="Ảnh nhóm thuốc"
+             style="max-width:200px; max-height:200px; border-radius:8px; border:1px solid #ddd; padding:4px;">
+        <div style="margin-top:6px;">
+          <label style="display:inline-flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+            <input type="checkbox" name="xoa_anh" value="1">
+            <span style="color:#e53e3e;">Xoá ảnh hiện tại</span>
+          </label>
+        </div>
+      </div>
+      {% endif %}
+
+      {# Input chọn file #}
+      {{ form.file_anh(accept="image/png,image/jpeg,image/webp,image/gif", style="margin-top:4px;") }}
+      <div style="font-size:0.82em; color:#666; margin-top:4px;">
+        Chấp nhận: PNG, JPG, JPEG, WEBP, GIF — tối đa 5 MB. Ảnh sẽ được crop vuông 400×400px.
+      </div>
+      {% for e in form.file_anh.errors %}
+        <div class="field-errors">{{ e }}</div>
+      {% endfor %}
+
+      {# Preview ảnh trước khi lưu #}
+      <div id="preview-wrap" style="display:none; margin-top:10px;">
+        <p style="font-size:0.85em; color:#555; margin-bottom:4px;">Xem trước:</p>
+        <img id="preview-img" src="#" alt="Xem trước"
+             style="max-width:200px; max-height:200px; border-radius:8px; border:1px solid #ddd; padding:4px;">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      {{ form.submit(class="btn btn-primary") }}
+      <a href="{{ url_for('admin_nhom_thuoc.danh_sach') }}" class="btn btn-outline">Huỷ</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  (function () {
+    const input = document.querySelector('input[name="file_anh"]');
+    const wrap  = document.getElementById('preview-wrap');
+    const img   = document.getElementById('preview-img');
+    if (!input) return;
+    input.addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) { wrap.style.display = 'none'; return; }
+      const reader = new FileReader();
+      reader.onload = e => { img.src = e.target.result; wrap.style.display = 'block'; };
+      reader.readAsDataURL(file);
+    });
+  })();
+</script>
+{% endblock %}

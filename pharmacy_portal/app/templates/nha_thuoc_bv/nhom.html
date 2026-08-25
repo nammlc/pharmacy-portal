@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ nhom.ten_nhom }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow"><a href="{{ url_for('ntbv.index') }}" style="color:inherit;">Nhà thuốc BV</a></div>
+  <h1>{{ nhom.ten_nhom }}</h1>
+</div>
+
+<div class="results-panel">
+  {% if danh_sach_thuoc %}
+  <div class="category-grid" style="margin:0; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+    {% for thuoc in danh_sach_thuoc %}
+    <a class="category-card" href="{{ url_for('ntbv.xem_thuoc', thuoc_id=thuoc.id) }}" style="flex-direction:row; align-items:center; gap:14px;">
+      {% if thuoc.hinh_anh %}
+      <img src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}" style="width:56px; height:56px; object-fit:cover; border-radius:8px; flex-shrink:0; background:var(--paper-0);">
+      {% endif %}
+      <div>
+        <h3 style="margin:0 0 4px;">{{ thuoc.ten_biet_duoc }}</h3>
+        <p style="margin:0;">{{ thuoc.hoat_chat.ten_hoat_chat if thuoc.hoat_chat else '' }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">Chưa có thuốc nào trong nhóm này.</div>
+  {% endif %}
+</div>
+{% endblock %}

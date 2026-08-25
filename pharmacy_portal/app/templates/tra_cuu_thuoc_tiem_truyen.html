@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Tra cứu thuốc tiêm truyền{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">Tra cứu</div>
+  <h1>Thuốc tiêm truyền</h1>
+  <p>Dung môi pha loãng, tốc độ truyền, độ ổn định và lưu ý khi truyền tĩnh mạch.</p>
+</div>
+
+<div class="search-panel">
+  <form class="search-form" method="get">
+    <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên thuốc hoặc hoạt chất...">
+    <button type="submit">Tra cứu</button>
+  </form>
+</div>
+
+<div class="results-panel">
+  {% if ket_qua %}
+  <table class="result-table">
+    <thead>
+      <tr>
+        <th>Tên thuốc</th>
+        <th>Dung môi pha loãng</th>
+        <th>Tốc độ truyền</th>
+        <th>Độ ổn định</th>
+        <th>Cảnh báo</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in ket_qua %}
+      <tr>
+        <td><strong>{{ item.thuoc.ten_thuoc }}</strong><br><span style="color:var(--text-muted); font-size:12.5px;">{{ item.thuoc.hoat_chat or '' }}</span></td>
+        <td>{{ item.dung_moi_pha_loang or '—' }}</td>
+        <td>{{ item.toc_do_truyen or '—' }}</td>
+        <td>{{ item.do_on_dinh or '—' }}</td>
+        <td>{{ item.canh_bao or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% elif tu_khoa %}
+  <div class="empty-state">Không tìm thấy thuốc phù hợp với "{{ tu_khoa }}".</div>
+  {% else %}
+  <div class="empty-state">Nhập tên thuốc hoặc hoạt chất để bắt đầu tra cứu.</div>
+  {% endif %}
+</div>
+{% endblock %}

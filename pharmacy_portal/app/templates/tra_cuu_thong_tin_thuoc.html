@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Tra cứu thông tin thuốc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">Tra cứu</div>
+  <h1>Thông tin thuốc</h1>
+  <p>Danh mục thuốc, chỉ định, chống chỉ định, liều dùng và tác dụng phụ.</p>
+</div>
+
+<div class="search-panel">
+  <form class="search-form" method="get">
+    <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên thuốc hoặc hoạt chất...">
+    <button type="submit">Tra cứu</button>
+  </form>
+</div>
+
+<div class="results-panel">
+  {% if danh_sach_thuoc %}
+  <table class="result-table">
+    <thead>
+      <tr>
+        <th>Tên thuốc</th>
+        <th>Hoạt chất</th>
+        <th>Hàm lượng</th>
+        <th>Dạng bào chế</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for thuoc in danh_sach_thuoc %}
+      <tr>
+        <td><strong>{{ thuoc.ten_thuoc }}</strong></td>
+        <td>{{ thuoc.hoat_chat or '—' }}</td>
+        <td>{{ thuoc.ham_luong or '—' }}</td>
+        <td>{{ thuoc.dang_bao_che or '—' }}</td>
+        <td><a href="{{ url_for('ttth.chi_tiet', thuoc_id=thuoc.id) }}" style="color: var(--sage-500); font-weight:600;">Xem chi tiết &rarr;</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% elif tu_khoa %}
+  <div class="empty-state">Không tìm thấy thuốc phù hợp với "{{ tu_khoa }}".</div>
+  {% else %}
+  <div class="empty-state">Nhập tên thuốc hoặc hoạt chất để bắt đầu tra cứu.</div>
+  {% endif %}
+</div>
+{% endblock %}

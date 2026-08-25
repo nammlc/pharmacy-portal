@@ -1,0 +1,34 @@
+{% extends "admin/base.html" %}
+{% block title %}Bài viết bệnh nhân{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head">
+  <h1>Bài viết cho bệnh nhân</h1>
+  <a href="{{ url_for('admin_ttbn.them') }}" class="btn btn-primary">+ Thêm bài viết</a>
+</div>
+
+{% if items %}
+<table class="result-table">
+  <thead><tr><th>Tiêu đề</th><th>Danh mục</th><th></th></tr></thead>
+  <tbody>
+    {% for item in items %}
+    <tr>
+      <td><strong>{{ item.tieu_de }}</strong></td>
+      <td>{{ item.danh_muc or '—' }}</td>
+      <td>
+        <div class="table-actions">
+          <a class="btn btn-outline btn-sm" href="{{ url_for('admin_ttbn.sua', item_id=item.id) }}">Sửa</a>
+          <form method="POST" action="{{ url_for('admin_ttbn.xoa', item_id=item.id) }}" onsubmit="return confirm('Xoá bài viết này?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger btn-sm">Xoá</button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="admin-empty">Chưa có bài viết nào.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Thông tin cho bệnh nhân{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">Dành cho người bệnh</div>
+  <h1>Thông tin cho bệnh nhân</h1>
+  <p>Hướng dẫn sử dụng thuốc và chăm sóc tại nhà, trình bày dễ hiểu.</p>
+</div>
+
+<div class="results-panel">
+  {% if bai_viet %}
+  <table class="result-table">
+    <thead>
+      <tr><th>Tiêu đề</th><th>Danh mục</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for bv in bai_viet %}
+      <tr>
+        <td><strong>{{ bv.tieu_de }}</strong></td>
+        <td>{{ bv.danh_muc or '—' }}</td>
+        <td><a href="{{ url_for('ttbn.chi_tiet', bai_viet_id=bv.id) }}" style="color: var(--sage-500); font-weight:600;">Đọc &rarr;</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">Chưa có bài viết nào được đăng.</div>
+  {% endif %}
+</div>
+{% endblock %}

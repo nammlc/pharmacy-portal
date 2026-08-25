@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ thuoc.ten_biet_duoc }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">
+    <a href="{{ url_for('ntbv.index') }}" style="color:inherit;">Nhà thuốc BV</a>
+    {% if thuoc.nhom %} / <a href="{{ url_for('ntbv.xem_nhom', nhom_id=thuoc.nhom.id) }}" style="color:inherit;">{{ thuoc.nhom.ten_nhom }}</a>{% endif %}
+  </div>
+  <h1>{{ thuoc.ten_biet_duoc }}</h1>
+  <p>{{ thuoc.hoat_chat.ten_hoat_chat if thuoc.hoat_chat else '' }}</p>
+</div>
+
+<div class="results-panel" style="display:flex; gap:28px; flex-wrap:wrap; align-items:flex-start;">
+  {% if thuoc.hinh_anh %}
+  <img src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}" style="width:220px; border-radius:var(--radius-md); border:1px solid var(--line-200); flex-shrink:0;">
+  {% endif %}
+
+  <table class="result-table" style="flex:1; min-width:280px;">
+    <tbody>
+      <tr><td style="width:180px; color:var(--text-muted);">Nhóm thuốc</td><td>{{ thuoc.nhom.ten_nhom if thuoc.nhom else '—' }}</td></tr>
+      <tr><td style="color:var(--text-muted);">Hoạt chất</td><td>{{ thuoc.hoat_chat.ten_hoat_chat if thuoc.hoat_chat else '—' }}</td></tr>
+      {% if thuoc.link_tham_khao %}
+      <tr><td style="color:var(--text-muted);">Nguồn tham khảo</td><td><a href="{{ thuoc.link_tham_khao | chuan_hoa_url }}" target="_blank" rel="noopener" style="color:var(--sage-500);">{{ thuoc.link_tham_khao }}</a></td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

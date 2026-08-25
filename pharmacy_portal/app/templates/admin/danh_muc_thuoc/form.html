@@ -1,0 +1,97 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ tieu_de }}{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head"><h1>{{ tieu_de }}</h1></div>
+
+<div class="admin-form-card">
+  <form method="POST" enctype="multipart/form-data" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="form-row">
+      {{ form.ten_biet_duoc.label }}
+      {{ form.ten_biet_duoc() }}
+      {% for e in form.ten_biet_duoc.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+
+    <div class="form-row">
+      {{ form.nhom_thuoc_id.label }}
+      {{ form.nhom_thuoc_id() }}
+      <a href="{{ url_for('admin_nhom_thuoc.them') }}" target="_blank" style="font-size:12.5px; color:var(--sage-500);">+ Thêm nhóm mới</a>
+    </div>
+
+    <div class="form-row">
+      {{ form.hoat_chat_id.label }}
+      {{ form.hoat_chat_id() }}
+      <a href="{{ url_for('admin_hoat_chat.them') }}" target="_blank" style="font-size:12.5px; color:var(--sage-500);">+ Thêm hoạt chất mới</a>
+    </div>
+
+    {% for field in [form.thanh_phan, form.chi_dinh, form.chong_chi_dinh, form.cach_dung_lieu_dung] %}
+    <div class="form-row">
+      {{ field.label }}
+      {{ field() }}
+      {% for e in field.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+    {% endfor %}
+
+    <div class="form-row">
+      {{ form.link_chi_tiet.label }}
+      {{ form.link_chi_tiet() }}
+      {% for e in form.link_chi_tiet.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+
+    {# --- Khối upload ảnh --- #}
+    <div class="form-row">
+      <label>Hình ảnh thuốc</label>
+
+      {% if thuoc and thuoc.hinh_anh %}
+      <div style="margin-bottom:10px;">
+        <img src="{{ thuoc.hinh_anh }}" alt="Ảnh thuốc"
+             style="max-width:200px; max-height:200px; border-radius:8px; border:1px solid #ddd; padding:4px;">
+        <div style="margin-top:6px;">
+          <label style="display:inline-flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+            <input type="checkbox" name="xoa_anh" value="1">
+            <span style="color:#e53e3e;">Xoá ảnh hiện tại</span>
+          </label>
+        </div>
+      </div>
+      {% endif %}
+
+      {{ form.file_anh(accept="image/png,image/jpeg,image/webp,image/gif", style="margin-top:4px;") }}
+      <div style="font-size:0.82em; color:#666; margin-top:4px;">
+        Chấp nhận: PNG, JPG, JPEG, WEBP, GIF — tối đa 5 MB
+      </div>
+      {% for e in form.file_anh.errors %}
+        <div class="field-errors">{{ e }}</div>
+      {% endfor %}
+
+      <div id="preview-wrap" style="display:none; margin-top:10px;">
+        <p style="font-size:0.85em; color:#555; margin-bottom:4px;">Xem trước:</p>
+        <img id="preview-img" src="#" alt="Xem trước"
+             style="max-width:200px; max-height:200px; border-radius:8px; border:1px solid #ddd; padding:4px;">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      {{ form.submit(class="btn btn-primary") }}
+      <a href="{{ url_for('admin_dmt.danh_sach') }}" class="btn btn-outline">Huỷ</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  (function () {
+    const input = document.querySelector('input[name="file_anh"]');
+    const wrap  = document.getElementById('preview-wrap');
+    const img   = document.getElementById('preview-img');
+    if (!input) return;
+    input.addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) { wrap.style.display = 'none'; return; }
+      const reader = new FileReader();
+      reader.onload = e => { img.src = e.target.result; wrap.style.display = 'block'; };
+      reader.readAsDataURL(file);
+    });
+  })();
+</script>
+{% endblock %}

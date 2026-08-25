@@ -1,0 +1,41 @@
+{% extends "admin/base.html" %}
+{% block title %}Hoạt chất{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head">
+  <h1>Hoạt chất</h1>
+  <a href="{{ url_for('admin_hoat_chat.them') }}" class="btn btn-primary">+ Thêm hoạt chất</a>
+</div>
+
+<form method="get" class="search-form" style="margin-bottom:18px; padding:0;">
+  <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm theo tên hoạt chất...">
+  <button type="submit" class="btn btn-outline">Tìm</button>
+</form>
+
+{% if danh_sach_hc %}
+<table class="result-table">
+  <thead>
+    <tr><th>Tên hoạt chất</th><th>Số biệt dược</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for hc in danh_sach_hc %}
+    <tr>
+      <td><strong>{{ hc.ten_hoat_chat }}</strong></td>
+      <td>{{ (hc.danh_muc_thuoc_list|length) + (hc.nha_thuoc_bv_list|length) }}</td>
+      <td>
+        <div class="table-actions">
+          <a class="btn btn-outline btn-sm" href="{{ url_for('admin_hoat_chat.sua', hc_id=hc.id) }}">Sửa</a>
+          <form method="POST" action="{{ url_for('admin_hoat_chat.xoa', hc_id=hc.id) }}" onsubmit="return confirm('Xoá hoạt chất này?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger btn-sm">Xoá</button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="admin-empty">Chưa có hoạt chất nào{% if tu_khoa %} khớp với "{{ tu_khoa }}"{% endif %}.</div>
+{% endif %}
+{% endblock %}

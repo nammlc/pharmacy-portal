@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+{% block title %}Thuốc tiêm truyền{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head">
+  <h1>Thuốc tiêm truyền</h1>
+  <a href="{{ url_for('admin_tttt.them') }}" class="btn btn-primary">+ Thêm</a>
+</div>
+
+{% if items %}
+<table class="result-table">
+  <thead><tr><th>Thuốc</th><th>Dung môi</th><th>Tốc độ truyền</th><th></th></tr></thead>
+  <tbody>
+    {% for item in items %}
+    <tr>
+      <td><strong>{{ item.thuoc.ten_thuoc }}</strong></td>
+      <td>{{ item.dung_moi_pha_loang or '—' }}</td>
+      <td>{{ item.toc_do_truyen or '—' }}</td>
+      <td>
+        <div class="table-actions">
+          <a class="btn btn-outline btn-sm" href="{{ url_for('admin_tttt.sua', item_id=item.id) }}">Sửa</a>
+          <form method="POST" action="{{ url_for('admin_tttt.xoa', item_id=item.id) }}" onsubmit="return confirm('Xoá bản ghi này?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger btn-sm">Xoá</button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="admin-empty">Chưa có dữ liệu. {% if not items %}Cần thêm thuốc trong <a href="{{ url_for('admin_thuoc.danh_sach') }}" style="color:var(--sage-500);">Danh mục thuốc</a> trước.{% endif %}</div>
+{% endif %}
+{% endblock %}

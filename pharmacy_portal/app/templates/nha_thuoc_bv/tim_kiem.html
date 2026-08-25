@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Kết quả tìm kiếm{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow"><a href="{{ url_for('ntbv.index') }}" style="color:inherit;">Nhà thuốc BV</a></div>
+  <h1>Kết quả cho "{{ tu_khoa }}"</h1>
+</div>
+
+<div class="search-panel">
+  <form class="search-form" method="get">
+    <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên biệt dược hoặc hoạt chất...">
+    <button type="submit" class="btn btn-primary">Tìm</button>
+  </form>
+</div>
+
+<div class="results-panel">
+  {% if ket_qua %}
+  <div class="category-grid" style="margin:0; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+    {% for thuoc in ket_qua %}
+    <a class="category-card" href="{{ url_for('ntbv.xem_thuoc', thuoc_id=thuoc.id) }}" style="flex-direction:row; align-items:center; gap:14px;">
+      {% if thuoc.hinh_anh %}
+      <img src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}" style="width:56px; height:56px; object-fit:cover; border-radius:8px; flex-shrink:0;">
+      {% endif %}
+      <div>
+        <h3 style="margin:0 0 4px;">{{ thuoc.ten_biet_duoc }}</h3>
+        <p style="margin:0;">{{ thuoc.hoat_chat.ten_hoat_chat if thuoc.hoat_chat else '' }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">Không tìm thấy thuốc phù hợp.</div>
+  {% endif %}
+</div>
+{% endblock %}

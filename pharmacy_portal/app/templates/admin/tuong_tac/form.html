@@ -1,0 +1,23 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ tieu_de }}{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head"><h1>{{ tieu_de }}</h1></div>
+
+<div class="admin-form-card">
+  <form method="POST" novalidate>
+    {{ form.hidden_tag() }}
+    {% for field in [form.thuoc_a_id, form.thuoc_b_id, form.muc_do, form.co_che, form.hau_qua_lam_sang, form.xu_tri, form.nguon_tham_khao] %}
+    <div class="form-row">
+      {{ field.label }}
+      {{ field() }}
+      {% for e in field.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+    {% endfor %}
+    <div class="form-actions">
+      {{ form.submit(class="btn btn-primary") }}
+      <a href="{{ url_for('admin_ttt.danh_sach') }}" class="btn btn-outline">Huỷ</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
