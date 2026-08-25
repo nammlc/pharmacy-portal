@@ -16,9 +16,12 @@
     </div>
 
     <div class="form-row">
-      {{ form.nhom_thuoc_id.label }}
-      {{ form.nhom_thuoc_id() }}
-      <a href="{{ url_for('admin_nhom_thuoc.them') }}" target="_blank" style="font-size:12.5px; color:var(--sage-500);">+ Thêm nhóm mới</a>
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        {{ form.nhom_thuoc_id.label }}
+        <a href="{{ url_for('admin_nhom_thuoc.them') }}" target="_blank" style="font-size:12.5px; color:var(--sage-500); white-space:nowrap;">+ Thêm nhóm mới</a>
+      </div>
+      {{ form.nhom_thuoc_id(**{"data-searchable": "1", "data-placeholder": "Gõ để tìm nhóm thuốc..."}) }}
+      {% for e in form.nhom_thuoc_id.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
     </div>
 
     {{ render_checkbox_group(form.hoat_chat_ids, url_for('admin_hoat_chat.them'), "+ Thêm hoạt chất mới") }}
