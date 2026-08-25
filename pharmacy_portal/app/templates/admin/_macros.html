@@ -19,3 +19,34 @@
   {% for e in field.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
 </div>
 {% endmacro %}
+
+{# ============================================================
+   render_checkbox_group(field, them_moi_url, them_moi_label):
+   Render 1 SelectMultipleField dạng danh sách checkbox cuộn được
+   (thay vì <select multiple> khó dùng, phải giữ Ctrl để chọn nhiều).
+   Dùng cho quan hệ nhiều-nhiều, vd: 1 biệt dược nhiều hoạt chất.
+   ============================================================ #}
+{% macro render_checkbox_group(field, them_moi_url=none, them_moi_label="+ Thêm mới") %}
+<div class="form-row">
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+    {{ field.label }}
+    {% if them_moi_url %}
+    <a href="{{ them_moi_url }}" target="_blank" style="font-size:12.5px; color:var(--sage-500); white-space:nowrap;">{{ them_moi_label }}</a>
+    {% endif %}
+  </div>
+  <div class="checkbox-group">
+    {% if field.choices %}
+      {% for value, label, checked, render_kw in field.iter_choices() %}
+      <label class="checkbox-item">
+        <input type="checkbox" name="{{ field.name }}" value="{{ value }}" {% if checked %}checked{% endif %}>
+        <span>{{ label }}</span>
+      </label>
+      {% endfor %}
+    {% else %}
+      <p style="color:var(--text-muted); font-size:13px; margin:6px 0;">Chưa có dữ liệu — bấm "{{ them_moi_label }}" ở trên để tạo mới.</p>
+    {% endif %}
+  </div>
+  <div style="font-size:0.8em; color:#777; margin-top:4px;">Có thể chọn nhiều hoạt chất (thuốc phối hợp).</div>
+  {% for e in field.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+</div>
+{% endmacro %}

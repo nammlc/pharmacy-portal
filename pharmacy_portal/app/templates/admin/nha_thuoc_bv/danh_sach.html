@@ -41,7 +41,7 @@
           {% endif %}
         </td>
         <td><strong>{{ t.ten_biet_duoc }}</strong></td>
-        <td style="color:var(--text-muted);">{{ t.hoat_chat.ten_hoat_chat if t.hoat_chat else '—' }}</td>
+        <td style="color:var(--text-muted);">{{ t.ten_hoat_chat_hien_thi or '—' }}</td>
         <td>
           {% if t.nhom %}<span class="adm-badge">{{ t.nhom.ten_nhom }}</span>{% else %}—{% endif %}
         </td>

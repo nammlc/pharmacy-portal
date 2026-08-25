@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import (
-    StringField, TextAreaField, SelectField, PasswordField, SubmitField
+    StringField, TextAreaField, SelectField, SelectMultipleField, PasswordField, SubmitField
 )
 from wtforms.validators import DataRequired, Length, Optional
 
@@ -68,7 +68,8 @@ class HoatChatForm(FlaskForm):
 class DanhMucThuocForm(FlaskForm):
     ten_biet_duoc = StringField("Tên biệt dược", validators=[DataRequired(), Length(max=255)])
     nhom_thuoc_id = SelectField("Nhóm thuốc", coerce=int, validators=[Optional()])
-    hoat_chat_id = SelectField("Hoạt chất", coerce=int, validators=[Optional()])
+    # Nhiều-nhiều: 1 biệt dược có thể cấu thành từ nhiều hoạt chất (thuốc phối hợp)
+    hoat_chat_ids = SelectMultipleField("Hoạt chất", coerce=int, validators=[Optional()])
     thanh_phan = TextAreaField("Thành phần", validators=[Optional()])
     chi_dinh = TextAreaField("Chỉ định", validators=[Optional()])
     chong_chi_dinh = TextAreaField("Chống chỉ định", validators=[Optional()])
@@ -87,7 +88,8 @@ class DanhMucThuocForm(FlaskForm):
 class NhaThuocBVForm(FlaskForm):
     ten_biet_duoc = StringField("Tên biệt dược", validators=[DataRequired(), Length(max=255)])
     nhom_thuoc_id = SelectField("Nhóm thuốc", coerce=int, validators=[Optional()])
-    hoat_chat_id = SelectField("Hoạt chất", coerce=int, validators=[Optional()])
+    # Nhiều-nhiều: 1 biệt dược có thể cấu thành từ nhiều hoạt chất (thuốc phối hợp)
+    hoat_chat_ids = SelectMultipleField("Hoạt chất", coerce=int, validators=[Optional()])
     link_tham_khao = StringField("Link tham khảo", validators=[Optional(), Length(max=500)])
     file_anh = FileField(
         "Hình ảnh thuốc",

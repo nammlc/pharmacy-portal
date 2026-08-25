@@ -8,7 +8,7 @@
     {% if thuoc.nhom %} / <a href="{{ url_for('ntbv.xem_nhom', nhom_id=thuoc.nhom.id) }}" style="color:inherit;">{{ thuoc.nhom.ten_nhom }}</a>{% endif %}
   </div>
   <h1>{{ thuoc.ten_biet_duoc }}</h1>
-  <p>{{ thuoc.hoat_chat.ten_hoat_chat if thuoc.hoat_chat else '' }}</p>
+  <p>{{ thuoc.ten_hoat_chat_hien_thi }}</p>
 </div>
 
 <div class="results-panel drug-detail">
@@ -27,7 +27,7 @@
     </div>
     <div class="drug-detail-section">
       <p class="drug-detail-section-label">Hoạt chất</p>
-      <p style="margin:0; font-size:14px;">{{ thuoc.hoat_chat.ten_hoat_chat if thuoc.hoat_chat else '—' }}</p>
+      <p style="margin:0; font-size:14px;">{{ thuoc.ten_hoat_chat_hien_thi or '—' }}</p>
     </div>
     {% if thuoc.link_tham_khao %}
     <div class="drug-detail-section">

@@ -1103,6 +1103,30 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .form-row .field-errors { color: var(--level-cctd); font-size: 12.5px; margin-top: 5px; }
 .form-actions { display: flex; gap: 10px; margin-top: 22px; }
 
+/* ---------- Nhóm checkbox (chọn nhiều - vd: nhiều hoạt chất) ---------- */
+.checkbox-group {
+  border: 1px solid var(--line-200);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 6px;
+  margin-top: 4px;
+}
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 9px;
+  border-radius: var(--radius-sm);
+  font-weight: 400;
+  font-size: 13.5px;
+  color: var(--ink-900);
+  cursor: pointer;
+}
+.checkbox-item:hover { background: var(--paper-0); }
+.checkbox-item input[type="checkbox"] { width: 15px; height: 15px; flex-shrink: 0; accent-color: var(--sage-500); }
+
 /* ---------- Trình soạn thảo văn bản kiểu Word (Quill) ---------- */
 .rich-editor-hidden { display: none !important; }
 

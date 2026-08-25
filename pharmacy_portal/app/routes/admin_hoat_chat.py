@@ -55,7 +55,7 @@ def sua(hc_id):
 @login_required
 def xoa(hc_id):
     hc = HoatChat.query.get_or_404(hc_id)
-    if hc.danh_muc_thuoc_list or hc.nha_thuoc_bv_list:
+    if hc.danh_muc_thuoc_co_hoat_chat.first() or hc.nha_thuoc_bv_co_hoat_chat.first():
         flash(f'Không thể xoá "{hc.ten_hoat_chat}" vì vẫn còn thuốc gắn với hoạt chất này.', "danger")
         return redirect(url_for("admin_hoat_chat.danh_sach"))
     ten = hc.ten_hoat_chat

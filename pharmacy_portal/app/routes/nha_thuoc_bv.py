@@ -17,12 +17,13 @@ def index():
         trang = request.args.get("page", 1, type=int)
         like_pattern = f"%{tu_khoa}%"
         phan_trang = (
-            NhaThuocBV.query.outerjoin(HoatChat, NhaThuocBV.hoat_chat_id == HoatChat.id)
+            NhaThuocBV.query.outerjoin(NhaThuocBV.hoat_chat_list)
             .filter(
                 NhaThuocBV.ten_biet_duoc.ilike(like_pattern)
                 | HoatChat.ten_hoat_chat.ilike(like_pattern)
             )
             .order_by(NhaThuocBV.ten_biet_duoc)
+            .distinct()
             .paginate(page=trang, per_page=SO_THUOC_MOI_TRANG, error_out=False)
         )
         return render_template("nha_thuoc_bv/tim_kiem.html", phan_trang=phan_trang, tu_khoa=tu_khoa)

@@ -14,7 +14,7 @@ def _nap_lua_chon(form):
         (n.id, n.ten_nhom)
         for n in NhomThuoc.query.filter_by(loai="danh_muc_thuoc").order_by(NhomThuoc.ten_nhom).all()
     ]
-    form.hoat_chat_id.choices = [_tuy_chon_rong()] + [
+    form.hoat_chat_ids.choices = [
         (h.id, h.ten_hoat_chat) for h in HoatChat.query.order_by(HoatChat.ten_hoat_chat).all()
     ]
 
@@ -47,7 +47,7 @@ def them():
         thuoc.chong_chi_dinh = lam_sach_html(thuoc.chong_chi_dinh)
         thuoc.cach_dung_lieu_dung = lam_sach_html(thuoc.cach_dung_lieu_dung)
         thuoc.nhom_thuoc_id = form.nhom_thuoc_id.data or None
-        thuoc.hoat_chat_id = form.hoat_chat_id.data or None
+        thuoc.hoat_chat_list = HoatChat.query.filter(HoatChat.id.in_(form.hoat_chat_ids.data or [])).all()
         db.session.add(thuoc)
         db.session.flush()
 
@@ -74,7 +74,7 @@ def sua(thuoc_id):
     _nap_lua_chon(form)
     if request.method == "GET":
         form.nhom_thuoc_id.data = thuoc.nhom_thuoc_id or 0
-        form.hoat_chat_id.data = thuoc.hoat_chat_id or 0
+        form.hoat_chat_ids.data = [hc.id for hc in thuoc.hoat_chat_list]
     if form.validate_on_submit():
         form.populate_obj(thuoc)
         thuoc.thanh_phan = lam_sach_html(thuoc.thanh_phan)
@@ -82,7 +82,7 @@ def sua(thuoc_id):
         thuoc.chong_chi_dinh = lam_sach_html(thuoc.chong_chi_dinh)
         thuoc.cach_dung_lieu_dung = lam_sach_html(thuoc.cach_dung_lieu_dung)
         thuoc.nhom_thuoc_id = form.nhom_thuoc_id.data or None
-        thuoc.hoat_chat_id = form.hoat_chat_id.data or None
+        thuoc.hoat_chat_list = HoatChat.query.filter(HoatChat.id.in_(form.hoat_chat_ids.data or [])).all()
 
         file_anh = request.files.get("file_anh")
         if file_anh and file_anh.filename:

@@ -27,7 +27,7 @@
       {% endif %}
       <div class="drug-card-body">
         <h3>{{ thuoc.ten_biet_duoc }}</h3>
-        <p>{{ thuoc.hoat_chat.ten_hoat_chat if thuoc.hoat_chat else 'Chưa có hoạt chất' }}</p>
+        <p>{{ thuoc.ten_hoat_chat_hien_thi or 'Chưa có hoạt chất' }}</p>
       </div>
     </a>
     {% endfor %}

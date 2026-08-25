@@ -34,19 +34,22 @@ with app.app_context():
 
     # --- Danh mục thuốc mẫu (bảng danh_muc_thuoc) ---
     dmt_thuoc = DanhMucThuoc(
-        ten_biet_duoc="[MẪU] Thuốc A", hoat_chat_id=hoat_chat_a.id, nhom_thuoc_id=nhom_dmt.id,
+        ten_biet_duoc="[MẪU] Thuốc A", nhom_thuoc_id=nhom_dmt.id,
         thanh_phan="[MẪU] Hoạt chất A 500mg + tá dược vừa đủ",
         chi_dinh="[MẪU] Nội dung minh hoạ",
         chong_chi_dinh="[MẪU] Nội dung minh hoạ",
         cach_dung_lieu_dung="[MẪU] Uống 1 viên/lần x 2 lần/ngày",
     )
+    dmt_thuoc.hoat_chat_list = [hoat_chat_a]  # nhiều-nhiều: có thể gán nhiều hoạt chất
     db.session.add(dmt_thuoc)
 
     # --- Nhà thuốc BV mẫu (bảng nha_thuoc_bv) ---
-    db.session.add(NhaThuocBV(
-        ten_biet_duoc="[MẪU] Thuốc C", hoat_chat_id=hoat_chat_b.id, nhom_thuoc_id=nhom_ntbv.id,
+    ntbv_thuoc = NhaThuocBV(
+        ten_biet_duoc="[MẪU] Thuốc C", nhom_thuoc_id=nhom_ntbv.id,
         link_tham_khao="https://ví-dụ.vn/thuoc-c",
-    ))
+    )
+    ntbv_thuoc.hoat_chat_list = [hoat_chat_b]
+    db.session.add(ntbv_thuoc)
     db.session.commit()
 
     # --- Thuốc (dữ liệu tra cứu chi tiết: tiêm truyền / tương tác / tương kỵ) ---

@@ -2,7 +2,7 @@
 {% block title %}{{ tieu_de }}{% endblock %}
 
 {% block admin_content %}
-{% from "admin/_macros.html" import render_field %}
+{% from "admin/_macros.html" import render_field, render_checkbox_group %}
 <div class="admin-page-head"><h1>{{ tieu_de }}</h1></div>
 
 <div class="admin-form-card">
@@ -21,11 +21,7 @@
       <a href="{{ url_for('admin_nhom_thuoc.them') }}" target="_blank" style="font-size:12.5px; color:var(--sage-500);">+ Thêm nhóm mới</a>
     </div>
 
-    <div class="form-row">
-      {{ form.hoat_chat_id.label }}
-      {{ form.hoat_chat_id() }}
-      <a href="{{ url_for('admin_hoat_chat.them') }}" target="_blank" style="font-size:12.5px; color:var(--sage-500);">+ Thêm hoạt chất mới</a>
-    </div>
+    {{ render_checkbox_group(form.hoat_chat_ids, url_for('admin_hoat_chat.them'), "+ Thêm hoạt chất mới") }}
 
     {% for field in [form.thanh_phan, form.chi_dinh, form.chong_chi_dinh, form.cach_dung_lieu_dung] %}
       {{ render_field(field) }}

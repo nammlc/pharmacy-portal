@@ -57,13 +57,35 @@ class HoatChat(db.Model):
         return f"<HoatChat {self.ten_hoat_chat}>"
 
 
+# --------------------------------------------------------------------------
+# Bảng trung gian (nhiều-nhiều): 1 biệt dược có thể được cấu thành từ NHIỀU
+# hoạt chất (thuốc phối hợp, vd: Panadol Extra = Paracetamol + Cafein), và
+# 1 hoạt chất có thể xuất hiện trong nhiều biệt dược.
+# --------------------------------------------------------------------------
+danh_muc_thuoc_hoat_chat = db.Table(
+    "danh_muc_thuoc_hoat_chat",
+    db.Column("danh_muc_thuoc_id", db.Integer, db.ForeignKey("danh_muc_thuoc.id", ondelete="CASCADE"), primary_key=True),
+    db.Column("hoat_chat_id", db.Integer, db.ForeignKey("hoat_chat.id", ondelete="CASCADE"), primary_key=True),
+)
+
+nha_thuoc_bv_hoat_chat = db.Table(
+    "nha_thuoc_bv_hoat_chat",
+    db.Column("nha_thuoc_bv_id", db.Integer, db.ForeignKey("nha_thuoc_bv.id", ondelete="CASCADE"), primary_key=True),
+    db.Column("hoat_chat_id", db.Integer, db.ForeignKey("hoat_chat.id", ondelete="CASCADE"), primary_key=True),
+)
+
+
 class DanhMucThuoc(db.Model):
     """Danh mục thuốc (biệt dược) hiển thị công khai - mỗi thuốc thuộc 1 nhóm
-    thuốc và 1 hoạt chất, kèm thông tin chỉ định/chống chỉ định/cách dùng."""
+    thuốc, có thể cấu thành từ NHIỀU hoạt chất (thuốc phối hợp), kèm thông
+    tin chỉ định/chống chỉ định/cách dùng."""
     __tablename__ = "danh_muc_thuoc"
 
     id = db.Column(db.Integer, primary_key=True)
     nhom_thuoc_id = db.Column(db.Integer, db.ForeignKey("nhom_thuoc.id"), nullable=True)
+    # CHÚ Ý: hoat_chat_id giữ lại để tương thích dữ liệu cũ / không phá schema,
+    # nhưng KHÔNG còn dùng trong code - quan hệ hoạt chất giờ dùng
+    # `hoat_chat_list` (nhiều-nhiều) bên dưới.
     hoat_chat_id = db.Column(db.Integer, db.ForeignKey("hoat_chat.id"), nullable=True)
     ten_biet_duoc = db.Column(db.String(255), nullable=False, index=True)
     thanh_phan = db.Column(db.Text)
@@ -75,7 +97,17 @@ class DanhMucThuoc(db.Model):
     ngay_cap_nhat = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     nhom = db.relationship("NhomThuoc", backref="danh_muc_thuoc_list")
-    hoat_chat = db.relationship("HoatChat", backref="danh_muc_thuoc_list")
+    hoat_chat = db.relationship("HoatChat", foreign_keys=[hoat_chat_id])  # cũ - giữ tương thích
+    hoat_chat_list = db.relationship(
+        "HoatChat", secondary=danh_muc_thuoc_hoat_chat,
+        backref=db.backref("danh_muc_thuoc_co_hoat_chat", lazy="dynamic"),
+        order_by="HoatChat.ten_hoat_chat",
+    )
+
+    @property
+    def ten_hoat_chat_hien_thi(self):
+        """Chuỗi hiển thị: 'Paracetamol + Cafein' hoặc rỗng nếu chưa gán."""
+        return " + ".join(hc.ten_hoat_chat for hc in self.hoat_chat_list)
 
     def __repr__(self):
         return f"<DanhMucThuoc {self.ten_biet_duoc}>"
@@ -83,11 +115,14 @@ class DanhMucThuoc(db.Model):
 
 class NhaThuocBV(db.Model):
     """Danh mục thuốc bán tại Nhà thuốc Bệnh viện - cùng cấu trúc phân loại
-    (nhóm thuốc + hoạt chất) như Danh mục thuốc, nhưng dữ liệu gọn hơn."""
+    (nhóm thuốc + nhiều hoạt chất) như Danh mục thuốc, nhưng dữ liệu gọn hơn."""
     __tablename__ = "nha_thuoc_bv"
 
     id = db.Column(db.Integer, primary_key=True)
     nhom_thuoc_id = db.Column(db.Integer, db.ForeignKey("nhom_thuoc.id"), nullable=True)
+    # CHÚ Ý: hoat_chat_id giữ lại để tương thích dữ liệu cũ / không phá schema,
+    # nhưng KHÔNG còn dùng trong code - quan hệ hoạt chất giờ dùng
+    # `hoat_chat_list` (nhiều-nhiều) bên dưới.
     hoat_chat_id = db.Column(db.Integer, db.ForeignKey("hoat_chat.id"), nullable=True)
     ten_biet_duoc = db.Column(db.String(255), nullable=False, index=True)
     link_tham_khao = db.Column(db.String(500))
@@ -95,7 +130,16 @@ class NhaThuocBV(db.Model):
     ngay_cap_nhat = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     nhom = db.relationship("NhomThuoc", backref="nha_thuoc_bv_list")
-    hoat_chat = db.relationship("HoatChat", backref="nha_thuoc_bv_list")
+    hoat_chat = db.relationship("HoatChat", foreign_keys=[hoat_chat_id])  # cũ - giữ tương thích
+    hoat_chat_list = db.relationship(
+        "HoatChat", secondary=nha_thuoc_bv_hoat_chat,
+        backref=db.backref("nha_thuoc_bv_co_hoat_chat", lazy="dynamic"),
+        order_by="HoatChat.ten_hoat_chat",
+    )
+
+    @property
+    def ten_hoat_chat_hien_thi(self):
+        return " + ".join(hc.ten_hoat_chat for hc in self.hoat_chat_list)
 
     def __repr__(self):
         return f"<NhaThuocBV {self.ten_biet_duoc}>"
