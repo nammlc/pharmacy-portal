@@ -31,6 +31,7 @@
     </a>
     {% endfor %}
   </div>
+  {% set phan_trang = phan_trang_nhom %}
   {% set endpoint = 'dmt.index' %}
   {% set args = {} %}
   {% include "_phan_trang.html" with context %}
