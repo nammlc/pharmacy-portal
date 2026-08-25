@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Kết quả tìm kiếm{% endblock %}
+
+{% block content %}
+{% set tong_so_ket_qua = phan_trang_dmt.total + phan_trang_ntbv.total %}
+<div class="page-header">
+  <div class="eyebrow">Tìm kiếm</div>
+  <h1>Kết quả cho "{{ tu_khoa }}"</h1>
+  <p>{{ tong_so_ket_qua }} thuốc phù hợp trên toàn bộ hệ thống.</p>
+</div>
+
+<div class="search-panel">
+  <form class="search-form" method="get" action="{{ url_for('main.tim_kiem') }}">
+    <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên biệt dược hoặc hoạt chất...">
+    <button type="submit" class="btn btn-primary">Tìm</button>
+  </form>
+</div>
+
+{% if not tong_so_ket_qua %}
+<div class="results-panel">
+  <div class="empty-state">
+    <div class="empty-state-icon">&#128269;</div>
+    Không tìm thấy thuốc phù hợp.
+  </div>
+</div>
+{% else %}
+
+<div class="results-panel">
+  <div class="admin-page-head" style="margin-top:8px;">
+    <h1 style="font-size:18px;">Danh mục thuốc <span style="color:var(--text-muted); font-weight:500;">({{ phan_trang_dmt.total }} kết quả)</span></h1>
+    {% if phan_trang_dmt.total %}
+    <a href="{{ url_for('dmt.index', q=tu_khoa) }}" class="btn btn-outline btn-sm">Xem tất cả &#8594;</a>
+    {% endif %}
+  </div>
+
+  {% if phan_trang_dmt.items %}
+  <div class="drug-grid">
+    {% for thuoc in phan_trang_dmt.items %}
+    <a class="drug-card" href="{{ url_for('dmt.xem_thuoc', thuoc_id=thuoc.id) }}">
+      {% if thuoc.hinh_anh %}
+      <img class="drug-card-thumb" src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}">
+      {% else %}
+      <div class="drug-card-thumb-fallback">{{ thuoc.ten_biet_duoc[:1]|upper }}</div>
+      {% endif %}
+      <div class="drug-card-body">
+        <h3>{{ thuoc.ten_biet_duoc }}</h3>
+        <p>{{ thuoc.ten_hoat_chat_hien_thi or 'Chưa có hoạt chất' }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p style="color:var(--text-muted); font-size:14px;">Không có thuốc phù hợp bên Danh mục thuốc.</p>
+  {% endif %}
+</div>
+
+<div class="results-panel" style="margin-top:32px;">
+  <div class="admin-page-head" style="margin-top:8px;">
+    <h1 style="font-size:18px;">Nhà thuốc BV <span style="color:var(--text-muted); font-weight:500;">({{ phan_trang_ntbv.total }} kết quả)</span></h1>
+    {% if phan_trang_ntbv.total %}
+    <a href="{{ url_for('ntbv.index', q=tu_khoa) }}" class="btn btn-outline btn-sm">Xem tất cả &#8594;</a>
+    {% endif %}
+  </div>
+
+  {% if phan_trang_ntbv.items %}
+  <div class="drug-grid">
+    {% for thuoc in phan_trang_ntbv.items %}
+    <a class="drug-card" href="{{ url_for('ntbv.xem_thuoc', thuoc_id=thuoc.id) }}">
+      {% if thuoc.hinh_anh %}
+      <img class="drug-card-thumb" src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}">
+      {% else %}
+      <div class="drug-card-thumb-fallback">{{ thuoc.ten_biet_duoc[:1]|upper }}</div>
+      {% endif %}
+      <div class="drug-card-body">
+        <h3>{{ thuoc.ten_biet_duoc }}</h3>
+        <p>{{ thuoc.ten_hoat_chat_hien_thi or 'Chưa có hoạt chất' }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p style="color:var(--text-muted); font-size:14px;">Không có thuốc phù hợp bên Nhà thuốc BV.</p>
+  {% endif %}
+</div>
+
+{% endif %}
+{% endblock %}
