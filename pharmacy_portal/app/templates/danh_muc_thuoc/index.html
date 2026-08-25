@@ -16,17 +16,24 @@
 </div>
 
 <div class="results-panel">
-  {% if nhom_ds %}
-  <div class="category-grid" style="margin:0;">
-    {% for nhom in nhom_ds %}
-    <a class="category-card" href="{{ url_for('dmt.xem_nhom', nhom_id=nhom.id) }}">
-      <svg class="category-card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5.5M12 4V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div class="category-icon">&#128138;</div>
+  {% if phan_trang_nhom.items %}
+  <div class="nhom-grid">
+    {% for nhom in phan_trang_nhom.items %}
+    <a class="nhom-card nhom-card-accent-{{ loop.index0 % 4 }}" href="{{ url_for('dmt.xem_nhom', nhom_id=nhom.id) }}">
+      <div class="nhom-card-icon">&#128138;</div>
       <h3>{{ nhom.ten_nhom }}</h3>
-      <span class="category-card-count">{{ counts.get(nhom.id, 0) }} thuốc</span>
+      <div class="nhom-card-footer">
+        <span class="nhom-card-count">{{ counts.get(nhom.id, 0) }} thuốc</span>
+        <span class="nhom-card-arrow">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5.5M12 4V10.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </div>
     </a>
     {% endfor %}
   </div>
+  {% set endpoint = 'dmt.index' %}
+  {% set args = {} %}
+  {% include "_phan_trang.html" with context %}
   {% else %}
   <div class="empty-state">
     <div class="empty-state-icon">&#128138;</div>

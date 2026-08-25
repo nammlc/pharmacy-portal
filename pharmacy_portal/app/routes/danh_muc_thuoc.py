@@ -6,6 +6,7 @@ from app.models.models import NhomThuoc, HoatChat, DanhMucThuoc
 bp = Blueprint("dmt", __name__, url_prefix="/danh-muc-thuoc")
 
 SO_THUOC_MOI_TRANG = 12
+SO_NHOM_MOI_TRANG = 8
 
 
 @bp.route("/")
@@ -26,17 +27,18 @@ def index():
         )
         return render_template("danh_muc_thuoc/tim_kiem.html", phan_trang=phan_trang, tu_khoa=tu_khoa)
 
-    nhom_ds = (
+    trang = request.args.get("page", 1, type=int)
+    phan_trang_nhom = (
         NhomThuoc.query.filter_by(loai="danh_muc_thuoc")
         .order_by(NhomThuoc.thu_tu, NhomThuoc.ten_nhom)
-        .all()
+        .paginate(page=trang, per_page=SO_NHOM_MOI_TRANG, error_out=False)
     )
     counts = dict(
         db.session.query(DanhMucThuoc.nhom_thuoc_id, func.count(DanhMucThuoc.id))
         .group_by(DanhMucThuoc.nhom_thuoc_id)
         .all()
     )
-    return render_template("danh_muc_thuoc/index.html", nhom_ds=nhom_ds, counts=counts)
+    return render_template("danh_muc_thuoc/index.html", phan_trang_nhom=phan_trang_nhom, counts=counts)
 
 
 @bp.route("/nhom/<int:nhom_id>")
