@@ -266,3 +266,56 @@
   .admin-nav { flex-direction: row; flex-wrap: wrap; }
   .admin-main { padding: 24px 18px 50px; }
 }
+
+/* ---------- Dán ảnh từ clipboard (Ctrl+V) ---------- */
+.anh-paste-zone {
+  margin-top: 8px;
+  border: 1.5px dashed var(--line-200);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.anh-paste-zone:hover,
+.anh-paste-zone:focus-visible {
+  border-color: var(--sage-500);
+  color: var(--sage-500);
+  background: var(--sage-100);
+}
+.anh-paste-zone.is-active-zone {
+  border-color: var(--sage-500);
+  background: var(--sage-100);
+  color: var(--sage-500);
+}
+.anh-paste-zone.is-flash {
+  border-color: #2e6b5c;
+  background: var(--sage-100);
+  color: #2e6b5c;
+}
+.anh-paste-zone-icon {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--line-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+.anh-paste-zone kbd {
+  background: #fff;
+  border: 1px solid var(--line-200);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11.5px;
+  color: var(--ink-900);
+}
