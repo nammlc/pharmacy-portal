@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request
-from app.models.models import Thuoc, ThongTinThuoc
+from app.models.models import Thuoc
+from app.utils.tim_kiem import tim_thuoc
 
 bp = Blueprint("ttth", __name__, url_prefix="/tra-cuu-thong-tin-thuoc")
 
@@ -11,21 +12,15 @@ def index():
     tu_khoa = request.args.get("q", "").strip()
     trang = request.args.get("page", 1, type=int)
 
-    query = Thuoc.query
     if tu_khoa:
-        like_pattern = f"%{tu_khoa}%"
-        query = query.filter(
-            Thuoc.ten_thuoc.ilike(like_pattern) | Thuoc.hoat_chat.ilike(like_pattern)
+        phan_trang = tim_thuoc(tu_khoa, per_page=SO_THUOC_MOI_TRANG, page=trang)
+    else:
+        phan_trang = Thuoc.query.order_by(Thuoc.ten_thuoc).paginate(
+            page=trang, per_page=SO_THUOC_MOI_TRANG, error_out=False
         )
-    phan_trang = query.order_by(Thuoc.ten_thuoc).paginate(
-        page=trang, per_page=SO_THUOC_MOI_TRANG, error_out=False
-    )
 
-    return render_template(
-        "tra_cuu_thong_tin_thuoc.html",
-        phan_trang=phan_trang,
-        tu_khoa=tu_khoa,
-    )
+    return render_template("tra_cuu_thong_tin_thuoc.html",
+                           phan_trang=phan_trang, tu_khoa=tu_khoa)
 
 
 @bp.route("/<int:thuoc_id>")
