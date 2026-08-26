@@ -105,3 +105,21 @@ def xoa(thuoc_id):
     db.session.commit()
     flash(f'Đã xoá "{ten}" khỏi Nhà thuốc BV.', "success")
     return redirect(url_for("admin_ntbv.danh_sach"))
+
+
+@bp.route("/xoa-hang-loat", methods=["POST"])
+@login_required
+def xoa_hang_loat():
+    ids = request.form.getlist("ids", type=int)
+    if not ids:
+        flash("Chưa chọn thuốc nào để xoá.", "warning")
+        return redirect(url_for("admin_ntbv.danh_sach"))
+    items = NhaThuocBV.query.filter(NhaThuocBV.id.in_(ids)).all()
+    so_luong = len(items)
+    for thuoc in items:
+        if thuoc.hinh_anh:
+            xoa_anh_cloudinary(thuoc.hinh_anh)
+        db.session.delete(thuoc)
+    db.session.commit()
+    flash(f'Đã xoá {so_luong} thuốc khỏi Nhà thuốc BV.', "success")
+    return redirect(url_for("admin_ntbv.danh_sach"))

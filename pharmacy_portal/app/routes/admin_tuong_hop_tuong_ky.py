@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required
 from app import db
 from app.models.models import TuongHopTuongKy, Thuoc
@@ -62,4 +62,20 @@ def xoa(item_id):
     db.session.delete(item)
     db.session.commit()
     flash("Đã xoá.", "success")
+    return redirect(url_for("admin_thtk.danh_sach"))
+
+
+@bp.route("/xoa-hang-loat", methods=["POST"])
+@login_required
+def xoa_hang_loat():
+    ids = request.form.getlist("ids", type=int)
+    if not ids:
+        flash("Chưa chọn cặp nào để xoá.", "warning")
+        return redirect(url_for("admin_thtk.danh_sach"))
+    items = TuongHopTuongKy.query.filter(TuongHopTuongKy.id.in_(ids)).all()
+    so_luong = len(items)
+    for item in items:
+        db.session.delete(item)
+    db.session.commit()
+    flash(f"Đã xoá {so_luong} cặp tương hợp/tương kỵ.", "success")
     return redirect(url_for("admin_thtk.danh_sach"))

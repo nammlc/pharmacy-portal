@@ -103,6 +103,32 @@ def xoa(nhom_id):
     return redirect(url_for("admin_nhom_thuoc.danh_sach"))
 
 
+@bp.route("/xoa-hang-loat", methods=["POST"])
+@login_required
+def xoa_hang_loat():
+    ids = request.form.getlist("ids", type=int)
+    if not ids:
+        flash("Chưa chọn nhóm thuốc nào để xoá.", "warning")
+        return redirect(url_for("admin_nhom_thuoc.danh_sach"))
+    items = NhomThuoc.query.filter(NhomThuoc.id.in_(ids)).all()
+    da_xoa = 0
+    bi_bo_qua = 0
+    for nhom in items:
+        if nhom.danh_muc_thuoc_list or nhom.nha_thuoc_bv_list:
+            bi_bo_qua += 1
+            continue
+        if nhom.hinh_anh:
+            xoa_anh_cloudinary(nhom.hinh_anh)
+        db.session.delete(nhom)
+        da_xoa += 1
+    db.session.commit()
+    if da_xoa:
+        flash(f"Đã xoá {da_xoa} nhóm thuốc.", "success")
+    if bi_bo_qua:
+        flash(f"Bỏ qua {bi_bo_qua} nhóm vì vẫn còn thuốc thuộc nhóm này.", "danger")
+    return redirect(url_for("admin_nhom_thuoc.danh_sach"))
+
+
 def _so_nguyen(gia_tri):
     try:
         return int(gia_tri)

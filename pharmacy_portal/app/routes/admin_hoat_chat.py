@@ -63,3 +63,27 @@ def xoa(hc_id):
     db.session.commit()
     flash(f'Đã xoá hoạt chất "{ten}".', "success")
     return redirect(url_for("admin_hoat_chat.danh_sach"))
+
+
+@bp.route("/xoa-hang-loat", methods=["POST"])
+@login_required
+def xoa_hang_loat():
+    ids = request.form.getlist("ids", type=int)
+    if not ids:
+        flash("Chưa chọn hoạt chất nào để xoá.", "warning")
+        return redirect(url_for("admin_hoat_chat.danh_sach"))
+    items = HoatChat.query.filter(HoatChat.id.in_(ids)).all()
+    da_xoa = 0
+    bi_bo_qua = 0
+    for hc in items:
+        if hc.danh_muc_thuoc_co_hoat_chat.first() or hc.nha_thuoc_bv_co_hoat_chat.first():
+            bi_bo_qua += 1
+            continue
+        db.session.delete(hc)
+        da_xoa += 1
+    db.session.commit()
+    if da_xoa:
+        flash(f"Đã xoá {da_xoa} hoạt chất.", "success")
+    if bi_bo_qua:
+        flash(f"Bỏ qua {bi_bo_qua} hoạt chất vì vẫn còn thuốc gắn với chúng.", "danger")
+    return redirect(url_for("admin_hoat_chat.danh_sach"))

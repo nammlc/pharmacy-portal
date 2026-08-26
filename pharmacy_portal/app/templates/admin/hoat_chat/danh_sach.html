@@ -17,10 +17,21 @@
 </form>
 
 {% if danh_sach_hc %}
+<div class="adm-bulk-toolbar" id="bulkToolbar" hidden>
+  <span class="adm-bulk-count" id="bulkCount"></span>
+  <div class="adm-bulk-actions">
+    <button type="button" class="btn btn-outline btn-sm" id="bulkClearBtn">Bỏ chọn</button>
+    <button type="submit" form="bulkDeleteForm" class="act-del-bulk" id="bulkDeleteBtn" disabled>Xoá đã chọn</button>
+  </div>
+</div>
+<form id="bulkDeleteForm" method="POST" action="{{ url_for('admin_hoat_chat.xoa_hang_loat') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+</form>
 <div class="adm-table-wrap">
   <table class="adm-table">
     <thead>
       <tr>
+        <th class="adm-check-col"><input type="checkbox" id="checkAll" aria-label="Chọn tất cả"></th>
         <th style="width:40px;">#</th>
         <th>Tên hoạt chất</th>
         <th></th>
@@ -29,6 +40,7 @@
     <tbody>
       {% for h in danh_sach_hc %}
       <tr>
+        <td class="adm-check-col"><input type="checkbox" name="ids" value="{{ h.id }}" form="bulkDeleteForm" class="js-row-check" aria-label="Chọn {{ h.ten_hoat_chat }}"></td>
         <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
         <td><strong>{{ h.ten_hoat_chat }}</strong></td>
         <td class="td-actions">
