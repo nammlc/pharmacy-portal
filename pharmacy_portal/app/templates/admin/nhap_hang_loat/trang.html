@@ -1,0 +1,61 @@
+{% extends "admin/base.html" %}
+{% block title %}Nhập hàng loạt{% endblock %}
+{% block page_eyebrow %}Nhập hàng loạt{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head"><h1>Nhập hàng loạt từ file</h1></div>
+
+<p style="color:var(--text-muted); font-size:13.5px; max-width:640px; margin-bottom:24px;">
+  Dùng để nhập nhanh nhiều thuốc cùng lúc bằng file CSV hoặc Excel (.xlsx), thay vì thêm
+  từng thuốc một qua form. Nhóm thuốc và hoạt chất chưa có trong hệ thống sẽ được
+  <strong>tự động tạo mới</strong> theo tên trong file. Nếu tên biệt dược đã tồn tại,
+  dữ liệu của thuốc đó sẽ được <strong>cập nhật</strong> theo file (không tạo trùng).
+</p>
+
+<div style="display:flex; flex-direction:column; gap:20px; max-width:640px;">
+
+  <div class="admin-form-card">
+    <h2 style="font-family:var(--font-display); font-size:16px; margin:0 0 6px;">Danh mục thuốc</h2>
+    <p style="color:var(--text-muted); font-size:13px; margin:0 0 16px;">
+      Cột cần có: <code>ten_biet_duoc</code> (bắt buộc), <code>nhom_thuoc</code>, <code>hoat_chat</code>
+      (nhiều hoạt chất cách nhau bằng dấu +), <code>thanh_phan</code>, <code>chi_dinh</code>,
+      <code>chong_chi_dinh</code>, <code>cach_dung_lieu_dung</code>, <code>link_chi_tiet</code>.
+    </p>
+    <a href="{{ url_for('admin_nhap_hang_loat.tai_mau_dmt') }}" style="font-size:13px; color:var(--sage-500); font-weight:600;">&#8595; Tải file mẫu CSV</a>
+
+    <form method="POST" action="{{ url_for('admin_nhap_hang_loat.nhap_dmt') }}" enctype="multipart/form-data" style="margin-top:16px;" novalidate>
+      {{ form_dmt.hidden_tag() }}
+      <div class="form-row" style="margin-bottom:14px;">
+        {{ form_dmt.file_du_lieu(accept=".csv,.xlsx") }}
+        {% for e in form_dmt.file_du_lieu.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+      </div>
+      {{ form_dmt.submit(class="btn btn-primary") }}
+    </form>
+  </div>
+
+  <div class="admin-form-card">
+    <h2 style="font-family:var(--font-display); font-size:16px; margin:0 0 6px;">Nhà thuốc BV</h2>
+    <p style="color:var(--text-muted); font-size:13px; margin:0 0 16px;">
+      Cột cần có: <code>ten_biet_duoc</code> (bắt buộc), <code>nhom_thuoc</code>, <code>hoat_chat</code>
+      (nhiều hoạt chất cách nhau bằng dấu +), <code>link_tham_khao</code>.
+    </p>
+    <a href="{{ url_for('admin_nhap_hang_loat.tai_mau_ntbv') }}" style="font-size:13px; color:var(--sage-500); font-weight:600;">&#8595; Tải file mẫu CSV</a>
+
+    <form method="POST" action="{{ url_for('admin_nhap_hang_loat.nhap_ntbv') }}" enctype="multipart/form-data" style="margin-top:16px;" novalidate>
+      {{ form_ntbv.hidden_tag() }}
+      <div class="form-row" style="margin-bottom:14px;">
+        {{ form_ntbv.file_du_lieu(accept=".csv,.xlsx") }}
+        {% for e in form_ntbv.file_du_lieu.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+      </div>
+      {{ form_ntbv.submit(class="btn btn-primary") }}
+    </form>
+  </div>
+
+  <div style="background:var(--paper-0); border:1px dashed var(--line-200); border-radius:var(--radius-md); padding:16px 18px; font-size:13px; color:var(--text-muted);">
+    <strong style="color:var(--ink-900);">Mẹo:</strong> mở file mẫu CSV bằng Excel, giữ nguyên dòng tiêu đề cột,
+    xoá dòng ví dụ và điền dữ liệu thật vào, rồi lưu lại (giữ định dạng .csv hoặc lưu thành .xlsx) và tải lên đây.
+    File Excel xuất từ hệ thống khác cũng dùng được, miễn có đủ các cột tên như trên (không phân biệt hoa/thường, có dấu hay không).
+  </div>
+
+</div>
+{% endblock %}

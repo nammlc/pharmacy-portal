@@ -110,6 +110,9 @@ def create_app(config_class=Config):
     from app.routes.admin_ve_chung_toi import bp as admin_vct_bp
     app.register_blueprint(admin_vct_bp)
 
+    from app.routes.admin_nhap_hang_loat import bp as admin_nhap_hang_loat_bp
+    app.register_blueprint(admin_nhap_hang_loat_bp)
+
     _tao_tai_khoan_dau_tien_neu_can(app)
 
     return app
