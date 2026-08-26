@@ -12,8 +12,11 @@ Kết quả sắp xếp: exact/prefix lên đầu, fuzzy xuống dưới.
 
 from __future__ import annotations
 import re
+import logging
 from sqlalchemy import or_, and_, text
 from app import db
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -54,6 +57,16 @@ def _trgm_ids_thuoc(tu_khoa: str, bang: str, col: str, id_col: str = "id",
         ).fetchall()
         return [r[0] for r in rows]
     except Exception:
+        # KHÔNG để lỗi này biến mất âm thầm - fuzzy search phụ thuộc
+        # extension pg_trgm trên Postgres (bật qua file them_trgm.sql).
+        # Nếu chưa bật, hoặc chạy nhầm trên SQLite (không hỗ trợ
+        # similarity()/ILIKE), lỗi sẽ hiện trong log Render thay vì
+        # khiến tính năng "im lặng" không hoạt động mà không rõ vì sao.
+        logger.warning(
+            "Fuzzy search (pg_trgm) lỗi trên bảng '%s' cột '%s' - "
+            "có thể chưa chạy them_trgm.sql trên Neon, hoặc DB không phải Postgres.",
+            bang, col, exc_info=True,
+        )
         return []
 
 
@@ -72,6 +85,11 @@ def _trgm_ids_hoat_chat(tu_khoa: str, limit: int = 40) -> list[int]:
         ).fetchall()
         return [r[0] for r in rows]
     except Exception:
+        logger.warning(
+            "Fuzzy search (pg_trgm) lỗi trên bảng 'hoat_chat' - "
+            "có thể chưa chạy them_trgm.sql trên Neon, hoặc DB không phải Postgres.",
+            exc_info=True,
+        )
         return []
 
 

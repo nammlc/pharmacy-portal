@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request
 from app.models.models import CaiDat, DanhMucThuoc, NhaThuocBV, HoatChat
+from app.utils.tim_kiem import tim_danh_muc_thuoc, tim_nha_thuoc_bv
 
 bp = Blueprint("main", __name__)
 
@@ -30,35 +31,18 @@ def trang_chu():
 
 @bp.route("/tim-kiem")
 def tim_kiem():
-    """Tìm kiếm gộp: trả kết quả từ cả Danh mục thuốc và Nhà thuốc BV."""
+    """Tìm kiếm gộp: trả kết quả từ cả Danh mục thuốc và Nhà thuốc BV
+    - dùng chung bộ máy fuzzy search (bắt lỗi chính tả, gõ thiếu dấu...)
+    với ô tìm kiếm trong 2 trang Danh mục thuốc / Nhà thuốc BV, thay vì
+    so khớp ilike đơn thuần như trước."""
     tu_khoa = request.args.get("q", "").strip()
     if not tu_khoa:
         return redirect(url_for("main.trang_chu"))
 
     SO_XEM_TRUOC = 8
-    like_pattern = f"%{tu_khoa}%"
 
-    phan_trang_dmt = (
-        DanhMucThuoc.query.outerjoin(DanhMucThuoc.hoat_chat_list)
-        .filter(
-            DanhMucThuoc.ten_biet_duoc.ilike(like_pattern)
-            | HoatChat.ten_hoat_chat.ilike(like_pattern)
-        )
-        .order_by(DanhMucThuoc.ten_biet_duoc)
-        .distinct()
-        .paginate(page=1, per_page=SO_XEM_TRUOC, error_out=False)
-    )
-
-    phan_trang_ntbv = (
-        NhaThuocBV.query.outerjoin(NhaThuocBV.hoat_chat_list)
-        .filter(
-            NhaThuocBV.ten_biet_duoc.ilike(like_pattern)
-            | HoatChat.ten_hoat_chat.ilike(like_pattern)
-        )
-        .order_by(NhaThuocBV.ten_biet_duoc)
-        .distinct()
-        .paginate(page=1, per_page=SO_XEM_TRUOC, error_out=False)
-    )
+    phan_trang_dmt = tim_danh_muc_thuoc(tu_khoa, per_page=SO_XEM_TRUOC, page=1)
+    phan_trang_ntbv = tim_nha_thuoc_bv(tu_khoa, per_page=SO_XEM_TRUOC, page=1)
 
     return render_template(
         "tim_kiem_tong_hop.html",
