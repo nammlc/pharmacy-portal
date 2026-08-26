@@ -76,7 +76,10 @@
             <span class="anh-paste-zone-icon">&#128203;</span>
             Bấm vào đây rồi <kbd>Ctrl</kbd>+<kbd>V</kbd> để dán ảnh đã copy
           </div>
-          <img id="pre1" src="#" alt="" class="vct-preview-img" style="display:none;">
+          <div class="preview-img-box">
+            <img id="pre1" src="#" alt="" class="vct-preview-img" style="display:none;">
+            <button type="button" class="preview-clear-btn" id="pre1-clear" style="display:none;" title="Bỏ ảnh vừa chọn">&times;</button>
+          </div>
         </div>
 
         <!-- Ảnh 2 -->
@@ -98,7 +101,10 @@
             <span class="anh-paste-zone-icon">&#128203;</span>
             Bấm vào đây rồi <kbd>Ctrl</kbd>+<kbd>V</kbd> để dán ảnh đã copy
           </div>
-          <img id="pre2" src="#" alt="" class="vct-preview-img" style="display:none;">
+          <div class="preview-img-box">
+            <img id="pre2" src="#" alt="" class="vct-preview-img" style="display:none;">
+            <button type="button" class="preview-clear-btn" id="pre2-clear" style="display:none;" title="Bỏ ảnh vừa chọn">&times;</button>
+          </div>
         </div>
 
       </div>
@@ -178,11 +184,32 @@
 <script>
 function previewAnh(input, preId) {
   const img = document.getElementById(preId);
+  const clearBtn = document.getElementById(preId + '-clear');
   const file = input.files[0];
-  if (!file) { img.style.display = 'none'; return; }
+  if (!file) {
+    img.style.display = 'none';
+    if (clearBtn) clearBtn.style.display = 'none';
+    return;
+  }
   const reader = new FileReader();
-  reader.onload = e => { img.src = e.target.result; img.style.display = 'block'; };
+  reader.onload = e => {
+    img.src = e.target.result;
+    img.style.display = 'block';
+    if (clearBtn) clearBtn.style.display = 'flex';
+  };
   reader.readAsDataURL(file);
 }
+
+document.querySelectorAll('.preview-clear-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    const preId = btn.id.replace('-clear', '');
+    const img = document.getElementById(preId);
+    const inputName = preId === 'pre1' ? 'file_anh_1' : 'file_anh_2';
+    const input = document.querySelector('input[name="' + inputName + '"]');
+    if (input) input.value = '';
+    if (img) img.style.display = 'none';
+    btn.style.display = 'none';
+  });
+});
 </script>
 {% endblock %}

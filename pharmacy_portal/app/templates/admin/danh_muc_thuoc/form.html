@@ -68,8 +68,11 @@
 
       <div id="preview-wrap" style="display:none; margin-top:10px;">
         <p style="font-size:0.85em; color:#555; margin-bottom:4px;">Xem trước:</p>
-        <img id="preview-img" src="#" alt="Xem trước"
-             style="max-width:200px; max-height:200px; border-radius:8px; border:1px solid #ddd; padding:4px;">
+        <div class="preview-img-box">
+          <img id="preview-img" src="#" alt="Xem trước"
+               style="max-width:200px; max-height:200px; border-radius:8px; border:1px solid #ddd; padding:4px; display:block;">
+          <button type="button" id="preview-clear-btn" class="preview-clear-btn" title="Bỏ ảnh vừa chọn">&times;</button>
+        </div>
       </div>
     </div>
 
@@ -82,10 +85,11 @@
 
 <script>
   (function () {
-    const input    = document.querySelector('input[name="file_anh"]');
-    const wrap     = document.getElementById('preview-wrap');
-    const img      = document.getElementById('preview-img');
-    const xoaAnh   = document.querySelector('input[name="xoa_anh"]');
+    const input     = document.querySelector('input[name="file_anh"]');
+    const wrap      = document.getElementById('preview-wrap');
+    const img       = document.getElementById('preview-img');
+    const xoaAnh    = document.querySelector('input[name="xoa_anh"]');
+    const clearBtn  = document.getElementById('preview-clear-btn');
     if (!input) return;
     input.addEventListener('change', function () {
       const file = this.files[0];
@@ -100,6 +104,13 @@
       // Đã chọn ảnh mới -> ảnh mới sẽ tự thay ảnh cũ, không cần tích "xoá ảnh" nữa
       if (xoaAnh) { xoaAnh.checked = false; xoaAnh.disabled = true; }
     });
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        input.value = '';
+        wrap.style.display = 'none';
+        if (xoaAnh) xoaAnh.disabled = false;
+      });
+    }
   })();
 </script>
 {% endblock %}

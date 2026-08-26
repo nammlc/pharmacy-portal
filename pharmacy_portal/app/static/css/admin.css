@@ -319,3 +319,30 @@
   font-size: 11.5px;
   color: var(--ink-900);
 }
+
+/* ---------- Preview ảnh + nút X để bỏ ảnh vừa chọn ---------- */
+.preview-img-box {
+  position: relative;
+  display: inline-block;
+}
+.preview-clear-btn {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ink-900);
+  color: #fff;
+  border: 2px solid #fff;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  transition: background 0.15s, transform 0.15s;
+}
+.preview-clear-btn:hover { background: #c73e3e; transform: scale(1.08); }
