@@ -7,7 +7,12 @@
 <div class="admin-form-card">
   <form method="POST" novalidate>
     {{ form.hidden_tag() }}
-    {% for field in [form.mat_khau_hien_tai, form.mat_khau_moi, form.xac_nhan_mat_khau_moi] %}
+    <div class="form-row">
+      {{ form.mat_khau_hien_tai.label }}
+      {{ form.mat_khau_hien_tai(autocomplete="current-password") }}
+      {% for e in form.mat_khau_hien_tai.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+    {% for field in [form.mat_khau_moi, form.xac_nhan_mat_khau_moi] %}
     <div class="form-row">
       {{ field.label }}
       {{ field(autocomplete="new-password") }}

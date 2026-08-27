@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -43,3 +44,15 @@ class Config:
 
     # Kích thước file tối đa cho phép upload (5 MB)
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024
+
+    # --- Tự động đăng xuất khi không hoạt động ---
+    # Phiên đăng nhập admin hết hạn sau 15 phút không thao tác gì (không phải
+    # 15 phút kể từ lúc đăng nhập - mỗi request sẽ tự làm mới lại đồng hồ này,
+    # xem SESSION_REFRESH_EACH_REQUEST + session.permanent=True trong admin_auth.py).
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=15)
+    SESSION_REFRESH_EACH_REQUEST = True
+    # Cookie phiên chỉ gửi qua HTTPS khi chạy production (Render luôn có HTTPS).
+    # Đặt False khi chạy local (http://127.0.0.1) để không bị mất cookie lúc test.
+    SESSION_COOKIE_SECURE = os.environ.get("DB_TYPE") == "postgres"
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
