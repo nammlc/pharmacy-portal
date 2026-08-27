@@ -236,6 +236,8 @@
 }
 </style>
 
+<script>const TOTAL_ROWS = {{ rows|length }};</script>
+{% raw %}
 <script>
 // Toggle mở/đóng card
 function toggleCard(idx) {
@@ -291,7 +293,7 @@ function filterHoatChat(input) {
 
 // Confirm trước khi submit
 function confirmSubmit() {
-  const total = {{ rows|length|tojson }};
+  const total = TOTAL_ROWS;
   const checks = document.querySelectorAll('.pv-check:checked');
   const idxSet = new Set([...checks].map(c => c.dataset.idx));
   if (idxSet.size < total) {
@@ -317,3 +319,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+{% endraw %}
+{% endblock %}
