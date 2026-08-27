@@ -76,7 +76,7 @@
     {{ form.hidden_tag() }}
     <div class="form-row">
       {{ form.file_du_lieu.label }}
-      {{ form.file_du_lieu(accept=".xlsx") }}
+      {{ form.file_du_lieu(accept=".xlsx,.csv") }}
       {% for e in form.file_du_lieu.errors %}
       <div class="field-errors">{{ e }}</div>
       {% endfor %}

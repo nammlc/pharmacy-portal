@@ -26,13 +26,13 @@ from app.utils.lam_sach_html import lam_sach_html
 
 bp = Blueprint("admin_nhap_hang_loat", __name__, url_prefix="/admin/nhap-hang-loat")
 
-_DUOI_FILE = ["xlsx"]
+_DUOI_FILE = ["xlsx", "csv"]
 
 
 class UploadForm(FlaskForm):
     file_du_lieu = FileField(
         "Chọn file Excel (.xlsx)",
-        validators=[FileRequired(), FileAllowed(_DUOI_FILE, "Chỉ nhận file .xlsx.")],
+        validators=[FileRequired(), FileAllowed(_DUOI_FILE, "Chỉ nhận file .xlsx hoặc .csv.")],
     )
     submit = SubmitField("Tiếp tục →")
 

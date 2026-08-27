@@ -291,7 +291,7 @@ function filterHoatChat(input) {
 
 // Confirm trước khi submit
 function confirmSubmit() {
-  const total = {{ rows|length }};
+  const total = {{ rows|length|tojson }};
   const checks = document.querySelectorAll('.pv-check:checked');
   const idxSet = new Set([...checks].map(c => c.dataset.idx));
   if (idxSet.size < total) {
