@@ -32,6 +32,44 @@ class Config:
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # --- Connection pool — fix lỗi "connection closed" sau thời gian không dùng ---
+    # Neon (và nhiều PaaS) đóng kết nối idle sau ~5 phút.
+    # pool_pre_ping=True: kiểm tra connection còn sống trước mỗi request.
+    # pool_recycle=300: tái tạo connection sau 300 giây (trước khi Neon đóng).
+    # pool_size + max_overflow: giới hạn số kết nối đồng thời (phù hợp free tier).
+    # pool_pre_ping + recycle: fix lỗi "connection closed" sau idle
+    # connect_args keepalives chỉ dùng cho PostgreSQL (psycopg2), không dùng cho SQLite/MySQL
+    if DB_TYPE == "mysql":
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            "pool_pre_ping": True,
+            "pool_recycle": 280,
+            "pool_size": 3,
+            "max_overflow": 5,
+            "pool_timeout": 20,
+        }
+    elif "postgresql" in (
+        os.environ.get("DATABASE_URL", "")
+    ):
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            "pool_pre_ping": True,
+            "pool_recycle": 280,
+            "pool_size": 3,
+            "max_overflow": 5,
+            "pool_timeout": 20,
+            "connect_args": {
+                "connect_timeout": 10,
+                "keepalives": 1,
+                "keepalives_idle": 60,
+                "keepalives_interval": 10,
+                "keepalives_count": 5,
+            },
+        }
+    else:
+        # SQLite: không cần pool phức tạp
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            "pool_pre_ping": True,
+        }
+
     # Số kết quả tối đa hiển thị trên 1 trang tra cứu
     RESULTS_PER_PAGE = 20
 

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="refresh" content="3">
+<title>Đang kết nối lại...</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #f4f7fb; color: #0b1f3a;
+    min-height: 100vh; display: flex;
+    align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: #fff; border-radius: 16px;
+    padding: 48px 40px; max-width: 420px; width: 100%;
+    text-align: center;
+    box-shadow: 0 16px 48px rgba(11,31,58,0.12);
+  }
+  .spinner {
+    width: 48px; height: 48px;
+    border: 4px solid #dbe4ee;
+    border-top-color: #1a4d8f;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    margin: 0 auto 24px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  h1 { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+  p { color: #57708a; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+  .reload-btn {
+    display: inline-block; background: #1a4d8f; color: #fff;
+    border: 0; border-radius: 8px; padding: 11px 24px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: inherit; text-decoration: none;
+  }
+  .reload-btn:hover { background: #2568b3; }
+  .countdown { font-size: 12px; color: #9bafc7; margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="spinner"></div>
+  <h1>Đang kết nối lại...</h1>
+  <p>Kết nối đến cơ sở dữ liệu bị gián đoạn do không hoạt động trong một thời gian. Trang sẽ tự động tải lại.</p>
+  <a href="javascript:location.reload()" class="reload-btn">Tải lại ngay</a>
+  <div class="countdown" id="cd">Tự động tải lại sau 3 giây...</div>
+</div>
+<script>
+  let s = 3;
+  const cd = document.getElementById('cd');
+  setInterval(() => {
+    s--;
+    if (s <= 0) { location.reload(); return; }
+    cd.textContent = `Tự động tải lại sau ${s} giây...`;
+  }, 1000);
+</script>
+</body>
+</html>

@@ -115,6 +115,27 @@ def create_app(config_class=Config):
 
     _tao_tai_khoan_dau_tien_neu_can(app)
 
+    # --- Xử lý lỗi DB connection (OperationalError) ---
+    # Khi connection pool trả về connection chết, SQLAlchemy raise OperationalError.
+    # pool_pre_ping đã xử lý hầu hết, nhưng thêm handler này làm lớp dự phòng:
+    # thay vì trang trắng 500, user thấy thông báo và tự động reload.
+    from sqlalchemy.exc import OperationalError, DisconnectionError
+    from flask import render_template as _render
+
+    @app.errorhandler(OperationalError)
+    def xu_ly_loi_ket_noi_db(e):
+        app.logger.error(f"DB OperationalError: {e}")
+        # Thử đóng session hiện tại để request sau dùng connection mới
+        try:
+            db.session.remove()
+        except Exception:
+            pass
+        return _render("loi_ket_noi.html"), 503
+
+    @app.errorhandler(503)
+    def xu_ly_503(e):
+        return _render("loi_ket_noi.html"), 503
+
     return app
 
 
