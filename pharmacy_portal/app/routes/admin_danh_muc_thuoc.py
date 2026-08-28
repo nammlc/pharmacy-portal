@@ -5,6 +5,7 @@ from app.models.models import DanhMucThuoc, NhomThuoc, HoatChat
 from app.forms import DanhMucThuocForm, _tuy_chon_rong
 from app.utils.lam_sach_html import lam_sach_html
 from app.utils.upload_anh import upload_anh_danh_muc_thuoc, xoa_anh_cloudinary
+from app.utils.xoa_hang_loat_crud import lay_id_tu_form, xoa_theo_danh_sach_id, xoa_toan_bo, flash_ket_qua_xoa
 
 bp = Blueprint("admin_dmt", __name__, url_prefix="/admin/danh-muc-thuoc")
 
@@ -117,19 +118,31 @@ def xoa(thuoc_id):
     return redirect(url_for("admin_dmt.danh_sach"))
 
 
+def _xoa_anh_thuoc(thuoc):
+    if thuoc.hinh_anh:
+        xoa_anh_cloudinary(thuoc.hinh_anh)
+
+
 @bp.route("/xoa-hang-loat", methods=["POST"])
 @login_required
 def xoa_hang_loat():
-    ids = request.form.getlist("ids", type=int)
-    if not ids:
-        flash("Chưa chọn thuốc nào để xoá.", "warning")
-        return redirect(url_for("admin_dmt.danh_sach"))
-    items = DanhMucThuoc.query.filter(DanhMucThuoc.id.in_(ids)).all()
-    so_luong = len(items)
-    for thuoc in items:
-        if thuoc.hinh_anh:
-            xoa_anh_cloudinary(thuoc.hinh_anh)
-        db.session.delete(thuoc)
-    db.session.commit()
-    flash(f'Đã xoá {so_luong} thuốc khỏi Danh mục thuốc.', "success")
+    ids = lay_id_tu_form(request)
+    so_da_xoa, bo_qua = xoa_theo_danh_sach_id(
+        DanhMucThuoc, ids,
+        xoa_anh=_xoa_anh_thuoc,
+        hien_thi=lambda t: t.ten_biet_duoc,
+    )
+    flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="thuốc trong Danh mục thuốc")
+    return redirect(url_for("admin_dmt.danh_sach"))
+
+
+@bp.route("/xoa-tat-ca", methods=["POST"])
+@login_required
+def xoa_tat_ca():
+    so_da_xoa, bo_qua = xoa_toan_bo(
+        DanhMucThuoc,
+        xoa_anh=_xoa_anh_thuoc,
+        hien_thi=lambda t: t.ten_biet_duoc,
+    )
+    flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="thuốc trong Danh mục thuốc")
     return redirect(url_for("admin_dmt.danh_sach"))

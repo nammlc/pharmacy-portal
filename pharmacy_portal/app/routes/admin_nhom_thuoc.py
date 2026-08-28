@@ -4,6 +4,7 @@ from app import db
 from app.models.models import NhomThuoc
 from app.forms import NhomThuocForm
 from app.utils.upload_anh import upload_anh_nhom_thuoc, xoa_anh_cloudinary
+from app.utils.xoa_hang_loat_crud import lay_id_tu_form, xoa_theo_danh_sach_id, xoa_toan_bo, flash_ket_qua_xoa
 
 bp = Blueprint("admin_nhom_thuoc", __name__, url_prefix="/admin/nhom-thuoc")
 
@@ -37,7 +38,7 @@ def them():
         file_anh = request.files.get("file_anh")
         if file_anh and file_anh.filename:
             try:
-                url = upload_anh_nhom_thuoc(file_anh, public_id=f"nhom_{nhom.id}")
+                url = upload_anh_nhom_thuoc(file_anh)
                 if url:
                     nhom.hinh_anh = url
             except ValueError as e:
@@ -68,7 +69,7 @@ def sua(nhom_id):
         anh_moi_url = None
         if file_anh and file_anh.filename:
             try:
-                anh_moi_url = upload_anh_nhom_thuoc(file_anh, public_id=f"nhom_{nhom.id}")
+                anh_moi_url = upload_anh_nhom_thuoc(file_anh)
             except ValueError as e:
                 flash(str(e), "warning")
 
@@ -103,29 +104,41 @@ def xoa(nhom_id):
     return redirect(url_for("admin_nhom_thuoc.danh_sach"))
 
 
+def _xoa_anh_nhom(nhom):
+    if nhom.hinh_anh:
+        xoa_anh_cloudinary(nhom.hinh_anh)
+
+
+def _kiem_tra_nhom_con_thuoc(nhom):
+    if nhom.danh_muc_thuoc_list or nhom.nha_thuoc_bv_list:
+        return "còn thuốc thuộc nhóm này"
+    return None
+
+
 @bp.route("/xoa-hang-loat", methods=["POST"])
 @login_required
 def xoa_hang_loat():
-    ids = request.form.getlist("ids", type=int)
-    if not ids:
-        flash("Chưa chọn nhóm thuốc nào để xoá.", "warning")
-        return redirect(url_for("admin_nhom_thuoc.danh_sach"))
-    items = NhomThuoc.query.filter(NhomThuoc.id.in_(ids)).all()
-    da_xoa = 0
-    bi_bo_qua = 0
-    for nhom in items:
-        if nhom.danh_muc_thuoc_list or nhom.nha_thuoc_bv_list:
-            bi_bo_qua += 1
-            continue
-        if nhom.hinh_anh:
-            xoa_anh_cloudinary(nhom.hinh_anh)
-        db.session.delete(nhom)
-        da_xoa += 1
-    db.session.commit()
-    if da_xoa:
-        flash(f"Đã xoá {da_xoa} nhóm thuốc.", "success")
-    if bi_bo_qua:
-        flash(f"Bỏ qua {bi_bo_qua} nhóm vì vẫn còn thuốc thuộc nhóm này.", "danger")
+    ids = lay_id_tu_form(request)
+    so_da_xoa, bo_qua = xoa_theo_danh_sach_id(
+        NhomThuoc, ids,
+        xoa_anh=_xoa_anh_nhom,
+        kiem_tra_rang_buoc=_kiem_tra_nhom_con_thuoc,
+        hien_thi=lambda n: n.ten_nhom,
+    )
+    flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="nhóm thuốc")
+    return redirect(url_for("admin_nhom_thuoc.danh_sach"))
+
+
+@bp.route("/xoa-tat-ca", methods=["POST"])
+@login_required
+def xoa_tat_ca():
+    so_da_xoa, bo_qua = xoa_toan_bo(
+        NhomThuoc,
+        xoa_anh=_xoa_anh_nhom,
+        kiem_tra_rang_buoc=_kiem_tra_nhom_con_thuoc,
+        hien_thi=lambda n: n.ten_nhom,
+    )
+    flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="nhóm thuốc")
     return redirect(url_for("admin_nhom_thuoc.danh_sach"))
 
 

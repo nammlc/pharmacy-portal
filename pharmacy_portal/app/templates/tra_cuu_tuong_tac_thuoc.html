@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="page-header">
-  <div class="eyebrow">Tra cứu</div>
+  <div class="eyebrow">⚠️ Tra cứu</div>
   <h1>Tương tác thuốc</h1>
   <p>Mức độ, cơ chế và hướng xử trí khi hai thuốc dùng đồng thời.</p>
 </div>
@@ -11,7 +11,7 @@
 <div class="search-panel">
   <form class="search-form" method="get">
     <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên thuốc...">
-    <button type="submit">Tra cứu</button>
+    <button type="submit">🔍 Tra cứu</button>
   </form>
 </div>
 
@@ -30,19 +30,25 @@
     <tbody>
       {% for item in ket_qua %}
       <tr>
-        <td>{{ item.thuoc_a.ten_thuoc }}</td>
-        <td>{{ item.thuoc_b.ten_thuoc }}</td>
-        <td><span class="badge-level badge-{{ item.muc_do }}">{{ item.muc_do.replace('_', ' ') }}</span></td>
-        <td class="rich-content">{{ (item.hau_qua_lam_sang | safe) if item.hau_qua_lam_sang else '—' }}</td>
-        <td class="rich-content">{{ (item.xu_tri | safe) if item.xu_tri else '—' }}</td>
+        <td data-nhan="Thuốc A">{{ item.thuoc_a.ten_thuoc }}</td>
+        <td data-nhan="Thuốc B">{{ item.thuoc_b.ten_thuoc }}</td>
+        <td data-nhan="Mức độ"><span class="badge-level badge-{{ item.muc_do }}">{{ item.muc_do.replace('_', ' ') }}</span></td>
+        <td data-nhan="Hậu quả" class="rich-content">{{ (item.hau_qua_lam_sang | safe) if item.hau_qua_lam_sang else '—' }}</td>
+        <td data-nhan="Xử trí" class="rich-content">{{ (item.xu_tri | safe) if item.xu_tri else '—' }}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   {% elif tu_khoa %}
-  <div class="empty-state">Không tìm thấy tương tác nào liên quan đến "{{ tu_khoa }}".</div>
+  <div class="empty-state">
+    <div class="empty-state-icon">&#128269;</div>
+    Không tìm thấy tương tác nào liên quan đến "{{ tu_khoa }}".
+  </div>
   {% else %}
-  <div class="empty-state">Nhập tên thuốc để xem các tương tác liên quan.</div>
+  <div class="empty-state">
+    <div class="empty-state-icon">&#9888;&#65039;</div>
+    Nhập tên thuốc để xem các tương tác liên quan.
+  </div>
   {% endif %}
 </div>
 {% endblock %}

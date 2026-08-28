@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="page-header">
-  <div class="eyebrow">Tra cứu</div>
+  <div class="eyebrow">🧪 Tra cứu</div>
   <h1>Tương hợp - Tương kỵ thuốc</h1>
   <p>Kiểm tra khả năng phối hợp hoặc pha chung giữa hai thuốc.</p>
 </div>
@@ -12,7 +12,7 @@
   <form class="search-form" method="get">
     <input type="text" name="thuoc_a" value="{{ thuoc_a }}" placeholder="Thuốc thứ nhất...">
     <input type="text" name="thuoc_b" value="{{ thuoc_b }}" placeholder="Thuốc thứ hai...">
-    <button type="submit">Kiểm tra</button>
+    <button type="submit">🔍 Kiểm tra</button>
   </form>
 </div>
 
@@ -30,18 +30,24 @@
     <tbody>
       {% for item in ket_qua %}
       <tr>
-        <td>{{ item.thuoc_a.ten_thuoc }}</td>
-        <td>{{ item.thuoc_b.ten_thuoc }}</td>
-        <td><span class="badge-level badge-{{ item.trang_thai }}">{{ item.trang_thai.replace('_', ' ') }}</span></td>
-        <td class="rich-content">{{ (item.mo_ta | safe) if item.mo_ta else '—' }}</td>
+        <td data-nhan="Thuốc A">{{ item.thuoc_a.ten_thuoc }}</td>
+        <td data-nhan="Thuốc B">{{ item.thuoc_b.ten_thuoc }}</td>
+        <td data-nhan="Trạng thái"><span class="badge-level badge-{{ item.trang_thai }}">{{ item.trang_thai.replace('_', ' ') }}</span></td>
+        <td data-nhan="Mô tả" class="rich-content">{{ (item.mo_ta | safe) if item.mo_ta else '—' }}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   {% elif thuoc_a and thuoc_b %}
-  <div class="empty-state">Chưa có dữ liệu tương hợp - tương kỵ cho cặp thuốc này.</div>
+  <div class="empty-state">
+    <div class="empty-state-icon">&#128269;</div>
+    Chưa có dữ liệu tương hợp - tương kỵ cho cặp thuốc này.
+  </div>
   {% else %}
-  <div class="empty-state">Nhập tên 2 thuốc cần kiểm tra để bắt đầu.</div>
+  <div class="empty-state">
+    <div class="empty-state-icon">&#129514;</div>
+    Nhập tên 2 thuốc cần kiểm tra để bắt đầu.
+  </div>
   {% endif %}
 </div>
 {% endblock %}

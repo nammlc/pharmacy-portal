@@ -17,21 +17,10 @@
 </form>
 
 {% if danh_sach_thuoc %}
-<div class="adm-bulk-toolbar" id="bulkToolbar" hidden>
-  <span class="adm-bulk-count" id="bulkCount"></span>
-  <div class="adm-bulk-actions">
-    <button type="button" class="btn btn-outline btn-sm" id="bulkClearBtn">Bỏ chọn</button>
-    <button type="submit" form="bulkDeleteForm" class="act-del-bulk" id="bulkDeleteBtn" disabled>Xoá đã chọn</button>
-  </div>
-</div>
-<form id="bulkDeleteForm" method="POST" action="{{ url_for('admin_ntbv.xoa_hang_loat') }}">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-</form>
 <div class="adm-table-wrap">
   <table class="adm-table">
     <thead>
       <tr>
-        <th class="adm-check-col"><input type="checkbox" id="checkAll" aria-label="Chọn tất cả"></th>
         <th style="width:40px;">#</th>
         <th style="width:42px;"></th>
         <th>Tên biệt dược</th>
@@ -43,7 +32,6 @@
     <tbody>
       {% for t in danh_sach_thuoc %}
       <tr>
-        <td class="adm-check-col"><input type="checkbox" name="ids" value="{{ t.id }}" form="bulkDeleteForm" class="js-row-check" aria-label="Chọn {{ t.ten_biet_duoc }}"></td>
         <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
         <td>
           {% if t.hinh_anh %}

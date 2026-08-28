@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, session
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from app.models.models import NguoiDung
 from app.forms import DangNhapForm, DoiMatKhauForm
@@ -26,11 +26,6 @@ def dang_nhap():
             return render_template("admin/dang_nhap.html", form=form)
 
         login_user(nguoi_dung)
-        # Đánh dấu phiên là "permanent" để áp dụng PERMANENT_SESSION_LIFETIME
-        # (tự đăng xuất sau 15 phút không hoạt động - xem config.py). Không
-        # dùng remember-cookie (login_user mặc định remember=False) vì
-        # remember-cookie sẽ ghi đè, khiến phiên không bao giờ tự hết hạn.
-        session.permanent = True
         next_page = request.args.get("next")
         return redirect(next_page or url_for("admin_dashboard.trang_chinh"))
 

@@ -4,6 +4,7 @@ from app import db
 from app.models.models import TuongTacThuoc, Thuoc
 from app.forms import TuongTacThuocForm
 from app.utils.lam_sach_html import lam_sach_html
+from app.utils.xoa_hang_loat_crud import lay_id_tu_form, xoa_theo_danh_sach_id, xoa_toan_bo, flash_ket_qua_xoa
 
 bp = Blueprint("admin_ttt", __name__, url_prefix="/admin/tuong-tac-thuoc")
 
@@ -69,17 +70,24 @@ def xoa(item_id):
     return redirect(url_for("admin_ttt.danh_sach"))
 
 
+def _hien_thi_cap(item):
+    ten_a = item.thuoc_a.ten_thuoc if item.thuoc_a else "?"
+    ten_b = item.thuoc_b.ten_thuoc if item.thuoc_b else "?"
+    return f"{ten_a} & {ten_b}"
+
+
 @bp.route("/xoa-hang-loat", methods=["POST"])
 @login_required
 def xoa_hang_loat():
-    ids = request.form.getlist("ids", type=int)
-    if not ids:
-        flash("Chưa chọn cặp nào để xoá.", "warning")
-        return redirect(url_for("admin_ttt.danh_sach"))
-    items = TuongTacThuoc.query.filter(TuongTacThuoc.id.in_(ids)).all()
-    so_luong = len(items)
-    for item in items:
-        db.session.delete(item)
-    db.session.commit()
-    flash(f"Đã xoá {so_luong} tương tác thuốc.", "success")
+    ids = lay_id_tu_form(request)
+    so_da_xoa, bo_qua = xoa_theo_danh_sach_id(TuongTacThuoc, ids, hien_thi=_hien_thi_cap)
+    flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="cặp tương tác thuốc")
+    return redirect(url_for("admin_ttt.danh_sach"))
+
+
+@bp.route("/xoa-tat-ca", methods=["POST"])
+@login_required
+def xoa_tat_ca():
+    so_da_xoa, bo_qua = xoa_toan_bo(TuongTacThuoc, hien_thi=_hien_thi_cap)
+    flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="cặp tương tác thuốc")
     return redirect(url_for("admin_ttt.danh_sach"))

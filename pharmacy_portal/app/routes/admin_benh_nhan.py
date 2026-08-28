@@ -4,6 +4,7 @@ from app import db
 from app.models.models import ThongTinBenhNhan
 from app.forms import ThongTinBenhNhanForm
 from app.utils.lam_sach_html import lam_sach_html
+from app.utils.xoa_hang_loat_crud import lay_id_tu_form, xoa_theo_danh_sach_id, xoa_toan_bo, flash_ket_qua_xoa
 
 bp = Blueprint("admin_ttbn", __name__, url_prefix="/admin/thong-tin-benh-nhan")
 
@@ -62,14 +63,21 @@ def xoa(item_id):
 @bp.route("/xoa-hang-loat", methods=["POST"])
 @login_required
 def xoa_hang_loat():
-    ids = request.form.getlist("ids", type=int)
-    if not ids:
-        flash("Chưa chọn bài viết nào để xoá.", "warning")
-        return redirect(url_for("admin_ttbn.danh_sach"))
-    items = ThongTinBenhNhan.query.filter(ThongTinBenhNhan.id.in_(ids)).all()
-    so_luong = len(items)
-    for item in items:
-        db.session.delete(item)
-    db.session.commit()
-    flash(f"Đã xoá {so_luong} bài viết.", "success")
+    ids = lay_id_tu_form(request)
+    so_da_xoa, bo_qua = xoa_theo_danh_sach_id(
+        ThongTinBenhNhan, ids,
+        hien_thi=lambda b: b.tieu_de,
+    )
+    flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="bài viết")
+    return redirect(url_for("admin_ttbn.danh_sach"))
+
+
+@bp.route("/xoa-tat-ca", methods=["POST"])
+@login_required
+def xoa_tat_ca():
+    so_da_xoa, bo_qua = xoa_toan_bo(
+        ThongTinBenhNhan,
+        hien_thi=lambda b: b.tieu_de,
+    )
+    flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="bài viết")
     return redirect(url_for("admin_ttbn.danh_sach"))

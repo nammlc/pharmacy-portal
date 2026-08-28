@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="page-header">
-  <div class="eyebrow">Tra cứu</div>
+  <div class="eyebrow">📋 Tra cứu</div>
   <h1>Thông tin thuốc</h1>
   <p>Danh mục thuốc, chỉ định, chống chỉ định, liều dùng và tác dụng phụ.</p>
 </div>
@@ -11,7 +11,7 @@
 <div class="search-panel">
   <form class="search-form" method="get">
     <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên thuốc hoặc hoạt chất...">
-    <button type="submit">Tra cứu</button>
+    <button type="submit">🔍 Tra cứu</button>
   </form>
 </div>
 
@@ -30,11 +30,11 @@
     <tbody>
       {% for thuoc in phan_trang.items %}
       <tr>
-        <td><strong>{{ thuoc.ten_thuoc }}</strong></td>
-        <td>{{ thuoc.hoat_chat or '—' }}</td>
-        <td>{{ thuoc.ham_luong or '—' }}</td>
-        <td>{{ thuoc.dang_bao_che or '—' }}</td>
-        <td><a href="{{ url_for('ttth.chi_tiet', thuoc_id=thuoc.id) }}" style="color: var(--sage-500); font-weight:600;">Xem chi tiết &rarr;</a></td>
+        <td data-nhan="Tên thuốc"><strong>{{ thuoc.ten_thuoc }}</strong></td>
+        <td data-nhan="Hoạt chất">{{ thuoc.hoat_chat or '—' }}</td>
+        <td data-nhan="Hàm lượng">{{ thuoc.ham_luong or '—' }}</td>
+        <td data-nhan="Dạng bào chế">{{ thuoc.dang_bao_che or '—' }}</td>
+        <td data-nhan=""><a href="{{ url_for('ttth.chi_tiet', thuoc_id=thuoc.id) }}" style="color: var(--sage-500); font-weight:600;">Xem chi tiết &rarr;</a></td>
       </tr>
       {% endfor %}
     </tbody>

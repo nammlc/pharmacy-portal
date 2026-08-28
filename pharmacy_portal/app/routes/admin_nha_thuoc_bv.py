@@ -4,6 +4,7 @@ from app import db
 from app.models.models import NhaThuocBV, NhomThuoc, HoatChat
 from app.forms import NhaThuocBVForm, _tuy_chon_rong
 from app.utils.upload_anh import upload_anh_nha_thuoc_bv, xoa_anh_cloudinary
+from app.utils.xoa_hang_loat_crud import lay_id_tu_form, xoa_theo_danh_sach_id, xoa_toan_bo, flash_ket_qua_xoa
 
 bp = Blueprint("admin_ntbv", __name__, url_prefix="/admin/nha-thuoc-bv")
 
@@ -107,19 +108,31 @@ def xoa(thuoc_id):
     return redirect(url_for("admin_ntbv.danh_sach"))
 
 
+def _xoa_anh_thuoc(thuoc):
+    if thuoc.hinh_anh:
+        xoa_anh_cloudinary(thuoc.hinh_anh)
+
+
 @bp.route("/xoa-hang-loat", methods=["POST"])
 @login_required
 def xoa_hang_loat():
-    ids = request.form.getlist("ids", type=int)
-    if not ids:
-        flash("Chưa chọn thuốc nào để xoá.", "warning")
-        return redirect(url_for("admin_ntbv.danh_sach"))
-    items = NhaThuocBV.query.filter(NhaThuocBV.id.in_(ids)).all()
-    so_luong = len(items)
-    for thuoc in items:
-        if thuoc.hinh_anh:
-            xoa_anh_cloudinary(thuoc.hinh_anh)
-        db.session.delete(thuoc)
-    db.session.commit()
-    flash(f'Đã xoá {so_luong} thuốc khỏi Nhà thuốc BV.', "success")
+    ids = lay_id_tu_form(request)
+    so_da_xoa, bo_qua = xoa_theo_danh_sach_id(
+        NhaThuocBV, ids,
+        xoa_anh=_xoa_anh_thuoc,
+        hien_thi=lambda t: t.ten_biet_duoc,
+    )
+    flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="thuốc trong Nhà thuốc BV")
+    return redirect(url_for("admin_ntbv.danh_sach"))
+
+
+@bp.route("/xoa-tat-ca", methods=["POST"])
+@login_required
+def xoa_tat_ca():
+    so_da_xoa, bo_qua = xoa_toan_bo(
+        NhaThuocBV,
+        xoa_anh=_xoa_anh_thuoc,
+        hien_thi=lambda t: t.ten_biet_duoc,
+    )
+    flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="thuốc trong Nhà thuốc BV")
     return redirect(url_for("admin_ntbv.danh_sach"))

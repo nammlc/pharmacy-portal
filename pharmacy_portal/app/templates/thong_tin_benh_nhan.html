@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="page-header">
-  <div class="eyebrow">Dành cho người bệnh</div>
+  <div class="eyebrow">🧑‍⚕️ Dành cho người bệnh</div>
   <h1>Thông tin cho bệnh nhân</h1>
   <p>Hướng dẫn sử dụng thuốc và chăm sóc tại nhà, trình bày dễ hiểu.</p>
 </div>
@@ -17,9 +17,9 @@
     <tbody>
       {% for bv in bai_viet %}
       <tr>
-        <td><strong>{{ bv.tieu_de }}</strong></td>
-        <td>{{ bv.danh_muc or '—' }}</td>
-        <td><a href="{{ url_for('ttbn.chi_tiet', bai_viet_id=bv.id) }}" style="color: var(--sage-500); font-weight:600;">Đọc &rarr;</a></td>
+        <td data-nhan="Tiêu đề"><strong>{{ bv.tieu_de }}</strong></td>
+        <td data-nhan="Danh mục">{{ bv.danh_muc or '—' }}</td>
+        <td data-nhan=""><a href="{{ url_for('ttbn.chi_tiet', bai_viet_id=bv.id) }}" style="color: var(--sage-500); font-weight:600;">Đọc &rarr;</a></td>
       </tr>
       {% endfor %}
     </tbody>

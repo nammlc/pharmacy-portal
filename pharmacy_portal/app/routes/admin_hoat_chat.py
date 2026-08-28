@@ -3,6 +3,7 @@ from flask_login import login_required
 from app import db
 from app.models.models import HoatChat
 from app.forms import HoatChatForm
+from app.utils.xoa_hang_loat_crud import lay_id_tu_form, xoa_theo_danh_sach_id, xoa_toan_bo, flash_ket_qua_xoa
 
 bp = Blueprint("admin_hoat_chat", __name__, url_prefix="/admin/hoat-chat")
 
@@ -65,25 +66,32 @@ def xoa(hc_id):
     return redirect(url_for("admin_hoat_chat.danh_sach"))
 
 
+def _kiem_tra_hc_con_thuoc(hc):
+    if hc.danh_muc_thuoc_co_hoat_chat.first() or hc.nha_thuoc_bv_co_hoat_chat.first():
+        return "còn thuốc gắn với hoạt chất này"
+    return None
+
+
 @bp.route("/xoa-hang-loat", methods=["POST"])
 @login_required
 def xoa_hang_loat():
-    ids = request.form.getlist("ids", type=int)
-    if not ids:
-        flash("Chưa chọn hoạt chất nào để xoá.", "warning")
-        return redirect(url_for("admin_hoat_chat.danh_sach"))
-    items = HoatChat.query.filter(HoatChat.id.in_(ids)).all()
-    da_xoa = 0
-    bi_bo_qua = 0
-    for hc in items:
-        if hc.danh_muc_thuoc_co_hoat_chat.first() or hc.nha_thuoc_bv_co_hoat_chat.first():
-            bi_bo_qua += 1
-            continue
-        db.session.delete(hc)
-        da_xoa += 1
-    db.session.commit()
-    if da_xoa:
-        flash(f"Đã xoá {da_xoa} hoạt chất.", "success")
-    if bi_bo_qua:
-        flash(f"Bỏ qua {bi_bo_qua} hoạt chất vì vẫn còn thuốc gắn với chúng.", "danger")
+    ids = lay_id_tu_form(request)
+    so_da_xoa, bo_qua = xoa_theo_danh_sach_id(
+        HoatChat, ids,
+        kiem_tra_rang_buoc=_kiem_tra_hc_con_thuoc,
+        hien_thi=lambda h: h.ten_hoat_chat,
+    )
+    flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="hoạt chất")
+    return redirect(url_for("admin_hoat_chat.danh_sach"))
+
+
+@bp.route("/xoa-tat-ca", methods=["POST"])
+@login_required
+def xoa_tat_ca():
+    so_da_xoa, bo_qua = xoa_toan_bo(
+        HoatChat,
+        kiem_tra_rang_buoc=_kiem_tra_hc_con_thuoc,
+        hien_thi=lambda h: h.ten_hoat_chat,
+    )
+    flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="hoạt chất")
     return redirect(url_for("admin_hoat_chat.danh_sach"))
