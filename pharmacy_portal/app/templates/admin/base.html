@@ -98,5 +98,69 @@
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin_searchable_select.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dan_anh_clipboard.js') }}"></script>
+
+<!-- Modal xác nhận xoá — dùng chung toàn admin -->
+<div id="xoaModal" class="xoa-modal-overlay" style="display:none;" onclick="if(event.target===this)dongModal()">
+  <div class="xoa-modal-box">
+    <div class="xoa-modal-icon">🗑️</div>
+    <h3 class="xoa-modal-title" id="xoaModalTitle">Xác nhận xoá</h3>
+    <p class="xoa-modal-msg" id="xoaModalMsg">Bạn có chắc muốn xoá mục này không? Hành động này không thể hoàn tác.</p>
+    <div class="xoa-modal-actions">
+      <button type="button" onclick="dongModal()" class="btn btn-outline">Huỷ</button>
+      <button type="button" id="xoaModalConfirm" class="btn btn-danger" style="background:#dc2626;color:#fff;border-color:#dc2626;">Xoá</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.xoa-modal-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(11,31,58,0.55); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.xoa-modal-box {
+  background: #fff; border-radius: 16px; padding: 32px 28px;
+  max-width: 380px; width: 100%; text-align: center;
+  box-shadow: 0 24px 64px rgba(11,31,58,0.25);
+  animation: modalIn .18s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes modalIn { from { transform: scale(.88); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.xoa-modal-icon { font-size: 36px; margin-bottom: 12px; }
+.xoa-modal-title { font-family: var(--font-display); font-size: 18px; font-weight: 800; margin: 0 0 10px; color: var(--ink-900); }
+.xoa-modal-msg { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin: 0 0 24px; }
+.xoa-modal-actions { display: flex; gap: 10px; justify-content: center; }
+.xoa-modal-actions .btn { min-width: 100px; justify-content: center; }
+</style>
+
+<script>
+let _xoaForm = null;
+
+function moModal(form, ten) {
+  _xoaForm = form;
+  const msg = ten
+    ? `Bạn có chắc muốn xoá <strong>${ten}</strong>? Hành động này không thể hoàn tác.`
+    : 'Bạn có chắc muốn xoá mục này? Hành động này không thể hoàn tác.';
+  document.getElementById('xoaModalMsg').innerHTML = msg;
+  document.getElementById('xoaModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  document.getElementById('xoaModalConfirm').focus();
+}
+
+function dongModal() {
+  document.getElementById('xoaModal').style.display = 'none';
+  document.body.style.overflow = '';
+  _xoaForm = null;
+}
+
+document.getElementById('xoaModalConfirm').addEventListener('click', () => {
+  if (_xoaForm) { _xoaForm.submit(); }
+});
+
+// Phím Escape đóng modal
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') dongModal();
+});
+</script>
+
 </body>
 </html>

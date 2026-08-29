@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request
 from sqlalchemy import func
+from sqlalchemy.orm import selectinload
 from app import db
 from app.models.models import NhomThuoc, DanhMucThuoc
 from app.utils.tim_kiem import tim_danh_muc_thuoc
@@ -46,6 +47,7 @@ def xem_nhom(nhom_id):
         f = _build_filter(cols, tu_khoa)
         phan_trang = (
             DanhMucThuoc.query
+            .options(selectinload(DanhMucThuoc.hoat_chat_list))
             .outerjoin(DanhMucThuoc.hoat_chat_list)
             .filter(DanhMucThuoc.nhom_thuoc_id == nhom_id, f)
             .distinct()
@@ -54,7 +56,9 @@ def xem_nhom(nhom_id):
         )
     else:
         phan_trang = (
-            DanhMucThuoc.query.filter_by(nhom_thuoc_id=nhom.id)
+            DanhMucThuoc.query
+            .options(selectinload(DanhMucThuoc.hoat_chat_list))
+            .filter_by(nhom_thuoc_id=nhom.id)
             .order_by(DanhMucThuoc.ten_biet_duoc)
             .paginate(page=trang, per_page=SO_THUOC_MOI_TRANG, error_out=False)
         )

@@ -83,10 +83,6 @@ class DanhMucThuoc(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     nhom_thuoc_id = db.Column(db.Integer, db.ForeignKey("nhom_thuoc.id"), nullable=True)
-    # CHÚ Ý: hoat_chat_id giữ lại để tương thích dữ liệu cũ / không phá schema,
-    # nhưng KHÔNG còn dùng trong code - quan hệ hoạt chất giờ dùng
-    # `hoat_chat_list` (nhiều-nhiều) bên dưới.
-    hoat_chat_id = db.Column(db.Integer, db.ForeignKey("hoat_chat.id"), nullable=True)
     ten_biet_duoc = db.Column(db.String(255), nullable=False, index=True)
     thanh_phan = db.Column(db.Text)
     chi_dinh = db.Column(db.Text)
@@ -97,7 +93,6 @@ class DanhMucThuoc(db.Model):
     ngay_cap_nhat = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     nhom = db.relationship("NhomThuoc", backref="danh_muc_thuoc_list")
-    hoat_chat = db.relationship("HoatChat", foreign_keys=[hoat_chat_id])  # cũ - giữ tương thích
     hoat_chat_list = db.relationship(
         "HoatChat", secondary=danh_muc_thuoc_hoat_chat,
         backref=db.backref("danh_muc_thuoc_co_hoat_chat", lazy="dynamic"),
@@ -120,17 +115,12 @@ class NhaThuocBV(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     nhom_thuoc_id = db.Column(db.Integer, db.ForeignKey("nhom_thuoc.id"), nullable=True)
-    # CHÚ Ý: hoat_chat_id giữ lại để tương thích dữ liệu cũ / không phá schema,
-    # nhưng KHÔNG còn dùng trong code - quan hệ hoạt chất giờ dùng
-    # `hoat_chat_list` (nhiều-nhiều) bên dưới.
-    hoat_chat_id = db.Column(db.Integer, db.ForeignKey("hoat_chat.id"), nullable=True)
     ten_biet_duoc = db.Column(db.String(255), nullable=False, index=True)
     link_tham_khao = db.Column(db.String(500))
     hinh_anh = db.Column(db.String(500))
     ngay_cap_nhat = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     nhom = db.relationship("NhomThuoc", backref="nha_thuoc_bv_list")
-    hoat_chat = db.relationship("HoatChat", foreign_keys=[hoat_chat_id])  # cũ - giữ tương thích
     hoat_chat_list = db.relationship(
         "HoatChat", secondary=nha_thuoc_bv_hoat_chat,
         backref=db.backref("nha_thuoc_bv_co_hoat_chat", lazy="dynamic"),

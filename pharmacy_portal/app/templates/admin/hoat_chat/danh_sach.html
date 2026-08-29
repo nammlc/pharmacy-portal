@@ -34,9 +34,9 @@
         <td class="td-actions">
           <div class="row-act">
             <a href="{{ url_for('admin_hoat_chat.sua', hc_id=h.id) }}">Sửa</a>
-            <form method="POST" action="{{ url_for('admin_hoat_chat.xoa', hc_id=h.id) }}" onsubmit="return confirm('Xoá hoạt chất này?');" style="display:contents;">
+            <form method="POST" action="{{ url_for('admin_hoat_chat.xoa', hc_id=h.id) }}" onsubmit="return false;" style="display:contents;">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <button type="submit" class="act-del">Xoá</button>
+              <button type="button" class="act-del" onclick="moModal(this.closest('form'), '{{ h.ten_hoat_chat }}')">Xoá</button>
             </form>
           </div>
         </td>

@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required
 from app import db
+from sqlalchemy.orm import selectinload
 from app.models.models import NhaThuocBV, NhomThuoc, HoatChat
 from app.forms import NhaThuocBVForm, _tuy_chon_rong
 from app.utils.upload_anh import upload_anh_nha_thuoc_bv, xoa_anh_cloudinary
@@ -27,7 +28,7 @@ def danh_sach():
     query = NhaThuocBV.query
     if tu_khoa:
         query = query.filter(NhaThuocBV.ten_biet_duoc.ilike(f"%{tu_khoa}%"))
-    phan_trang = query.order_by(NhaThuocBV.ten_biet_duoc).paginate(page=trang, per_page=10, error_out=False)
+    phan_trang = query.options(selectinload(NhaThuocBV.hoat_chat_list), selectinload(NhaThuocBV.nhom)).order_by(NhaThuocBV.ten_biet_duoc).paginate(page=trang, per_page=10, error_out=False)
     return render_template("admin/nha_thuoc_bv/danh_sach.html",
                            danh_sach_thuoc=phan_trang.items,
                            phan_trang=phan_trang,
