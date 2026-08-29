@@ -1,4 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request
+from sqlalchemy import text
+from app import db
 from app.models.models import CaiDat, DanhMucThuoc, NhaThuocBV, HoatChat
 from app.utils.tim_kiem import tim_danh_muc_thuoc, tim_nha_thuoc_bv
 
@@ -26,7 +28,18 @@ VCT_MAC_DINH = {
 
 @bp.route("/")
 def trang_chu():
-    return render_template("trang_chu.html")
+    # Lấy stat từ DB — dùng lại UNION ALL giống dashboard
+    try:
+        rows = db.session.execute(text("""
+            SELECT 'dmt', COUNT(*) FROM danh_muc_thuoc
+            UNION ALL SELECT 'ntbv', COUNT(*) FROM nha_thuoc_bv
+            UNION ALL SELECT 'thuoc', COUNT(*) FROM thuoc
+            UNION ALL SELECT 'thtk', COUNT(*) FROM tuong_hop_tuong_ky
+        """)).fetchall()
+        stat = {r[0]: r[1] for r in rows}
+    except Exception:
+        stat = {}
+    return render_template("trang_chu.html", stat=stat)
 
 
 @bp.route("/tim-kiem")

@@ -26,28 +26,28 @@
       </span>
     </a>
 
-    <a href="{{ url_for('admin_dashboard.trang_chinh') }}" class="{{ 'active' if request.endpoint == 'admin_dashboard.trang_chinh' }}">Tổng quan</a>
+    <a href="{{ url_for('admin_dashboard.trang_chinh') }}" class="{{ 'active' if request.endpoint == 'admin_dashboard.trang_chinh' }}">🏠 Tổng quan</a>
 
-    <div class="section-label">Danh mục thuốc</div>
+    <div class="section-label">💊 Danh mục thuốc</div>
     <a href="{{ url_for('admin_dmt.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_dmt' }}">Danh mục thuốc</a>
-    <a href="{{ url_for('admin_ntbv.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ntbv' }}">Nhà thuốc BV</a>
-    <a href="{{ url_for('admin_nhom_thuoc.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_nhom_thuoc' }}">Nhóm thuốc</a>
-    <a href="{{ url_for('admin_hoat_chat.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_hoat_chat' }}">Hoạt chất</a>
-    <a href="{{ url_for('admin_nhap_hang_loat.trang_chinh') }}" class="{{ 'active' if request.blueprint == 'admin_nhap_hang_loat' }}">Nhập hàng loạt</a>
+    <a href="{{ url_for('admin_ntbv.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ntbv' }}">🏥 Nhà thuốc BV</a>
+    <a href="{{ url_for('admin_nhom_thuoc.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_nhom_thuoc' }}">📂 Nhóm thuốc</a>
+    <a href="{{ url_for('admin_hoat_chat.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_hoat_chat' }}">🧬 Hoạt chất</a>
+    <a href="{{ url_for('admin_nhap_hang_loat.trang_chinh') }}" class="{{ 'active' if request.blueprint == 'admin_nhap_hang_loat' }}">📥 Nhập hàng loạt</a>
 
     <div class="section-label">Tra cứu</div>
-    <a href="{{ url_for('admin_thuoc.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_thuoc' }}">Thuốc (dữ liệu tra cứu)</a>
-    <a href="{{ url_for('admin_tttt.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_tttt' }}">Thuốc tiêm truyền</a>
-    <a href="{{ url_for('admin_thtk.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_thtk' }}">Tương hợp - Tương kỵ</a>
-    <a href="{{ url_for('admin_ttt.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ttt' }}">Tương tác thuốc</a>
-    <a href="{{ url_for('admin_ttth.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ttth' }}">Thông tin thuốc</a>
+    <a href="{{ url_for('admin_thuoc.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_thuoc' }}">🔬 Thuốc tra cứu</a>
+    <a href="{{ url_for('admin_tttt.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_tttt' }}">💉 Thuốc tiêm truyền</a>
+    <a href="{{ url_for('admin_thtk.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_thtk' }}">🧪 Tương hợp - Tương kỵ</a>
+    <a href="{{ url_for('admin_ttt.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ttt' }}">⚠️ Tương tác thuốc</a>
+    <a href="{{ url_for('admin_ttth.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ttth' }}">📋 Thông tin thuốc</a>
 
     <div class="section-label">Nội dung</div>
-    <a href="{{ url_for('admin_ttbn.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ttbn' }}">Bài viết bệnh nhân</a>
+    <a href="{{ url_for('admin_ttbn.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ttbn' }}">🧑‍⚕️ Bài viết bệnh nhân</a>
 
     <div class="section-label">Khác</div>
-    <a href="{{ url_for('admin_vct.chinh_sua') }}" class="{{ 'active' if request.blueprint == 'admin_vct' }}">Về chúng tôi</a>
-    <a href="{{ url_for('main.trang_chu') }}" target="_blank">Xem trang công khai &#8599;</a>
+    <a href="{{ url_for('admin_vct.chinh_sua') }}" class="{{ 'active' if request.blueprint == 'admin_vct' }}">✏️ Về chúng tôi</a>
+    <a href="{{ url_for('main.trang_chu') }}" target="_blank">🌐 Xem trang công khai ↗</a>
   </aside>
 
   <div class="admin-main">

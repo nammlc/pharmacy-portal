@@ -1,67 +1,100 @@
 {% extends "base.html" %}
-{% block title %}Trang chủ{% endblock %}
+{% block title %}Trang chủ — Cổng Tra Cứu Dược{% endblock %}
 
 {% block content %}
 <section class="hero">
   <div class="hero-inner">
-    <div class="hero-eyebrow">✨ Khoa Dược &middot; Cổng thông tin nội bộ</div>
-    <h1>Tra cứu thông tin dược nhanh, chính xác</h1>
-    <p>Danh mục thuốc, tương tác, tương hợp - tương kỵ và hướng dẫn sử dụng được cập nhật và kiểm duyệt bởi dược sĩ lâm sàng.</p>
+    <div class="hero-badge">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
+    <h1>Tra cứu thông tin<br><span>dược phẩm</span> nhanh chóng</h1>
+    <p>Danh mục thuốc, tương tác, tương hợp–kỵ và hướng dẫn sử dụng được cập nhật và kiểm duyệt bởi Dược sĩ lâm sàng.</p>
     <form class="hero-search" action="{{ url_for('main.tim_kiem') }}" method="get">
       <input type="text" name="q" placeholder="Nhập tên thuốc hoặc hoạt chất...">
       <button type="submit">🔍 Tra cứu</button>
     </form>
+
+    {% if stat %}
+    <div class="hero-stats">
+      {% if stat.get('dmt') %}
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ stat.dmt }}</div>
+        <div class="hero-stat-lbl">Danh mục thuốc</div>
+      </div>
+      {% endif %}
+      {% if stat.get('ntbv') %}
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ stat.ntbv }}</div>
+        <div class="hero-stat-lbl">Nhà thuốc BV</div>
+      </div>
+      {% endif %}
+      {% if stat.get('thuoc') %}
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ stat.thuoc }}</div>
+        <div class="hero-stat-lbl">Thuốc tra cứu</div>
+      </div>
+      {% endif %}
+      {% if stat.get('thtk') %}
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ stat.thtk }}</div>
+        <div class="hero-stat-lbl">Cặp tương hợp/kỵ</div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
   </div>
 </section>
 
-<div class="category-grid">
-  <a class="category-card category-card-accent-0" href="{{ url_for('dmt.index') }}">
-    <svg class="category-card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5.5M12 4V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <div class="category-icon">&#128138;</div>
-    <h3>Danh mục thuốc</h3>
-    <p>Tra cứu thuốc theo nhóm dược lý, đầy đủ thông tin chỉ định, liều dùng.</p>
-  </a>
+<div class="category-grid-outer">
+  <div class="category-grid">
 
-  <a class="category-card category-card-accent-2" href="{{ url_for('ntbv.index') }}">
-    <svg class="category-card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5.5M12 4V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <div class="category-icon">&#127973;</div>
-    <h3>Nhà thuốc BV</h3>
-    <p>Danh mục thuốc bán tại Nhà thuốc Bệnh viện, tra theo nhóm và hoạt chất.</p>
-  </a>
+    <a class="category-card cat-dmt" href="{{ url_for('dmt.index') }}">
+      <div class="cat-icon-wrap">💊</div>
+      <h3>Danh mục thuốc</h3>
+      <p>Tra cứu theo nhóm dược lý, đầy đủ thông tin chỉ định và liều dùng.</p>
+      <div class="cat-arrow">Xem danh mục →</div>
+    </a>
 
-  <a class="category-card category-card-accent-5" href="{{ url_for('tttt.index') }}">
-    <svg class="category-card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5.5M12 4V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <div class="category-icon">&#128137;</div>
-    <h3>Thuốc tiêm truyền</h3>
-    <p>Dung môi pha loãng, tốc độ truyền, độ ổn định sau pha.</p>
-  </a>
+    <a class="category-card cat-ntbv" href="{{ url_for('ntbv.index') }}">
+      <div class="cat-icon-wrap">🏥</div>
+      <h3>Nhà thuốc BV</h3>
+      <p>Danh mục thuốc bán tại Nhà thuốc Bệnh viện, tra theo nhóm và hoạt chất.</p>
+      <div class="cat-arrow">Xem danh mục →</div>
+    </a>
 
-  <a class="category-card category-card-accent-4" href="{{ url_for('thtk.index') }}">
-    <svg class="category-card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5.5M12 4V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <div class="category-icon">&#129514;</div>
-    <h3>Tương hợp - Tương kỵ</h3>
-    <p>Kiểm tra khả năng phối hợp/pha chung giữa hai thuốc.</p>
-  </a>
+    <a class="category-card cat-tt" href="{{ url_for('tttt.index') }}">
+      <div class="cat-icon-wrap">💉</div>
+      <h3>Thuốc tiêm truyền</h3>
+      <p>Dung môi pha loãng, tốc độ truyền, độ ổn định và thời hạn sau pha.</p>
+      <div class="cat-arrow">Tra cứu →</div>
+    </a>
 
-  <a class="category-card category-card-accent-1" href="{{ url_for('ttt.index') }}">
-    <svg class="category-card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5.5M12 4V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <div class="category-icon">&#9888;&#65039;</div>
-    <h3>Tương tác thuốc</h3>
-    <p>Mức độ, cơ chế và cách xử trí khi dùng đồng thời.</p>
-  </a>
+    <a class="category-card cat-thtk" href="{{ url_for('thtk.index') }}">
+      <div class="cat-icon-wrap">🧪</div>
+      <h3>Tương hợp - Tương kỵ</h3>
+      <p>Kiểm tra khả năng pha chung và phối hợp giữa hai thuốc truyền tĩnh mạch.</p>
+      <div class="cat-arrow">Kiểm tra →</div>
+    </a>
 
-  <a class="category-card category-card-accent-3" href="{{ url_for('ttth.index') }}">
-    <svg class="category-card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5.5M12 4V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <div class="category-icon">&#128203;</div>
-    <h3>Thông tin thuốc</h3>
-    <p>Chỉ định, chống chỉ định, liều dùng, tác dụng phụ.</p>
-  </a>
+    <a class="category-card cat-ttt" href="{{ url_for('ttt.index') }}">
+      <div class="cat-icon-wrap">⚠️</div>
+      <h3>Tương tác thuốc</h3>
+      <p>Mức độ, cơ chế tương tác và hướng xử trí khi dùng đồng thời hai thuốc.</p>
+      <div class="cat-arrow">Kiểm tra →</div>
+    </a>
 
-  <a class="category-card category-card-accent-6" href="{{ url_for('ttbn.index') }}">
-    <svg class="category-card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5.5M12 4V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <div class="category-icon">&#128151;</div>
-    <h3>Thông tin cho bệnh nhân</h3>
-    <p>Hướng dẫn dùng thuốc tại nhà, dễ hiểu cho người bệnh.</p>
-  </a>
+    <a class="category-card cat-ttth" href="{{ url_for('ttth.index') }}">
+      <div class="cat-icon-wrap">📋</div>
+      <h3>Thông tin thuốc</h3>
+      <p>Chỉ định, chống chỉ định, liều dùng theo đối tượng và tác dụng phụ.</p>
+      <div class="cat-arrow">Tra cứu →</div>
+    </a>
+
+    <a class="category-card cat-ttbn" href="{{ url_for('ttbn.index') }}">
+      <div class="cat-icon-wrap">🧑‍⚕️</div>
+      <h3>Thông tin bệnh nhân</h3>
+      <p>Hướng dẫn dùng thuốc tại nhà, ngôn ngữ đơn giản dễ hiểu cho người bệnh.</p>
+      <div class="cat-arrow">Xem hướng dẫn →</div>
+    </a>
+
+  </div>
 </div>
 {% endblock %}
