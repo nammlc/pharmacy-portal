@@ -184,7 +184,7 @@ class BaiVietForm(FlaskForm):
         choices=[("nhap", "Bản nháp"), ("da_xuat_ban", "Đã xuất bản"), ("an", "Ẩn")],
         validators=[DataRequired()],
     )
-    ghim = BooleanField("Ghim bài viết lên đầu danh sách")
+    ghim = BooleanField("Ghim thành bài viết lớn ở đầu trang")
     file_anh = FileField(
         "Ảnh đại diện",
         validators=[

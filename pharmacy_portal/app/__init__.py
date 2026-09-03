@@ -145,6 +145,25 @@ def create_app(config_class=Config):
     def xu_ly_503(e):
         return _render("loi_ket_noi.html"), 503
 
+    # --- File/ảnh gửi lên quá lớn (413 Request Entity Too Large) ---
+    # Mặc định Werkzeug trả về trang trắng khó hiểu "Request Entity Too Large".
+    # Bắt lỗi này để thông báo rõ ràng bằng tiếng Việt và quay lại trang cũ,
+    # thay vì màn hình trắng.
+    from werkzeug.exceptions import RequestEntityTooLarge
+    from flask import flash as _flash, redirect as _redirect, request as _request, url_for as _url_for
+
+    @app.errorhandler(RequestEntityTooLarge)
+    @app.errorhandler(413)
+    def xu_ly_413(e):
+        gioi_han_mb = app.config.get("MAX_CONTENT_LENGTH", 0) // (1024 * 1024)
+        _flash(
+            f"Dữ liệu gửi lên vượt quá giới hạn cho phép ({gioi_han_mb} MB), thường là do ảnh quá lớn. "
+            f"Vui lòng chọn ảnh có dung lượng nhỏ hơn rồi thử lại (trình duyệt sẽ tự nén ảnh trước khi gửi).",
+            "danger",
+        )
+        dich_den = _request.referrer or _url_for("admin_dashboard.trang_chinh")
+        return _redirect(dich_den), 302
+
     return app
 
 

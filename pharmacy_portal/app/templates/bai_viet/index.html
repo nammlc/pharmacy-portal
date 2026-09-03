@@ -20,6 +20,41 @@
 {% endif %}
 
 <div class="results-panel">
+
+  {% if bai_noi_bat %}
+  <div class="bv-noibat">
+    <a class="bv-noibat-chinh" href="{{ url_for('bv.chi_tiet', slug=bai_noi_bat.slug) }}">
+      <div class="bv-noibat-anh" {% if bai_noi_bat.anh_dai_dien %}style="background-image:url('{{ bai_noi_bat.anh_dai_dien }}');"{% endif %}>
+        {% if not bai_noi_bat.anh_dai_dien %}<span class="bv-card-thumb-fallback">📰</span>{% endif %}
+      </div>
+      <div class="bv-noibat-body">
+        {% if bai_noi_bat.danh_muc %}
+        <span class="bv-card-tag" style="--chip-color: {{ bai_noi_bat.danh_muc.mau_sac or '#1a4d8f' }};">{{ bai_noi_bat.danh_muc.ten }}</span>
+        {% endif %}
+        <h2>{{ bai_noi_bat.tieu_de }}</h2>
+        {% if bai_noi_bat.mo_ta_ngan %}<p>{{ bai_noi_bat.mo_ta_ngan }}</p>{% endif %}
+        <div class="bv-card-meta">
+          <span>{{ bai_noi_bat.ngay_xuat_ban.strftime('%d/%m/%Y') if bai_noi_bat.ngay_xuat_ban else bai_noi_bat.ngay_tao.strftime('%d/%m/%Y') }}</span>
+          <span>👁 {{ bai_noi_bat.luot_xem or 0 }}</span>
+        </div>
+      </div>
+    </a>
+
+    {% if bai_phu %}
+    <div class="bv-noibat-phu">
+      {% for bv in bai_phu %}
+      <a class="bv-phu-item" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
+        {% if bv.danh_muc %}
+        <span class="bv-phu-eyebrow" style="--chip-color: {{ bv.danh_muc.mau_sac or '#1a4d8f' }};">{{ bv.danh_muc.ten }}</span>
+        {% endif %}
+        <span class="bv-phu-title">{{ bv.tieu_de }}</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
   {% if bai_viet_list %}
   <div class="bv-grid">
     {% for bv in bai_viet_list %}
@@ -45,7 +80,7 @@
   {% set endpoint = 'bv.index' %}
   {% set args = {'danh_muc': danh_muc_hien_tai.slug} if danh_muc_hien_tai else {} %}
   {% include "_phan_trang.html" with context %}
-  {% else %}
+  {% elif not bai_noi_bat %}
   <div class="empty-state">
     <div class="empty-state-icon">📰</div>
     Chưa có bài viết nào được đăng{{ ' trong danh mục này' if danh_muc_hien_tai else '' }}.
@@ -66,6 +101,43 @@
 .bv-filter-chip:hover { border-color: var(--chip-color, var(--sage-500)); color: var(--chip-color, var(--sage-500)); }
 .bv-filter-chip.is-active {
   background: var(--chip-color, var(--sage-500)); border-color: var(--chip-color, var(--sage-500)); color:#fff;
+}
+
+/* ---------- Khối nổi bật: 1 bài lớn + danh sách nhỏ bên cạnh ---------- */
+.bv-noibat {
+  display:grid; grid-template-columns: 1.7fr 1fr; gap:28px;
+  margin-bottom:36px; padding-bottom:32px; border-bottom:1px solid var(--line-200);
+}
+.bv-noibat-chinh { display:flex; flex-direction:column; color:inherit; }
+.bv-noibat-anh {
+  position:relative; width:100%; aspect-ratio:16/9; border-radius:var(--radius-md);
+  background:var(--sage-100) center/cover no-repeat; display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--line-200); overflow:hidden;
+}
+.bv-noibat-anh .bv-card-thumb-fallback { font-size:52px; opacity:.5; }
+.bv-noibat-body { padding-top:16px; display:flex; flex-direction:column; gap:10px; }
+.bv-noibat-body h2 {
+  margin:0; font-family:var(--font-display); font-size:26px; line-height:1.28; font-weight:800; color:var(--ink-900);
+}
+.bv-noibat-body p { margin:0; font-size:15px; color:var(--text-muted); line-height:1.55; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+
+.bv-noibat-phu { display:flex; flex-direction:column; }
+.bv-phu-item {
+  display:flex; flex-direction:column; gap:5px; padding:14px 0; color:inherit;
+  border-bottom:1px solid var(--line-200);
+}
+.bv-noibat-phu .bv-phu-item:first-child { padding-top:0; }
+.bv-noibat-phu .bv-phu-item:last-child { border-bottom:none; }
+.bv-phu-eyebrow {
+  font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.03em;
+  color: var(--chip-color, var(--sage-500));
+}
+.bv-phu-title { font-size:14.5px; font-weight:700; color:var(--ink-900); line-height:1.4; transition:color .15s ease; }
+.bv-phu-item:hover .bv-phu-title { color: var(--sage-500); }
+
+@media (max-width: 860px) {
+  .bv-noibat { grid-template-columns: 1fr; gap:18px; }
+  .bv-noibat-body h2 { font-size:21px; }
 }
 
 .bv-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:20px; }

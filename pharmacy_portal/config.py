@@ -79,5 +79,8 @@ class Config:
     CLOUDINARY_API_KEY = os.environ.get("CLOUDINARY_API_KEY", "")
     CLOUDINARY_API_SECRET = os.environ.get("CLOUDINARY_API_SECRET", "")
 
-    # Kích thước file tối đa cho phép upload (5 MB)
-    MAX_CONTENT_LENGTH = 5 * 1024 * 1024
+    # Kích thước file tối đa cho phép upload.
+    # Ảnh đã được nén ở trình duyệt trước khi gửi lên (xem app/static/js/nen_anh.js)
+    # nên thường chỉ còn vài trăm KB, nhưng màn hình "Nhập hàng loạt" có thể gửi
+    # nhiều ảnh cùng lúc (nhiều thuốc trong 1 lần lưu) nên để dư ra 40 MB cho cả request.
+    MAX_CONTENT_LENGTH = 40 * 1024 * 1024
