@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required
 from sqlalchemy import text
 from app import db
 from app.models.models import DanhMucThuoc, NhaThuocBV
+from app.utils.upload_anh import upload_anh_noi_dung
 
 bp = Blueprint("admin_dashboard", __name__, url_prefix="/admin")
 
@@ -49,3 +50,23 @@ def trang_chinh():
                            so_luong=so_luong,
                            cap_nhat_dmt=cap_nhat_dmt,
                            cap_nhat_ntbv=cap_nhat_ntbv)
+
+
+@bp.route("/upload-anh-noi-dung", methods=["POST"])
+@login_required
+def upload_anh_noi_dung_view():
+    """API AJAX dùng chung cho MỌI trình soạn thảo rich-text (Quill) trong
+    trang quản trị: bấm nút chèn ảnh -> JS gửi file lên đây -> trả về URL
+    Cloudinary -> JS chèn thẻ <img> vào đúng vị trí con trỏ trong nội dung.
+    Cho phép chèn NHIỀU ảnh mô tả xen giữa các đoạn văn (khác ảnh đại diện,
+    vốn chỉ có 1 ảnh cho cả bài viết)."""
+    file_anh = request.files.get("anh")
+    if not file_anh or not file_anh.filename:
+        return jsonify({"loi": "Không nhận được file ảnh."}), 400
+    try:
+        url = upload_anh_noi_dung(file_anh)
+    except ValueError as e:
+        return jsonify({"loi": str(e)}), 400
+    if not url:
+        return jsonify({"loi": "Upload ảnh thất bại, thử lại sau."}), 500
+    return jsonify({"url": url})

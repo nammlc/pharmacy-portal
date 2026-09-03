@@ -113,6 +113,16 @@ def upload_anh_bai_viet(file_object, url_cu: str | None = None) -> str | None:
                                    url_cu=url_cu, width=1200, height=800, crop="fill")
 
 
+def upload_anh_noi_dung(file_object) -> str | None:
+    """Upload 1 ảnh MÔ TẢ được chèn giữa các đoạn văn trong nội dung bài viết
+    (trình soạn thảo Quill). Khác ảnh đại diện: 1 bài viết có thể có NHIỀU
+    ảnh loại này nên không có khái niệm "url_cu" để xoá — ảnh cũ (nếu bị gỡ
+    khỏi nội dung khi sửa bài) chỉ đơn giản không còn được tham chiếu tới nữa.
+    Giới hạn kích thước rộng hơn ảnh đại diện vì ảnh minh hoạ có thể cần nét hơn."""
+    return _upload_len_cloudinary(file_object, "pharmacy/bai_viet_noi_dung",
+                                   width=1600, height=1600, crop="limit")
+
+
 # --------------------------------------------------------------------------
 # Tệp đính kèm bài viết (PDF, Word, Excel, ZIP...) - upload dạng "raw" trên
 # Cloudinary (không phải ảnh nên không qua transformation).

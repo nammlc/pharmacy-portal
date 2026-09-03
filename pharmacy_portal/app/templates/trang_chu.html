@@ -14,18 +14,9 @@
 
     {% if stat %}
     <div class="hero-stats">
-      {% if stat.get('dmt') %}
-      <div class="hero-stat">
-        <div class="hero-stat-num">{{ stat.dmt }}</div>
-        <div class="hero-stat-lbl">Danh mục thuốc</div>
-      </div>
-      {% endif %}
-      {% if stat.get('ntbv') %}
-      <div class="hero-stat">
-        <div class="hero-stat-num">{{ stat.ntbv }}</div>
-        <div class="hero-stat-lbl">Nhà thuốc BV</div>
-      </div>
-      {% endif %}
+      {# Đã ẩn 2 số liệu "Danh mục thuốc" và "Nhà thuốc BV" theo yêu cầu —
+         dữ liệu đếm (stat.dmt / stat.ntbv) vẫn được tính ở route, chỉ
+         không hiển thị ở đây nữa. Xoá khối comment này để hiện lại. #}
       {% if stat.get('thuoc') %}
       <div class="hero-stat">
         <div class="hero-stat-num">{{ stat.thuoc }}</div>

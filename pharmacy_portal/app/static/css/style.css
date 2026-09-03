@@ -1314,6 +1314,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   background: #fff;
 }
 .rich-editor-wrap .ql-editor { min-height: 130px; line-height: 1.55; color: var(--ink-900); }
+.rich-editor-wrap .ql-editor img { max-width: 100%; border-radius: 6px; }
 .rich-editor-wrap .ql-editor.ql-blank::before { color: #9aa8b8; font-style: normal; }
 .rich-editor-wrap .ql-snow .ql-picker { font-family: var(--font-body); }
 .rich-editor-wrap:focus-within .ql-toolbar.ql-snow,
@@ -1395,6 +1396,15 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 }
 .rich-content a { color: var(--navy-600); text-decoration: underline; }
 .rich-content strong { font-weight: 700; }
+.rich-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 16px auto;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--line-200);
+}
+
 
 .table-actions { display: flex; gap: 8px; }
 

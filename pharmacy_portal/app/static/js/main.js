@@ -116,6 +116,52 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
   if (typeof Quill === "undefined") return;
 
+  var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+  var csrfToken = csrfMeta ? csrfMeta.getAttribute("content") : "";
+
+  // Chèn ảnh mô tả vào đúng vị trí con trỏ trong editor. Cho phép chèn
+  // NHIỀU ảnh xen giữa các đoạn văn (khác ảnh đại diện — chỉ có 1 ảnh
+  // cho cả bài viết, upload riêng ở field "file_anh" bên dưới).
+  function chenAnhVaoNoiDung(quill) {
+    var input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/png,image/jpeg,image/webp,image/gif";
+    input.onchange = function () {
+      var file = input.files && input.files[0];
+      if (!file) return;
+
+      var range = quill.getSelection(true);
+      // Hiện chỗ giữ trong lúc tải ảnh lên, để người dùng biết đang xử lý
+      var chuGiuCho = "Đang tải ảnh lên...";
+      quill.insertText(range.index, chuGiuCho, { italic: true });
+      quill.setSelection(range.index + chuGiuCho.length);
+
+      var duLieu = new FormData();
+      duLieu.append("anh", file);
+
+      fetch("/admin/upload-anh-noi-dung", {
+        method: "POST",
+        headers: { "X-CSRFToken": csrfToken },
+        body: duLieu,
+      })
+        .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+        .then(function (ket_qua) {
+          quill.deleteText(range.index, chuGiuCho.length);
+          if (!ket_qua.ok || !ket_qua.data.url) {
+            alert(ket_qua.data.loi || "Upload ảnh thất bại, thử lại sau.");
+            return;
+          }
+          quill.insertEmbed(range.index, "image", ket_qua.data.url);
+          quill.setSelection(range.index + 1);
+        })
+        .catch(function () {
+          quill.deleteText(range.index, chuGiuCho.length);
+          alert("Không kết nối được máy chủ, thử lại sau.");
+        });
+    };
+    input.click();
+  }
+
   document.querySelectorAll("[data-rich-editor]").forEach(function (wrap) {
     var targetId = wrap.getAttribute("data-target");
     var textarea = targetId ? document.getElementById(targetId) : null;
@@ -126,14 +172,19 @@ document.addEventListener("DOMContentLoaded", function () {
       theme: "snow",
       placeholder: textarea.getAttribute("placeholder") || "",
       modules: {
-        toolbar: [
-          [{ header: [1, 2, 3, false] }],
-          ["bold", "italic", "underline", "strike"],
-          ["blockquote"],
-          [{ list: "ordered" }, { list: "bullet" }],
-          ["link"],
-          ["clean"],
-        ],
+        toolbar: {
+          container: [
+            [{ header: [1, 2, 3, false] }],
+            ["bold", "italic", "underline", "strike"],
+            ["blockquote"],
+            [{ list: "ordered" }, { list: "bullet" }],
+            ["link", "image"],
+            ["clean"],
+          ],
+          handlers: {
+            image: function () { chenAnhVaoNoiDung(quill); },
+          },
+        },
       },
     });
 

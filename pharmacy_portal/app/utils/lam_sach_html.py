@@ -17,12 +17,16 @@ _THE_DUOC_PHEP = [
     "p", "br", "strong", "b", "em", "i", "u", "s", "strike",
     "h1", "h2", "h3", "blockquote",
     "ul", "ol", "li",
-    "a",
+    "a", "img",
 ]
 
 _THUOC_TINH_DUOC_PHEP = {
     "a": ["href", "target", "rel"],
+    "img": ["src", "alt"],
 }
+# Ghi chú: bleach mặc định chỉ cho phép giao thức http/https/mailto ở MỌI
+# thuộc tính kiểu URL (href, src...) — tự động chặn "javascript:", "data:"
+# nên ảnh/link độc hại không thể lọt qua kể cả khi không khai báo thêm gì.
 
 
 def lam_sach_html(html_content):
