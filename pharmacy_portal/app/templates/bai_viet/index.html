@@ -22,27 +22,43 @@
 <div class="results-panel">
 
   {% if bai_noi_bat %}
-  <div class="bv-noibat">
-    <a class="bv-noibat-chinh" href="{{ url_for('bv.chi_tiet', slug=bai_noi_bat.slug) }}">
-      <div class="bv-noibat-anh" {% if bai_noi_bat.anh_dai_dien %}style="background-image:url('{{ bai_noi_bat.anh_dai_dien }}');"{% endif %}>
-        {% if not bai_noi_bat.anh_dai_dien %}<span class="bv-card-thumb-fallback">📰</span>{% endif %}
-      </div>
-      <div class="bv-noibat-body">
-        {% if bai_noi_bat.danh_muc %}
-        <span class="bv-card-tag" style="--chip-color: {{ bai_noi_bat.danh_muc.mau_sac or '#1a4d8f' }};">{{ bai_noi_bat.danh_muc.ten }}</span>
-        {% endif %}
-        <h2>{{ bai_noi_bat.tieu_de }}</h2>
-        {% if bai_noi_bat.mo_ta_ngan %}<p>{{ bai_noi_bat.mo_ta_ngan }}</p>{% endif %}
-        <div class="bv-card-meta">
-          <span>{{ bai_noi_bat.ngay_xuat_ban.strftime('%d/%m/%Y') if bai_noi_bat.ngay_xuat_ban else bai_noi_bat.ngay_tao.strftime('%d/%m/%Y') }}</span>
-          <span>👁 {{ bai_noi_bat.luot_xem or 0 }}</span>
-        </div>
-      </div>
-    </a>
+  <div class="bv-noibat-wrap">
 
-    {% if bai_phu %}
+    <div class="bv-noibat-left">
+      <a class="bv-noibat-anh" href="{{ url_for('bv.chi_tiet', slug=bai_noi_bat.slug) }}"
+         {% if bai_noi_bat.anh_dai_dien %}style="background-image:url('{{ bai_noi_bat.anh_dai_dien }}');"{% endif %}>
+        {% if not bai_noi_bat.anh_dai_dien %}<span class="bv-card-thumb-fallback">📰</span>{% endif %}
+        <div class="bv-noibat-overlay">
+          {% if bai_noi_bat.danh_muc %}
+          <span class="bv-card-tag bv-card-tag-anh" style="--chip-color: {{ bai_noi_bat.danh_muc.mau_sac or '#1a4d8f' }};">{{ bai_noi_bat.danh_muc.ten }}</span>
+          {% endif %}
+          <h2>{{ bai_noi_bat.tieu_de }}</h2>
+          {% if bai_noi_bat.mo_ta_ngan %}<p>{{ bai_noi_bat.mo_ta_ngan }}</p>{% endif %}
+          <div class="bv-noibat-meta">
+            <span>{{ bai_noi_bat.ngay_xuat_ban.strftime('%d/%m/%Y') if bai_noi_bat.ngay_xuat_ban else bai_noi_bat.ngay_tao.strftime('%d/%m/%Y') }}</span>
+            <span>👁 {{ bai_noi_bat.luot_xem or 0 }}</span>
+          </div>
+        </div>
+      </a>
+
+      {% if bai_cung_danh_muc %}
+      <div class="bv-lienquan-grid">
+        {% for bv in bai_cung_danh_muc %}
+        <a class="bv-lienquan-card" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
+          <div class="bv-lienquan-anh" {% if bv.anh_dai_dien %}style="background-image:url('{{ bv.anh_dai_dien }}');"{% endif %}>
+            {% if not bv.anh_dai_dien %}<span class="bv-card-thumb-fallback">📰</span>{% endif %}
+          </div>
+          <span class="bv-lienquan-title">{{ bv.tieu_de }}</span>
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    {% if bai_khac_danh_muc %}
     <div class="bv-noibat-phu">
-      {% for bv in bai_phu %}
+      <div class="bv-phu-heading">Tin tức trong ngày</div>
+      {% for bv in bai_khac_danh_muc %}
       <a class="bv-phu-item" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
         {% if bv.danh_muc %}
         <span class="bv-phu-eyebrow" style="--chip-color: {{ bv.danh_muc.mau_sac or '#1a4d8f' }};">{{ bv.danh_muc.ten }}</span>
@@ -103,30 +119,62 @@
   background: var(--chip-color, var(--sage-500)); border-color: var(--chip-color, var(--sage-500)); color:#fff;
 }
 
-/* ---------- Khối nổi bật: 1 bài lớn + danh sách nhỏ bên cạnh ---------- */
-.bv-noibat {
+/* ---------- Khối nổi bật: bài lớn (overlay) + liên quan cùng DM + list khác DM ---------- */
+.bv-noibat-wrap {
   display:grid; grid-template-columns: 1.7fr 1fr; gap:28px;
   margin-bottom:36px; padding-bottom:32px; border-bottom:1px solid var(--line-200);
+  align-items:start;
 }
-.bv-noibat-chinh { display:flex; flex-direction:column; color:inherit; }
+.bv-noibat-left { display:flex; flex-direction:column; gap:18px; }
+
 .bv-noibat-anh {
-  position:relative; width:100%; aspect-ratio:16/9; border-radius:var(--radius-md);
-  background:var(--sage-100) center/cover no-repeat; display:flex; align-items:center; justify-content:center;
-  border:1px solid var(--line-200); overflow:hidden;
+  position:relative; display:block; width:100%; aspect-ratio:16/9; border-radius:var(--radius-md);
+  background:var(--sage-100) center/cover no-repeat; overflow:hidden; border:1px solid var(--line-200);
 }
-.bv-noibat-anh .bv-card-thumb-fallback { font-size:52px; opacity:.5; }
-.bv-noibat-body { padding-top:16px; display:flex; flex-direction:column; gap:10px; }
-.bv-noibat-body h2 {
-  margin:0; font-family:var(--font-display); font-size:26px; line-height:1.28; font-weight:800; color:var(--ink-900);
+.bv-noibat-anh .bv-card-thumb-fallback {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:52px; opacity:.5;
 }
-.bv-noibat-body p { margin:0; font-size:15px; color:var(--text-muted); line-height:1.55; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.bv-noibat-overlay {
+  position:absolute; left:0; right:0; bottom:0; top:45%;
+  background:linear-gradient(180deg, rgba(11,31,58,0) 0%, rgba(11,31,58,.55) 32%, rgba(11,31,58,.92) 100%);
+  display:flex; flex-direction:column; justify-content:flex-end; gap:8px;
+  padding:22px 24px;
+}
+.bv-card-tag-anh { align-self:flex-start; }
+.bv-noibat-overlay h2 {
+  margin:0; font-family:var(--font-display); font-size:24px; line-height:1.28; font-weight:800; color:#fff;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.bv-noibat-overlay p {
+  margin:0; font-size:14px; color:rgba(255,255,255,.85); line-height:1.5;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.bv-noibat-meta { display:flex; gap:16px; font-size:12.5px; color:rgba(255,255,255,.75); }
+
+.bv-lienquan-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; }
+.bv-lienquan-card { display:flex; flex-direction:column; gap:8px; color:inherit; }
+.bv-lienquan-anh {
+  width:100%; aspect-ratio:16/10; border-radius:var(--radius-sm); background:var(--sage-100) center/cover no-repeat;
+  border:1px solid var(--line-200); position:relative; overflow:hidden;
+}
+.bv-lienquan-anh .bv-card-thumb-fallback { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:26px; opacity:.55; }
+.bv-lienquan-title {
+  font-size:13.5px; font-weight:700; color:var(--ink-900); line-height:1.4;
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+  transition:color .15s ease;
+}
+.bv-lienquan-card:hover .bv-lienquan-title { color: var(--sage-500); }
 
 .bv-noibat-phu { display:flex; flex-direction:column; }
+.bv-phu-heading {
+  font-family:var(--font-display); font-size:14px; font-weight:800; color: var(--sage-500);
+  text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px; padding-bottom:10px;
+  border-bottom:2px solid var(--sage-500);
+}
 .bv-phu-item {
   display:flex; flex-direction:column; gap:5px; padding:14px 0; color:inherit;
   border-bottom:1px solid var(--line-200);
 }
-.bv-noibat-phu .bv-phu-item:first-child { padding-top:0; }
 .bv-noibat-phu .bv-phu-item:last-child { border-bottom:none; }
 .bv-phu-eyebrow {
   font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.03em;
@@ -136,8 +184,13 @@
 .bv-phu-item:hover .bv-phu-title { color: var(--sage-500); }
 
 @media (max-width: 860px) {
-  .bv-noibat { grid-template-columns: 1fr; gap:18px; }
-  .bv-noibat-body h2 { font-size:21px; }
+  .bv-noibat-wrap { grid-template-columns: 1fr; gap:20px; }
+  .bv-noibat-overlay h2 { font-size:20px; }
+  .bv-lienquan-grid { grid-template-columns: repeat(3, 1fr); gap:10px; }
+  .bv-lienquan-title { font-size:12.5px; -webkit-line-clamp:2; }
+}
+@media (max-width: 560px) {
+  .bv-lienquan-grid { grid-template-columns: 1fr 1fr; }
 }
 
 .bv-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:20px; }
@@ -160,6 +213,9 @@
   align-self:flex-start; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.02em;
   color: var(--chip-color, var(--sage-500)); background: color-mix(in srgb, var(--chip-color, var(--sage-500)) 12%, white);
   padding:3px 10px; border-radius:var(--radius-full);
+}
+.bv-card-tag-anh {
+  color:#fff; background: color-mix(in srgb, var(--chip-color, var(--sage-500)) 78%, transparent);
 }
 .bv-card-body h3 { margin:0; font-family:var(--font-display); font-size:16.5px; font-weight:800; color:var(--ink-900); line-height:1.35; }
 .bv-card-body p { margin:0; font-size:13.5px; color:var(--text-muted); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
