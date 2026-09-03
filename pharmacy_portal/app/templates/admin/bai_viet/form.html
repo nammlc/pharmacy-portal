@@ -1,0 +1,96 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ tieu_de }}{% endblock %}
+
+{% block admin_content %}
+{% from "admin/_macros.html" import render_field %}
+<div class="admin-page-head"><h1>{{ tieu_de }}</h1></div>
+
+<div class="admin-form-card">
+  <form method="POST" enctype="multipart/form-data" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="form-row">
+      {{ form.tieu_de.label }}
+      {{ form.tieu_de() }}
+      {% for e in form.tieu_de.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+      <div class="form-row">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          {{ form.danh_muc_id.label }}
+          <a href="{{ url_for('admin_dmbv.them') }}" target="_blank" style="font-size:12.5px; color:var(--sage-500); white-space:nowrap;">+ Thêm danh mục</a>
+        </div>
+        {{ form.danh_muc_id(**{"data-searchable": "1", "data-placeholder": "Gõ để tìm danh mục..."}) }}
+        {% for e in form.danh_muc_id.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="form-row">
+        {{ form.trang_thai.label }}
+        {{ form.trang_thai() }}
+        {% for e in form.trang_thai.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label style="display:inline-flex; align-items:center; gap:8px; font-weight:normal; cursor:pointer;">
+        {{ form.ghim() }} {{ form.ghim.label.text }}
+      </label>
+    </div>
+
+    <div class="form-row">
+      {{ form.mo_ta_ngan.label }}
+      {{ form.mo_ta_ngan(rows=3) }}
+      {% for e in form.mo_ta_ngan.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+
+    {{ render_field(form.noi_dung) }}
+
+    {# --- Ảnh đại diện --- #}
+    <div class="form-row">
+      <label>Ảnh đại diện</label>
+
+      {% if bai_viet and bai_viet.anh_dai_dien %}
+      <div style="margin-bottom:10px;">
+        <img src="{{ bai_viet.anh_dai_dien }}" alt="Ảnh đại diện"
+             style="max-width:200px; max-height:200px; border-radius:8px; border:1px solid #ddd; padding:4px;">
+        <div style="margin-top:6px;">
+          <label style="display:inline-flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+            <input type="checkbox" name="xoa_anh" value="1">
+            <span style="color:#e53e3e;">Xoá ảnh hiện tại</span>
+          </label>
+        </div>
+      </div>
+      {% endif %}
+
+      {{ form.file_anh(accept="image/png,image/jpeg,image/webp,image/gif", style="margin-top:4px;") }}
+      <div style="font-size:0.82em; color:#666; margin-top:4px;">Chấp nhận: PNG, JPG, JPEG, WEBP, GIF — tối đa 5 MB</div>
+      {% for e in form.file_anh.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+
+    {# --- Tệp đính kèm --- #}
+    <div class="form-row">
+      <label>Tệp đính kèm</label>
+
+      {% if bai_viet and bai_viet.file_dinh_kem %}
+      <div style="margin-bottom:10px; font-size:13.5px;">
+        📎 <a href="{{ bai_viet.file_dinh_kem }}" target="_blank">{{ bai_viet.ten_file or 'Tệp hiện tại' }}</a>
+        <label style="display:inline-flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer; margin-left:14px;">
+          <input type="checkbox" name="xoa_tep" value="1">
+          <span style="color:#e53e3e;">Xoá tệp hiện tại</span>
+        </label>
+      </div>
+      {% endif %}
+
+      {{ form.file_dinh_kem(style="margin-top:4px;") }}
+      <div style="font-size:0.82em; color:#666; margin-top:4px;">Chấp nhận: PDF, DOC, DOCX, XLS, XLSX, ZIP — tối đa 5 MB</div>
+      {% for e in form.file_dinh_kem.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+
+    <div class="form-actions">
+      {{ form.submit(class="btn btn-primary") }}
+      <a href="{{ url_for('admin_bv.danh_sach') }}" class="btn btn-outline">Huỷ</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

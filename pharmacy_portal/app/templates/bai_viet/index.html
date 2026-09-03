@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ danh_muc_hien_tai.ten if danh_muc_hien_tai else 'Bài viết - Thông báo' }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">📰 Tin tức &amp; thông báo</div>
+  <h1>{{ danh_muc_hien_tai.ten if danh_muc_hien_tai else 'Bài viết - Thông báo' }}</h1>
+  <p>{{ danh_muc_hien_tai.mo_ta if danh_muc_hien_tai else 'Thông báo nội bộ, tin tức dược phẩm, bài báo khoa học và hướng dẫn chuyên môn từ Khoa Dược.' }}</p>
+</div>
+
+{% if danh_sach_danh_muc %}
+<div class="bv-filter-bar">
+  <a href="{{ url_for('bv.index') }}" class="bv-filter-chip {{ 'is-active' if not danh_muc_hien_tai }}">Tất cả</a>
+  {% for dm in danh_sach_danh_muc %}
+  <a href="{{ url_for('bv.index', danh_muc=dm.slug) }}"
+     class="bv-filter-chip {{ 'is-active' if danh_muc_hien_tai and danh_muc_hien_tai.id == dm.id }}"
+     style="--chip-color: {{ dm.mau_sac or '#1a4d8f' }};">{{ dm.ten }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="results-panel">
+  {% if bai_viet_list %}
+  <div class="bv-grid">
+    {% for bv in bai_viet_list %}
+    <a class="bv-card" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
+      <div class="bv-card-thumb" {% if bv.anh_dai_dien %}style="background-image:url('{{ bv.anh_dai_dien }}');"{% endif %}>
+        {% if not bv.anh_dai_dien %}<span class="bv-card-thumb-fallback">📰</span>{% endif %}
+        {% if bv.ghim %}<span class="bv-card-pin">📌 Ghim</span>{% endif %}
+      </div>
+      <div class="bv-card-body">
+        {% if bv.danh_muc %}
+        <span class="bv-card-tag" style="--chip-color: {{ bv.danh_muc.mau_sac or '#1a4d8f' }};">{{ bv.danh_muc.ten }}</span>
+        {% endif %}
+        <h3>{{ bv.tieu_de }}</h3>
+        {% if bv.mo_ta_ngan %}<p>{{ bv.mo_ta_ngan }}</p>{% endif %}
+        <div class="bv-card-meta">
+          <span>{{ bv.ngay_xuat_ban.strftime('%d/%m/%Y') if bv.ngay_xuat_ban else bv.ngay_tao.strftime('%d/%m/%Y') }}</span>
+          <span>👁 {{ bv.luot_xem or 0 }}</span>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% set endpoint = 'bv.index' %}
+  {% set args = {'danh_muc': danh_muc_hien_tai.slug} if danh_muc_hien_tai else {} %}
+  {% include "_phan_trang.html" with context %}
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">📰</div>
+    Chưa có bài viết nào được đăng{{ ' trong danh mục này' if danh_muc_hien_tai else '' }}.
+  </div>
+  {% endif %}
+</div>
+
+<style>
+.bv-filter-bar { display:flex; flex-wrap:wrap; gap:8px; margin: 0 0 22px; }
+.bv-filter-chip {
+  display:inline-flex; align-items:center; padding:7px 16px; border-radius:var(--radius-full);
+  border:1.5px solid var(--line-200); font-size:13.5px; font-weight:600; color:var(--text-muted);
+  background:var(--paper-50); transition: all .15s ease;
+}
+.bv-filter-chip:hover { border-color: var(--chip-color, var(--sage-500)); color: var(--chip-color, var(--sage-500)); }
+.bv-filter-chip.is-active {
+  background: var(--chip-color, var(--sage-500)); border-color: var(--chip-color, var(--sage-500)); color:#fff;
+}
+
+.bv-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:20px; }
+.bv-card {
+  display:flex; flex-direction:column; background:var(--paper-50); border:1px solid var(--line-200);
+  border-radius:var(--radius-md); overflow:hidden; box-shadow: var(--shadow-sm); transition: transform .15s ease, box-shadow .15s ease;
+}
+.bv-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.bv-card-thumb {
+  position:relative; height:150px; background:var(--sage-100) center/cover no-repeat;
+  display:flex; align-items:center; justify-content:center;
+}
+.bv-card-thumb-fallback { font-size:34px; opacity:.6; }
+.bv-card-pin {
+  position:absolute; top:10px; left:10px; background:rgba(11,31,58,.78); color:#fff;
+  font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:var(--radius-full);
+}
+.bv-card-body { padding:16px 18px 18px; display:flex; flex-direction:column; gap:8px; flex:1; }
+.bv-card-tag {
+  align-self:flex-start; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.02em;
+  color: var(--chip-color, var(--sage-500)); background: color-mix(in srgb, var(--chip-color, var(--sage-500)) 12%, white);
+  padding:3px 10px; border-radius:var(--radius-full);
+}
+.bv-card-body h3 { margin:0; font-family:var(--font-display); font-size:16.5px; font-weight:800; color:var(--ink-900); line-height:1.35; }
+.bv-card-body p { margin:0; font-size:13.5px; color:var(--text-muted); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.bv-card-meta { margin-top:auto; padding-top:8px; display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); }
+</style>
+{% endblock %}

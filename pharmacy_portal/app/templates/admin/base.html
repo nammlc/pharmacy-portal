@@ -43,6 +43,8 @@
     <a href="{{ url_for('admin_ttth.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ttth' }}">📋 Thông tin thuốc</a>
 
     <div class="section-label">Nội dung</div>
+    <a href="{{ url_for('admin_bv.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_bv' }}">📰 Bài viết - Thông báo</a>
+    <a href="{{ url_for('admin_dmbv.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_dmbv' }}">🗂️ Danh mục bài viết</a>
     <a href="{{ url_for('admin_ttbn.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ttbn' }}">🧑‍⚕️ Bài viết bệnh nhân</a>
 
     <div class="section-label">Khác</div>

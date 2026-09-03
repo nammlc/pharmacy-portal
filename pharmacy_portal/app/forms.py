@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import (
-    StringField, TextAreaField, SelectField, SelectMultipleField, PasswordField, SubmitField
+    StringField, TextAreaField, SelectField, SelectMultipleField, PasswordField, SubmitField,
+    BooleanField
 )
 from wtforms.validators import DataRequired, Length, Optional
 
@@ -162,4 +163,41 @@ class ThongTinBenhNhanForm(FlaskForm):
     tieu_de = StringField("Tiêu đề", validators=[DataRequired(), Length(max=255)])
     danh_muc = StringField("Danh mục", validators=[Optional(), Length(max=150)])
     noi_dung = TextAreaField("Nội dung", validators=[DataRequired()])
+    submit = SubmitField("Lưu")
+
+
+class DanhMucBaiVietForm(FlaskForm):
+    ten = StringField("Tên danh mục", validators=[DataRequired(), Length(max=150)])
+    mo_ta = StringField("Mô tả ngắn", validators=[Optional(), Length(max=255)])
+    mau_sac = StringField("Màu sắc (mã hex, vd #1a4d8f)", validators=[Optional(), Length(max=20)])
+    thu_tu = StringField("Thứ tự hiển thị", validators=[Optional(), Length(max=10)])
+    submit = SubmitField("Lưu")
+
+
+class BaiVietForm(FlaskForm):
+    tieu_de = StringField("Tiêu đề", validators=[DataRequired(), Length(max=500)])
+    danh_muc_id = SelectField("Danh mục", coerce=int, validators=[Optional()])
+    mo_ta_ngan = TextAreaField("Mô tả ngắn (hiển thị ở danh sách)", validators=[Optional(), Length(max=500)])
+    noi_dung = TextAreaField("Nội dung", validators=[DataRequired()])
+    trang_thai = SelectField(
+        "Trạng thái",
+        choices=[("nhap", "Bản nháp"), ("da_xuat_ban", "Đã xuất bản"), ("an", "Ẩn")],
+        validators=[DataRequired()],
+    )
+    ghim = BooleanField("Ghim bài viết lên đầu danh sách")
+    file_anh = FileField(
+        "Ảnh đại diện",
+        validators=[
+            Optional(),
+            FileAllowed(["png", "jpg", "jpeg", "webp", "gif"], "Chỉ chấp nhận PNG, JPG, JPEG, WEBP, GIF."),
+        ],
+    )
+    file_dinh_kem = FileField(
+        "Tệp đính kèm (PDF, Word, Excel, ZIP...)",
+        validators=[
+            Optional(),
+            FileAllowed(["pdf", "doc", "docx", "xls", "xlsx", "zip"],
+                       "Chỉ chấp nhận PDF, DOC, DOCX, XLS, XLSX, ZIP."),
+        ],
+    )
     submit = SubmitField("Lưu")

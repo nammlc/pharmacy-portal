@@ -106,3 +106,63 @@ def upload_anh_thuoc(file_object, url_cu: str | None = None) -> str | None:
 def upload_anh_ve_chung_toi(file_object, url_cu: str | None = None) -> str | None:
     return _upload_len_cloudinary(file_object, "pharmacy/ve_chung_toi",
                                    url_cu=url_cu, width=1200, height=800, crop="fill")
+
+
+def upload_anh_bai_viet(file_object, url_cu: str | None = None) -> str | None:
+    return _upload_len_cloudinary(file_object, "pharmacy/bai_viet",
+                                   url_cu=url_cu, width=1200, height=800, crop="fill")
+
+
+# --------------------------------------------------------------------------
+# Tệp đính kèm bài viết (PDF, Word, Excel, ZIP...) - upload dạng "raw" trên
+# Cloudinary (không phải ảnh nên không qua transformation).
+# --------------------------------------------------------------------------
+_DUOI_TEP_DINH_KEM_HOP_LE = {"pdf", "doc", "docx", "xls", "xlsx", "zip"}
+
+
+def _duoi_tep_hop_le(ten_file: str, duoi_hop_le: set) -> bool:
+    return "." in ten_file and ten_file.rsplit(".", 1)[1].lower() in duoi_hop_le
+
+
+def upload_tep_dinh_kem_bai_viet(file_object, url_cu: str | None = None):
+    """Upload tệp đính kèm bài viết lên Cloudinary (resource_type='raw').
+    Trả về tuple (url_moi, ten_file_goc) hoặc (None, None) nếu không có file."""
+    if not file_object or not file_object.filename:
+        return None, None
+    ten_goc = file_object.filename
+    if not _duoi_tep_hop_le(ten_goc, _DUOI_TEP_DINH_KEM_HOP_LE):
+        raise ValueError("Chỉ chấp nhận file PDF, DOC, DOCX, XLS, XLSX, ZIP.")
+
+    if url_cu:
+        xoa_tep_dinh_kem_cloudinary(url_cu)
+
+    _ket_noi_cloudinary()
+    duoi = ten_goc.rsplit(".", 1)[1].lower()
+    public_id = f"bai_viet_dinh_kem_{uuid.uuid4().hex[:12]}.{duoi}"
+    ket_qua = cloudinary.uploader.upload(
+        file_object,
+        folder="pharmacy/bai_viet_dinh_kem",
+        public_id=public_id,
+        resource_type="raw",
+        overwrite=False,
+    )
+    return ket_qua.get("secure_url"), ten_goc
+
+
+def xoa_tep_dinh_kem_cloudinary(url_tep: str) -> bool:
+    """Xoá tệp đính kèm (resource_type='raw') khỏi Cloudinary dựa vào URL.
+    Khác ảnh: với 'raw', public_id giữ nguyên phần đuôi file."""
+    if not url_tep:
+        return False
+    try:
+        _ket_noi_cloudinary()
+        phan = url_tep.rsplit("/upload/", 1)
+        if len(phan) < 2:
+            return False
+        public_id_raw = phan[1]
+        if public_id_raw.startswith("v") and "/" in public_id_raw:
+            public_id_raw = public_id_raw.split("/", 1)[1]
+        ket_qua = cloudinary.uploader.destroy(public_id_raw, resource_type="raw")
+        return ket_qua.get("result") == "ok"
+    except Exception:
+        return False

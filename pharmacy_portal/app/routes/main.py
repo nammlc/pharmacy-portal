@@ -28,7 +28,14 @@ VCT_MAC_DINH = {
 
 @bp.route("/")
 def trang_chu():
-    # Lấy stat từ DB — dùng lại UNION ALL giống dashboard
+    # Trang chủ chuyển hướng thẳng vào trang Bài viết/Thông báo, để người
+    # dùng vừa truy cập web là thấy ngay tin tức/thông báo mới nhất.
+    return redirect(url_for("bv.index"))
+
+
+@bp.route("/tong-quan")
+def tong_quan():
+    """Trang tổng quan (thống kê nhanh) - trang chủ cũ, vẫn giữ lại để truy cập trực tiếp khi cần."""
     try:
         rows = db.session.execute(text("""
             SELECT 'dmt', COUNT(*) FROM danh_muc_thuoc

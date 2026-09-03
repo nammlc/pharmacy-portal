@@ -1,0 +1,67 @@
+{% extends "admin/base.html" %}
+{% from "admin/_phan_trang.html" import render as pt %}
+{% block title %}Bài viết - Thông báo{% endblock %}
+{% block admin_content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Bài viết - Thông báo</h1>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">{{ phan_trang.total }} bài viết</p>
+  </div>
+  <a href="{{ url_for('admin_bv.them') }}" class="btn btn-primary">+ Thêm bài viết</a>
+</div>
+
+<form method="get" class="adm-search-row">
+  <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm theo tiêu đề...">
+  <button type="submit" class="btn btn-outline btn-sm">Tìm</button>
+  {% if tu_khoa %}<a href="{{ url_for('admin_bv.danh_sach') }}" class="btn btn-outline btn-sm">✕ Xoá</a>{% endif %}
+</form>
+
+{% if items %}
+<div class="adm-table-wrap">
+  <table class="adm-table">
+    <thead>
+      <tr><th style="width:40px;">#</th><th>Tiêu đề</th><th>Danh mục</th><th>Trạng thái</th><th>Ngày đăng</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
+        <td>
+          <strong>{{ item.tieu_de }}</strong>
+          {% if item.ghim %}<span class="adm-badge" style="margin-left:6px;">📌 Ghim</span>{% endif %}
+        </td>
+        <td>{% if item.danh_muc %}<span class="adm-badge">{{ item.danh_muc.ten }}</span>{% else %}—{% endif %}</td>
+        <td>
+          {% if item.trang_thai == 'da_xuat_ban' %}
+          <span class="adm-badge" style="background:#e5f6ec;color:#1a7a45;">Đã xuất bản</span>
+          {% elif item.trang_thai == 'nhap' %}
+          <span class="adm-badge adm-badge-alt">Bản nháp</span>
+          {% else %}
+          <span class="adm-badge" style="background:#fbe6dd;color:#b3401f;">Ẩn</span>
+          {% endif %}
+        </td>
+        <td style="color:var(--text-muted);white-space:nowrap;">
+          {{ (item.ngay_xuat_ban or item.ngay_tao).strftime('%d/%m/%Y') if (item.ngay_xuat_ban or item.ngay_tao) else '—' }}
+        </td>
+        <td class="td-actions">
+          <div class="row-act">
+            {% if item.trang_thai == 'da_xuat_ban' %}
+            <a href="{{ url_for('bv.chi_tiet', slug=item.slug) }}" target="_blank">Xem</a>
+            {% endif %}
+            <a href="{{ url_for('admin_bv.sua', item_id=item.id) }}">Sửa</a>
+            <form method="POST" action="{{ url_for('admin_bv.xoa', item_id=item.id) }}" onsubmit="return false;" style="display:contents;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="button" class="act-del" onclick="moModal(this.closest('form'), '{{ item.tieu_de }}')">Xoá</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{{ pt(phan_trang, 'admin_bv.danh_sach', q=tu_khoa) }}
+{% else %}
+<div class="admin-empty">Chưa có bài viết nào.</div>
+{% endif %}
+{% endblock %}

@@ -70,6 +70,9 @@ def create_app(config_class=Config):
     from app.routes.nha_thuoc_bv import bp as ntbv_bp
     app.register_blueprint(ntbv_bp)
 
+    from app.routes.bai_viet import bp as bv_bp
+    app.register_blueprint(bv_bp)
+
     # --- Trang quản trị (admin) - yêu cầu đăng nhập ---
     from app.routes.admin_auth import bp as admin_auth_bp
     app.register_blueprint(admin_auth_bp)
@@ -112,6 +115,12 @@ def create_app(config_class=Config):
 
     from app.routes.admin_nhap_hang_loat import bp as admin_nhap_hang_loat_bp
     app.register_blueprint(admin_nhap_hang_loat_bp)
+
+    from app.routes.admin_bai_viet import bp as admin_bv_bp
+    app.register_blueprint(admin_bv_bp)
+
+    from app.routes.admin_danh_muc_bai_viet import bp as admin_dmbv_bp
+    app.register_blueprint(admin_dmbv_bp)
 
     _tao_tai_khoan_dau_tien_neu_can(app)
 

@@ -33,6 +33,7 @@
 
       <nav class="main-nav" id="mainNav">
         <a href="{{ url_for('main.trang_chu') }}" class="{{ 'active' if request.endpoint == 'main.trang_chu' }}">🏠 Trang chủ</a>
+        <a href="{{ url_for('bv.index') }}" class="{{ 'active' if request.blueprint == 'bv' }}">📰 Bài viết - Thông báo</a>
         <a href="{{ url_for('dmt.index') }}" class="{{ 'active' if request.blueprint == 'dmt' }}">💊 Danh mục thuốc</a>
         <a href="{{ url_for('ntbv.index') }}" class="{{ 'active' if request.blueprint == 'ntbv' }}">🏥 Nhà thuốc BV</a>
         <a href="{{ url_for('tttt.index') }}" class="{{ 'active' if request.blueprint == 'tttt' }}">💉 Thuốc tiêm truyền</a>

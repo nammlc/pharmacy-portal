@@ -239,6 +239,60 @@ class ThongTinBenhNhan(db.Model):
     ngay_dang = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+class DanhMucBaiViet(db.Model):
+    """Danh mục cho bài viết / thông báo (vd: Thông báo, Tin tức, Bài báo khoa học...)."""
+    __tablename__ = "danh_muc_bai_viet"
+
+    id = db.Column(db.Integer, primary_key=True)
+    ten = db.Column(db.String(150), nullable=False)
+    slug = db.Column(db.String(150), unique=True)
+    mo_ta = db.Column(db.String(255))
+    mau_sac = db.Column(db.String(20), default="#1a4d8f")
+    thu_tu = db.Column(db.Integer, default=0)
+    ngay_tao = db.Column(db.DateTime, default=datetime.utcnow)
+
+    bai_viet_list = db.relationship("BaiViet", backref="danh_muc")
+
+    def __repr__(self):
+        return f"<DanhMucBaiViet {self.ten}>"
+
+
+class BaiViet(db.Model):
+    """Bài viết / thông báo đăng công khai trên trang web (tin tức, thông báo nội bộ,
+    bài báo khoa học, hướng dẫn chuyên môn...)."""
+    __tablename__ = "bai_viet"
+
+    id = db.Column(db.Integer, primary_key=True)
+    danh_muc_id = db.Column(db.Integer, db.ForeignKey("danh_muc_bai_viet.id", ondelete="SET NULL"), nullable=True)
+    nguoi_dung_id = db.Column(db.Integer, db.ForeignKey("nguoi_dung.id", ondelete="SET NULL"), nullable=True)
+
+    tieu_de = db.Column(db.String(500), nullable=False)
+    slug = db.Column(db.String(520), unique=True)
+    mo_ta_ngan = db.Column(db.String(500))
+    noi_dung = db.Column(db.Text)
+
+    anh_dai_dien = db.Column(db.String(500))
+    file_dinh_kem = db.Column(db.String(500))
+    ten_file = db.Column(db.String(255))
+
+    # nhap: bản nháp (chưa hiển thị công khai) | da_xuat_ban: hiển thị công khai | an: đã ẩn
+    trang_thai = db.Column(
+        db.Enum("nhap", "da_xuat_ban", "an", name="trang_thai_bai_viet"),
+        nullable=False, default="nhap",
+    )
+    ghim = db.Column(db.Boolean, default=False)
+    luot_xem = db.Column(db.Integer, default=0)
+
+    ngay_tao = db.Column(db.DateTime, default=datetime.utcnow)
+    ngay_xuat_ban = db.Column(db.DateTime)
+    ngay_cap_nhat = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    tac_gia = db.relationship("NguoiDung")
+
+    def __repr__(self):
+        return f"<BaiViet {self.tieu_de}>"
+
+
 class CaiDat(db.Model):
     """Lưu cài đặt hệ thống dạng key-value, dùng cho trang Về chúng tôi và các nội dung tĩnh."""
     __tablename__ = "cai_dat"

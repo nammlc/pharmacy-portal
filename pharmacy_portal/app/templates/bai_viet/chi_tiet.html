@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{{ bai_viet.tieu_de }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">
+    {% if bai_viet.danh_muc %}
+    <a href="{{ url_for('bv.index', danh_muc=bai_viet.danh_muc.slug) }}" style="color: inherit;">{{ bai_viet.danh_muc.ten }}</a>
+    {% else %}
+    Bài viết - Thông báo
+    {% endif %}
+  </div>
+  <h1>{{ bai_viet.tieu_de }}</h1>
+  <p style="display:flex; gap:16px; flex-wrap:wrap; font-size:13.5px;">
+    <span>🗓 {{ bai_viet.ngay_xuat_ban.strftime('%d/%m/%Y') if bai_viet.ngay_xuat_ban else bai_viet.ngay_tao.strftime('%d/%m/%Y') }}</span>
+    <span>👁 {{ bai_viet.luot_xem or 0 }} lượt xem</span>
+    {% if bai_viet.tac_gia %}<span>✍️ {{ bai_viet.tac_gia.ho_ten or bai_viet.tac_gia.ten_dang_nhap }}</span>{% endif %}
+  </p>
+</div>
+
+<div class="results-panel">
+  {% if bai_viet.anh_dai_dien %}
+  <img src="{{ bai_viet.anh_dai_dien }}" alt="{{ bai_viet.tieu_de }}"
+       style="width:100%; max-width:760px; max-height:420px; object-fit:cover; border-radius:var(--radius-md); border:1px solid var(--line-200); margin-bottom:20px;">
+  {% endif %}
+
+  <div style="background:var(--paper-50); border:1px solid var(--line-200); border-radius:var(--radius-md); padding:28px; max-width:760px;" class="rich-content">
+    {{ bai_viet.noi_dung | safe if bai_viet.noi_dung else '' }}
+  </div>
+
+  {% if bai_viet.file_dinh_kem %}
+  <a href="{{ bai_viet.file_dinh_kem }}" target="_blank" rel="noopener"
+     style="display:inline-flex; align-items:center; gap:8px; margin-top:18px; padding:10px 18px; border-radius:var(--radius-sm); background:var(--sage-100); color:var(--sage-500); font-weight:700; font-size:13.5px; max-width:760px;">
+    📎 Tải tệp đính kèm{{ ' — ' ~ bai_viet.ten_file if bai_viet.ten_file }}
+  </a>
+  {% endif %}
+
+  {% if bai_lien_quan %}
+  <div style="max-width:760px; margin-top:36px;">
+    <h3 style="font-family:var(--font-display); font-size:16px; margin-bottom:12px;">Bài viết liên quan</h3>
+    <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px;">
+      {% for bv in bai_lien_quan %}
+      <li>
+        <a href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}" style="color:var(--navy-600); font-weight:600; font-size:14px;">→ {{ bv.tieu_de }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

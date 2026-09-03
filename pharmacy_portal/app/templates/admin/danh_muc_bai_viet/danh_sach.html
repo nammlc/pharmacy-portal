@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% from "admin/_phan_trang.html" import render as pt %}
+{% block title %}Danh mục bài viết{% endblock %}
+{% block admin_content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Danh mục bài viết</h1>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">{{ phan_trang.total }} danh mục</p>
+  </div>
+  <a href="{{ url_for('admin_dmbv.them') }}" class="btn btn-primary">+ Thêm danh mục</a>
+</div>
+
+{% if danh_sach_dm %}
+<div class="adm-table-wrap">
+  <table class="adm-table">
+    <thead>
+      <tr><th style="width:40px;">#</th><th></th><th>Tên danh mục</th><th>Mô tả</th><th>Số bài viết</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for dm in danh_sach_dm %}
+      <tr>
+        <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
+        <td><span style="display:inline-block; width:14px; height:14px; border-radius:4px; background:{{ dm.mau_sac or '#1a4d8f' }};"></span></td>
+        <td><strong>{{ dm.ten }}</strong></td>
+        <td style="color:var(--text-muted);">{{ dm.mo_ta or '—' }}</td>
+        <td>{{ dm.bai_viet_list|length }}</td>
+        <td class="td-actions">
+          <div class="row-act">
+            <a href="{{ url_for('admin_dmbv.sua', dm_id=dm.id) }}">Sửa</a>
+            <form method="POST" action="{{ url_for('admin_dmbv.xoa', dm_id=dm.id) }}" onsubmit="return false;" style="display:contents;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="button" class="act-del" onclick="moModal(this.closest('form'), '{{ dm.ten }}')">Xoá</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{{ pt(phan_trang, 'admin_dmbv.danh_sach') }}
+{% else %}
+<div class="admin-empty">Chưa có danh mục nào.</div>
+{% endif %}
+{% endblock %}
