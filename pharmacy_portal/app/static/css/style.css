@@ -1783,15 +1783,119 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 }
 
 /* ============================================================
-   CẢI THIỆN HOVER — TRANG BÀI VIẾT (bai_viet/index.html)
+   TRANG BÀI VIẾT (bai_viet/index.html + bai_viet/tim_kiem.html)
+   Dùng chung cho cả 2 trang để giao diện đồng nhất.
    ============================================================ */
+.bv-filter-bar {
+  max-width: 1180px; margin: 0 auto 22px; padding: 0 24px;
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.bv-filter-chip {
+  display: inline-flex; align-items: center; padding: 7px 16px; border-radius: var(--radius-full);
+  border: 1.5px solid var(--line-200); font-size: 13.5px; font-weight: 600; color: var(--text-muted);
+  background: var(--paper-50);
+  transition: border-color .15s ease, color .15s ease, background .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
+}
+.bv-filter-chip:hover { border-color: var(--chip-color, var(--sage-500)); color: var(--chip-color, var(--sage-500)); transform: scale(1.04); }
+.bv-filter-chip.is-active {
+  background: var(--chip-color, var(--sage-500)); border-color: var(--chip-color, var(--sage-500)); color: #fff;
+  transform: scale(1);
+}
 
-/* Card lưới bài viết — smooth lift + glow */
+/* ---------- Khối nổi bật: bài lớn (overlay) + liên quan cùng DM + list khác DM ---------- */
+.bv-noibat-wrap {
+  display: grid; grid-template-columns: 1.7fr 1fr; gap: 28px;
+  margin-bottom: 36px; padding-bottom: 32px; border-bottom: 1px solid var(--line-200);
+  align-items: start;
+}
+.bv-noibat-left { display: flex; flex-direction: column; gap: 18px; }
+
+.bv-noibat-anh {
+  position: relative; display: block; width: 100%; aspect-ratio: 16/9; border-radius: var(--radius-md);
+  background: var(--sage-100) center/cover no-repeat; overflow: hidden; border: 1px solid var(--line-200);
+  transition: box-shadow .2s ease;
+}
+.bv-noibat-anh:hover { box-shadow: var(--shadow-md); }
+.bv-noibat-anh .bv-card-thumb-fallback {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 52px; opacity: .5;
+}
+.bv-noibat-overlay {
+  position: absolute; left: 0; right: 0; bottom: 0; top: 45%;
+  background: linear-gradient(180deg, rgba(11,31,58,0) 0%, rgba(11,31,58,.55) 32%, rgba(11,31,58,.92) 100%);
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 8px;
+  padding: 22px 24px;
+}
+.bv-card-tag-anh { align-self: flex-start; }
+.bv-noibat-overlay h2 {
+  margin: 0; font-family: var(--font-display); font-size: 24px; line-height: 1.28; font-weight: 800; color: #fff;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  transition: color .15s ease;
+}
+.bv-noibat-anh:hover .bv-noibat-overlay h2 { color: var(--sky-400); }
+.bv-noibat-overlay p {
+  margin: 0; font-size: 14px; color: rgba(255,255,255,.85); line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.bv-noibat-meta { display: flex; gap: 16px; font-size: 12.5px; color: rgba(255,255,255,.75); }
+
+.bv-lienquan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.bv-lienquan-card { display: flex; flex-direction: column; gap: 8px; color: inherit; transition: transform .18s ease; }
+.bv-lienquan-card:hover { transform: translateY(-3px); }
+.bv-lienquan-anh {
+  width: 100%; aspect-ratio: 16/10; border-radius: var(--radius-sm); background: var(--sage-100) center/cover no-repeat;
+  background-size: 100%; border: 1px solid var(--line-200); position: relative; overflow: hidden;
+}
+.bv-lienquan-anh .bv-card-thumb-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 26px; opacity: .55; }
+.bv-lienquan-title {
+  font-size: 13.5px; font-weight: 700; color: var(--ink-900); line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  transition: color .15s ease;
+}
+.bv-lienquan-card:hover .bv-lienquan-title { color: var(--sage-500); }
+
+.bv-noibat-phu { display: flex; flex-direction: column; }
+.bv-phu-heading {
+  font-family: var(--font-display); font-size: 14px; font-weight: 800; color: var(--sage-500);
+  text-transform: uppercase; letter-spacing: .03em; margin-bottom: 6px; padding-bottom: 10px;
+  border-bottom: 2px solid var(--sage-500);
+}
+.bv-phu-item {
+  position: relative;
+  display: flex; flex-direction: column; gap: 5px; padding: 14px 0 14px 0; color: inherit;
+  border-bottom: 1px solid var(--line-200);
+  border-radius: var(--radius-sm);
+  transition: padding-left .15s ease, background .15s ease;
+}
+.bv-noibat-phu .bv-phu-item:last-child { border-bottom: none; }
+.bv-phu-item::before {
+  content: ''; position: absolute; left: 0; top: 12px; bottom: 12px; width: 0;
+  background: var(--navy-500); border-radius: 2px; transition: width .15s ease;
+}
+.bv-phu-item:hover { padding-left: 10px; background: var(--sage-100); }
+.bv-phu-item:hover::before { width: 3px; }
+.bv-phu-eyebrow {
+  font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+  color: var(--chip-color, var(--sage-500));
+}
+.bv-phu-title { font-size: 14.5px; font-weight: 700; color: var(--ink-900); line-height: 1.4; transition: color .15s ease; }
+.bv-phu-item:hover .bv-phu-title { color: var(--sage-500); }
+
+@media (max-width: 860px) {
+  .bv-noibat-wrap { grid-template-columns: 1fr; gap: 20px; }
+  .bv-noibat-overlay h2 { font-size: 20px; }
+  .bv-lienquan-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .bv-lienquan-title { font-size: 12.5px; -webkit-line-clamp: 2; }
+}
+@media (max-width: 560px) {
+  .bv-lienquan-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---------- Lưới bài viết (index.html + tim_kiem.html) ---------- */
+.bv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
 .bv-card {
-  transition:
-    transform .22s cubic-bezier(.34,1.56,.64,1),
-    box-shadow .22s ease,
-    border-color .18s ease;
+  display: flex; flex-direction: column; background: var(--paper-50); border: 1px solid var(--line-200);
+  border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);
+  transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease, border-color .18s ease;
   will-change: transform;
 }
 .bv-card:hover {
@@ -1799,69 +1903,25 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   box-shadow: 0 16px 40px rgba(11,31,58,.14), 0 4px 12px rgba(11,31,58,.08);
   border-color: var(--navy-500);
 }
-
-/* Ảnh thumbnail — không zoom, chỉ card lift (đã có ở .bv-card:hover) */
 .bv-card-thumb {
-  background-size: 100%;
+  position: relative; height: 150px; background: var(--sage-100) center/cover no-repeat; background-size: 100%;
+  display: flex; align-items: center; justify-content: center;
 }
-
-/* Tiêu đề đổi màu khi hover */
-.bv-card-body h3 {
-  transition: color .15s ease;
+.bv-card-thumb-fallback { font-size: 34px; opacity: .6; }
+.bv-card-pin {
+  position: absolute; top: 10px; left: 10px; background: rgba(11,31,58,.78); color: #fff;
+  font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: var(--radius-full);
 }
+.bv-card-body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.bv-card-tag {
+  align-self: flex-start; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .02em;
+  color: var(--chip-color, var(--sage-500)); background: color-mix(in srgb, var(--chip-color, var(--sage-500)) 12%, white);
+  padding: 3px 10px; border-radius: var(--radius-full);
+}
+.bv-card-tag-anh {
+  color: #fff; background: color-mix(in srgb, var(--chip-color, var(--sage-500)) 78%, transparent);
+}
+.bv-card-body h3 { margin: 0; font-family: var(--font-display); font-size: 16.5px; font-weight: 800; color: var(--ink-900); line-height: 1.35; transition: color .15s ease; }
 .bv-card:hover .bv-card-body h3 { color: var(--navy-600); }
-
-/* Bài nổi bật lớn — hover overlay sáng lên */
-.bv-noibat-anh {
-  transition: box-shadow .2s ease;
-}
-.bv-noibat-anh:hover {
-  box-shadow: 0 8px 32px rgba(11,31,58,.25);
-}
-.bv-noibat-anh:hover .bv-noibat-overlay h2 {
-  color: var(--sky-400);
-  transition: color .15s;
-}
-
-/* Ảnh liên quan — chỉ lift nhẹ, không zoom ảnh */
-.bv-lienquan-card {
-  transition: transform .18s ease;
-}
-.bv-lienquan-card:hover {
-  transform: translateY(-3px);
-}
-.bv-lienquan-anh {
-  background-size: 100%;
-}
-
-/* Item list bên phải — highlight bar */
-.bv-phu-item {
-  position: relative;
-  transition: padding-left .15s ease, background .15s ease;
-  border-radius: var(--radius-sm);
-}
-.bv-phu-item::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 12px; bottom: 12px;
-  width: 0;
-  background: var(--navy-500);
-  border-radius: 2px;
-  transition: width .15s ease;
-}
-.bv-phu-item:hover {
-  padding-left: 10px;
-  background: var(--sage-100);
-}
-.bv-phu-item:hover::before { width: 3px; }
-
-/* Filter chips — scale khi hover */
-.bv-filter-chip {
-  transition: all .15s cubic-bezier(.34,1.56,.64,1);
-}
-.bv-filter-chip:hover {
-  transform: scale(1.04);
-}
-.bv-filter-chip.is-active {
-  transform: scale(1);
-}
+.bv-card-body p { margin: 0; font-size: 13.5px; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.bv-card-meta { margin-top: auto; padding-top: 8px; display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); }
