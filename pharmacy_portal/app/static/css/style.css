@@ -1802,10 +1802,10 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 
 /* Zoom ảnh thumbnail khi hover */
 .bv-card-thumb {
-  transition: background-size .35s ease;
+  transition: background-size .6s cubic-bezier(.25,.46,.45,.94);
   background-size: 100%;
 }
-.bv-card:hover .bv-card-thumb { background-size: 108%; }
+.bv-card:hover .bv-card-thumb { background-size: 106%; }
 
 /* Tiêu đề đổi màu khi hover */
 .bv-card-body h3 {
@@ -1833,10 +1833,10 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   transform: translateY(-3px);
 }
 .bv-lienquan-anh {
-  transition: background-size .3s ease;
+  transition: background-size .65s cubic-bezier(.25,.46,.45,.94);
   background-size: 100%;
 }
-.bv-lienquan-card:hover .bv-lienquan-anh { background-size: 108%; }
+.bv-lienquan-card:hover .bv-lienquan-anh { background-size: 105%; }
 
 /* Item list bên phải — highlight bar */
 .bv-phu-item {
