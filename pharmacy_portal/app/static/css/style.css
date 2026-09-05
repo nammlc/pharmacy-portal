@@ -1787,7 +1787,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
    Dùng chung cho cả 2 trang để giao diện đồng nhất.
    ============================================================ */
 .bv-filter-bar {
-  max-width: 1180px; margin: 0 auto 22px; padding: 0 24px;
+  max-width: 1180px; margin: 22px auto 22px; padding: 0 24px;
   display: flex; flex-wrap: wrap; gap: 8px;
 }
 .bv-filter-chip {
