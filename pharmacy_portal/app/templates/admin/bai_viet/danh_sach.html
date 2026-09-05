@@ -40,8 +40,8 @@
           <span class="adm-badge" style="background:#fbe6dd;color:#b3401f;">Ẩn</span>
           {% endif %}
         </td>
-        <td style="color:var(--text-muted);white-space:nowrap;">
-          {{ (item.ngay_xuat_ban or item.ngay_tao).strftime('%d/%m/%Y') if (item.ngay_xuat_ban or item.ngay_tao) else '—' }}
+        <td style="color:var(--text-muted);white-space:nowrap;font-size:12.5px;">
+          {{ (item.ngay_xuat_ban or item.ngay_tao).strftime('%d/%m/%Y %H:%M') if (item.ngay_xuat_ban or item.ngay_tao) else '—' }}
         </td>
         <td class="td-actions">
           <div class="row-act">

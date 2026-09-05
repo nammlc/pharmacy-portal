@@ -31,7 +31,7 @@ def danh_sach():
         query = query.filter(BaiViet.tieu_de.ilike(f"%{tu_khoa}%"))
     phan_trang = (query
                   .order_by(BaiViet.ghim.desc(), BaiViet.ngay_tao.desc())
-                  .paginate(page=trang, per_page=10, error_out=False))
+                  .paginate(page=trang, per_page=8, error_out=False))
     return render_template("admin/bai_viet/danh_sach.html",
                            items=phan_trang.items, phan_trang=phan_trang, tu_khoa=tu_khoa)
 
