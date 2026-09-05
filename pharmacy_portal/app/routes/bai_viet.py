@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, abort
 from sqlalchemy import or_
 from app import db
 from app.models.models import BaiViet, DanhMucBaiViet
+from app.utils.tim_kiem import tim_bai_viet
 
 bp = Blueprint("bv", __name__, url_prefix="/bai-viet")
 
@@ -13,9 +14,10 @@ SO_BAI_KHAC_DANH_MUC = 6   # danh sách tiêu đề bên cạnh bài lớn, KHÁ
 @bp.route("/")
 def index():
     """
-    Danh sách bài viết/thông báo đã xuất bản, có thể lọc theo danh mục.
+    Danh sách bài viết/thông báo đã xuất bản, có thể lọc theo danh mục
+    hoặc tìm kiếm gần đúng theo từ khoá (?q=...).
 
-    Ở trang 1 (không lọc theo danh mục), hiển thị thêm khối "nổi bật":
+    Ở trang 1 (không lọc theo danh mục và không tìm kiếm), hiển thị thêm khối "nổi bật":
     - 1 bài viết LỚN (bài được admin ghim gần nhất; nếu chưa ghim bài nào
       thì lấy bài mới xuất bản nhất) - ảnh có lớp overlay chứa tiêu đề/mô tả.
     - Bên dưới bài lớn: lưới 3 bài viết CÙNG danh mục với bài lớn.
@@ -23,8 +25,21 @@ def index():
     Các bài còn lại (chưa xuất hiện ở khối trên) hiển thị dạng lưới bên dưới
     như bình thường, có phân trang.
     """
+    tu_khoa = request.args.get("q", "").strip()
+    trang = request.args.get("page", 1, type=int)
+
+    danh_sach_danh_muc = DanhMucBaiViet.query.order_by(DanhMucBaiViet.thu_tu, DanhMucBaiViet.ten).all()
+
+    if tu_khoa:
+        phan_trang = tim_bai_viet(tu_khoa, per_page=SO_BAI_MOI_TRANG, page=trang)
+        return render_template(
+            "bai_viet/tim_kiem.html",
+            phan_trang=phan_trang,
+            tu_khoa=tu_khoa,
+            danh_sach_danh_muc=danh_sach_danh_muc,
+        )
+
     danh_muc_slug = request.args.get("danh_muc", "").strip()
-    trang = request.args.get("trang", 1, type=int)
 
     query = BaiViet.query.filter(BaiViet.trang_thai == "da_xuat_ban")
 
@@ -92,8 +107,6 @@ def index():
         query_luoi.order_by(BaiViet.ghim.desc(), BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
         .paginate(page=trang, per_page=SO_BAI_MOI_TRANG, error_out=False)
     )
-
-    danh_sach_danh_muc = DanhMucBaiViet.query.order_by(DanhMucBaiViet.thu_tu, DanhMucBaiViet.ten).all()
 
     return render_template(
         "bai_viet/index.html",

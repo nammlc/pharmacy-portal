@@ -1800,12 +1800,10 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   border-color: var(--navy-500);
 }
 
-/* Zoom ảnh thumbnail khi hover */
+/* Ảnh thumbnail — không zoom, chỉ card lift (đã có ở .bv-card:hover) */
 .bv-card-thumb {
-  transition: background-size .6s cubic-bezier(.25,.46,.45,.94);
   background-size: 100%;
 }
-.bv-card:hover .bv-card-thumb { background-size: 106%; }
 
 /* Tiêu đề đổi màu khi hover */
 .bv-card-body h3 {
@@ -1825,7 +1823,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   transition: color .15s;
 }
 
-/* Ảnh liên quan — lift */
+/* Ảnh liên quan — chỉ lift nhẹ, không zoom ảnh */
 .bv-lienquan-card {
   transition: transform .18s ease;
 }
@@ -1833,10 +1831,8 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   transform: translateY(-3px);
 }
 .bv-lienquan-anh {
-  transition: background-size .65s cubic-bezier(.25,.46,.45,.94);
   background-size: 100%;
 }
-.bv-lienquan-card:hover .bv-lienquan-anh { background-size: 105%; }
 
 /* Item list bên phải — highlight bar */
 .bv-phu-item {

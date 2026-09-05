@@ -8,6 +8,13 @@
   <p>{{ danh_muc_hien_tai.mo_ta if danh_muc_hien_tai else 'Thông báo nội bộ, tin tức dược phẩm, bài báo khoa học và hướng dẫn chuyên môn từ Khoa Dược.' }}</p>
 </div>
 
+<div class="search-panel">
+  <form class="search-form" method="get">
+    <input type="text" name="q" placeholder="Tìm bài viết theo tiêu đề...">
+    <button type="submit">🔍 Tìm</button>
+  </form>
+</div>
+
 {% if danh_sach_danh_muc %}
 <div class="bv-filter-bar">
   <a href="{{ url_for('bv.index') }}" class="bv-filter-chip {{ 'is-active' if not danh_muc_hien_tai }}">Tất cả</a>

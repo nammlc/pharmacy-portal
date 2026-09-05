@@ -373,3 +373,68 @@ def _build_filter(cols, tu_khoa):
     prefix = [c.ilike(f"{t}%") for c in cols for t in tokens]
     from sqlalchemy import or_, and_
     return or_(*sub, and_(*token_and), *prefix)
+
+
+def tim_bai_viet(tu_khoa: str, per_page: int = 9, page: int = 1):
+    """Tìm gần đúng bài viết (theo tiêu đề + mô tả ngắn), chỉ trong các bài đã xuất bản."""
+    from app.models.models import BaiViet
+
+    q = tu_khoa.strip()
+    if not q:
+        return None
+
+    da_xuat_ban = BaiViet.trang_thai == "da_xuat_ban"
+    tokens = _tach_token(q)
+
+    sub = BaiViet.tieu_de.ilike(f"%{q}%")
+    mo_ta = BaiViet.mo_ta_ngan.ilike(f"%{q}%")
+
+    if tokens:
+        token_and = and_(*[
+            or_(BaiViet.tieu_de.ilike(f"%{t}%"), BaiViet.mo_ta_ngan.ilike(f"%{t}%"))
+            for t in tokens
+        ])
+        token_prefix = or_(*[BaiViet.tieu_de.ilike(f"{t}%") for t in tokens])
+        fast_filter = or_(sub, mo_ta, token_and, token_prefix)
+    else:
+        fast_filter = or_(sub, mo_ta)
+
+    fast_ids = {
+        r[0] for r in
+        BaiViet.query.filter(da_xuat_ban, fast_filter).with_entities(BaiViet.id).all()
+    }
+
+    # pg_trgm bắt lỗi chính tả trên tiêu đề (chỉ có tác dụng nếu DB là Postgres + đã bật extension)
+    trgm_raw_ids = _trgm_ids_thuoc(q, "bai_viet", "tieu_de")
+    trgm_ids = []
+    if trgm_raw_ids:
+        trgm_ids = [
+            r[0] for r in
+            BaiViet.query.filter(BaiViet.id.in_(trgm_raw_ids), da_xuat_ban)
+            .with_entities(BaiViet.id).all()
+        ]
+
+    all_ids, seen = [], set()
+    for id_ in list(fast_ids) + trgm_ids:
+        if id_ not in seen:
+            all_ids.append(id_)
+            seen.add(id_)
+
+    if not all_ids:
+        return BaiViet.query.filter(BaiViet.id == -1).paginate(
+            page=page, per_page=per_page, error_out=False
+        )
+
+    priority_ids = [i for i in all_ids if i in fast_ids]
+    fuzzy_ids = [i for i in all_ids if i not in fast_ids]
+    ordered_ids = priority_ids + fuzzy_ids
+
+    total = len(ordered_ids)
+    start = (page - 1) * per_page
+    page_ids = ordered_ids[start: start + per_page]
+
+    items = BaiViet.query.filter(BaiViet.id.in_(page_ids)).all()
+    id_order = {id_: i for i, id_ in enumerate(page_ids)}
+    items.sort(key=lambda x: id_order.get(x.id, 9999))
+
+    return _FakePagination(items, total, page, per_page)
