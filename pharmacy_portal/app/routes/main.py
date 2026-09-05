@@ -47,7 +47,15 @@ def trang_chu():
         stat = {r[0]: r[1] for r in rows}
     except Exception:
         stat = {}
-    return render_template("trang_chu.html", stat=stat)
+    # Lấy 4 bài viết mới nhất cho section homepage
+    from app.models.models import BaiViet
+    bai_viet_moi = (
+        BaiViet.query
+        .filter_by(trang_thai="da_xuat_ban")
+        .order_by(BaiViet.ghim.desc(), BaiViet.ngay_xuat_ban.desc())
+        .limit(4).all()
+    )
+    return render_template("trang_chu.html", stat=stat, bai_viet_moi=bai_viet_moi)
 
 
 @bp.route("/tim-kiem")

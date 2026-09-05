@@ -1,5 +1,45 @@
 {% extends "base.html" %}
-{% block title %}Trang chủ — Cổng Tra Cứu Dược{% endblock %}
+{% block title %}Trang chủ — Cổng Tra Cứu Dược
+<!-- Section bài viết mới nhất -->
+{% set bai_moi = [] %}
+{% for bai in bai_viet_moi %}{% if loop.index <= 4 %}{% set _ = bai_moi.append(bai) %}{% endif %}{% endfor %}
+{% if bai_viet_moi %}
+<section class="tc-bai-viet-wrap">
+  <div class="tc-bai-viet-inner">
+    <div class="tc-bai-viet-head">
+      <div class="tc-bai-viet-title">
+        <span class="tc-bv-dot"></span>
+        📰 Tin tức & Thông báo mới nhất
+      </div>
+      <a href="{{ url_for('bv.index') }}" class="tc-bv-xem-them">Xem tất cả →</a>
+    </div>
+    <div class="tc-bv-grid">
+      {% for bv in bai_viet_moi %}
+      <a class="tc-bv-card" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
+        <div class="tc-bv-thumb" {% if bv.anh_dai_dien %}style="background-image:url('{{ bv.anh_dai_dien }}')"{% endif %}>
+          {% if not bv.anh_dai_dien %}<span class="tc-bv-thumb-icon">📰</span>{% endif %}
+          {% if bv.ghim %}<span class="tc-bv-pin">📌</span>{% endif %}
+          {% if bv.danh_muc %}
+          <span class="tc-bv-tag" style="--tc-bv-color:{{ bv.danh_muc.mau_sac }}">{{ bv.danh_muc.ten }}</span>
+          {% endif %}
+        </div>
+        <div class="tc-bv-body">
+          <h3>{{ bv.tieu_de }}</h3>
+          {% if bv.mo_ta_ngan %}<p>{{ bv.mo_ta_ngan }}</p>{% endif %}
+          <div class="tc-bv-meta">
+            <span>🗓 {{ bv.ngay_xuat_ban.strftime('%d/%m/%Y') if bv.ngay_xuat_ban else bv.ngay_tao.strftime('%d/%m/%Y') }}</span>
+            {% if bv.luot_xem %}<span>👁 {{ bv.luot_xem }}</span>{% endif %}
+          </div>
+        </div>
+        <div class="tc-bv-arrow">→</div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}
 
 {% block content %}
 <section class="hero">

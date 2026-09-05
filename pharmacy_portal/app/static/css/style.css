@@ -1575,3 +1575,297 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .row-act a:hover { border-color: var(--navy-500); color: var(--navy-500); background: var(--sage-100); }
 .row-act .act-del { color: var(--level-cctd); border-color: #f0c9c9; }
 .row-act .act-del:hover { background: #fff5f5; border-color: var(--level-cctd); }
+
+/* ============================================================
+   SECTION BÀI VIẾT MỚI NHẤT — TRANG CHỦ
+   ============================================================ */
+.tc-bai-viet-wrap {
+  background: var(--ink-900);
+  padding: 56px 24px 64px;
+  margin-top: 40px;
+}
+.tc-bai-viet-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.tc-bai-viet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.tc-bai-viet-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tc-bv-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--sky-400);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(74,159,224,.5); }
+  50% { box-shadow: 0 0 0 8px rgba(74,159,224,0); }
+}
+.tc-bv-xem-them {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--sky-400);
+  border: 1.5px solid rgba(74,159,224,.35);
+  border-radius: var(--radius-sm);
+  padding: 7px 16px;
+  transition: all .15s;
+}
+.tc-bv-xem-them:hover {
+  background: rgba(74,159,224,.12);
+  border-color: var(--sky-400);
+}
+
+/* Grid 4 bài */
+.tc-bv-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* Card bài viết trang chủ */
+.tc-bv-card {
+  background: rgba(255,255,255,.06);
+  border: 1.5px solid rgba(255,255,255,.1);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  position: relative;
+  transition:
+    transform .22s cubic-bezier(.34,1.56,.64,1),
+    border-color .18s,
+    background .18s,
+    box-shadow .22s;
+}
+.tc-bv-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(74,159,224,.08) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none;
+}
+.tc-bv-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  border-color: rgba(74,159,224,.5);
+  background: rgba(255,255,255,.1);
+  box-shadow: 0 20px 40px rgba(0,0,0,.35), 0 0 0 1px rgba(74,159,224,.2);
+}
+.tc-bv-card:hover::after { opacity: 1; }
+
+.tc-bv-thumb {
+  height: 160px;
+  background: rgba(255,255,255,.05) center/cover no-repeat;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tc-bv-thumb::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(11,31,58,.7) 100%);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.tc-bv-card:hover .tc-bv-thumb::before { opacity: 1; }
+
+/* Zoom ảnh khi hover */
+.tc-bv-thumb {
+  background-size: cover;
+  background-position: center;
+  transition: background-size .35s ease;
+}
+.tc-bv-card:hover .tc-bv-thumb {
+  background-size: 108%;
+}
+
+.tc-bv-thumb-icon { font-size: 32px; opacity: .4; }
+.tc-bv-pin {
+  position: absolute;
+  top: 8px; right: 8px;
+  font-size: 14px;
+  background: rgba(11,31,58,.75);
+  border-radius: 6px;
+  padding: 3px 7px;
+}
+.tc-bv-tag {
+  position: absolute;
+  bottom: 8px; left: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #fff;
+  background: var(--tc-bv-color, var(--navy-600));
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.tc-bv-body {
+  padding: 14px 16px 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tc-bv-body h3 {
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color .15s;
+}
+.tc-bv-card:hover .tc-bv-body h3 { color: var(--sky-400); }
+.tc-bv-body p {
+  font-size: 12.5px;
+  color: rgba(255,255,255,.55);
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.tc-bv-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 11.5px;
+  color: rgba(255,255,255,.4);
+  margin-top: auto;
+  padding-top: 8px;
+}
+.tc-bv-arrow {
+  padding: 10px 16px;
+  font-size: 14px;
+  color: rgba(255,255,255,.25);
+  text-align: right;
+  border-top: 1px solid rgba(255,255,255,.06);
+  transition: color .15s, padding-right .15s;
+}
+.tc-bv-card:hover .tc-bv-arrow {
+  color: var(--sky-400);
+  padding-right: 12px;
+}
+
+@media (max-width: 900px) {
+  .tc-bv-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 540px) {
+  .tc-bv-grid { grid-template-columns: 1fr; }
+  .tc-bai-viet-wrap { padding: 40px 16px 48px; }
+}
+
+/* ============================================================
+   CẢI THIỆN HOVER — TRANG BÀI VIẾT (bai_viet/index.html)
+   ============================================================ */
+
+/* Card lưới bài viết — smooth lift + glow */
+.bv-card {
+  transition:
+    transform .22s cubic-bezier(.34,1.56,.64,1),
+    box-shadow .22s ease,
+    border-color .18s ease;
+  will-change: transform;
+}
+.bv-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 40px rgba(11,31,58,.14), 0 4px 12px rgba(11,31,58,.08);
+  border-color: var(--navy-500);
+}
+
+/* Zoom ảnh thumbnail khi hover */
+.bv-card-thumb {
+  transition: background-size .35s ease;
+  background-size: 100%;
+}
+.bv-card:hover .bv-card-thumb { background-size: 108%; }
+
+/* Tiêu đề đổi màu khi hover */
+.bv-card-body h3 {
+  transition: color .15s ease;
+}
+.bv-card:hover .bv-card-body h3 { color: var(--navy-600); }
+
+/* Bài nổi bật lớn — hover overlay sáng lên */
+.bv-noibat-anh {
+  transition: box-shadow .2s ease;
+}
+.bv-noibat-anh:hover {
+  box-shadow: 0 8px 32px rgba(11,31,58,.25);
+}
+.bv-noibat-anh:hover .bv-noibat-overlay h2 {
+  color: var(--sky-400);
+  transition: color .15s;
+}
+
+/* Ảnh liên quan — lift */
+.bv-lienquan-card {
+  transition: transform .18s ease;
+}
+.bv-lienquan-card:hover {
+  transform: translateY(-3px);
+}
+.bv-lienquan-anh {
+  transition: background-size .3s ease;
+  background-size: 100%;
+}
+.bv-lienquan-card:hover .bv-lienquan-anh { background-size: 108%; }
+
+/* Item list bên phải — highlight bar */
+.bv-phu-item {
+  position: relative;
+  transition: padding-left .15s ease, background .15s ease;
+  border-radius: var(--radius-sm);
+}
+.bv-phu-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 12px; bottom: 12px;
+  width: 0;
+  background: var(--navy-500);
+  border-radius: 2px;
+  transition: width .15s ease;
+}
+.bv-phu-item:hover {
+  padding-left: 10px;
+  background: var(--sage-100);
+}
+.bv-phu-item:hover::before { width: 3px; }
+
+/* Filter chips — scale khi hover */
+.bv-filter-chip {
+  transition: all .15s cubic-bezier(.34,1.56,.64,1);
+}
+.bv-filter-chip:hover {
+  transform: scale(1.04);
+}
+.bv-filter-chip.is-active {
+  transform: scale(1);
+}
