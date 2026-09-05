@@ -42,7 +42,7 @@
         <h3>{{ bv.tieu_de }}</h3>
         {% if bv.mo_ta_ngan %}<p>{{ bv.mo_ta_ngan }}</p>{% endif %}
         <div class="bv-card-meta">
-          <span>{{ bv.ngay_xuat_ban.strftime('%d/%m/%Y') if bv.ngay_xuat_ban else bv.ngay_tao.strftime('%d/%m/%Y') }}</span>
+          <span>{{ (bv.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bv.ngay_xuat_ban else (bv.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}</span>
           <span>👁 {{ bv.luot_xem or 0 }}</span>
         </div>
       </div>

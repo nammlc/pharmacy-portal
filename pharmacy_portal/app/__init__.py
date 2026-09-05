@@ -34,6 +34,13 @@ def create_app(config_class=Config):
             return url
         return "https://" + url
 
+    @app.template_filter("gio_vn")
+    def gio_vn_filter(dt):
+        """Chuyển datetime UTC lưu trong CSDL sang giờ Việt Nam (GMT+7) khi
+        hiển thị ra giao diện. Dùng: {{ (item.ngay_tao | gio_vn).strftime('%d/%m/%Y %H:%M') }}"""
+        from app.utils.thoi_gian import gio_vn
+        return gio_vn(dt)
+
     login_manager.init_app(app)
     login_manager.login_view = "admin_auth.dang_nhap"
     login_manager.login_message = "Vui lòng đăng nhập để tiếp tục."

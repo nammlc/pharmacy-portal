@@ -21,7 +21,7 @@
         <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
         <td><strong>{{ item.tieu_de }}</strong></td>
         <td>{% if item.danh_muc %}<span class="adm-badge">{{ item.danh_muc }}</span>{% else %}—{% endif %}</td>
-        <td style="color:var(--text-muted);white-space:nowrap;">{{ item.ngay_dang.strftime('%d/%m/%Y') if item.ngay_dang else '—' }}</td>
+        <td style="color:var(--text-muted);white-space:nowrap;">{{ (item.ngay_dang | gio_vn).strftime('%d/%m/%Y') if item.ngay_dang else '—' }}</td>
         <td class="td-actions">
           <div class="row-act">
             <a href="{{ url_for('admin_ttbn.sua', item_id=item.id) }}">Sửa</a>

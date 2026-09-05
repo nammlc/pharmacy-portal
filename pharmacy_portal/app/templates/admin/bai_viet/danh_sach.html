@@ -41,7 +41,7 @@
           {% endif %}
         </td>
         <td style="color:var(--text-muted);white-space:nowrap;font-size:12.5px;">
-          {{ (item.ngay_xuat_ban or item.ngay_tao).strftime('%d/%m/%Y %H:%M') if (item.ngay_xuat_ban or item.ngay_tao) else '—' }}
+          {{ ((item.ngay_xuat_ban or item.ngay_tao) | gio_vn).strftime('%d/%m/%Y %H:%M') if (item.ngay_xuat_ban or item.ngay_tao) else '—' }}
         </td>
         <td class="td-actions">
           <div class="row-act">

@@ -68,7 +68,7 @@
             <td><strong>{{ t.ten_biet_duoc }}</strong></td>
             <td style="color:var(--text-muted);">{{ t.nhom.ten_nhom if t.nhom else '—' }}</td>
             <td style="color:var(--text-muted);white-space:nowrap;font-size:12.5px;">
-              {{ t.ngay_cap_nhat.strftime('%d/%m/%Y %H:%M') if t.ngay_cap_nhat else '—' }}
+              {{ (t.ngay_cap_nhat | gio_vn).strftime('%d/%m/%Y %H:%M') if t.ngay_cap_nhat else '—' }}
             </td>
             <td class="td-actions">
               <div class="row-act">
@@ -100,7 +100,7 @@
             <td><strong>{{ t.ten_biet_duoc }}</strong></td>
             <td style="color:var(--text-muted);">{{ t.nhom.ten_nhom if t.nhom else '—' }}</td>
             <td style="color:var(--text-muted);white-space:nowrap;font-size:12.5px;">
-              {{ t.ngay_cap_nhat.strftime('%d/%m/%Y %H:%M') if t.ngay_cap_nhat else '—' }}
+              {{ (t.ngay_cap_nhat | gio_vn).strftime('%d/%m/%Y %H:%M') if t.ngay_cap_nhat else '—' }}
             </td>
             <td class="td-actions">
               <div class="row-act">

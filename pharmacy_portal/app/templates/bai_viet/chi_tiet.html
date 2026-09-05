@@ -12,7 +12,7 @@
   </div>
   <h1>{{ bai_viet.tieu_de }}</h1>
   <p style="display:flex; gap:16px; flex-wrap:wrap; font-size:13.5px;">
-    <span>🗓 {{ bai_viet.ngay_xuat_ban.strftime('%d/%m/%Y') if bai_viet.ngay_xuat_ban else bai_viet.ngay_tao.strftime('%d/%m/%Y') }}</span>
+    <span>🗓 {{ (bai_viet.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bai_viet.ngay_xuat_ban else (bai_viet.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}</span>
     <span>👁 {{ bai_viet.luot_xem or 0 }} lượt xem</span>
     {% if bai_viet.tac_gia %}<span>✍️ {{ bai_viet.tac_gia.ho_ten or bai_viet.tac_gia.ten_dang_nhap }}</span>{% endif %}
   </p>
