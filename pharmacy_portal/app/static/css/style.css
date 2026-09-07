@@ -1539,13 +1539,32 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .adm-table tbody tr:hover td { background: #f7faff; }
 .adm-table td.td-actions { white-space: nowrap; width: 1px; }
 
-/* Cột tên/tiêu đề chính (biệt dược, hoạt chất, bài viết...) — nếu không có
-   min-width, trên điện thoại bảng auto-layout sẽ bóp cột này gần như bằng 0
-   để nhồi vừa các cột badge/hành động khác vào màn hình hẹp, khiến chữ vỡ
-   dòng từng 1-2 từ một, cực xấu. Đặt min-width để chữ luôn có đủ chỗ xuống
-   dòng tự nhiên (2-3 dòng bình thường) — bảng khi đó rộng hơn màn hình một
-   chút và có thể vuốt ngang xem tiếp (đã bật overflow-x:auto ở trên). */
-.adm-table td.col-title { min-width: 190px; }
+/* Cột tên/tiêu đề chính (biệt dược, hoạt chất, bài viết...) — giới hạn
+   MỖI DÒNG CHỈ 1 HÀNG, chữ dài quá sẽ tự cắt và hiện dấu "…" ở cuối, thay
+   vì xuống dòng dài ngoằng làm mỗi dòng bảng cao thấp lộn xộn. Có thêm
+   thuộc tính title="..." trên chữ để di chuột (desktop) vẫn xem được đầy
+   đủ nội dung khi bị cắt.
+   .col-title (td)       → giới hạn độ rộng tối đa của cả cột.
+   .col-title-text (span)→ phần tử con thật sự thực hiện cắt "…" — tách
+   riêng vì <td> với table-layout mặc định (auto) không phải lúc nào cũng
+   cắt chữ ổn định ở mọi trình duyệt, còn 1 span/div block con bên trong
+   thì luôn cắt đúng theo chiều rộng đã được cha giới hạn. */
+.adm-table td.col-title { max-width: 260px; }
+.col-title-text {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+.col-title-badges { margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap; }
+
+.adm-table td.col-desc {
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 /* Trên điện thoại: ghim cột Sửa/Xoá vào mép phải màn hình khi vuốt ngang,
    để luôn thấy và bấm được ngay mà không cần vuốt hết bảng. */

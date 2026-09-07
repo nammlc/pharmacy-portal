@@ -30,7 +30,7 @@
       {% for h in danh_sach_hc %}
       <tr>
         <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
-        <td class="col-title"><strong>{{ h.ten_hoat_chat }}</strong></td>
+        <td class="col-title"><strong class="col-title-text" title="{{ h.ten_hoat_chat }}">{{ h.ten_hoat_chat }}</strong></td>
         <td class="td-actions">
           <div class="row-act">
             <a href="{{ url_for('admin_hoat_chat.sua', hc_id=h.id) }}">Sửa</a>

@@ -21,8 +21,8 @@
       <tr>
         <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
         <td><span style="display:inline-block; width:14px; height:14px; border-radius:4px; background:{{ dm.mau_sac or '#1a4d8f' }};"></span></td>
-        <td class="col-title"><strong>{{ dm.ten }}</strong></td>
-        <td style="color:var(--text-muted);">{{ dm.mo_ta or '—' }}</td>
+        <td class="col-title"><strong class="col-title-text" title="{{ dm.ten }}">{{ dm.ten }}</strong></td>
+        <td class="col-desc" style="color:var(--text-muted);" title="{{ dm.mo_ta or '' }}">{{ dm.mo_ta or '—' }}</td>
         <td>{{ dm.bai_viet_list|length }}</td>
         <td class="td-actions">
           <div class="row-act">

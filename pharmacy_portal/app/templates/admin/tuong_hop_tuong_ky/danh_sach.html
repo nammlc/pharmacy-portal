@@ -19,8 +19,8 @@
       {% for item in items %}
       <tr>
         <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
-        <td class="col-title"><strong>{{ item.thuoc_a.ten_thuoc }}</strong></td>
-        <td class="col-title"><strong>{{ item.thuoc_b.ten_thuoc }}</strong></td>
+        <td class="col-title"><strong class="col-title-text" title="{{ item.thuoc_a.ten_thuoc }}">{{ item.thuoc_a.ten_thuoc }}</strong></td>
+        <td class="col-title"><strong class="col-title-text" title="{{ item.thuoc_b.ten_thuoc }}">{{ item.thuoc_b.ten_thuoc }}</strong></td>
         <td><span class="badge-level badge-{{ item.trang_thai }}">{{ item.trang_thai|replace('_',' ')|title }}</span></td>
         <td class="td-actions">
           <div class="row-act">
