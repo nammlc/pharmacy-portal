@@ -1842,7 +1842,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .bv-lienquan-card { display: flex; flex-direction: column; gap: 8px; color: inherit; transition: transform .18s ease; }
 .bv-lienquan-card:hover { transform: translateY(-3px); }
 .bv-lienquan-anh {
-  width: 100%; aspect-ratio: 16/10; border-radius: var(--radius-sm); background: var(--sage-100) center/contain no-repeat;
+  width: 100%; aspect-ratio: 16/10; border-radius: var(--radius-sm); background: var(--sage-100) center/cover no-repeat;
   border: 1px solid var(--line-200); position: relative; overflow: hidden;
 }
 .bv-lienquan-anh .bv-card-thumb-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 26px; opacity: .55; }
@@ -1917,7 +1917,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   border-color: var(--navy-500);
 }
 .bv-card-thumb {
-  position: relative; height: 160px; background: var(--sage-100) center/contain no-repeat;
+  position: relative; height: 172px; background: var(--sage-100) center/cover no-repeat;
   display: flex; align-items: center; justify-content: center;
 }
 .bv-card-thumb-fallback { font-size: 34px; opacity: .6; }
