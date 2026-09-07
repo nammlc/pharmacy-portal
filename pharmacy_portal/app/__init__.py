@@ -1,0 +1,202 @@
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
+from flask_wtf import CSRFProtect
+from config import Config
+
+db = SQLAlchemy()
+login_manager = LoginManager()
+csrf = CSRFProtect()
+
+
+def create_app(config_class=Config):
+    app = Flask(__name__, instance_relative_config=True)
+    app.config.from_object(config_class)
+
+    import os
+    os.makedirs(app.instance_path, exist_ok=True)
+
+    db.init_app(app)
+    csrf.init_app(app)
+
+    @app.template_filter("chuan_hoa_url")
+    def chuan_hoa_url(url):
+        """
+        Chuẩn hoá URL để dùng trong href="...": nếu người dùng nhập thiếu
+        http://  hoặc https:// (vd: "nhathuoclongchau.com.vn/thuoc/abc.html"),
+        trình duyệt sẽ hiểu nhầm thành link tương đối và nối vào domain hiện
+        tại. Thêm "https://" phía trước nếu url chưa có scheme.
+        """
+        if not url:
+            return url
+        url = url.strip()
+        if url.startswith(("http://", "https://", "//", "mailto:", "tel:")):
+            return url
+        return "https://" + url
+
+    @app.template_filter("gio_vn")
+    def gio_vn_filter(dt):
+        """Chuyển datetime UTC lưu trong CSDL sang giờ Việt Nam (GMT+7) khi
+        hiển thị ra giao diện. Dùng: {{ (item.ngay_tao | gio_vn).strftime('%d/%m/%Y %H:%M') }}"""
+        from app.utils.thoi_gian import gio_vn
+        return gio_vn(dt)
+
+    login_manager.init_app(app)
+    login_manager.login_view = "admin_auth.dang_nhap"
+    login_manager.login_message = "Vui lòng đăng nhập để tiếp tục."
+    login_manager.login_message_category = "warning"
+
+    from app.models.models import NguoiDung
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return db.session.get(NguoiDung, int(user_id))
+
+    # --- Trang công khai ---
+    from app.routes.main import bp as main_bp
+    app.register_blueprint(main_bp)
+
+    from app.routes.tra_cuu_thuoc_tiem_truyen import bp as tttt_bp
+    app.register_blueprint(tttt_bp)
+
+    from app.routes.tra_cuu_tuong_hop_tuong_ky import bp as thtk_bp
+    app.register_blueprint(thtk_bp)
+
+    from app.routes.tra_cuu_tuong_tac_thuoc import bp as ttt_bp
+    app.register_blueprint(ttt_bp)
+
+    from app.routes.tra_cuu_thong_tin_thuoc import bp as ttth_bp
+    app.register_blueprint(ttth_bp)
+
+    from app.routes.thong_tin_benh_nhan import bp as ttbn_bp
+    app.register_blueprint(ttbn_bp)
+
+    from app.routes.danh_muc_thuoc import bp as dmt_bp
+    app.register_blueprint(dmt_bp)
+
+    from app.routes.nha_thuoc_bv import bp as ntbv_bp
+    app.register_blueprint(ntbv_bp)
+
+    from app.routes.bai_viet import bp as bv_bp
+    app.register_blueprint(bv_bp)
+
+    # --- Trang quản trị (admin) - yêu cầu đăng nhập ---
+    from app.routes.admin_auth import bp as admin_auth_bp
+    app.register_blueprint(admin_auth_bp)
+
+    from app.routes.admin_dashboard import bp as admin_dashboard_bp
+    app.register_blueprint(admin_dashboard_bp)
+
+    from app.routes.admin_thuoc import bp as admin_thuoc_bp
+    app.register_blueprint(admin_thuoc_bp)
+
+    from app.routes.admin_nhom_thuoc import bp as admin_nhom_thuoc_bp
+    app.register_blueprint(admin_nhom_thuoc_bp)
+
+    from app.routes.admin_hoat_chat import bp as admin_hoat_chat_bp
+    app.register_blueprint(admin_hoat_chat_bp)
+
+    from app.routes.admin_danh_muc_thuoc import bp as admin_dmt_bp
+    app.register_blueprint(admin_dmt_bp)
+
+    from app.routes.admin_nha_thuoc_bv import bp as admin_ntbv_bp
+    app.register_blueprint(admin_ntbv_bp)
+
+    from app.routes.admin_tiem_truyen import bp as admin_tttt_bp
+    app.register_blueprint(admin_tttt_bp)
+
+    from app.routes.admin_tuong_hop_tuong_ky import bp as admin_thtk_bp
+    app.register_blueprint(admin_thtk_bp)
+
+    from app.routes.admin_tuong_tac import bp as admin_ttt_bp
+    app.register_blueprint(admin_ttt_bp)
+
+    from app.routes.admin_thong_tin_thuoc import bp as admin_ttth_bp
+    app.register_blueprint(admin_ttth_bp)
+
+    from app.routes.admin_benh_nhan import bp as admin_ttbn_bp
+    app.register_blueprint(admin_ttbn_bp)
+
+    from app.routes.admin_ve_chung_toi import bp as admin_vct_bp
+    app.register_blueprint(admin_vct_bp)
+
+    from app.routes.admin_nhap_hang_loat import bp as admin_nhap_hang_loat_bp
+    app.register_blueprint(admin_nhap_hang_loat_bp)
+
+    from app.routes.admin_bai_viet import bp as admin_bv_bp
+    app.register_blueprint(admin_bv_bp)
+
+    from app.routes.admin_danh_muc_bai_viet import bp as admin_dmbv_bp
+    app.register_blueprint(admin_dmbv_bp)
+
+    _tao_tai_khoan_dau_tien_neu_can(app)
+
+    # --- Xử lý lỗi DB connection (OperationalError) ---
+    # Khi connection pool trả về connection chết, SQLAlchemy raise OperationalError.
+    # pool_pre_ping đã xử lý hầu hết, nhưng thêm handler này làm lớp dự phòng:
+    # thay vì trang trắng 500, user thấy thông báo và tự động reload.
+    from sqlalchemy.exc import OperationalError, DisconnectionError
+    from flask import render_template as _render
+
+    @app.errorhandler(OperationalError)
+    def xu_ly_loi_ket_noi_db(e):
+        app.logger.error(f"DB OperationalError: {e}")
+        # Thử đóng session hiện tại để request sau dùng connection mới
+        try:
+            db.session.remove()
+        except Exception:
+            pass
+        return _render("loi_ket_noi.html"), 503
+
+    @app.errorhandler(503)
+    def xu_ly_503(e):
+        return _render("loi_ket_noi.html"), 503
+
+    # --- File/ảnh gửi lên quá lớn (413 Request Entity Too Large) ---
+    # Mặc định Werkzeug trả về trang trắng khó hiểu "Request Entity Too Large".
+    # Bắt lỗi này để thông báo rõ ràng bằng tiếng Việt và quay lại trang cũ,
+    # thay vì màn hình trắng.
+    from werkzeug.exceptions import RequestEntityTooLarge
+    from flask import flash as _flash, redirect as _redirect, request as _request, url_for as _url_for
+
+    @app.errorhandler(RequestEntityTooLarge)
+    @app.errorhandler(413)
+    def xu_ly_413(e):
+        gioi_han_mb = app.config.get("MAX_CONTENT_LENGTH", 0) // (1024 * 1024)
+        _flash(
+            f"Dữ liệu gửi lên vượt quá giới hạn cho phép ({gioi_han_mb} MB), thường là do ảnh quá lớn. "
+            f"Vui lòng chọn ảnh có dung lượng nhỏ hơn rồi thử lại (trình duyệt sẽ tự nén ảnh trước khi gửi).",
+            "danger",
+        )
+        dich_den = _request.referrer or _url_for("admin_dashboard.trang_chinh")
+        return _redirect(dich_den), 302
+
+    return app
+
+
+def _tao_tai_khoan_dau_tien_neu_can(app):
+    """Tự tạo 1 tài khoản admin khi khởi động, nếu:
+    - Chưa có tài khoản admin nào trong database, VÀ
+    - Đã đặt 2 biến môi trường ADMIN_USERNAME + ADMIN_PASSWORD
+
+    Dùng cho hosting free (như Render free tier) không có Shell/Console
+    để chạy create_admin.py thủ công. Idempotent - chạy lại nhiều lần
+    không tạo trùng, vì chỉ tạo khi bảng nguoi_dung đang rỗng.
+    """
+    import os
+    from app.models.models import NguoiDung
+
+    ten_dang_nhap = os.environ.get("ADMIN_USERNAME")
+    mat_khau = os.environ.get("ADMIN_PASSWORD")
+
+    if not ten_dang_nhap or not mat_khau:
+        return
+
+    with app.app_context():
+        db.create_all()
+        if NguoiDung.query.count() == 0:
+            nguoi_dung = NguoiDung(ten_dang_nhap=ten_dang_nhap, vai_tro="quan_tri")
+            nguoi_dung.set_password(mat_khau)
+            db.session.add(nguoi_dung)
+            db.session.commit()
+            app.logger.info(f"Đã tự tạo tài khoản admin '{ten_dang_nhap}' từ biến môi trường.")

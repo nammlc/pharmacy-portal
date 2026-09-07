@@ -1,0 +1,149 @@
+from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask_login import login_required
+from app import db
+from app.models.models import NhomThuoc
+from app.forms import NhomThuocForm
+from app.utils.upload_anh import upload_anh_nhom_thuoc, xoa_anh_cloudinary
+from app.utils.xoa_hang_loat_crud import lay_id_tu_form, xoa_theo_danh_sach_id, xoa_toan_bo, flash_ket_qua_xoa
+
+bp = Blueprint("admin_nhom_thuoc", __name__, url_prefix="/admin/nhom-thuoc")
+
+
+@bp.route("/")
+@login_required
+def danh_sach():
+    trang = request.args.get("trang", 1, type=int)
+    phan_trang = (NhomThuoc.query
+                  .order_by(NhomThuoc.loai, NhomThuoc.thu_tu, NhomThuoc.ten_nhom)
+                  .paginate(page=trang, per_page=10, error_out=False))
+    return render_template("admin/nhom_thuoc/danh_sach.html",
+                           danh_sach_nhom=phan_trang.items,
+                           phan_trang=phan_trang)
+
+
+@bp.route("/them", methods=["GET", "POST"])
+@login_required
+def them():
+    form = NhomThuocForm()
+    if form.validate_on_submit():
+        nhom = NhomThuoc(
+            ten_nhom=form.ten_nhom.data,
+            loai=form.loai.data,
+            thu_tu=_so_nguyen(form.thu_tu.data),
+        )
+        db.session.add(nhom)
+        db.session.flush()  # lấy nhom.id
+
+        # Xử lý upload ảnh
+        file_anh = request.files.get("file_anh")
+        if file_anh and file_anh.filename:
+            try:
+                url = upload_anh_nhom_thuoc(file_anh)
+                if url:
+                    nhom.hinh_anh = url
+            except ValueError as e:
+                flash(str(e), "warning")
+
+        db.session.commit()
+        flash(f'Đã thêm nhóm thuốc "{nhom.ten_nhom}".', "success")
+        return redirect(url_for("admin_nhom_thuoc.danh_sach"))
+    return render_template("admin/nhom_thuoc/form.html", form=form, tieu_de="Thêm nhóm thuốc")
+
+
+@bp.route("/<int:nhom_id>/sua", methods=["GET", "POST"])
+@login_required
+def sua(nhom_id):
+    nhom = NhomThuoc.query.get_or_404(nhom_id)
+    form = NhomThuocForm(obj=nhom)
+    if request.method == "GET":
+        form.thu_tu.data = str(nhom.thu_tu or 0)
+    if form.validate_on_submit():
+        nhom.ten_nhom = form.ten_nhom.data
+        nhom.loai = form.loai.data
+        nhom.thu_tu = _so_nguyen(form.thu_tu.data)
+
+        # --- Xử lý ảnh: ảnh mới luôn được ưu tiên, tự xoá ảnh cũ trên
+        # Cloudinary trước khi thay để tránh rác. Checkbox "xoá ảnh" chỉ
+        # có tác dụng khi KHÔNG có ảnh mới đi kèm.
+        file_anh = request.files.get("file_anh")
+        anh_moi_url = None
+        if file_anh and file_anh.filename:
+            try:
+                anh_moi_url = upload_anh_nhom_thuoc(file_anh)
+            except ValueError as e:
+                flash(str(e), "warning")
+
+        if anh_moi_url:
+            if nhom.hinh_anh and nhom.hinh_anh != anh_moi_url:
+                xoa_anh_cloudinary(nhom.hinh_anh)
+            nhom.hinh_anh = anh_moi_url
+        elif request.form.get("xoa_anh") and nhom.hinh_anh:
+            xoa_anh_cloudinary(nhom.hinh_anh)
+            nhom.hinh_anh = None
+
+        db.session.commit()
+        flash(f'Đã cập nhật "{nhom.ten_nhom}".', "success")
+        return redirect(url_for("admin_nhom_thuoc.danh_sach"))
+    return render_template("admin/nhom_thuoc/form.html", form=form, tieu_de="Sửa nhóm thuốc", nhom=nhom)
+
+
+@bp.route("/<int:nhom_id>/xoa", methods=["POST"])
+@login_required
+def xoa(nhom_id):
+    nhom = NhomThuoc.query.get_or_404(nhom_id)
+    if nhom.danh_muc_thuoc_list or nhom.nha_thuoc_bv_list:
+        flash(f'Không thể xoá "{nhom.ten_nhom}" vì vẫn còn thuốc thuộc nhóm này.', "danger")
+        return redirect(url_for("admin_nhom_thuoc.danh_sach"))
+    ten = nhom.ten_nhom
+    # Xoá ảnh Cloudinary trước
+    if nhom.hinh_anh:
+        xoa_anh_cloudinary(nhom.hinh_anh)
+    db.session.delete(nhom)
+    db.session.commit()
+    flash(f'Đã xoá nhóm thuốc "{ten}".', "success")
+    return redirect(url_for("admin_nhom_thuoc.danh_sach"))
+
+
+def _xoa_anh_nhom(nhom):
+    if nhom.hinh_anh:
+        xoa_anh_cloudinary(nhom.hinh_anh)
+
+
+def _kiem_tra_nhom_con_thuoc(nhom):
+    if nhom.danh_muc_thuoc_list or nhom.nha_thuoc_bv_list:
+        return "còn thuốc thuộc nhóm này"
+    return None
+
+
+@bp.route("/xoa-hang-loat", methods=["POST"])
+@login_required
+def xoa_hang_loat():
+    ids = lay_id_tu_form(request)
+    so_da_xoa, bo_qua = xoa_theo_danh_sach_id(
+        NhomThuoc, ids,
+        xoa_anh=_xoa_anh_nhom,
+        kiem_tra_rang_buoc=_kiem_tra_nhom_con_thuoc,
+        hien_thi=lambda n: n.ten_nhom,
+    )
+    flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="nhóm thuốc")
+    return redirect(url_for("admin_nhom_thuoc.danh_sach"))
+
+
+@bp.route("/xoa-tat-ca", methods=["POST"])
+@login_required
+def xoa_tat_ca():
+    so_da_xoa, bo_qua = xoa_toan_bo(
+        NhomThuoc,
+        xoa_anh=_xoa_anh_nhom,
+        kiem_tra_rang_buoc=_kiem_tra_nhom_con_thuoc,
+        hien_thi=lambda n: n.ten_nhom,
+    )
+    flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="nhóm thuốc")
+    return redirect(url_for("admin_nhom_thuoc.danh_sach"))
+
+
+def _so_nguyen(gia_tri):
+    try:
+        return int(gia_tri)
+    except (TypeError, ValueError):
+        return 0

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Trang chủ — Cổng Tra Cứu Dược
+<!-- Section bài viết mới nhất -->
+{% set bai_moi = [] %}
+{% for bai in bai_viet_moi %}{% if loop.index <= 4 %}{% set _ = bai_moi.append(bai) %}{% endif %}{% endfor %}
+{% if bai_viet_moi %}
+<section class="tc-bai-viet-wrap">
+  <div class="tc-bai-viet-inner">
+    <div class="tc-bai-viet-head">
+      <div class="tc-bai-viet-title">
+        <span class="tc-bv-dot"></span>
+        📰 Tin tức & Thông báo mới nhất
+      </div>
+      <a href="{{ url_for('bv.index') }}" class="tc-bv-xem-them">Xem tất cả →</a>
+    </div>
+    <div class="tc-bv-grid">
+      {% for bv in bai_viet_moi %}
+      <a class="tc-bv-card" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
+        <div class="tc-bv-thumb" {% if bv.anh_dai_dien %}style="background-image:url('{{ bv.anh_dai_dien }}')"{% endif %}>
+          {% if not bv.anh_dai_dien %}<span class="tc-bv-thumb-icon">📰</span>{% endif %}
+          {% if bv.ghim %}<span class="tc-bv-pin">📌</span>{% endif %}
+          {% if bv.danh_muc %}
+          <span class="tc-bv-tag" style="--tc-bv-color:{{ bv.danh_muc.mau_sac }}">{{ bv.danh_muc.ten }}</span>
+          {% endif %}
+        </div>
+        <div class="tc-bv-body">
+          <h3>{{ bv.tieu_de }}</h3>
+          {% if bv.mo_ta_ngan %}<p>{{ bv.mo_ta_ngan }}</p>{% endif %}
+          <div class="tc-bv-meta">
+            <span>🗓 {{ (bv.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bv.ngay_xuat_ban else (bv.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}</span>
+            {% if bv.luot_xem %}<span>👁 {{ bv.luot_xem }}</span>{% endif %}
+          </div>
+        </div>
+        <div class="tc-bv-arrow">→</div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
+    <h1>Tra cứu thông tin<br><span>dược phẩm</span> nhanh chóng</h1>
+    <p>Danh mục thuốc, tương tác, tương hợp–kỵ và hướng dẫn sử dụng được cập nhật và kiểm duyệt bởi Dược sĩ lâm sàng.</p>
+    <form class="hero-search" action="{{ url_for('main.tim_kiem') }}" method="get">
+      <input type="text" name="q" placeholder="Nhập tên thuốc hoặc hoạt chất...">
+      <button type="submit">🔍 Tra cứu</button>
+    </form>
+
+    {% if stat %}
+    <div class="hero-stats">
+      {# Đã ẩn 2 số liệu "Danh mục thuốc" và "Nhà thuốc BV" theo yêu cầu —
+         dữ liệu đếm (stat.dmt / stat.ntbv) vẫn được tính ở route, chỉ
+         không hiển thị ở đây nữa. Xoá khối comment này để hiện lại. #}
+      {% if stat.get('thuoc') %}
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ stat.thuoc }}</div>
+        <div class="hero-stat-lbl">Thuốc tra cứu</div>
+      </div>
+      {% endif %}
+      {% if stat.get('thtk') %}
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ stat.thtk }}</div>
+        <div class="hero-stat-lbl">Cặp tương hợp/kỵ</div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<div class="category-grid-outer">
+  <div class="category-grid">
+
+    <a class="category-card cat-dmt" href="{{ url_for('dmt.index') }}">
+      <div class="cat-icon-wrap">💊</div>
+      <h3>Danh mục thuốc</h3>
+      <p>Tra cứu theo nhóm dược lý, đầy đủ thông tin chỉ định và liều dùng.</p>
+      <div class="cat-arrow">Xem danh mục →</div>
+    </a>
+
+    <a class="category-card cat-ntbv" href="{{ url_for('ntbv.index') }}">
+      <div class="cat-icon-wrap">🏥</div>
+      <h3>Nhà thuốc BV</h3>
+      <p>Danh mục thuốc bán tại Nhà thuốc Bệnh viện, tra theo nhóm và hoạt chất.</p>
+      <div class="cat-arrow">Xem danh mục →</div>
+    </a>
+
+    <a class="category-card cat-tt" href="{{ url_for('tttt.index') }}">
+      <div class="cat-icon-wrap">💉</div>
+      <h3>Thuốc tiêm truyền</h3>
+      <p>Dung môi pha loãng, tốc độ truyền, độ ổn định và thời hạn sau pha.</p>
+      <div class="cat-arrow">Tra cứu →</div>
+    </a>
+
+    <a class="category-card cat-thtk" href="{{ url_for('thtk.index') }}">
+      <div class="cat-icon-wrap">🧪</div>
+      <h3>Tương hợp - Tương kỵ</h3>
+      <p>Kiểm tra khả năng pha chung và phối hợp giữa hai thuốc truyền tĩnh mạch.</p>
+      <div class="cat-arrow">Kiểm tra →</div>
+    </a>
+
+    <a class="category-card cat-ttt" href="{{ url_for('ttt.index') }}">
+      <div class="cat-icon-wrap">⚠️</div>
+      <h3>Tương tác thuốc</h3>
+      <p>Mức độ, cơ chế tương tác và hướng xử trí khi dùng đồng thời hai thuốc.</p>
+      <div class="cat-arrow">Kiểm tra →</div>
+    </a>
+
+    <a class="category-card cat-ttth" href="{{ url_for('ttth.index') }}">
+      <div class="cat-icon-wrap">📋</div>
+      <h3>Thông tin thuốc</h3>
+      <p>Chỉ định, chống chỉ định, liều dùng theo đối tượng và tác dụng phụ.</p>
+      <div class="cat-arrow">Tra cứu →</div>
+    </a>
+
+    <a class="category-card cat-ttbn" href="{{ url_for('ttbn.index') }}">
+      <div class="cat-icon-wrap">🧑‍⚕️</div>
+      <h3>Thông tin bệnh nhân</h3>
+      <p>Hướng dẫn dùng thuốc tại nhà, ngôn ngữ đơn giản dễ hiểu cho người bệnh.</p>
+      <div class="cat-arrow">Xem hướng dẫn →</div>
+    </a>
+
+  </div>
+</div>
+{% endblock %}

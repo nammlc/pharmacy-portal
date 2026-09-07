@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ thuoc.ten_biet_duoc }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">
+    <a href="{{ url_for('dmt.index') }}" style="color:inherit;">Danh mục thuốc</a>
+    {% if thuoc.nhom %} / <a href="{{ url_for('dmt.xem_nhom', nhom_id=thuoc.nhom.id) }}" style="color:inherit;">{{ thuoc.nhom.ten_nhom }}</a>{% endif %}
+  </div>
+  <h1>{{ thuoc.ten_biet_duoc }}</h1>
+  <p>{{ thuoc.ten_hoat_chat_hien_thi }}</p>
+</div>
+
+<div class="results-panel drug-detail">
+  <div class="drug-detail-media">
+    {% if thuoc.hinh_anh %}
+    <img src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}">
+    {% else %}
+    <div class="drug-detail-media-fallback">{{ thuoc.ten_biet_duoc[:1]|upper }}</div>
+    {% endif %}
+  </div>
+
+  <div class="drug-detail-card">
+    <div class="drug-detail-section">
+      <p class="drug-detail-section-label">Thành phần</p>
+      {% if thuoc.thanh_phan %}<div class="rich-content">{{ thuoc.thanh_phan | safe }}</div>{% else %}<p class="drug-detail-section-empty">Chưa cập nhật.</p>{% endif %}
+    </div>
+    <div class="drug-detail-section">
+      <p class="drug-detail-section-label">Chỉ định</p>
+      {% if thuoc.chi_dinh %}<div class="rich-content">{{ thuoc.chi_dinh | safe }}</div>{% else %}<p class="drug-detail-section-empty">Chưa cập nhật.</p>{% endif %}
+    </div>
+    <div class="drug-detail-section">
+      <p class="drug-detail-section-label">Cách dùng, liều dùng</p>
+      {% if thuoc.cach_dung_lieu_dung %}<div class="rich-content">{{ thuoc.cach_dung_lieu_dung | safe }}</div>{% else %}<p class="drug-detail-section-empty">Chưa cập nhật.</p>{% endif %}
+    </div>
+    <div class="drug-detail-section">
+      <p class="drug-detail-section-label">Chống chỉ định</p>
+      {% if thuoc.chong_chi_dinh %}<div class="rich-content">{{ thuoc.chong_chi_dinh | safe }}</div>{% else %}<p class="drug-detail-section-empty">Chưa cập nhật.</p>{% endif %}
+    </div>
+    {% if thuoc.link_chi_tiet %}
+    <div class="drug-detail-section">
+      <p class="drug-detail-section-label">Nguồn tham khảo</p>
+      <a href="{{ thuoc.link_chi_tiet | chuan_hoa_url }}" target="_blank" rel="noopener" style="color:var(--sage-500); font-weight:600; word-break:break-all;">{{ thuoc.link_chi_tiet }}</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

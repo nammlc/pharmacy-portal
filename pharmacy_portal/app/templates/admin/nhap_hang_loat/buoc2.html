@@ -1,0 +1,90 @@
+{% extends "admin/base.html" %}
+{% block title %}Upload file — {{ tieu_de }}{% endblock %}
+{% block admin_content %}
+
+<div class="admin-page-head">
+  <div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">
+      <a href="{{ url_for('admin_nhap_hang_loat.trang_chinh') }}">Nhập hàng loạt</a>
+      › {{ tieu_de }}
+    </div>
+    <h1>Nhập hàng loạt — {{ tieu_de }}</h1>
+  </div>
+</div>
+
+<!-- Hướng dẫn cột -->
+<div class="admin-form-card" style="max-width:680px; margin-bottom:20px;">
+  <div style="font-size:13px; font-weight:700; margin-bottom:10px; color:var(--ink-900);">
+    📋 Cột trong file Excel
+  </div>
+  {% if loai == 'dmt' %}
+  <table style="width:100%;font-size:13px;border-collapse:collapse;">
+    <tr style="background:var(--paper-0);">
+      <th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--line-200);">Tên cột</th>
+      <th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--line-200);">Mô tả</th>
+      <th style="padding:8px 12px;border-bottom:1px solid var(--line-200);">Bắt buộc?</th>
+    </tr>
+    {% for col, desc, req in [
+      ('ten_biet_duoc','Tên biệt dược','✅'),
+      ('thanh_phan','Thành phần chi tiết',''),
+      ('chi_dinh','Chỉ định điều trị',''),
+      ('chong_chi_dinh','Chống chỉ định',''),
+      ('cach_dung_lieu_dung','Cách dùng, liều dùng',''),
+      ('link_chi_tiet','Link tham khảo (URL)',''),
+    ] %}
+    <tr>
+      <td style="padding:8px 12px;border-bottom:1px solid var(--line-100);font-family:var(--font-mono);font-size:12px;">{{ col }}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid var(--line-100);color:var(--text-muted);">{{ desc }}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid var(--line-100);text-align:center;">{{ req }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <table style="width:100%;font-size:13px;border-collapse:collapse;">
+    <tr style="background:var(--paper-0);">
+      <th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--line-200);">Tên cột</th>
+      <th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--line-200);">Mô tả</th>
+      <th style="padding:8px 12px;border-bottom:1px solid var(--line-200);">Bắt buộc?</th>
+    </tr>
+    {% for col, desc, req in [
+      ('ten_biet_duoc','Tên biệt dược','✅'),
+      ('link_tham_khao','Link tham khảo (URL)',''),
+    ] %}
+    <tr>
+      <td style="padding:8px 12px;border-bottom:1px solid var(--line-100);font-family:var(--font-mono);font-size:12px;">{{ col }}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid var(--line-100);color:var(--text-muted);">{{ desc }}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid var(--line-100);text-align:center;">{{ req }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+  <div style="margin-top:12px;">
+    {% if loai == 'dmt' %}
+    <a href="{{ url_for('admin_nhap_hang_loat.tai_mau_dmt') }}" style="font-size:13px;color:var(--navy-600);font-weight:600;">⬇ Tải file mẫu CSV</a>
+    {% else %}
+    <a href="{{ url_for('admin_nhap_hang_loat.tai_mau_ntbv') }}" style="font-size:13px;color:var(--navy-600);font-weight:600;">⬇ Tải file mẫu CSV</a>
+    {% endif %}
+    <span style="color:var(--text-muted);font-size:12px;margin-left:8px;">
+      Nhóm thuốc và hoạt chất sẽ chọn ở bước tiếp theo.
+    </span>
+  </div>
+</div>
+
+<!-- Form upload -->
+<div class="admin-form-card" style="max-width:480px;">
+  <form method="POST" enctype="multipart/form-data" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-row">
+      {{ form.file_du_lieu.label }}
+      {{ form.file_du_lieu(accept=".xlsx,.csv") }}
+      {% for e in form.file_du_lieu.errors %}
+      <div class="field-errors">{{ e }}</div>
+      {% endfor %}
+    </div>
+    <div class="form-actions">
+      {{ form.submit(class="btn btn-primary") }}
+      <a href="{{ url_for('admin_nhap_hang_loat.trang_chinh') }}" class="btn btn-outline">Quay lại</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

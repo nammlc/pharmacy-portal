@@ -1,0 +1,52 @@
+{% extends "admin/base.html" %}
+{% from "admin/_phan_trang.html" import render as pt %}
+{% block title %}Hoạt chất{% endblock %}
+{% block admin_content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Hoạt chất</h1>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">{{ phan_trang.total }} hoạt chất</p>
+  </div>
+  <a href="{{ url_for('admin_hoat_chat.them') }}" class="btn btn-primary">+ Thêm hoạt chất</a>
+</div>
+
+<form method="get" class="adm-search-row">
+  <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm theo tên hoạt chất...">
+  <button type="submit" class="btn btn-outline btn-sm">Tìm</button>
+  {% if tu_khoa %}<a href="{{ url_for('admin_hoat_chat.danh_sach') }}" class="btn btn-outline btn-sm">✕ Xoá</a>{% endif %}
+</form>
+
+{% if danh_sach_hc %}
+<div class="adm-table-wrap">
+  <table class="adm-table">
+    <thead>
+      <tr>
+        <th style="width:40px;">#</th>
+        <th>Tên hoạt chất</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for h in danh_sach_hc %}
+      <tr>
+        <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
+        <td><strong>{{ h.ten_hoat_chat }}</strong></td>
+        <td class="td-actions">
+          <div class="row-act">
+            <a href="{{ url_for('admin_hoat_chat.sua', hc_id=h.id) }}">Sửa</a>
+            <form method="POST" action="{{ url_for('admin_hoat_chat.xoa', hc_id=h.id) }}" onsubmit="return false;" style="display:contents;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="button" class="act-del" onclick="moModal(this.closest('form'), '{{ h.ten_hoat_chat }}')">Xoá</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{{ pt(phan_trang, 'admin_hoat_chat.danh_sach', tu_khoa) }}
+{% else %}
+<div class="admin-empty">Không có hoạt chất nào{% if tu_khoa %} khớp với "{{ tu_khoa }}"{% endif %}.</div>
+{% endif %}
+{% endblock %}

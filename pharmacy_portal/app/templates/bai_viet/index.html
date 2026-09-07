@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}{{ danh_muc_hien_tai.ten if danh_muc_hien_tai else 'Bài viết - Thông báo' }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">📰 Tin tức &amp; thông báo</div>
+  <h1>{{ danh_muc_hien_tai.ten if danh_muc_hien_tai else 'Bài viết - Thông báo' }}</h1>
+  <p>{{ danh_muc_hien_tai.mo_ta if danh_muc_hien_tai else 'Thông báo nội bộ, tin tức dược phẩm, bài báo khoa học và hướng dẫn chuyên môn từ Khoa Dược.' }}</p>
+</div>
+
+<div class="search-panel">
+  <form class="search-form" method="get">
+    <input type="text" name="q" placeholder="Tìm bài viết theo tiêu đề...">
+    <button type="submit">🔍 Tìm</button>
+  </form>
+</div>
+
+{% if danh_sach_danh_muc %}
+<div class="bv-filter-bar">
+  <a href="{{ url_for('bv.index') }}" class="bv-filter-chip {{ 'is-active' if not danh_muc_hien_tai }}">Tất cả</a>
+  {% for dm in danh_sach_danh_muc %}
+  <a href="{{ url_for('bv.index', danh_muc=dm.slug) }}"
+     class="bv-filter-chip {{ 'is-active' if danh_muc_hien_tai and danh_muc_hien_tai.id == dm.id }}"
+     style="--chip-color: {{ dm.mau_sac or '#1a4d8f' }};">{{ dm.ten }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="results-panel">
+
+  {# ===== SLIDESHOW 4 bài nổi bật ===== #}
+  {% set slide_bai = [] %}
+  {% if bai_noi_bat %}{% set _ = slide_bai.append(bai_noi_bat) %}{% endif %}
+  {% for bv in bai_cung_danh_muc %}{% if slide_bai|length < 4 %}{% set _ = slide_bai.append(bv) %}{% endif %}{% endfor %}
+  {% for bv in bai_khac_danh_muc %}{% if slide_bai|length < 4 %}{% set _ = slide_bai.append(bv) %}{% endif %}{% endfor %}
+
+  {% if slide_bai %}
+  <div class="bv-slideshow" id="bvSlideshow" aria-label="Bài viết nổi bật">
+
+    <!-- Slides -->
+    <div class="bv-slides">
+      {% for bv in slide_bai %}
+      <div class="bv-slide {% if loop.first %}is-active{% endif %}"
+           data-idx="{{ loop.index0 }}"
+           aria-hidden="{{ 'false' if loop.first else 'true' }}">
+        <a class="bv-slide-link" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}" tabindex="{{ '0' if loop.first else '-1' }}">
+          <!-- Ảnh nền -->
+          <div class="bv-slide-bg"
+               {% if bv.anh_dai_dien %}style="background-image:url('{{ bv.anh_dai_dien }}')"{% endif %}>
+            {% if not bv.anh_dai_dien %}
+            <div class="bv-slide-bg-fallback">📰</div>
+            {% endif %}
+          </div>
+          <!-- Gradient overlay -->
+          <div class="bv-slide-overlay"></div>
+          <!-- Nội dung -->
+          <div class="bv-slide-content">
+            {% if bv.danh_muc %}
+            <span class="bv-slide-tag" style="background:{{ bv.danh_muc.mau_sac }};">{{ bv.danh_muc.ten }}</span>
+            {% endif %}
+            {% if bv.ghim %}<span class="bv-slide-pin">📌 Nổi bật</span>{% endif %}
+            <h2 class="bv-slide-title">{{ bv.tieu_de }}</h2>
+            {% if bv.mo_ta_ngan %}
+            <p class="bv-slide-desc">{{ bv.mo_ta_ngan }}</p>
+            {% endif %}
+            <div class="bv-slide-meta">
+              <span>🗓 {{ (bv.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bv.ngay_xuat_ban else (bv.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}</span>
+              {% if bv.luot_xem %}<span>👁 {{ bv.luot_xem }}</span>{% endif %}
+            </div>
+            <span class="bv-slide-cta">Đọc tiếp →</span>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Điều hướng prev/next -->
+    {% if slide_bai|length > 1 %}
+    <button class="bv-slide-arrow bv-slide-prev" onclick="bvSlide(-1)" aria-label="Bài trước">‹</button>
+    <button class="bv-slide-arrow bv-slide-next" onclick="bvSlide(1)" aria-label="Bài tiếp">›</button>
+
+    <!-- Dots chỉ vị trí -->
+    <div class="bv-slide-dots">
+      {% for bv in slide_bai %}
+      <button class="bv-dot {% if loop.first %}is-active{% endif %}"
+              onclick="bvGoTo({{ loop.index0 }})"
+              aria-label="Slide {{ loop.index }}"></button>
+      {% endfor %}
+    </div>
+
+    <!-- Thanh tiến trình tự động -->
+    <div class="bv-slide-progress"><div class="bv-slide-progress-bar" id="bvProgressBar"></div></div>
+    {% endif %}
+
+  </div>
+
+  <script>
+  (function () {
+    const DELAY = 5000; // 5 giây mỗi slide
+    const slides = document.querySelectorAll('#bvSlideshow .bv-slide');
+    const dots   = document.querySelectorAll('#bvSlideshow .bv-dot');
+    const bar    = document.getElementById('bvProgressBar');
+    if (!slides.length) return;
+
+    let cur = 0, timer = null, prog = null;
+
+    function show(n) {
+      slides[cur].classList.remove('is-active');
+      slides[cur].setAttribute('aria-hidden', 'true');
+      slides[cur].querySelector('a').setAttribute('tabindex', '-1');
+      if (dots[cur]) dots[cur].classList.remove('is-active');
+
+      cur = (n + slides.length) % slides.length;
+
+      slides[cur].classList.add('is-active');
+      slides[cur].setAttribute('aria-hidden', 'false');
+      slides[cur].querySelector('a').setAttribute('tabindex', '0');
+      if (dots[cur]) dots[cur].classList.add('is-active');
+
+      // Reset progress bar
+      if (bar) { bar.style.transition = 'none'; bar.style.width = '0%'; }
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (bar) { bar.style.transition = `width ${DELAY}ms linear`; bar.style.width = '100%'; }
+      }));
+    }
+
+    function startAuto() {
+      clearInterval(timer);
+      timer = setInterval(() => show(cur + 1), DELAY);
+    }
+
+    // Dừng khi hover, tiếp khi rời
+    const ss = document.getElementById('bvSlideshow');
+    ss.addEventListener('mouseenter', () => clearInterval(timer));
+    ss.addEventListener('mouseleave', () => { startAuto(); });
+
+    // Touch swipe
+    let tx = 0;
+    ss.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
+    ss.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - tx;
+      if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1));
+      startAuto();
+    });
+
+    window.bvSlide = n => { show(cur + n); startAuto(); };
+    window.bvGoTo  = n => { show(n); startAuto(); };
+
+    // Khởi động
+    show(0);
+    startAuto();
+  })();
+  </script>
+  {% endif %}
+
+  {% if bai_viet_list %}
+  <div class="bv-grid">
+    {% for bv in bai_viet_list %}
+    <a class="bv-card" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
+      <div class="bv-card-thumb" {% if bv.anh_dai_dien %}style="background-image:url('{{ bv.anh_dai_dien }}');"{% endif %}>
+        {% if not bv.anh_dai_dien %}<span class="bv-card-thumb-fallback">📰</span>{% endif %}
+        {% if bv.ghim %}<span class="bv-card-pin">📌 Ghim</span>{% endif %}
+      </div>
+      <div class="bv-card-body">
+        {% if bv.danh_muc %}
+        <span class="bv-card-tag" style="--chip-color: {{ bv.danh_muc.mau_sac or '#1a4d8f' }};">{{ bv.danh_muc.ten }}</span>
+        {% endif %}
+        <h3>{{ bv.tieu_de }}</h3>
+        {% if bv.mo_ta_ngan %}<p>{{ bv.mo_ta_ngan }}</p>{% endif %}
+        <div class="bv-card-meta">
+          <span>{{ (bv.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bv.ngay_xuat_ban else (bv.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}</span>
+          <span>👁 {{ bv.luot_xem or 0 }}</span>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% set endpoint = 'bv.index' %}
+  {% set args = {'danh_muc': danh_muc_hien_tai.slug} if danh_muc_hien_tai else {} %}
+  {% include "_phan_trang.html" with context %}
+  {% elif not bai_noi_bat %}
+  <div class="empty-state">
+    <div class="empty-state-icon">📰</div>
+    Chưa có bài viết nào được đăng{{ ' trong danh mục này' if danh_muc_hien_tai else '' }}.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

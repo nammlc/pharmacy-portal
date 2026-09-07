@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Kết quả tìm kiếm{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow"><a href="{{ url_for('dmt.index') }}" style="color:inherit;">Danh mục thuốc</a></div>
+  <h1>Kết quả cho "{{ tu_khoa }}"</h1>
+  {% if phan_trang.total %}<p>{{ phan_trang.total }} thuốc phù hợp.</p>{% endif %}
+</div>
+
+<div class="search-panel">
+  <form class="search-form" method="get">
+    <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên biệt dược hoặc hoạt chất...">
+    <button type="submit" class="btn btn-primary">Tìm</button>
+  </form>
+</div>
+
+<div class="results-panel">
+  {% if phan_trang.items %}
+  <div class="drug-grid">
+    {% for thuoc in phan_trang.items %}
+    <a class="drug-card" href="{{ url_for('dmt.xem_thuoc', thuoc_id=thuoc.id) }}">
+      {% if thuoc.hinh_anh %}
+      <img class="drug-card-thumb" src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}">
+      {% else %}
+      <div class="drug-card-thumb-fallback">{{ thuoc.ten_biet_duoc[:1]|upper }}</div>
+      {% endif %}
+      <div class="drug-card-body">
+        <h3>{{ thuoc.ten_biet_duoc }}</h3>
+        <p>{{ thuoc.ten_hoat_chat_hien_thi or 'Chưa có hoạt chất' }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% set endpoint = 'dmt.index' %}
+  {% set args = {'q': tu_khoa} %}
+  {% include "_phan_trang.html" with context %}
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">&#128269;</div>
+    Không tìm thấy thuốc phù hợp.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

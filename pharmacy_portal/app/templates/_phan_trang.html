@@ -1,0 +1,49 @@
+{#
+  Include dùng chung để hiển thị điều hướng phân trang.
+  Biến cần truyền vào khi include:
+    - phan_trang: đối tượng Pagination (Flask-SQLAlchemy) — có .page, .pages, .has_prev, .has_next, .prev_num, .next_num, .iter_pages()
+    - endpoint:   tên route hiện tại (vd 'dmt.xem_nhom')
+    - args:       dict các tham số URL cần giữ lại ngoài 'page' (vd {'nhom_id': nhom.id} hoặc {'q': tu_khoa})
+#}
+{% if phan_trang and phan_trang.pages > 1 %}
+<nav class="pagination" aria-label="Điều hướng phân trang">
+  {% if phan_trang.has_prev %}
+  <a href="{{ url_for(endpoint, page=phan_trang.prev_num, **(args or {})) }}" class="page-btn page-prev" aria-label="Trang trước">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12.5L5.5 8L10 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Trước</span>
+  </a>
+  {% else %}
+  <span class="page-btn page-prev is-disabled" aria-disabled="true">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12.5L5.5 8L10 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Trước</span>
+  </span>
+  {% endif %}
+
+  <div class="page-numbers">
+    {% for so_trang in phan_trang.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+      {% if so_trang %}
+        {% if so_trang == phan_trang.page %}
+        <span class="page-num is-current" aria-current="page">{{ so_trang }}</span>
+        {% else %}
+        <a href="{{ url_for(endpoint, page=so_trang, **(args or {})) }}" class="page-num">{{ so_trang }}</a>
+        {% endif %}
+      {% else %}
+      <span class="page-ellipsis">&hellip;</span>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  {% if phan_trang.has_next %}
+  <a href="{{ url_for(endpoint, page=phan_trang.next_num, **(args or {})) }}" class="page-btn page-next" aria-label="Trang sau">
+    <span>Sau</span>
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+  {% else %}
+  <span class="page-btn page-next is-disabled" aria-disabled="true">
+    <span>Sau</span>
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3.5L10.5 8L6 12.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </span>
+  {% endif %}
+</nav>
+<p class="pagination-summary">Trang {{ phan_trang.page }}/{{ phan_trang.pages }} &middot; {{ phan_trang.total }} kết quả</p>
+{% endif %}

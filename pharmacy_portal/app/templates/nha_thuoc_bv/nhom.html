@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ nhom.ten_nhom }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow"><a href="{{ url_for('ntbv.index') }}" style="color:inherit;">Nhà thuốc BV</a></div>
+  <h1>{{ nhom.ten_nhom }}</h1>
+  {% if phan_trang.total %}<p>{{ phan_trang.total }} thuốc trong nhóm này.</p>{% endif %}
+</div>
+
+<div class="results-panel">
+  {% if phan_trang.items %}
+  <div class="drug-grid">
+    {% for thuoc in phan_trang.items %}
+    <a class="drug-card" href="{{ url_for('ntbv.xem_thuoc', thuoc_id=thuoc.id) }}">
+      {% if thuoc.hinh_anh %}
+      <img class="drug-card-thumb" src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}">
+      {% else %}
+      <div class="drug-card-thumb-fallback">{{ thuoc.ten_biet_duoc[:1]|upper }}</div>
+      {% endif %}
+      <div class="drug-card-body">
+        <h3>{{ thuoc.ten_biet_duoc }}</h3>
+        <p>{{ thuoc.ten_hoat_chat_hien_thi or 'Chưa có hoạt chất' }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% set endpoint = 'ntbv.xem_nhom' %}
+  {% set args = {'nhom_id': nhom.id} %}
+  {% include "_phan_trang.html" with context %}
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">&#128138;</div>
+    Chưa có thuốc nào trong nhóm này.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
