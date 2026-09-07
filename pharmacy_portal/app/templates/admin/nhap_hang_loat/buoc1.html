@@ -9,7 +9,7 @@
   chọn nhóm thuốc và hoạt chất, thêm ảnh nếu cần — rồi mới lưu vào cơ sở dữ liệu.
 </p>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:640px;">
+<div class="buoc1-grid">
 
   <a href="{{ url_for('admin_nhap_hang_loat.upload_dmt') }}" class="buoc1-card">
     <div class="buoc1-icon">💊</div>
@@ -28,6 +28,10 @@
 </div>
 
 <style>
+.buoc1-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:640px; }
+@media (max-width: 560px) {
+  .buoc1-grid { grid-template-columns: 1fr; }
+}
 .buoc1-card {
   display:flex; flex-direction:column; gap:8px;
   background:var(--paper-50); border:1px solid var(--line-200);

@@ -1204,7 +1204,29 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 }
 .form-row textarea { min-height: 90px; resize: vertical; }
 .form-row .field-errors { color: var(--level-cctd); font-size: 12.5px; margin-top: 5px; }
-.form-actions { display: flex; gap: 10px; margin-top: 22px; }
+.form-actions { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+
+/* Lưới 2 cột dùng chung cho các form admin (vd. bài viết: Danh mục + Trạng
+   thái). Trước đây một số form viết inline "grid-template-columns: 1fr 1fr"
+   thẳng trong HTML, KHÔNG có breakpoint mobile — trên điện thoại 2 cột bị
+   bóp quá hẹp khiến label, dropdown, link phụ đè/lệch lên nhau lung tung.
+   Class này luôn có sẵn fallback 1 cột dưới 640px. */
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 640px) {
+  .form-grid-2 { grid-template-columns: 1fr; }
+}
+
+/* Hàng "label + link phụ" (vd. "Danh mục ... + Thêm danh mục") — cho phép
+   xuống dòng thay vì bị bóp/tràn khi cột đã hẹp sẵn trên mobile. */
+.form-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.form-label-row label { margin-bottom: 0; }
 
 /* ---------- Nhóm checkbox (chọn nhiều - vd: nhiều hoạt chất) ---------- */
 .checkbox-group {
@@ -1481,7 +1503,13 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   background: var(--paper-50);
   border: 1px solid var(--line-200);
   border-radius: var(--radius-md);
-  overflow: hidden;
+  /* Trước đây là overflow:hidden — trên điện thoại, bảng rộng hơn màn hình
+     nên cột thao tác (Sửa/Xoá) ở cuối bảng bị CẮT MẤT hoàn toàn, không thể
+     bấm được. Đổi sang overflow-x:auto để có thể vuốt ngang xem hết bảng,
+     kết hợp sticky cột thao tác bên dưới để Sửa/Xoá luôn hiện sẵn, không
+     cần vuốt tới cuối mới thấy. */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   box-shadow: var(--shadow-sm);
 }
 .adm-table {
@@ -1510,6 +1538,21 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .adm-table tbody tr:last-child td { border-bottom: none; }
 .adm-table tbody tr:hover td { background: #f7faff; }
 .adm-table td.td-actions { white-space: nowrap; width: 1px; }
+
+/* Trên điện thoại: ghim cột Sửa/Xoá vào mép phải màn hình khi vuốt ngang,
+   để luôn thấy và bấm được ngay mà không cần vuốt hết bảng. */
+@media (max-width: 700px) {
+  .adm-table th:last-child,
+  .adm-table td.td-actions {
+    position: sticky;
+    right: 0;
+    z-index: 1;
+    background: var(--paper-50);
+    box-shadow: -8px 0 10px -8px rgba(11, 31, 58, 0.18);
+  }
+  .adm-table thead th:last-child { background: var(--paper-0); box-shadow: -8px 0 10px -8px rgba(11, 31, 58, 0.12); }
+  .adm-table tbody tr:hover td.td-actions { background: #f7faff; }
+}
 
 .adm-search-row {
   display: flex;

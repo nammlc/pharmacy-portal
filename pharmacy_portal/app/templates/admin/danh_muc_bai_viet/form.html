@@ -20,7 +20,7 @@
       {% for e in form.mo_ta.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
     </div>
 
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+    <div class="form-grid-2">
       <div class="form-row">
         {{ form.mau_sac.label }}
         {{ form.mau_sac(type="text", placeholder="#1a4d8f") }}

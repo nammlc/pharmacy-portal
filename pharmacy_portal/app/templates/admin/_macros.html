@@ -29,7 +29,7 @@
    ============================================================ #}
 {% macro render_checkbox_group(field, them_moi_url=none, them_moi_label="+ Thêm mới") %}
 <div class="form-row">
-  <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+  <div class="form-label-row">
     {{ field.label }}
     {% if them_moi_url %}
     <a href="{{ them_moi_url }}" target="_blank" style="font-size:12.5px; color:var(--sage-500); white-space:nowrap;">{{ them_moi_label }}</a>
