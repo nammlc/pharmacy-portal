@@ -19,7 +19,7 @@
       {% for item in items %}
       <tr>
         <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
-        <td><strong>{{ item.thuoc.ten_thuoc }}</strong></td>
+        <td class="col-title"><strong>{{ item.thuoc.ten_thuoc }}</strong></td>
         <td style="color:var(--text-muted);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ item.nguon_tham_khao or '—' }}</td>
         <td class="td-actions">
           <div class="row-act">

@@ -1539,6 +1539,14 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .adm-table tbody tr:hover td { background: #f7faff; }
 .adm-table td.td-actions { white-space: nowrap; width: 1px; }
 
+/* Cột tên/tiêu đề chính (biệt dược, hoạt chất, bài viết...) — nếu không có
+   min-width, trên điện thoại bảng auto-layout sẽ bóp cột này gần như bằng 0
+   để nhồi vừa các cột badge/hành động khác vào màn hình hẹp, khiến chữ vỡ
+   dòng từng 1-2 từ một, cực xấu. Đặt min-width để chữ luôn có đủ chỗ xuống
+   dòng tự nhiên (2-3 dòng bình thường) — bảng khi đó rộng hơn màn hình một
+   chút và có thể vuốt ngang xem tiếp (đã bật overflow-x:auto ở trên). */
+.adm-table td.col-title { min-width: 190px; }
+
 /* Trên điện thoại: ghim cột Sửa/Xoá vào mép phải màn hình khi vuốt ngang,
    để luôn thấy và bấm được ngay mà không cần vuốt hết bảng. */
 @media (max-width: 700px) {
@@ -1581,6 +1589,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   font-weight: 600;
   background: var(--sage-100);
   color: var(--navy-600);
+  white-space: nowrap;
 }
 .adm-badge-alt { background: var(--line-100); color: var(--text-muted); }
 

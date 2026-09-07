@@ -26,7 +26,7 @@
       {% for item in items %}
       <tr>
         <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
-        <td>
+        <td class="col-title">
           <strong>{{ item.tieu_de }}</strong>
           {% if item.ghim %}<span class="adm-badge" style="margin-left:6px;">📌 Ghim</span>{% endif %}
           {% if item.do_uu_tien %}<span class="adm-badge" style="margin-left:6px;background:#fff3cd;color:#8a6300;">⭐ Ưu tiên {{ item.do_uu_tien }}</span>{% endif %}
