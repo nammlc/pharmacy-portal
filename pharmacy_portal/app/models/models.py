@@ -282,6 +282,7 @@ class BaiViet(db.Model):
     )
     ghim = db.Column(db.Boolean, default=False)
     luot_xem = db.Column(db.Integer, default=0)
+    do_uu_tien = db.Column(db.Integer, nullable=True)  # 1..4 - mức ưu tiên hiển thị trang chủ Bài viết (None = không ưu tiên)
 
     ngay_tao = db.Column(db.DateTime, default=datetime.utcnow)
     ngay_xuat_ban = db.Column(db.DateTime)

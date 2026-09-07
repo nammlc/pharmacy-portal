@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, abort
+from flask import Blueprint, render_template, request, abort, redirect, url_for
 from sqlalchemy import or_
 from app import db
 from app.models.models import BaiViet, DanhMucBaiViet
@@ -6,24 +6,112 @@ from app.utils.tim_kiem import tim_bai_viet
 
 bp = Blueprint("bv", __name__, url_prefix="/bai-viet")
 
-SO_BAI_MOI_TRANG = 9
-SO_BAI_CUNG_DANH_MUC = 3   # slide 2-4 — cùng danh mục với bài ghim
-SO_BAI_KHAC_DANH_MUC = 6   # slide 2-4 fallback — KHÁC danh mục (đủ 4 slide)
+SO_BAI_MOI_TRANG = 9      # số bài/trang khi xem theo 1 danh mục cụ thể
+SO_BAI_MOI_KHOI = 9       # số bài mỗi khối danh mục ở trang chủ Bài viết
+SO_BAI_PHU = 7            # số tiêu đề ở danh sách bên phải slideshow
+SO_MUC_UU_TIEN = 4        # có 4 mức ưu tiên: 1, 2, 3, 4
+
+
+def _xay_dung_trang_chu_bai_viet():
+    """
+    Dựng dữ liệu cho khối đầu trang "Bài viết" (không lọc danh mục, không tìm kiếm):
+    - slide_bai: tối đa 4 bài cho slideshow bên trái, lấy theo mức ưu tiên 1-2-3-4
+      (admin gán ở trang sửa bài viết). Mức nào chưa gán thì bù bằng bài ghim/mới nhất.
+    - bai_phu: danh sách tiêu đề bên phải, KHÔNG trùng bài trong slideshow và KHÁC
+      danh mục với bài ưu tiên mức 1.
+    - danh_sach_khoi_danh_muc: các khối lưới 3 cột bên dưới, mỗi khối 1 danh mục,
+      tối đa 9 bài/khối. Thứ tự khối theo danh mục của các bài ưu tiên 1→2→3→4
+      trước, các danh mục còn lại xếp sau theo thứ tự đã cấu hình.
+    """
+    da_xuat_ban = BaiViet.trang_thai == "da_xuat_ban"
+
+    # --- Bài ưu tiên theo từng mức (mỗi mức lấy đúng 1 bài) ---
+    bai_uu_tien_theo_muc = {}
+    for b in (BaiViet.query.filter(da_xuat_ban, BaiViet.do_uu_tien.isnot(None))
+              .order_by(BaiViet.do_uu_tien.asc(), BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
+              .all()):
+        if b.do_uu_tien not in bai_uu_tien_theo_muc:
+            bai_uu_tien_theo_muc[b.do_uu_tien] = b
+
+    slide_bai = [bai_uu_tien_theo_muc[m] for m in range(1, SO_MUC_UU_TIEN + 1) if m in bai_uu_tien_theo_muc]
+
+    # Bù cho đủ 4 slide nếu còn thiếu mức ưu tiên - lấy bài ghim/mới nhất chưa có.
+    if len(slide_bai) < SO_MUC_UU_TIEN:
+        ds_id_slide = [b.id for b in slide_bai]
+        query_bu = BaiViet.query.filter(da_xuat_ban)
+        if ds_id_slide:
+            query_bu = query_bu.filter(BaiViet.id.notin_(ds_id_slide))
+        bu = (query_bu
+              .order_by(BaiViet.ghim.desc(), BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
+              .limit(SO_MUC_UU_TIEN - len(slide_bai))
+              .all())
+        slide_bai += bu
+
+    # --- Danh sách tiêu đề bên phải: khác bài trong slideshow, khác danh mục bài ưu tiên 1 ---
+    ds_id_slide = [b.id for b in slide_bai]
+    danh_muc_uu_tien_1 = bai_uu_tien_theo_muc.get(1).danh_muc_id if bai_uu_tien_theo_muc.get(1) else None
+
+    query_phu = BaiViet.query.filter(da_xuat_ban)
+    if ds_id_slide:
+        query_phu = query_phu.filter(BaiViet.id.notin_(ds_id_slide))
+    if danh_muc_uu_tien_1:
+        query_phu = query_phu.filter(
+            or_(BaiViet.danh_muc_id != danh_muc_uu_tien_1, BaiViet.danh_muc_id.is_(None))
+        )
+    bai_phu = (query_phu
+               .order_by(BaiViet.ghim.desc(), BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
+               .limit(SO_BAI_PHU)
+               .all())
+
+    # --- Thứ tự danh mục cho các khối lưới bên dưới ---
+    tat_ca_danh_muc = DanhMucBaiViet.query.order_by(DanhMucBaiViet.thu_tu, DanhMucBaiViet.ten).all()
+    dm_theo_id = {dm.id: dm for dm in tat_ca_danh_muc}
+
+    thu_tu_danh_muc = []
+    da_xep = set()
+    for m in range(1, SO_MUC_UU_TIEN + 1):
+        b = bai_uu_tien_theo_muc.get(m)
+        if b and b.danh_muc_id and b.danh_muc_id not in da_xep:
+            thu_tu_danh_muc.append(b.danh_muc_id)
+            da_xep.add(b.danh_muc_id)
+    for dm in tat_ca_danh_muc:
+        if dm.id not in da_xep:
+            thu_tu_danh_muc.append(dm.id)
+            da_xep.add(dm.id)
+
+    danh_sach_khoi_danh_muc = []
+    for dm_id in thu_tu_danh_muc:
+        dm = dm_theo_id.get(dm_id)
+        if not dm:
+            continue
+        bai_list = (BaiViet.query
+                    .filter(da_xuat_ban, BaiViet.danh_muc_id == dm.id)
+                    .order_by(BaiViet.ghim.desc(), BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
+                    .limit(SO_BAI_MOI_KHOI)
+                    .all())
+        if bai_list:
+            danh_sach_khoi_danh_muc.append({"danh_muc": dm, "bai_list": bai_list})
+
+    # --- Bài chưa gán danh mục: gom vào 1 khối "Khác" ở cuối, không để mất bài ---
+    bai_khong_danh_muc = (BaiViet.query
+                           .filter(da_xuat_ban, BaiViet.danh_muc_id.is_(None))
+                           .order_by(BaiViet.ghim.desc(), BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
+                           .limit(SO_BAI_MOI_KHOI)
+                           .all())
+    if bai_khong_danh_muc:
+        danh_sach_khoi_danh_muc.append({"danh_muc": None, "bai_list": bai_khong_danh_muc})
+
+    return slide_bai, bai_phu, danh_sach_khoi_danh_muc
 
 
 @bp.route("/")
 def index():
     """
-    Danh sách bài viết/thông báo đã xuất bản, có thể lọc theo danh mục
-    hoặc tìm kiếm gần đúng theo từ khoá (?q=...).
-
-    Ở trang 1 (không lọc theo danh mục và không tìm kiếm), hiển thị thêm khối "nổi bật":
-    - 1 bài viết LỚN (bài được admin ghim gần nhất; nếu chưa ghim bài nào
-      thì lấy bài mới xuất bản nhất) - ảnh có lớp overlay chứa tiêu đề/mô tả.
-    - Bên dưới bài lớn: lưới 3 bài viết CÙNG danh mục với bài lớn.
-    - Bên cạnh bài lớn: danh sách tiêu đề các bài viết KHÁC danh mục với bài lớn.
-    Các bài còn lại (chưa xuất hiện ở khối trên) hiển thị dạng lưới bên dưới
-    như bình thường, có phân trang.
+    - Có ?q= : trang kết quả tìm kiếm.
+    - Có ?danh_muc= : lưới bài viết phẳng theo 1 danh mục, có phân trang (như cũ).
+    - Không có gì cả (trang chủ Bài viết): layout tạp chí - slideshow ưu tiên
+      bên trái, danh sách tiêu đề bên phải, các khối lưới 3 cột theo danh mục
+      bên dưới (xem hàm _xay_dung_trang_chu_bai_viet).
     """
     tu_khoa = request.args.get("q", "").strip()
     trang = request.args.get("page", 1, type=int)
@@ -40,83 +128,39 @@ def index():
         )
 
     danh_muc_slug = request.args.get("danh_muc", "").strip()
-
-    query = BaiViet.query.filter(BaiViet.trang_thai == "da_xuat_ban")
-
     danh_muc_hien_tai = None
     if danh_muc_slug:
         danh_muc_hien_tai = DanhMucBaiViet.query.filter_by(slug=danh_muc_slug).first_or_404()
-        query = query.filter(BaiViet.danh_muc_id == danh_muc_hien_tai.id)
 
-    hien_thi_khoi_noi_bat = trang == 1 and not danh_muc_hien_tai
+    bai_viet_list = []
+    phan_trang = None
+    slide_bai, bai_phu, danh_sach_khoi_danh_muc = [], [], []
 
-    bai_noi_bat = None
-    bai_cung_danh_muc = []
-    bai_khac_danh_muc = []
-    ds_id_da_dung = []
-
-    if hien_thi_khoi_noi_bat:
-        bai_noi_bat = (
-            query.filter(BaiViet.ghim.is_(True))
-            .order_by(BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
-            .first()
+    if danh_muc_hien_tai:
+        query = BaiViet.query.filter(
+            BaiViet.trang_thai == "da_xuat_ban",
+            BaiViet.danh_muc_id == danh_muc_hien_tai.id,
         )
-        if not bai_noi_bat:
-            bai_noi_bat = query.order_by(BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc()).first()
-
-        if bai_noi_bat:
-            ds_id_da_dung.append(bai_noi_bat.id)
-
-            if bai_noi_bat.danh_muc_id:
-                bai_cung_danh_muc = (
-                    query.filter(
-                        BaiViet.danh_muc_id == bai_noi_bat.danh_muc_id,
-                        BaiViet.id.notin_(ds_id_da_dung),
-                    )
-                    .order_by(BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
-                    .limit(SO_BAI_CUNG_DANH_MUC)
-                    .all()
-                )
-                ds_id_da_dung += [b.id for b in bai_cung_danh_muc]
-
-                bai_khac_danh_muc = (
-                    query.filter(
-                        or_(BaiViet.danh_muc_id != bai_noi_bat.danh_muc_id, BaiViet.danh_muc_id.is_(None)),
-                        BaiViet.id.notin_(ds_id_da_dung),
-                    )
-                    .order_by(BaiViet.ghim.desc(), BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
-                    .limit(SO_BAI_KHAC_DANH_MUC)
-                    .all()
-                )
-            else:
-                # Bài lớn chưa gán danh mục -> không có khái niệm "cùng danh mục",
-                # danh sách bên cạnh lấy các bài mới nhất còn lại.
-                bai_khac_danh_muc = (
-                    query.filter(BaiViet.id.notin_(ds_id_da_dung))
-                    .order_by(BaiViet.ghim.desc(), BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
-                    .limit(SO_BAI_KHAC_DANH_MUC)
-                    .all()
-                )
-            ds_id_da_dung += [b.id for b in bai_khac_danh_muc]
-
-    query_luoi = query
-    if ds_id_da_dung:
-        query_luoi = query_luoi.filter(BaiViet.id.notin_(ds_id_da_dung))
-
-    phan_trang = (
-        query_luoi.order_by(BaiViet.ghim.desc(), BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
-        .paginate(page=trang, per_page=SO_BAI_MOI_TRANG, error_out=False)
-    )
+        phan_trang = (query
+                      .order_by(BaiViet.ghim.desc(), BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
+                      .paginate(page=trang, per_page=SO_BAI_MOI_TRANG, error_out=False))
+        bai_viet_list = phan_trang.items
+    elif trang == 1:
+        slide_bai, bai_phu, danh_sach_khoi_danh_muc = _xay_dung_trang_chu_bai_viet()
+    else:
+        # Trang chủ Bài viết (không lọc danh mục) không còn khái niệm "trang 2"
+        # với layout tạp chí mới - quay lại trang 1.
+        return redirect(url_for("bv.index"))
 
     return render_template(
         "bai_viet/index.html",
-        bai_viet_list=phan_trang.items,
+        bai_viet_list=bai_viet_list,
         phan_trang=phan_trang,
         danh_sach_danh_muc=danh_sach_danh_muc,
         danh_muc_hien_tai=danh_muc_hien_tai,
-        bai_noi_bat=bai_noi_bat,
-        bai_cung_danh_muc=bai_cung_danh_muc,
-        bai_khac_danh_muc=bai_khac_danh_muc,
+        slide_bai=slide_bai,
+        bai_phu=bai_phu,
+        danh_sach_khoi_danh_muc=danh_sach_khoi_danh_muc,
     )
 
 

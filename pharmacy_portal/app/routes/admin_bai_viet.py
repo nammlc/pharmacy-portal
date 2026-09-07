@@ -47,6 +47,7 @@ def them():
         bai_viet = BaiViet()
         form.populate_obj(bai_viet)
         bai_viet.danh_muc_id = form.danh_muc_id.data or None
+        bai_viet.do_uu_tien = int(form.do_uu_tien.data) if form.do_uu_tien.data else None
         bai_viet.noi_dung = lam_sach_html(bai_viet.noi_dung)
         bai_viet.nguoi_dung_id = current_user.id
         bai_viet.slug = tao_slug_duy_nhat(BaiViet, form.tieu_de.data)
@@ -54,6 +55,13 @@ def them():
             bai_viet.ngay_xuat_ban = datetime.utcnow()
         db.session.add(bai_viet)
         db.session.flush()  # lấy bai_viet.id trước khi commit
+
+        if bai_viet.do_uu_tien:
+            so_bi_go = (BaiViet.query
+                        .filter(BaiViet.do_uu_tien == bai_viet.do_uu_tien, BaiViet.id != bai_viet.id)
+                        .update({"do_uu_tien": None}))
+            if so_bi_go:
+                flash(f"Mỗi mức ưu tiên chỉ 1 bài — đã tự bỏ mức {bai_viet.do_uu_tien} khỏi {so_bi_go} bài viết khác.", "info")
 
         file_anh = request.files.get("file_anh")
         if file_anh and file_anh.filename:
@@ -88,11 +96,20 @@ def sua(item_id):
     _nap_lua_chon(form)
     if request.method == "GET":
         form.danh_muc_id.data = bai_viet.danh_muc_id or 0
+        form.do_uu_tien.data = str(bai_viet.do_uu_tien) if bai_viet.do_uu_tien else ""
     if form.validate_on_submit():
         trang_thai_cu = bai_viet.trang_thai
         form.populate_obj(bai_viet)
         bai_viet.danh_muc_id = form.danh_muc_id.data or None
+        bai_viet.do_uu_tien = int(form.do_uu_tien.data) if form.do_uu_tien.data else None
         bai_viet.noi_dung = lam_sach_html(bai_viet.noi_dung)
+
+        if bai_viet.do_uu_tien:
+            so_bi_go = (BaiViet.query
+                        .filter(BaiViet.do_uu_tien == bai_viet.do_uu_tien, BaiViet.id != bai_viet.id)
+                        .update({"do_uu_tien": None}))
+            if so_bi_go:
+                flash(f"Mỗi mức ưu tiên chỉ 1 bài — đã tự bỏ mức {bai_viet.do_uu_tien} khỏi {so_bi_go} bài viết khác.", "info")
 
         # Giữ nguyên slug đã có (không đổi URL khi sửa tiêu đề) — chỉ sinh mới nếu chưa có
         if not bai_viet.slug:

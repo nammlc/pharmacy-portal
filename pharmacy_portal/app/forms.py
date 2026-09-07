@@ -185,6 +185,17 @@ class BaiVietForm(FlaskForm):
         validators=[DataRequired()],
     )
     ghim = BooleanField("Ghim thành bài viết lớn ở đầu trang")
+    do_uu_tien = SelectField(
+        "Mức độ ưu tiên hiển thị (trang chủ Bài viết)",
+        choices=[
+            ("", "Không ưu tiên"),
+            ("1", "Mức 1 — cao nhất (slide đầu tiên)"),
+            ("2", "Mức 2"),
+            ("3", "Mức 3"),
+            ("4", "Mức 4"),
+        ],
+        validators=[Optional()],
+    )
     file_anh = FileField(
         "Ảnh đại diện",
         validators=[

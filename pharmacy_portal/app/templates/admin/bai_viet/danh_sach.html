@@ -29,6 +29,7 @@
         <td>
           <strong>{{ item.tieu_de }}</strong>
           {% if item.ghim %}<span class="adm-badge" style="margin-left:6px;">📌 Ghim</span>{% endif %}
+          {% if item.do_uu_tien %}<span class="adm-badge" style="margin-left:6px;background:#fff3cd;color:#8a6300;">⭐ Ưu tiên {{ item.do_uu_tien }}</span>{% endif %}
         </td>
         <td>{% if item.danh_muc %}<span class="adm-badge">{{ item.danh_muc.ten }}</span>{% else %}—{% endif %}</td>
         <td>

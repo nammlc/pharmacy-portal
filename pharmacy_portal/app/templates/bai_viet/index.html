@@ -28,131 +28,9 @@
 
 <div class="results-panel">
 
-  {# ===== SLIDESHOW 4 bài nổi bật ===== #}
-  {% set slide_bai = [] %}
-  {% if bai_noi_bat %}{% set _ = slide_bai.append(bai_noi_bat) %}{% endif %}
-  {% for bv in bai_cung_danh_muc %}{% if slide_bai|length < 4 %}{% set _ = slide_bai.append(bv) %}{% endif %}{% endfor %}
-  {% for bv in bai_khac_danh_muc %}{% if slide_bai|length < 4 %}{% set _ = slide_bai.append(bv) %}{% endif %}{% endfor %}
+  {% if danh_muc_hien_tai %}
 
-  {% if slide_bai %}
-  <div class="bv-slideshow" id="bvSlideshow" aria-label="Bài viết nổi bật">
-
-    <!-- Slides -->
-    <div class="bv-slides">
-      {% for bv in slide_bai %}
-      <div class="bv-slide {% if loop.first %}is-active{% endif %}"
-           data-idx="{{ loop.index0 }}"
-           aria-hidden="{{ 'false' if loop.first else 'true' }}">
-        <a class="bv-slide-link" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}" tabindex="{{ '0' if loop.first else '-1' }}">
-          <!-- Ảnh nền -->
-          <div class="bv-slide-bg"
-               {% if bv.anh_dai_dien %}style="background-image:url('{{ bv.anh_dai_dien }}')"{% endif %}>
-            {% if not bv.anh_dai_dien %}
-            <div class="bv-slide-bg-fallback">📰</div>
-            {% endif %}
-          </div>
-          <!-- Gradient overlay -->
-          <div class="bv-slide-overlay"></div>
-          <!-- Nội dung -->
-          <div class="bv-slide-content">
-            {% if bv.danh_muc %}
-            <span class="bv-slide-tag" style="background:{{ bv.danh_muc.mau_sac }};">{{ bv.danh_muc.ten }}</span>
-            {% endif %}
-            {% if bv.ghim %}<span class="bv-slide-pin">📌 Nổi bật</span>{% endif %}
-            <h2 class="bv-slide-title">{{ bv.tieu_de }}</h2>
-            {% if bv.mo_ta_ngan %}
-            <p class="bv-slide-desc">{{ bv.mo_ta_ngan }}</p>
-            {% endif %}
-            <div class="bv-slide-meta">
-              <span>🗓 {{ (bv.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bv.ngay_xuat_ban else (bv.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}</span>
-              {% if bv.luot_xem %}<span>👁 {{ bv.luot_xem }}</span>{% endif %}
-            </div>
-            <span class="bv-slide-cta">Đọc tiếp →</span>
-          </div>
-        </a>
-      </div>
-      {% endfor %}
-    </div>
-
-    <!-- Điều hướng prev/next -->
-    {% if slide_bai|length > 1 %}
-    <button class="bv-slide-arrow bv-slide-prev" onclick="bvSlide(-1)" aria-label="Bài trước">‹</button>
-    <button class="bv-slide-arrow bv-slide-next" onclick="bvSlide(1)" aria-label="Bài tiếp">›</button>
-
-    <!-- Dots chỉ vị trí -->
-    <div class="bv-slide-dots">
-      {% for bv in slide_bai %}
-      <button class="bv-dot {% if loop.first %}is-active{% endif %}"
-              onclick="bvGoTo({{ loop.index0 }})"
-              aria-label="Slide {{ loop.index }}"></button>
-      {% endfor %}
-    </div>
-
-    <!-- Thanh tiến trình tự động -->
-    <div class="bv-slide-progress"><div class="bv-slide-progress-bar" id="bvProgressBar"></div></div>
-    {% endif %}
-
-  </div>
-
-  <script>
-  (function () {
-    const DELAY = 5000; // 5 giây mỗi slide
-    const slides = document.querySelectorAll('#bvSlideshow .bv-slide');
-    const dots   = document.querySelectorAll('#bvSlideshow .bv-dot');
-    const bar    = document.getElementById('bvProgressBar');
-    if (!slides.length) return;
-
-    let cur = 0, timer = null, prog = null;
-
-    function show(n) {
-      slides[cur].classList.remove('is-active');
-      slides[cur].setAttribute('aria-hidden', 'true');
-      slides[cur].querySelector('a').setAttribute('tabindex', '-1');
-      if (dots[cur]) dots[cur].classList.remove('is-active');
-
-      cur = (n + slides.length) % slides.length;
-
-      slides[cur].classList.add('is-active');
-      slides[cur].setAttribute('aria-hidden', 'false');
-      slides[cur].querySelector('a').setAttribute('tabindex', '0');
-      if (dots[cur]) dots[cur].classList.add('is-active');
-
-      // Reset progress bar
-      if (bar) { bar.style.transition = 'none'; bar.style.width = '0%'; }
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        if (bar) { bar.style.transition = `width ${DELAY}ms linear`; bar.style.width = '100%'; }
-      }));
-    }
-
-    function startAuto() {
-      clearInterval(timer);
-      timer = setInterval(() => show(cur + 1), DELAY);
-    }
-
-    // Dừng khi hover, tiếp khi rời
-    const ss = document.getElementById('bvSlideshow');
-    ss.addEventListener('mouseenter', () => clearInterval(timer));
-    ss.addEventListener('mouseleave', () => { startAuto(); });
-
-    // Touch swipe
-    let tx = 0;
-    ss.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
-    ss.addEventListener('touchend', e => {
-      const dx = e.changedTouches[0].clientX - tx;
-      if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1));
-      startAuto();
-    });
-
-    window.bvSlide = n => { show(cur + n); startAuto(); };
-    window.bvGoTo  = n => { show(n); startAuto(); };
-
-    // Khởi động
-    show(0);
-    startAuto();
-  })();
-  </script>
-  {% endif %}
-
+  {# ===== Xem theo 1 danh mục cụ thể: lưới phẳng + phân trang (như cũ) ===== #}
   {% if bai_viet_list %}
   <div class="bv-grid">
     {% for bv in bai_viet_list %}
@@ -176,13 +54,190 @@
     {% endfor %}
   </div>
   {% set endpoint = 'bv.index' %}
-  {% set args = {'danh_muc': danh_muc_hien_tai.slug} if danh_muc_hien_tai else {} %}
+  {% set args = {'danh_muc': danh_muc_hien_tai.slug} %}
   {% include "_phan_trang.html" with context %}
-  {% elif not bai_noi_bat %}
+  {% else %}
   <div class="empty-state">
     <div class="empty-state-icon">📰</div>
-    Chưa có bài viết nào được đăng{{ ' trong danh mục này' if danh_muc_hien_tai else '' }}.
+    Chưa có bài viết nào được đăng trong danh mục này.
   </div>
   {% endif %}
+
+  {% else %}
+
+  {# ===== Trang chủ Bài viết: slideshow ưu tiên (trái) + tiêu đề khác danh mục (phải) ===== #}
+  {% if slide_bai %}
+  <div class="bv-noibat-wrap">
+    <div class="bv-noibat-left">
+      <div class="bv-slideshow" id="bvSlideshow" aria-label="Bài viết ưu tiên">
+        <div class="bv-slides">
+          {% for bv in slide_bai %}
+          <div class="bv-slide {% if loop.first %}is-active{% endif %}"
+               data-idx="{{ loop.index0 }}"
+               aria-hidden="{{ 'false' if loop.first else 'true' }}">
+            <a class="bv-slide-link" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}" tabindex="{{ '0' if loop.first else '-1' }}">
+              <div class="bv-slide-bg" {% if bv.anh_dai_dien %}style="background-image:url('{{ bv.anh_dai_dien }}')"{% endif %}>
+                {% if not bv.anh_dai_dien %}<div class="bv-slide-bg-fallback">📰</div>{% endif %}
+              </div>
+              <div class="bv-slide-overlay"></div>
+              <div class="bv-slide-content">
+                {% if bv.danh_muc %}
+                <span class="bv-slide-tag" style="background:{{ bv.danh_muc.mau_sac }};">{{ bv.danh_muc.ten }}</span>
+                {% endif %}
+                {% if bv.do_uu_tien %}<span class="bv-slide-pin">⭐ Ưu tiên {{ bv.do_uu_tien }}</span>{% endif %}
+                <h2 class="bv-slide-title">{{ bv.tieu_de }}</h2>
+                {% if bv.mo_ta_ngan %}<p class="bv-slide-desc">{{ bv.mo_ta_ngan }}</p>{% endif %}
+                <div class="bv-slide-meta">
+                  <span>🗓 {{ (bv.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bv.ngay_xuat_ban else (bv.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}</span>
+                  {% if bv.luot_xem %}<span>👁 {{ bv.luot_xem }}</span>{% endif %}
+                </div>
+                <span class="bv-slide-cta">Đọc tiếp →</span>
+              </div>
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+
+        {% if slide_bai|length > 1 %}
+        <button class="bv-slide-arrow bv-slide-prev" onclick="bvSlide(-1)" aria-label="Bài trước">‹</button>
+        <button class="bv-slide-arrow bv-slide-next" onclick="bvSlide(1)" aria-label="Bài tiếp">›</button>
+        <div class="bv-slide-dots">
+          {% for bv in slide_bai %}
+          <button class="bv-dot {% if loop.first %}is-active{% endif %}" onclick="bvGoTo({{ loop.index0 }})" aria-label="Slide {{ loop.index }}"></button>
+          {% endfor %}
+        </div>
+        <div class="bv-slide-progress"><div class="bv-slide-progress-bar" id="bvProgressBar"></div></div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if bai_phu %}
+    <div class="bv-noibat-phu">
+      <div class="bv-phu-heading">Bài viết khác</div>
+      {% for bv in bai_phu %}
+      <a class="bv-phu-item" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
+        {% if bv.danh_muc %}
+        <span class="bv-phu-eyebrow" style="--chip-color: {{ bv.danh_muc.mau_sac or '#1a4d8f' }};">{{ bv.danh_muc.ten }}</span>
+        {% endif %}
+        <span class="bv-phu-title">{{ bv.tieu_de }}</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <script>
+  (function () {
+    const DELAY = 5000; // 5 giây mỗi slide
+    const slides = document.querySelectorAll('#bvSlideshow .bv-slide');
+    const dots   = document.querySelectorAll('#bvSlideshow .bv-dot');
+    const bar    = document.getElementById('bvProgressBar');
+    if (!slides.length) return;
+
+    let cur = 0, timer = null;
+
+    function show(n) {
+      slides[cur].classList.remove('is-active');
+      slides[cur].setAttribute('aria-hidden', 'true');
+      slides[cur].querySelector('a').setAttribute('tabindex', '-1');
+      if (dots[cur]) dots[cur].classList.remove('is-active');
+
+      cur = (n + slides.length) % slides.length;
+
+      slides[cur].classList.add('is-active');
+      slides[cur].setAttribute('aria-hidden', 'false');
+      slides[cur].querySelector('a').setAttribute('tabindex', '0');
+      if (dots[cur]) dots[cur].classList.add('is-active');
+
+      if (bar) { bar.style.transition = 'none'; bar.style.width = '0%'; }
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (bar) { bar.style.transition = `width ${DELAY}ms linear`; bar.style.width = '100%'; }
+      }));
+    }
+
+    function startAuto() {
+      clearInterval(timer);
+      timer = setInterval(() => show(cur + 1), DELAY);
+    }
+
+    const ss = document.getElementById('bvSlideshow');
+    ss.addEventListener('mouseenter', () => clearInterval(timer));
+    ss.addEventListener('mouseleave', () => { startAuto(); });
+
+    let tx = 0;
+    ss.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
+    ss.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - tx;
+      if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1));
+      startAuto();
+    });
+
+    window.bvSlide = n => { show(cur + n); startAuto(); };
+    window.bvGoTo  = n => { show(n); startAuto(); };
+
+    show(0);
+    startAuto();
+  })();
+  </script>
+  {% endif %}
+
+  {# ===== Các khối lưới 3 cột theo danh mục, thứ tự theo bài ưu tiên ===== #}
+  {% if danh_sach_khoi_danh_muc %}
+  {% for khoi in danh_sach_khoi_danh_muc %}
+  <div class="bv-khoi" style="margin-bottom:38px;">
+    <div class="tktg-section-head">
+      <div class="tktg-section-title">
+        {% if khoi.danh_muc %}
+        <span class="tktg-dot" style="background:{{ khoi.danh_muc.mau_sac or '#1a4d8f' }};"></span>
+        {{ khoi.danh_muc.ten }}
+        {% else %}
+        <span class="tktg-dot" style="background:var(--text-muted);"></span>
+        Khác
+        {% endif %}
+      </div>
+      {% if khoi.danh_muc %}
+      <a href="{{ url_for('bv.index', danh_muc=khoi.danh_muc.slug) }}" class="btn btn-outline btn-sm">Xem tất cả →</a>
+      {% endif %}
+    </div>
+    <div class="bv-lienquan-grid bv-khoi-grid">
+      {% for bv in khoi.bai_list %}
+      <a class="bv-lienquan-card" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
+        <div class="bv-lienquan-anh" {% if bv.anh_dai_dien %}style="background-image:url('{{ bv.anh_dai_dien }}');"{% endif %}>
+          {% if not bv.anh_dai_dien %}<span class="bv-card-thumb-fallback">📰</span>{% endif %}
+          {% if bv.ghim %}<span class="bv-card-pin">📌</span>{% endif %}
+        </div>
+        <span class="bv-lienquan-title">{{ bv.tieu_de }}</span>
+        <span style="font-size:12px; color:var(--text-muted);">
+          {{ (bv.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bv.ngay_xuat_ban else (bv.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+  {% elif not slide_bai %}
+  <div class="empty-state">
+    <div class="empty-state-icon">📰</div>
+    Chưa có bài viết nào được đăng.
+  </div>
+  {% endif %}
+
+  {% endif %}
 </div>
+
+<style>
+.bv-khoi-grid { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 860px) { .bv-khoi-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 560px) { .bv-khoi-grid { grid-template-columns: 1fr 1fr; } }
+
+.tktg-section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
+}
+.tktg-section-title {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-display); font-size: 17px; font-weight: 700;
+}
+.tktg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+</style>
 {% endblock %}

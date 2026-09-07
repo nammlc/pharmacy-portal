@@ -42,6 +42,15 @@
     </div>
 
     <div class="form-row">
+      {{ form.do_uu_tien.label }}
+      {{ form.do_uu_tien() }}
+      <div style="font-size:12.5px; color:var(--text-muted); margin-top:4px;">
+        Mức 1-4 quyết định 4 slide đầu trang "Bài viết" và thứ tự các khối danh mục bên dưới. Mỗi mức chỉ 1 bài — chọn mức đã có bài khác giữ thì bài đó sẽ tự bỏ ưu tiên.
+      </div>
+      {% for e in form.do_uu_tien.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+
+    <div class="form-row">
       {{ form.mo_ta_ngan.label }}
       {{ form.mo_ta_ngan(rows=3) }}
       {% for e in form.mo_ta_ngan.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
