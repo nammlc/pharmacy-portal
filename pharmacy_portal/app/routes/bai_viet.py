@@ -12,6 +12,22 @@ SO_BAI_PHU = 7            # số tiêu đề ở danh sách bên phải slidesho
 SO_MUC_UU_TIEN = 4        # có 4 mức ưu tiên: 1, 2, 3, 4
 
 
+def _lay_bai_phu(loai_tru_id_bai=None, loai_tru_danh_muc_ids=None, gioi_han=SO_BAI_PHU):
+    """Lấy tối đa `gioi_han` bài viết đã xuất bản, loại trừ theo id bài viết
+    và/hoặc id danh mục được truyền vào (dùng cho khối 'Bài viết khác')."""
+    query = BaiViet.query.filter(BaiViet.trang_thai == "da_xuat_ban")
+    if loai_tru_id_bai:
+        query = query.filter(BaiViet.id.notin_(loai_tru_id_bai))
+    if loai_tru_danh_muc_ids:
+        query = query.filter(
+            or_(BaiViet.danh_muc_id.notin_(loai_tru_danh_muc_ids), BaiViet.danh_muc_id.is_(None))
+        )
+    return (query
+            .order_by(BaiViet.ghim.desc(), BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
+            .limit(gioi_han)
+            .all())
+
+
 def _xay_dung_trang_chu_bai_viet():
     """
     Dựng dữ liệu cho khối đầu trang "Bài viết" (không lọc danh mục, không tìm kiếm):
@@ -47,21 +63,26 @@ def _xay_dung_trang_chu_bai_viet():
               .all())
         slide_bai += bu
 
-    # --- Danh sách tiêu đề bên phải: khác bài trong slideshow, khác danh mục bài ưu tiên 1 ---
+    # --- Danh sách tiêu đề bên phải: ưu tiên khác danh mục với bài ưu tiên
+    # mức 1, và khác các bài đã có trong slideshow. Trang web có thể còn ít
+    # bài viết nên lọc chặt dễ ra danh sách RỖNG (lỗi trước đây khiến khối
+    # này "không hiện gì cả") — nới lỏng dần từng điều kiện một cho tới khi
+    # có kết quả, để sidebar luôn có nội dung nếu còn bài nào khác trên hệ
+    # thống, mà vẫn ưu tiên đúng ý: khác danh mục bài ưu tiên 1 trước tiên.
     ds_id_slide = [b.id for b in slide_bai]
-    danh_muc_uu_tien_1 = bai_uu_tien_theo_muc.get(1).danh_muc_id if bai_uu_tien_theo_muc.get(1) else None
+    bai_uu_tien_1 = bai_uu_tien_theo_muc.get(1)
+    danh_muc_uu_tien_1 = bai_uu_tien_1.danh_muc_id if bai_uu_tien_1 else None
 
-    query_phu = BaiViet.query.filter(da_xuat_ban)
-    if ds_id_slide:
-        query_phu = query_phu.filter(BaiViet.id.notin_(ds_id_slide))
-    if danh_muc_uu_tien_1:
-        query_phu = query_phu.filter(
-            or_(BaiViet.danh_muc_id != danh_muc_uu_tien_1, BaiViet.danh_muc_id.is_(None))
-        )
-    bai_phu = (query_phu
-               .order_by(BaiViet.ghim.desc(), BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
-               .limit(SO_BAI_PHU)
-               .all())
+    bai_phu = []
+    for loai_tru_id_bai, loai_tru_dm in [
+        (ds_id_slide, {danh_muc_uu_tien_1} if danh_muc_uu_tien_1 else None),  # 1) đẹp nhất: khác cả slideshow lẫn danh mục #1
+        (ds_id_slide, None),                                                   # 2) bỏ điều kiện danh mục, vẫn khác slideshow
+        ([bai_uu_tien_1.id] if bai_uu_tien_1 else None, {danh_muc_uu_tien_1} if danh_muc_uu_tien_1 else None),  # 3) chỉ loại đúng bài #1 + danh mục của nó
+        ([bai_uu_tien_1.id] if bai_uu_tien_1 else None, None),                 # 4) chỉ loại đúng bài #1
+    ]:
+        bai_phu = _lay_bai_phu(loai_tru_id_bai=loai_tru_id_bai, loai_tru_danh_muc_ids=loai_tru_dm)
+        if bai_phu:
+            break
 
     # --- Thứ tự danh mục cho các khối lưới bên dưới ---
     tat_ca_danh_muc = DanhMucBaiViet.query.order_by(DanhMucBaiViet.thu_tu, DanhMucBaiViet.ten).all()
