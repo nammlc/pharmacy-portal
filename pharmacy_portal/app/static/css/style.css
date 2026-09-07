@@ -1853,7 +1853,15 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 }
 .bv-lienquan-card:hover .bv-lienquan-title { color: var(--sage-500); }
 
-.bv-noibat-phu { display: flex; flex-direction: column; }
+.bv-noibat-phu {
+  display: flex; flex-direction: column;
+  max-height: 480px;      /* khớp đúng chiều cao .bv-slideshow bên trái */
+  overflow-y: auto;
+  padding-right: 4px;     /* chừa chỗ cho thanh cuộn, tránh đè lên chữ */
+}
+.bv-noibat-phu::-webkit-scrollbar { width: 5px; }
+.bv-noibat-phu::-webkit-scrollbar-thumb { background: var(--line-200); border-radius: 3px; }
+.bv-noibat-phu::-webkit-scrollbar-thumb:hover { background: var(--sage-300, #b9c9bd); }
 .bv-phu-heading {
   font-family: var(--font-display); font-size: 14px; font-weight: 800; color: var(--sage-500);
   text-transform: uppercase; letter-spacing: .03em; margin-bottom: 6px; padding-bottom: 10px;
@@ -1889,6 +1897,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   .bv-noibat-overlay h2 { font-size: 20px; }
   .bv-lienquan-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .bv-lienquan-title { font-size: 12.5px; -webkit-line-clamp: 2; }
+  .bv-noibat-phu { max-height: none; overflow-y: visible; padding-right: 0; }
 }
 @media (max-width: 560px) {
   .bv-lienquan-grid { grid-template-columns: 1fr 1fr; }

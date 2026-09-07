@@ -8,7 +8,7 @@ bp = Blueprint("bv", __name__, url_prefix="/bai-viet")
 
 SO_BAI_MOI_TRANG = 9      # số bài/trang khi xem theo 1 danh mục cụ thể
 SO_BAI_MOI_KHOI = 9       # số bài mỗi khối danh mục ở trang chủ Bài viết
-SO_BAI_PHU = 7            # số tiêu đề ở danh sách bên phải slideshow
+SO_BAI_PHU = 5            # số tiêu đề ở danh sách bên phải slideshow (vừa khít chiều cao ảnh 480px, thừa thì cuộn)
 SO_MUC_UU_TIEN = 4        # có 4 mức ưu tiên: 1, 2, 3, 4
 
 
