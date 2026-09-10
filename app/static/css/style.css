@@ -2158,28 +2158,18 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   font-size: 13px;
   color: rgba(255,255,255,.5);
 }
-.bv-slide-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--sky-400);
-  margin-top: 4px;
-  width: fit-content;
-  border-bottom: 1.5px solid transparent;
-  transition: border-color .15s;
-  padding-bottom: 2px;
-}
-.bv-slide-link:hover .bv-slide-cta {
-  border-color: var(--sky-400);
-}
 
-/* Mũi tên prev/next */
+/* Hiệu ứng hover trên chữ — thay cho nút "Đọc tiếp" đã bỏ */
+.bv-slide-title { transition: color .2s ease; }
+.bv-slide-tag { transition: filter .2s ease, transform .2s ease; }
+.bv-slide-link:hover .bv-slide-title { color: var(--sky-400); }
+.bv-slide-link:hover .bv-slide-tag { filter: brightness(1.12); transform: translateY(-1px); }
+.bv-slide-link:hover .bv-slide-desc { color: rgba(255,255,255,.9); }
+
+/* Mũi tên prev/next — đặt ở góc trên, tránh đè lên chữ neo dưới đáy slide */
 .bv-slide-arrow {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 16px;
   z-index: 10;
   background: rgba(255,255,255,.12);
   border: 1.5px solid rgba(255,255,255,.2);
