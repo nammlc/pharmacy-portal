@@ -5,18 +5,19 @@
 
 <!-- Hero section -->
 <section class="vct-hero">
-  {% if d.vct_hinh_anh_1 %}
-  <div class="vct-hero-img" style="background-image:url('{{ d.vct_hinh_anh_1 }}')"></div>
-  {% else %}
-  <div class="vct-hero-img vct-hero-gradient"></div>
-  {% endif %}
-  <div class="vct-hero-overlay"></div>
-  <div class="vct-hero-content">
-    <div class="vct-eyebrow">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
-    <h1>{{ d.vct_tieu_de or 'Về chúng tôi' }}</h1>
-    {% if d.vct_mo_ta_ngan %}
-    <p>{{ d.vct_mo_ta_ngan }}</p>
+  <div class="vct-hero-inner">
+    {% if d.vct_hinh_anh_1 %}
+    <img class="vct-hero-img" src="{{ d.vct_hinh_anh_1 }}" alt="{{ d.vct_tieu_de or 'Về chúng tôi' }}">
+    {% else %}
+    <div class="vct-hero-img vct-hero-gradient"></div>
     {% endif %}
+    <div class="vct-hero-textbox">
+      <div class="vct-eyebrow">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
+      <h1>{{ d.vct_tieu_de or 'Về chúng tôi' }}</h1>
+      {% if d.vct_mo_ta_ngan %}
+      <p>{{ d.vct_mo_ta_ngan }}</p>
+      {% endif %}
+    </div>
   </div>
 </section>
 
@@ -118,33 +119,41 @@
 <style>
 /* Hero */
 .vct-hero {
+  padding: 28px 24px 0;
+}
+.vct-hero-inner {
   position: relative;
-  height: 380px;
-  display: flex;
-  align-items: flex-end;
+  max-width: 1180px;
+  margin: 0 auto;
+  border-radius: 20px;
   overflow: hidden;
+  background: var(--ink-900);
+  isolation: isolate;
 }
 .vct-hero-img {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
+  display: block;
+  width: 100%;
+  max-height: 480px;
+  object-fit: contain;
+  background: var(--ink-900);
   transition: transform 6s ease;
 }
-.vct-hero-img:hover { transform: scale(1.03); }
+.vct-hero-inner:hover .vct-hero-img { transform: scale(1.02); }
 .vct-hero-gradient {
+  height: 320px;
   background: linear-gradient(135deg, var(--ink-900) 0%, var(--navy-600) 60%, var(--sky-400) 100%);
 }
-.vct-hero-overlay {
+.vct-hero-textbox {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(11,31,58,0.85) 0%, rgba(11,31,58,0.3) 60%, transparent 100%);
-}
-.vct-hero-content {
-  position: relative;
+  left: 28px; right: 28px; bottom: 28px;
+  max-width: 620px;
+  background: rgba(7, 15, 30, 0.74);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 16px;
+  padding: 24px 28px;
   z-index: 2;
-  padding: 40px 48px;
-  max-width: 800px;
 }
 .vct-eyebrow {
   font-size: 12px;
@@ -154,18 +163,17 @@
   color: var(--sky-400);
   margin-bottom: 10px;
 }
-.vct-hero-content h1 {
+.vct-hero-textbox h1 {
   font-family: var(--font-display);
-  font-size: clamp(26px, 4vw, 42px);
+  font-size: clamp(24px, 3.4vw, 36px);
   font-weight: 800;
   color: #fff;
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   line-height: 1.15;
 }
-.vct-hero-content p {
-  color: rgba(255,255,255,0.82);
-  font-size: 15.5px;
-  max-width: 560px;
+.vct-hero-textbox p {
+  color: rgba(255,255,255,0.88);
+  font-size: 15px;
   margin: 0;
   line-height: 1.6;
 }
@@ -238,9 +246,9 @@
 
 /* Ảnh phụ */
 .vct-photo-block img {
+  display: block;
   width: 100%;
-  max-height: 400px;
-  object-fit: cover;
+  height: auto;
   border-radius: 14px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.1);
 }
@@ -320,8 +328,11 @@ a.vct-contact-row:hover { color: var(--navy-500); }
 
 /* Responsive */
 @media (max-width: 640px) {
-  .vct-hero { height: 280px; }
-  .vct-hero-content { padding: 24px 20px; }
+  .vct-hero { padding: 16px 12px 0; }
+  .vct-hero-inner { border-radius: 14px; }
+  .vct-hero-img { max-height: 260px; }
+  .vct-hero-gradient { height: 220px; }
+  .vct-hero-textbox { left: 14px; right: 14px; bottom: 14px; padding: 16px 18px; max-width: none; }
   .vct-container { gap: 36px; padding: 0 16px; }
   .vct-cards-row { grid-template-columns: 1fr; }
   .vct-main-section { padding: 36px 0 60px; }
