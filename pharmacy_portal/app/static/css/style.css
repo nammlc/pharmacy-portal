@@ -2166,10 +2166,11 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .bv-slide-link:hover .bv-slide-tag { filter: brightness(1.12); transform: translateY(-1px); }
 .bv-slide-link:hover .bv-slide-desc { color: rgba(255,255,255,.9); }
 
-/* Mũi tên prev/next — đặt ở góc trên, tránh đè lên chữ neo dưới đáy slide */
+/* Mũi tên prev/next — canh giữa theo chiều dọc */
 .bv-slide-arrow {
   position: absolute;
-  top: 16px;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 10;
   background: rgba(255,255,255,.12);
   border: 1.5px solid rgba(255,255,255,.2);
