@@ -37,7 +37,7 @@
     <p class="tktg-empty">Không tìm thấy thuốc này trong hệ thống. Có thể tên trên đơn viết khác — bấm "Tìm" ở trên để thử tên khác.</p>
     {% else %}
     <div class="drug-grid drug-grid--nho">
-      {% for it in kq.items %}
+      {% for it in kq.danh_sach_ket_qua %}
       <a class="drug-card" href="{{ url_for(it.endpoint, thuoc_id=it.thuoc.id) }}">
         {% if it.thuoc.hinh_anh %}
         <img class="drug-card-thumb" src="{{ it.thuoc.hinh_anh }}" alt="{{ it.thuoc.ten_biet_duoc }}">

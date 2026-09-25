@@ -132,7 +132,11 @@ def tim_kiem():
             tong = phan_trang_dmt.total + phan_trang_ntbv.total
             ket_qua_hang_loat.append({
                 "ten_thuoc": ten_thuoc,
-                "items": items,
+                # LƯU Ý: không đặt tên khoá là "items" — Jinja sẽ hiểu
+                # kq.items là PHƯƠNG THỨC dict.items() có sẵn của Python
+                # (gây lỗi "'builtin_function_or_method' object is not
+                # iterable"), chứ không phải khoá dữ liệu này.
+                "danh_sach_ket_qua": items,
                 "tong": tong,
             })
         so_thuoc_tim_thay = sum(1 for k in ket_qua_hang_loat if k["tong"] > 0)
