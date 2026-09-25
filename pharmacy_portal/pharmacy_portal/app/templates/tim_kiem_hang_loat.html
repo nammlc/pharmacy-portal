@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Tra cứu đơn thuốc — {{ danh_sach_tu_khoa|length }} thuốc{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="eyebrow">🧾 Tìm kiếm hàng loạt · Đơn thuốc</div>
+  <h1>Kết quả tra cứu cho {{ danh_sach_tu_khoa|length }} thuốc trong đơn</h1>
+  <p>
+    {% if so_thuoc_khong_thay %}
+      Tìm thấy thông tin cho <strong>{{ danh_sach_tu_khoa|length - so_thuoc_khong_thay }}/{{ danh_sach_tu_khoa|length }}</strong> thuốc.
+      Có <strong>{{ so_thuoc_khong_thay }}</strong> thuốc chưa tra được, vui lòng hỏi lại dược sĩ.
+    {% else %}
+      Đã tìm thấy thông tin cho tất cả <strong>{{ danh_sach_tu_khoa|length }}</strong> thuốc trong đơn.
+    {% endif %}
+  </p>
+</div>
+
+<div class="search-panel">
+  <form class="search-form" method="get" action="{{ url_for('main.tim_kiem') }}">
+    <input type="text" name="q" value="{{ tu_khoa_goc }}" placeholder="Tên biệt dược hoặc hoạt chất...">
+    <button type="submit">🔍 Tìm</button>
+  </form>
+</div>
+
+<!-- Mục lục nhanh: danh sách thuốc trong đơn, bấm để nhảy tới kết quả -->
+<div class="results-panel" style="margin-bottom:24px;">
+  <div class="hl-muc-luc">
+    {% for kq in ket_qua_hang_loat %}
+    <a href="#hl-{{ loop.index }}" class="hl-muc-luc-item {{ 'hl-co-ket-qua' if kq.co_ket_qua else 'hl-khong-ket-qua' }}">
+      <span class="hl-muc-luc-icon">{{ '✓' if kq.co_ket_qua else '?' }}</span>
+      {{ kq.tu_khoa }}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="results-panel">
+  {% for kq in ket_qua_hang_loat %}
+  {% set tong_kq = kq.phan_trang_dmt.total + kq.phan_trang_ntbv.total %}
+  <div class="tktg-section hl-thuoc-block" id="hl-{{ loop.index }}">
+    <div class="tktg-section-head">
+      <div class="tktg-section-title">
+        <span class="hl-so-thu-tu">{{ loop.index }}</span>
+        {{ kq.tu_khoa }}
+        {% if not tong_kq %}
+        <span class="hl-badge-trong">Không tìm thấy</span>
+        {% endif %}
+      </div>
+      <a href="{{ url_for('main.tim_kiem', q=kq.tu_khoa) }}" class="btn btn-outline btn-sm">Tìm chi tiết →</a>
+    </div>
+
+    {% if not tong_kq %}
+    <p class="tktg-empty">Không tìm thấy thuốc phù hợp với "<strong>{{ kq.tu_khoa }}</strong>". Có thể tên bị gõ tắt hoặc chưa có trong danh mục — vui lòng hỏi dược sĩ.</p>
+    {% else %}
+
+      {% if kq.phan_trang_dmt.items %}
+      <div class="hl-nhom">
+        <div class="hl-nhom-tieu-de"><span class="tktg-dot" style="background:var(--cat-dmt)"></span> Danh mục thuốc</div>
+        <div class="drug-grid">
+          {% for thuoc in kq.phan_trang_dmt.items %}
+          <a class="drug-card" href="{{ url_for('dmt.xem_thuoc', thuoc_id=thuoc.id) }}">
+            {% if thuoc.hinh_anh %}
+            <img class="drug-card-thumb" src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}">
+            {% else %}
+            <div class="drug-card-thumb-fallback" style="background:#eff6ff;color:#2563eb;">{{ thuoc.ten_biet_duoc[:1]|upper }}</div>
+            {% endif %}
+            <div class="drug-card-body">
+              <h3>{{ thuoc.ten_biet_duoc }}</h3>
+              <p>{{ thuoc.ten_hoat_chat_hien_thi or '—' }}</p>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if kq.phan_trang_ntbv.items %}
+      <div class="hl-nhom" style="margin-top:18px;">
+        <div class="hl-nhom-tieu-de"><span class="tktg-dot" style="background:var(--cat-ntbv)"></span> Nhà thuốc BV</div>
+        <div class="drug-grid">
+          {% for thuoc in kq.phan_trang_ntbv.items %}
+          <a class="drug-card" href="{{ url_for('ntbv.xem_thuoc', thuoc_id=thuoc.id) }}">
+            {% if thuoc.hinh_anh %}
+            <img class="drug-card-thumb" src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}">
+            {% else %}
+            <div class="drug-card-thumb-fallback" style="background:#ecfdf5;color:#059669;">{{ thuoc.ten_biet_duoc[:1]|upper }}</div>
+            {% endif %}
+            <div class="drug-card-body">
+              <h3>{{ thuoc.ten_biet_duoc }}</h3>
+              <p>{{ thuoc.ten_hoat_chat_hien_thi or '—' }}</p>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<style>
+.hl-muc-luc { display: flex; flex-wrap: wrap; gap: 8px; }
+.hl-muc-luc-item {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  border: 1px solid var(--line-200); color: var(--ink-900); text-decoration: none;
+}
+.hl-muc-luc-item.hl-co-ket-qua { border-color: #bbf7d0; background: #f0fdf4; color: #15803d; }
+.hl-muc-luc-item.hl-khong-ket-qua { border-color: #fecaca; background: #fef2f2; color: #b91c1c; }
+.hl-muc-luc-icon { font-size: 12px; }
+.hl-thuoc-block { padding: 18px; border: 1px solid var(--line-200); border-radius: 14px; margin-bottom: 16px; }
+.hl-so-thu-tu {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%; background: var(--ink-900); color: #fff;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+.hl-badge-trong {
+  font-size: 11.5px; font-weight: 700; color: #b91c1c; background: #fef2f2;
+  border: 1px solid #fecaca; padding: 2px 8px; border-radius: 999px; margin-left: 4px;
+}
+.hl-nhom-tieu-de { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+</style>
+{% endblock %}

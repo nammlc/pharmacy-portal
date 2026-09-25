@@ -1,8 +1,19 @@
+import re
 from flask import Blueprint, render_template, redirect, url_for, request
 from sqlalchemy import text
 from app import db
 from app.models.models import CaiDat, DanhMucThuoc, NhaThuocBV, HoatChat
 from app.utils.tim_kiem import tim_danh_muc_thuoc, tim_nha_thuoc_bv
+
+# Dấu phân cách được chấp nhận giữa các tên thuốc khi phần mềm bên thứ 3
+# (đơn thuốc điện tử) tạo mã QR tìm kiếm hàng loạt, ví dụ:
+#   /tim-kiem?q=Lidocain,Paracetamol,Amoxicillin
+#   /tim-kiem?q=Lidocain;Paracetamol;Amoxicillin
+# Chấp nhận cả dấu phẩy và chấm phẩy để linh hoạt với nhiều nhà cung cấp.
+TACH_TU_KHOA_HANG_LOAT = re.compile(r"[,;]+")
+
+SO_XEM_TRUOC_DON = 8
+SO_XEM_TRUOC_HANG_LOAT = 5
 
 bp = Blueprint("main", __name__)
 
@@ -63,21 +74,55 @@ def tim_kiem():
     """Tìm kiếm gộp: trả kết quả từ cả Danh mục thuốc và Nhà thuốc BV
     - dùng chung bộ máy fuzzy search (bắt lỗi chính tả, gõ thiếu dấu...)
     với ô tìm kiếm trong 2 trang Danh mục thuốc / Nhà thuốc BV, thay vì
-    so khớp ilike đơn thuần như trước."""
-    tu_khoa = request.args.get("q", "").strip()
-    if not tu_khoa:
+    so khớp ilike đơn thuần như trước.
+
+    Tìm kiếm hàng loạt (quét QR đơn thuốc): nếu tham số q chứa nhiều tên
+    thuốc nối bằng dấu phẩy/chấm phẩy (vd: ?q=Lidocain,Paracetamol), trang
+    sẽ tự chuyển sang chế độ hiển thị kết quả theo từng thuốc trong đơn.
+    """
+    tu_khoa_goc = request.args.get("q", "").strip()
+    if not tu_khoa_goc:
         return redirect(url_for("main.trang_chu"))
 
-    SO_XEM_TRUOC = 8
+    danh_sach_tu_khoa = [
+        t.strip() for t in TACH_TU_KHOA_HANG_LOAT.split(tu_khoa_goc) if t.strip()
+    ]
 
-    phan_trang_dmt = tim_danh_muc_thuoc(tu_khoa, per_page=SO_XEM_TRUOC, page=1)
-    phan_trang_ntbv = tim_nha_thuoc_bv(tu_khoa, per_page=SO_XEM_TRUOC, page=1)
+    # Chỉ 1 từ khoá (hoặc không tách được) -> giữ nguyên giao diện tìm kiếm đơn
+    if len(danh_sach_tu_khoa) <= 1:
+        tu_khoa = danh_sach_tu_khoa[0] if danh_sach_tu_khoa else tu_khoa_goc
+        phan_trang_dmt = tim_danh_muc_thuoc(tu_khoa, per_page=SO_XEM_TRUOC_DON, page=1)
+        phan_trang_ntbv = tim_nha_thuoc_bv(tu_khoa, per_page=SO_XEM_TRUOC_DON, page=1)
+
+        return render_template(
+            "tim_kiem_tong_hop.html",
+            tu_khoa=tu_khoa,
+            phan_trang_dmt=phan_trang_dmt,
+            phan_trang_ntbv=phan_trang_ntbv,
+        )
+
+    # Từ 2 từ khoá trở lên -> chế độ tìm kiếm hàng loạt theo đơn thuốc
+    ket_qua_hang_loat = []
+    so_thuoc_khong_thay = 0
+    for tu in danh_sach_tu_khoa:
+        phan_trang_dmt = tim_danh_muc_thuoc(tu, per_page=SO_XEM_TRUOC_HANG_LOAT, page=1)
+        phan_trang_ntbv = tim_nha_thuoc_bv(tu, per_page=SO_XEM_TRUOC_HANG_LOAT, page=1)
+        co_ket_qua = bool(phan_trang_dmt.total or phan_trang_ntbv.total)
+        if not co_ket_qua:
+            so_thuoc_khong_thay += 1
+        ket_qua_hang_loat.append({
+            "tu_khoa": tu,
+            "phan_trang_dmt": phan_trang_dmt,
+            "phan_trang_ntbv": phan_trang_ntbv,
+            "co_ket_qua": co_ket_qua,
+        })
 
     return render_template(
-        "tim_kiem_tong_hop.html",
-        tu_khoa=tu_khoa,
-        phan_trang_dmt=phan_trang_dmt,
-        phan_trang_ntbv=phan_trang_ntbv,
+        "tim_kiem_hang_loat.html",
+        tu_khoa_goc=tu_khoa_goc,
+        danh_sach_tu_khoa=danh_sach_tu_khoa,
+        ket_qua_hang_loat=ket_qua_hang_loat,
+        so_thuoc_khong_thay=so_thuoc_khong_thay,
     )
 
 
