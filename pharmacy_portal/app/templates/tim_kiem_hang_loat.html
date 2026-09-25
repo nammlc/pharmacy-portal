@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Tra cứu đơn thuốc — {{ ket_qua_hang_loat|length }} thuốc{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">📋 Tra cứu đơn thuốc (quét mã QR)</div>
+  <h1>Kết quả tra cứu {{ ket_qua_hang_loat|length }} thuốc trong đơn</h1>
+  <p>
+    Tìm thấy thông tin cho <strong>{{ so_thuoc_tim_thay }}/{{ ket_qua_hang_loat|length }}</strong> thuốc.
+    {% if so_thuoc_tim_thay < ket_qua_hang_loat|length %}
+      Thuốc chưa có trong hệ thống được đánh dấu bên dưới.
+    {% endif %}
+  </p>
+</div>
+
+<div class="search-panel">
+  <form class="search-form" method="get" action="{{ url_for('main.tim_kiem') }}">
+    <input type="text" name="q" placeholder="Tra thêm 1 thuốc khác...">
+    <button type="submit">🔍 Tìm</button>
+  </form>
+</div>
+
+<div class="results-panel">
+  {% for kq in ket_qua_hang_loat %}
+  <div class="tkhl-thuoc {% if not kq.tong %}tkhl-thuoc--rong{% endif %}">
+    <div class="tkhl-thuoc-head">
+      <div class="tkhl-thuoc-ten">
+        {% if kq.tong %}<span class="tkhl-tick tkhl-tick--co">✓</span>{% else %}<span class="tkhl-tick tkhl-tick--khong">!</span>{% endif %}
+        {{ kq.ten_thuoc }}
+      </div>
+      {% if kq.tong %}
+      <a href="{{ url_for('main.tim_kiem', q=kq.ten_thuoc) }}" class="btn btn-outline btn-sm">Xem đầy đủ →</a>
+      {% endif %}
+    </div>
+
+    {% if not kq.tong %}
+    <p class="tktg-empty">Không tìm thấy thuốc này trong hệ thống. Có thể tên trên đơn viết khác — bấm "Tìm" ở trên để thử tên khác.</p>
+    {% else %}
+    <div class="drug-grid drug-grid--nho">
+      {% for it in kq.items %}
+      <a class="drug-card" href="{{ url_for(it.endpoint, thuoc_id=it.thuoc.id) }}">
+        {% if it.thuoc.hinh_anh %}
+        <img class="drug-card-thumb" src="{{ it.thuoc.hinh_anh }}" alt="{{ it.thuoc.ten_biet_duoc }}">
+        {% else %}
+        <div class="drug-card-thumb-fallback" style="background:#eff6ff;color:#2563eb;">{{ it.thuoc.ten_biet_duoc[:1]|upper }}</div>
+        {% endif %}
+        <div class="drug-card-body">
+          <h3>{{ it.thuoc.ten_biet_duoc }}</h3>
+          <p>{{ it.thuoc.ten_hoat_chat_hien_thi or '—' }}</p>
+          <span class="tkhl-nguon">{{ it.nguon }}</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<style>
+.tkhl-thuoc {
+  border: 1px solid var(--line-200); border-radius: var(--radius-md);
+  padding: 18px 20px; margin-bottom: 16px; background: var(--paper-50, #fff);
+}
+.tkhl-thuoc--rong { background: #fafafa; }
+.tkhl-thuoc-head {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 10px; margin-bottom: 12px;
+}
+.tkhl-thuoc-ten {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-display); font-size: 17px; font-weight: 700;
+}
+.tkhl-tick {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%; font-size: 13px; font-weight: 800;
+  flex-shrink: 0;
+}
+.tkhl-tick--co { background: #dcfce7; color: #16a34a; }
+.tkhl-tick--khong { background: #fee2e2; color: #dc2626; }
+.drug-grid--nho { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.tkhl-nguon {
+  display: inline-block; margin-top: 4px; font-size: 11px; font-weight: 600;
+  color: var(--text-muted); text-transform: uppercase; letter-spacing: .02em;
+}
+</style>
+{% endblock %}
