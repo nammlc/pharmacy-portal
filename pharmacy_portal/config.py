@@ -97,3 +97,12 @@ class Config:
     APP_BASE_URL = os.environ.get("APP_BASE_URL", "")
     # Link đặt lại mật khẩu có hiệu lực bao nhiêu giây (mặc định 30 phút)
     RESET_TOKEN_MAX_AGE = int(os.environ.get("RESET_TOKEN_MAX_AGE", "1800"))
+
+    # --- Cách 2: gửi email qua Google Apps Script (không cần tên miền) ---
+    # Render free chặn cổng SMTP nên không gửi Gmail trực tiếp được; thay vào đó
+    # gọi 1 Apps Script (chạy trên tài khoản Gmail của bạn) qua HTTPS.
+    # Xem hướng dẫn trong HUONG_DAN_GUI_MAIL_GMAIL.md. Nếu đặt GAS_MAIL_URL thì
+    # ưu tiên dùng cách này, bỏ qua Resend.
+    GAS_MAIL_URL = os.environ.get("GAS_MAIL_URL", "")
+    GAS_MAIL_SECRET = os.environ.get("GAS_MAIL_SECRET", "")
+    MAIL_NAME = os.environ.get("MAIL_NAME", "Cổng Tra Cứu Dược")

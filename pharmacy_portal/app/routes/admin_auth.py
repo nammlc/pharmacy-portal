@@ -136,13 +136,21 @@ def quen_mat_khau():
     if form.validate_on_submit():
         email = form.email.data.strip().lower()
         nguoi_dung = NguoiDung.query.filter(func.lower(NguoiDung.email) == email).first()
-        if nguoi_dung is not None and nguoi_dung.dang_hoat_dong:
-            if not _gui_link_dat_lai(nguoi_dung):
-                current_app.logger.error("Gửi email đặt lại mật khẩu thất bại cho user id=%s", nguoi_dung.id)
 
-        # Luôn báo cùng 1 thông báo dù email có tồn tại hay không (chống dò tài khoản).
-        flash("Nếu email này đã được đăng ký cho một tài khoản, link đặt lại mật khẩu vừa được gửi. "
-              "Vui lòng kiểm tra hộp thư (kể cả mục Spam).", "success")
+        if nguoi_dung is None:
+            flash("Email này chưa được đăng ký cho tài khoản nào. Vui lòng kiểm tra lại email.", "error")
+            return render_template("admin/quen_mat_khau.html", form=form)
+
+        if not nguoi_dung.dang_hoat_dong:
+            flash("Tài khoản này đã bị khoá. Liên hệ quản trị viên.", "error")
+            return render_template("admin/quen_mat_khau.html", form=form)
+
+        if not _gui_link_dat_lai(nguoi_dung):
+            current_app.logger.error("Gửi email đặt lại mật khẩu thất bại cho user id=%s", nguoi_dung.id)
+            flash("Không gửi được email đặt lại mật khẩu. Vui lòng thử lại sau hoặc liên hệ quản trị viên.", "error")
+            return render_template("admin/quen_mat_khau.html", form=form)
+
+        flash("Đã gửi link đặt lại mật khẩu tới email của bạn. Vui lòng kiểm tra hộp thư (kể cả mục Spam).", "success")
         return redirect(url_for("admin_auth.dang_nhap"))
 
     return render_template("admin/quen_mat_khau.html", form=form)
