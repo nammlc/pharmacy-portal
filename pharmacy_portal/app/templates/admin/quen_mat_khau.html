@@ -28,8 +28,13 @@
       {{ form.hidden_tag() }}
       <div class="form-row">
         {{ form.email.label }}
-        {{ form.email(autofocus=true, autocomplete="email", type="email") }}
+        {{ form.email(autofocus=true, autocomplete="email", type="email", placeholder=(goi_y[0] if goi_y else "")) }}
         {% for e in form.email.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+        {% if goi_y %}
+        <div style="margin-top:6px; font-size:12.5px; color:var(--text-muted);">
+          Gợi ý email đã đăng ký: <strong>{{ goi_y|join(", ") }}</strong>
+        </div>
+        {% endif %}
       </div>
       {{ form.submit(class="btn btn-primary", style="width:100%; justify-content:center; padding:11px;") }}
     </form>

@@ -127,6 +127,24 @@ def _gui_link_dat_lai(nguoi_dung):
     return gui_email(nguoi_dung.email, "Đặt lại mật khẩu — Cổng Tra Cứu Dược", html, text)
 
 
+def che_email(email):
+    """lcongnam30@gmail.com -> lc....30@gmail.com (chỉ lộ vài ký tự đầu/cuối phần tên)."""
+    ten, _, mien = email.partition("@")
+    if len(ten) >= 6:
+        ten_che = ten[:2] + "...." + ten[-2:]
+    elif len(ten) >= 3:
+        ten_che = ten[0] + "...." + ten[-1]
+    else:
+        ten_che = ten[:1] + "...."
+    return f"{ten_che}@{mien}"
+
+
+def _goi_y_email():
+    """Danh sách email đã che của các tài khoản đang hoạt động, để người dùng nhớ ra mình dùng email nào."""
+    ds = NguoiDung.query.filter(NguoiDung.email.isnot(None), NguoiDung.dang_hoat_dong.is_(True)).all()
+    return sorted({che_email(nd.email) for nd in ds if nd.email})
+
+
 @bp.route("/quen-mat-khau", methods=["GET", "POST"])
 def quen_mat_khau():
     if current_user.is_authenticated:
@@ -139,21 +157,21 @@ def quen_mat_khau():
 
         if nguoi_dung is None:
             flash("Email này chưa được đăng ký cho tài khoản nào. Vui lòng kiểm tra lại email.", "error")
-            return render_template("admin/quen_mat_khau.html", form=form)
+            return render_template("admin/quen_mat_khau.html", form=form, goi_y=_goi_y_email())
 
         if not nguoi_dung.dang_hoat_dong:
             flash("Tài khoản này đã bị khoá. Liên hệ quản trị viên.", "error")
-            return render_template("admin/quen_mat_khau.html", form=form)
+            return render_template("admin/quen_mat_khau.html", form=form, goi_y=_goi_y_email())
 
         if not _gui_link_dat_lai(nguoi_dung):
             current_app.logger.error("Gửi email đặt lại mật khẩu thất bại cho user id=%s", nguoi_dung.id)
             flash("Không gửi được email đặt lại mật khẩu. Vui lòng thử lại sau hoặc liên hệ quản trị viên.", "error")
-            return render_template("admin/quen_mat_khau.html", form=form)
+            return render_template("admin/quen_mat_khau.html", form=form, goi_y=_goi_y_email())
 
         flash("Đã gửi link đặt lại mật khẩu tới email của bạn. Vui lòng kiểm tra hộp thư (kể cả mục Spam).", "success")
         return redirect(url_for("admin_auth.dang_nhap"))
 
-    return render_template("admin/quen_mat_khau.html", form=form)
+    return render_template("admin/quen_mat_khau.html", form=form, goi_y=_goi_y_email())
 
 
 @bp.route("/dat-lai-mat-khau/<token>", methods=["GET", "POST"])
