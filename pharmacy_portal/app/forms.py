@@ -45,6 +45,7 @@ class DatLaiMatKhauForm(FlaskForm):
 
 
 class CapNhatEmailForm(FlaskForm):
+    mat_khau_hien_tai = PasswordField("Mật khẩu hiện tại (để xác nhận)", validators=[DataRequired()])
     email = StringField("Email nhận link đặt lại mật khẩu", validators=[
         DataRequired(message="Vui lòng nhập email."),
         Email(message="Email không hợp lệ."),

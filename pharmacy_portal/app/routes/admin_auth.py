@@ -175,6 +175,9 @@ def cap_nhat_email():
         form.email.data = current_user.email
 
     if form.validate_on_submit():
+        if not current_user.check_password(form.mat_khau_hien_tai.data):
+            flash("Mật khẩu hiện tại không đúng.", "error")
+            return render_template("admin/cap_nhat_email.html", form=form)
         email = form.email.data.strip().lower()
         trung = NguoiDung.query.filter(
             func.lower(NguoiDung.email) == email, NguoiDung.id != current_user.id

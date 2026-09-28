@@ -2307,3 +2307,24 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   .lightbox-overlay { padding: 16px; }
   .lightbox-close { top: 12px; right: 12px; width: 38px; height: 38px; font-size: 22px; }
 }
+
+/* Nút hiện/ẩn mật khẩu (js/hien_mat_khau.js) */
+.form-row input[type="email"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line-200);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  background: #fff;
+  box-sizing: border-box;
+}
+.pw-wrap { position: relative; display: block; }
+.pw-wrap input { width: 100%; padding-right: 44px !important; box-sizing: border-box; }
+.pw-toggle {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; border-radius: 6px; cursor: pointer;
+  color: var(--text-muted, #667);
+}
+.pw-toggle:hover { color: var(--ink-900, #1a2233); background: rgba(0,0,0,0.05); }

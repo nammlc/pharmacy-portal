@@ -11,6 +11,11 @@
   <form method="POST" novalidate>
     {{ form.hidden_tag() }}
     <div class="form-row">
+      {{ form.mat_khau_hien_tai.label }}
+      {{ form.mat_khau_hien_tai(autocomplete="current-password") }}
+      {% for e in form.mat_khau_hien_tai.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="form-row">
       {{ form.email.label }}
       {{ form.email(autocomplete="email", type="email") }}
       {% for e in form.email.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
