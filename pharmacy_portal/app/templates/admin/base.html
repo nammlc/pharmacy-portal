@@ -76,6 +76,7 @@
               <small>{{ current_user.vai_tro or "Quản trị viên" }}</small>
             </div>
           </div>
+          <a href="{{ url_for('admin_auth.cap_nhat_email') }}">Email khôi phục</a>
           <a href="{{ url_for('admin_auth.doi_mat_khau') }}">Đổi mật khẩu</a>
           <a class="logout" href="{{ url_for('admin_auth.dang_xuat') }}">Đăng xuất</a>
         </div>

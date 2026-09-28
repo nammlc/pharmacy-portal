@@ -12,6 +12,8 @@ class NguoiDung(UserMixin, db.Model):
     ten_dang_nhap = db.Column(db.String(100), unique=True, nullable=False, index=True)
     mat_khau_hash = db.Column(db.String(255), nullable=False)
     ho_ten = db.Column(db.String(150))
+    # Email dùng để nhận link đặt lại mật khẩu (gửi qua Resend). Có thể để trống.
+    email = db.Column(db.String(255), unique=True, index=True)
     vai_tro = db.Column(db.String(50), default="duoc_si")   # duoc_si, quan_tri...
     dang_hoat_dong = db.Column(db.Boolean, default=True)
     ngay_tao = db.Column(db.DateTime, default=datetime.utcnow)

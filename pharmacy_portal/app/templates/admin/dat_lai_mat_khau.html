@@ -3,20 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Đăng nhập quản trị — Cổng Tra Cứu Dược</title>
+<title>Đặt lại mật khẩu — Cổng Tra Cứu Dược</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-
 <div class="login-shell">
   <div class="login-card">
     <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo bệnh viện" style="width:72px; height:72px; margin:0 auto 16px; display:block;">
-    <h1>Đăng nhập quản trị</h1>
-    <p class="sub">Bệnh viện Đa khoa Tâm Đức Cầu Quan<br>Khoa Dược &middot; Cổng tra cứu thông tin dược</p>
-
+    <h1>Đặt lại mật khẩu</h1>
+    <p class="sub">Nhập mật khẩu mới cho tài khoản quản trị.</p>
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
       <div style="margin-bottom:16px;">
@@ -26,26 +24,18 @@
       </div>
       {% endif %}
     {% endwith %}
-
     <form method="POST" novalidate>
       {{ form.hidden_tag() }}
+      {% for field in [form.mat_khau_moi, form.xac_nhan_mat_khau_moi] %}
       <div class="form-row">
-        {{ form.ten_dang_nhap.label }}
-        {{ form.ten_dang_nhap(autofocus=true, autocomplete="username") }}
-        {% for e in form.ten_dang_nhap.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+        {{ field.label }}
+        {{ field(autocomplete="new-password") }}
+        {% for e in field.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
       </div>
-      <div class="form-row">
-        {{ form.mat_khau.label }}
-        {{ form.mat_khau(autocomplete="current-password") }}
-        {% for e in form.mat_khau.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
-      </div>
+      {% endfor %}
       {{ form.submit(class="btn btn-primary", style="width:100%; justify-content:center; padding:11px;") }}
     </form>
-    <p style="text-align:center; margin:16px 0 0; font-size:13px;">
-      <a href="{{ url_for('admin_auth.quen_mat_khau') }}">Quên mật khẩu?</a>
-    </p>
   </div>
 </div>
-
 </body>
 </html>

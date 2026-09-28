@@ -84,3 +84,16 @@ class Config:
     # nên thường chỉ còn vài trăm KB, nhưng màn hình "Nhập hàng loạt" có thể gửi
     # nhiều ảnh cùng lúc (nhiều thuốc trong 1 lần lưu) nên để dư ra 40 MB cho cả request.
     MAX_CONTENT_LENGTH = 40 * 1024 * 1024
+
+    # --- Gửi email qua Resend (chức năng quên mật khẩu) ---
+    # RESEND_API_KEY : tạo tại https://resend.com/api-keys
+    # MAIL_FROM      : địa chỉ gửi. Thử nghiệm dùng "Khoa Dược <onboarding@resend.dev>"
+    #                  (chỉ gửi được tới email chủ tài khoản Resend). Muốn gửi cho
+    #                  email khác phải verify domain riêng trên Resend.
+    # APP_BASE_URL   : địa chỉ gốc của web, dùng để tạo link trong email,
+    #                  vd https://pharmacy-portal-xsrn.onrender.com (không có dấu / cuối)
+    RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+    MAIL_FROM = os.environ.get("MAIL_FROM", "Khoa Dược <onboarding@resend.dev>")
+    APP_BASE_URL = os.environ.get("APP_BASE_URL", "")
+    # Link đặt lại mật khẩu có hiệu lực bao nhiêu giây (mặc định 30 phút)
+    RESET_TOKEN_MAX_AGE = int(os.environ.get("RESET_TOKEN_MAX_AGE", "1800"))

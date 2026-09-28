@@ -195,7 +195,8 @@ def _tao_tai_khoan_dau_tien_neu_can(app):
     with app.app_context():
         db.create_all()
         if NguoiDung.query.count() == 0:
-            nguoi_dung = NguoiDung(ten_dang_nhap=ten_dang_nhap, vai_tro="quan_tri")
+            email_admin = (os.environ.get("ADMIN_EMAIL") or "").strip().lower() or None
+            nguoi_dung = NguoiDung(ten_dang_nhap=ten_dang_nhap, vai_tro="quan_tri", email=email_admin)
             nguoi_dung.set_password(mat_khau)
             db.session.add(nguoi_dung)
             db.session.commit()

@@ -4,7 +4,7 @@ from wtforms import (
     StringField, TextAreaField, SelectField, SelectMultipleField, PasswordField, SubmitField,
     BooleanField
 )
-from wtforms.validators import DataRequired, Length, Optional
+from wtforms.validators import DataRequired, Length, Optional, Email, EqualTo
 
 
 def _tuy_chon_rong(label="— Không chọn —"):
@@ -23,6 +23,34 @@ class DoiMatKhauForm(FlaskForm):
     mat_khau_moi = PasswordField("Mật khẩu mới", validators=[DataRequired(), Length(min=8, message="Mật khẩu mới cần ít nhất 8 ký tự.")])
     xac_nhan_mat_khau_moi = PasswordField("Nhập lại mật khẩu mới", validators=[DataRequired()])
     submit = SubmitField("Đổi mật khẩu")
+
+
+class QuenMatKhauForm(FlaskForm):
+    email = StringField("Email đã đăng ký cho tài khoản", validators=[
+        DataRequired(message="Vui lòng nhập email."),
+        Email(message="Email không hợp lệ."),
+        Length(max=255),
+    ])
+    submit = SubmitField("Gửi link đặt lại mật khẩu")
+
+
+class DatLaiMatKhauForm(FlaskForm):
+    mat_khau_moi = PasswordField("Mật khẩu mới", validators=[
+        DataRequired(), Length(min=8, message="Mật khẩu mới cần ít nhất 8 ký tự."),
+    ])
+    xac_nhan_mat_khau_moi = PasswordField("Nhập lại mật khẩu mới", validators=[
+        DataRequired(), EqualTo("mat_khau_moi", message="Mật khẩu nhập lại không khớp."),
+    ])
+    submit = SubmitField("Đặt lại mật khẩu")
+
+
+class CapNhatEmailForm(FlaskForm):
+    email = StringField("Email nhận link đặt lại mật khẩu", validators=[
+        DataRequired(message="Vui lòng nhập email."),
+        Email(message="Email không hợp lệ."),
+        Length(max=255),
+    ])
+    submit = SubmitField("Lưu email")
 
 
 class ThuocForm(FlaskForm):
