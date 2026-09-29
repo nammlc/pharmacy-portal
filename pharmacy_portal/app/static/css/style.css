@@ -2436,3 +2436,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 /* 0-15%: quay trái | 15-45%: giữ | 45-75%: quay phải | 75-100%: giữ (nhìn về phía cửa) */
 @keyframes lo-look{0%{transform:rotate(0)}15%,45%{transform:rotate(-10deg)}75%,100%{transform:rotate(10deg)}}
 @keyframes lo-gaze{0%{transform:translateX(0)}15%,45%{transform:translateX(-1.4px)}75%,100%{transform:translateX(1.4px)}}
+
+/* Đăng nhập: lật ngang cả cụm cửa + người -> người đứng bên phải, bước từ phải sang trái vào cửa
+   (ngược hướng với đăng xuất). Toàn bộ chuyển động tự lật theo nên vẫn nhất quán. */
+.li-btn .lo-icon{transform:scaleX(-1)}
