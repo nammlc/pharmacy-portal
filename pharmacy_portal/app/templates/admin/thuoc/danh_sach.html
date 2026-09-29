@@ -11,7 +11,7 @@
 </div>
 
 <form method="get" class="adm-search-row">
-  <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm theo tên thuốc...">
+  <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm theo tên thuốc..." autocomplete="off">
   <button type="submit" class="btn btn-outline btn-sm">Tìm</button>
   {% if tu_khoa %}<a href="{{ url_for('admin_thuoc.danh_sach') }}" class="btn btn-outline btn-sm">✕ Xoá</a>{% endif %}
 </form>
