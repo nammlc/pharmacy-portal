@@ -34,6 +34,25 @@
     if (input.dataset.goiYGan) return;
     input.dataset.goiYGan = "1";
     input.setAttribute("autocomplete", "off");
+    // Gợi ý native của Chrome cho ô tìm kiếm (danh sách những từ đã gõ trước
+    // đó) vẫn hiện ra dù đã có autocomplete="off" — Chrome cố tình lờ thuộc
+    // tính này với các field dạng tìm kiếm có lịch sử nhập. Cách duy nhất
+    // Chrome chịu ẩn hẳn: field người dùng NHÌN THẤY và GÕ VÀO không được
+    // mang "name" nào cả -> Chrome không có gì để nhớ/gợi ý. Value thật vẫn
+    // được gửi lên server qua 1 input ẩn cùng tên, đồng bộ mỗi khi gõ/khi
+    // submit form.
+    var form = input.closest("form");
+    var ten_that = input.getAttribute("name");
+    if (form && ten_that) {
+      input.removeAttribute("name");
+      var an = document.createElement("input");
+      an.type = "hidden";
+      an.name = ten_that;
+      an.value = input.value;
+      form.appendChild(an);
+      input.addEventListener("input", function () { an.value = input.value; });
+      form.addEventListener("submit", function () { an.value = input.value; });
+    }
 
     var pham_vi = input.dataset.goiY;
 

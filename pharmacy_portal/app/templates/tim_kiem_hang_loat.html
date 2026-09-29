@@ -14,7 +14,7 @@
 </div>
 
 <div class="search-panel">
-  <form class="search-form" method="get" action="{{ url_for('main.tim_kiem') }}">
+  <form class="search-form" autocomplete="off" method="get" action="{{ url_for('main.tim_kiem') }}">
     <input type="text" name="q" placeholder="Tra thêm 1 thuốc khác...">
     <button type="submit">🔍 Tìm</button>
   </form>
