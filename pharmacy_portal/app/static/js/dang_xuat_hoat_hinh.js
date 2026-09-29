@@ -25,7 +25,9 @@
     } catch (e) {}
   }
 
-  // Tiếng rơi: "wiiiu" trượt xuống rồi "bịch" nhẹ khi chạm đất
+  // Tiếng rơi: "aaaa~" kéo dài (giọng tổng hợp bằng formant nguyên âm "a"),
+  // hoảng lên rồi trầm xuống + nhỏ dần như đang rơi xa, kết thúc bằng tiếng "bịch" xa xa.
+  var SCREAM = 1.5;          // giây
   function amThanhNga() {
     if (!audioCtx || VOLUME <= 0) return;
     try {
@@ -34,28 +36,49 @@
       master.gain.value = VOLUME;
       master.connect(audioCtx.destination);
 
-      // 1) tiếng vút rơi (slide whistle đi xuống), dài ~0.75s
-      var o1 = audioCtx.createOscillator(), g1 = audioCtx.createGain();
-      o1.type = "triangle";
-      o1.frequency.setValueAtTime(900, t);
-      o1.frequency.exponentialRampToValueAtTime(170, t + 0.75);
-      g1.gain.setValueAtTime(0.0001, t);
-      g1.gain.exponentialRampToValueAtTime(0.16, t + 0.05);
-      g1.gain.exponentialRampToValueAtTime(0.0001, t + 0.78);
-      o1.connect(g1); g1.connect(master);
-      o1.start(t); o1.stop(t + 0.8);
+      // nguồn giọng: sóng răng cưa + rung nhẹ (vibrato) cho tự nhiên
+      var voice = audioCtx.createOscillator();
+      voice.type = "sawtooth";
+      voice.frequency.setValueAtTime(470, t);
+      voice.frequency.linearRampToValueAtTime(640, t + 0.14);              // giật mình, vút lên
+      voice.frequency.exponentialRampToValueAtTime(290, t + SCREAM);       // trầm dần khi rơi xa
 
-      // 2) tiếng "bịch" khi chạm đất
-      var tb = t + 0.8;
+      var lfo = audioCtx.createOscillator(), lfoGain = audioCtx.createGain();
+      lfo.frequency.value = 6;
+      lfoGain.gain.setValueAtTime(6, t);
+      lfoGain.gain.linearRampToValueAtTime(20, t + SCREAM);                // càng về sau càng run
+      lfo.connect(lfoGain); lfoGain.connect(voice.frequency);
+
+      // độ to: vào nhanh, giữ, rồi nhỏ dần
+      var env = audioCtx.createGain();
+      env.gain.setValueAtTime(0.0001, t);
+      env.gain.exponentialRampToValueAtTime(0.32, t + 0.05);
+      env.gain.setValueAtTime(0.32, t + 0.35);
+      env.gain.exponentialRampToValueAtTime(0.0001, t + SCREAM);
+      env.connect(master);
+
+      // 3 formant của nguyên âm "a" (F1~800, F2~1250, F3~2600 Hz)
+      [[800, 6, 1.0], [1250, 8, 0.7], [2600, 10, 0.3]].forEach(function (f) {
+        var bp = audioCtx.createBiquadFilter(), g = audioCtx.createGain();
+        bp.type = "bandpass"; bp.frequency.value = f[0]; bp.Q.value = f[1];
+        g.gain.value = f[2];
+        voice.connect(bp); bp.connect(g); g.connect(env);
+      });
+
+      voice.start(t); lfo.start(t);
+      voice.stop(t + SCREAM + 0.05); lfo.stop(t + SCREAM + 0.05);
+
+      // "bịch" nhỏ, xa xa khi chạm đất
+      var tb = t + SCREAM + 0.02;
       var o2 = audioCtx.createOscillator(), g2 = audioCtx.createGain();
       o2.type = "sine";
-      o2.frequency.setValueAtTime(150, tb);
-      o2.frequency.exponentialRampToValueAtTime(45, tb + 0.16);
+      o2.frequency.setValueAtTime(130, tb);
+      o2.frequency.exponentialRampToValueAtTime(40, tb + 0.18);
       g2.gain.setValueAtTime(0.0001, tb);
-      g2.gain.exponentialRampToValueAtTime(0.5, tb + 0.01);
-      g2.gain.exponentialRampToValueAtTime(0.0001, tb + 0.2);
+      g2.gain.exponentialRampToValueAtTime(0.28, tb + 0.01);
+      g2.gain.exponentialRampToValueAtTime(0.0001, tb + 0.22);
       o2.connect(g2); g2.connect(master);
-      o2.start(tb); o2.stop(tb + 0.22);
+      o2.start(tb); o2.stop(tb + 0.25);
     } catch (e) {}
   }
 
@@ -84,13 +107,13 @@
       btn.classList.add("shake");
     }, WALK + 560);
     setTimeout(function () {                  // rơi xuống
-      person.style.transition = "transform 850ms cubic-bezier(.55,0,1,.45),opacity 500ms ease 450ms";
+      person.style.transition = "transform 1100ms cubic-bezier(.55,0,1,.45),opacity 500ms ease 600ms";
       person.style.transform = "translate(18px,34px) rotate(80deg)";
       amThanhNga();
       person.style.opacity = "0";
     }, WALK + 940);
     setTimeout(function () {                  // xong -> gọi route đăng xuất thật
       window.location.href = url;
-    }, WALK + 1800);
+    }, WALK + 940 + 1900);
   });
 })();
