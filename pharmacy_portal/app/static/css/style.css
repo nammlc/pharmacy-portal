@@ -2330,7 +2330,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .pw-toggle:hover { color: var(--ink-900, #1a2233); background: rgba(0,0,0,0.05); }
 
 /* Gợi ý tìm kiếm dạng dropdown (js/goi_y_tim_kiem.js) */
-.goi-y-wrap { position: relative; flex: 1; min-width: 0; }
+.goi-y-wrap { position: relative; flex: 1; min-width: 0; display: flex; align-items: center; }
 .hero-search .goi-y-wrap input,
 .search-form .goi-y-wrap input { width: 100%; }
 .goi-y-dropdown {
