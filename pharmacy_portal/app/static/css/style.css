@@ -247,13 +247,12 @@ a { color: inherit; text-decoration: none; }
   max-width: 560px;
   margin: 0 auto;
   border: 2px solid transparent;
-  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .hero-search:focus-within {
   border-color: var(--sky-400);
   box-shadow: 0 0 0 5px rgba(74, 159, 224, 0.28), 0 20px 40px -12px rgba(0,0,0,0.45);
-  transform: translateY(-2px);
 }
 
 .hero-search input {
@@ -2354,7 +2353,14 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   overflow-y: auto;
   z-index: 60;
   text-align: left;
+  /* Thanh cuộn mảnh, bo tròn — thay cho thanh cuộn to/thô mặc định của trình duyệt */
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-200) transparent;
 }
+.goi-y-dropdown::-webkit-scrollbar { width: 6px; }
+.goi-y-dropdown::-webkit-scrollbar-track { background: transparent; }
+.goi-y-dropdown::-webkit-scrollbar-thumb { background: var(--line-200); border-radius: 999px; }
+.goi-y-dropdown::-webkit-scrollbar-thumb:hover { background: var(--sage-300, #b9c9bd); }
 .goi-y-item { padding: 10px 14px; cursor: pointer; }
 .goi-y-item:hover, .goi-y-item.active { background: var(--paper-50); }
 .goi-y-item + .goi-y-item { border-top: 1px solid var(--line-200); }
