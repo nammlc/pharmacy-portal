@@ -39,7 +39,31 @@
         {{ form.mat_khau(autocomplete="current-password") }}
         {% for e in form.mat_khau.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
       </div>
-      {{ form.submit(class="btn btn-primary", style="width:100%; justify-content:center; padding:11px;") }}
+      <button type="submit" id="liBtn" class="lo-btn li-btn">
+        <span id="liLabel">{{ form.submit.label.text }}</span>
+        <span class="lo-icon" aria-hidden="true">
+          <span class="lo-frame"></span>
+          <span id="liPerson" class="lo-person">
+            <span class="lo-bob">
+              <svg width="16" height="22" viewBox="0 0 16 22" overflow="visible">
+                <g class="j thB far"><line class="limb" x1="8" y1="14.5" x2="8" y2="17.6"/>
+                  <g class="j shB"><line class="limb" x1="8" y1="17.6" x2="8" y2="20.7"/></g></g>
+                <g class="j ar2 far"><line class="limb" x1="8" y1="8.5" x2="8" y2="11.3"/>
+                  <g class="j fo2"><line class="limb" x1="8" y1="11.3" x2="8" y2="13.8"/></g></g>
+                <g class="j lean">
+                  <circle class="head" cx="8" cy="3" r="2.3"/>
+                  <line class="limb" x1="8" y1="6.5" x2="8" y2="14.5"/>
+                  <g class="j thA"><line class="limb" x1="8" y1="14.5" x2="8" y2="17.6"/>
+                    <g class="j shA"><line class="limb" x1="8" y1="17.6" x2="8" y2="20.7"/></g></g>
+                  <g class="j ar1"><line class="limb" x1="8" y1="8.5" x2="8" y2="11.3"/>
+                    <g class="j fo1"><line class="limb" x1="8" y1="11.3" x2="8" y2="13.8"/></g></g>
+                </g>
+              </svg>
+            </span>
+          </span>
+          <span id="liLeaf" class="lo-leaf closed"></span>
+        </span>
+      </button>
     </form>
     <p style="text-align:center; margin:16px 0 0; font-size:13px;">
       <a href="{{ url_for('admin_auth.quen_mat_khau') }}">Quên mật khẩu?</a>
@@ -48,5 +72,6 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/hien_mat_khau.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dang_nhap_hoat_hinh.js') }}"></script>
 </body>
 </html>
