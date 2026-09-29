@@ -2328,3 +2328,33 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   color: var(--text-muted, #667);
 }
 .pw-toggle:hover { color: var(--ink-900, #1a2233); background: rgba(0,0,0,0.05); }
+
+/* Gợi ý tìm kiếm dạng dropdown (js/goi_y_tim_kiem.js) */
+.goi-y-wrap { position: relative; flex: 1; min-width: 0; }
+.hero-search .goi-y-wrap input,
+.search-form .goi-y-wrap input { width: 100%; }
+.goi-y-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid var(--line-200);
+  border-radius: 12px;
+  box-shadow: 0 20px 40px -14px rgba(16, 25, 43, 0.3);
+  max-height: 340px;
+  overflow-y: auto;
+  z-index: 60;
+  text-align: left;
+}
+.goi-y-item { padding: 10px 14px; cursor: pointer; }
+.goi-y-item:hover, .goi-y-item.active { background: var(--paper-50); }
+.goi-y-item + .goi-y-item { border-top: 1px solid var(--line-200); }
+.goi-y-ten-dong { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.goi-y-ten { font-size: 14px; font-weight: 600; color: var(--ink-900); }
+.goi-y-ten strong { color: var(--sage-500); }
+.goi-y-phu { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+.goi-y-badge {
+  font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px;
+  background: #eef2ff; color: #4338ca; white-space: nowrap; flex-shrink: 0;
+}

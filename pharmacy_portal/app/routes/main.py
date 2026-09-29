@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request
+from flask import Blueprint, render_template, redirect, url_for, request, jsonify
 from sqlalchemy import text
 from app import db
 from app.models.models import CaiDat, DanhMucThuoc, NhaThuocBV, HoatChat
@@ -165,3 +165,38 @@ def tim_kiem():
 def ve_chung_toi():
     du_lieu = {k: CaiDat.lay(k, VCT_MAC_DINH.get(k, "")) for k in VCT_KEYS}
     return render_template("ve_chung_toi.html", d=du_lieu)
+
+
+@bp.route("/api/goi-y-tim-kiem")
+def goi_y_tim_kiem():
+    """API gợi ý tìm kiếm kiểu Google (dropdown khi đang gõ), dùng cho ô tìm kiếm
+    ở Trang chủ (scope=all, gộp cả 2 danh mục), Danh mục thuốc (scope=dmt) và
+    Nhà thuốc BV (scope=ntbv). Trả về tối đa 10 gợi ý, mỗi gợi ý trỏ thẳng tới
+    trang chi tiết thuốc đó."""
+    tu_khoa = request.args.get("q", "").strip()
+    pham_vi = request.args.get("scope", "all")
+    SO_GOI_Y_MOI_LOAI = 6
+
+    if len(tu_khoa) < 2:
+        return jsonify([])
+
+    ket_qua = []
+    if pham_vi in ("dmt", "all"):
+        pt = tim_danh_muc_thuoc(tu_khoa, per_page=SO_GOI_Y_MOI_LOAI, page=1)
+        for t in (pt.items if pt else []):
+            ket_qua.append({
+                "ten": t.ten_biet_duoc,
+                "phu": t.ten_hoat_chat_hien_thi or "",
+                "url": url_for("dmt.xem_thuoc", thuoc_id=t.id),
+                "loai": "Danh mục thuốc" if pham_vi == "all" else "",
+            })
+    if pham_vi in ("ntbv", "all"):
+        pt = tim_nha_thuoc_bv(tu_khoa, per_page=SO_GOI_Y_MOI_LOAI, page=1)
+        for t in (pt.items if pt else []):
+            ket_qua.append({
+                "ten": t.ten_biet_duoc,
+                "phu": t.ten_hoat_chat_hien_thi or "",
+                "url": url_for("ntbv.xem_thuoc", thuoc_id=t.id),
+                "loai": "Nhà thuốc BV" if pham_vi == "all" else "",
+            })
+    return jsonify(ket_qua[:10])
