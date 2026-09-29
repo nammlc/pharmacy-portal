@@ -33,7 +33,7 @@
     setTimeout(function () {                                                      // bước vào
       person.classList.add("walking");
       person.style.transition = "transform " + WALK + "ms linear";
-      person.style.transform = "translate(14px,0px) rotate(0deg)";
+      person.style.transform = "translate(16px,0px) rotate(0deg)";
     }, doi + 400);
     setTimeout(function () {                                                      // vào tới cửa -> đóng cửa
       person.classList.remove("walking");
