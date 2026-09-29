@@ -2386,38 +2386,44 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .lo-person svg{display:block;overflow:visible}
 
 .lo-person{--T:900ms;--cycles:3}
-.lo-person .limb{stroke:#ffffff;stroke-width:1.8;stroke-linecap:round;fill:none}
-.lo-person .head{fill:#ffffff}
-.lo-person .far{opacity:.55}
-.lo-person g.j{transform-box:view-box}
-.j.thA,.j.thB{transform-origin:8px 14.5px}
-.j.shA,.j.shB{transform-origin:8px 17.6px}
-.j.ar1,.j.ar2{transform-origin:8px 8.5px}
-.j.fo1,.j.fo2{transform-origin:8px 11.3px}
-.j.lean{transform-origin:8px 14.5px;transform:rotate(3deg)}
-.j.ar1,.j.ar2{transform:rotate(4deg)}
-.j.fo1,.j.fo2{transform:rotate(-14deg)}
+/* ---- Nhân vật gốc: sinh vật tròn có chồi non ---- */
+.lo-person .lk,.lo-person .cb,.lo-person .fc,.lo-person .am1,.lo-person .am2,.lo-person .sp,.lo-person .ft1,.lo-person .ft2{transform-box:view-box}
+.lo-person .lk{transform-origin:8px 20.4px}
+.lo-person .cb{transform-origin:8px 20.2px}
+.lo-person .am1{transform-origin:2px 13.4px}
+.lo-person .am2{transform-origin:14px 13.4px}
+.lo-person .sp{transform-origin:8px 8px}
+.lo-person .body{fill:#cfeedd;stroke:#2f6b57;stroke-width:1;stroke-linejoin:round}
+.lo-person .arm{fill:#cfeedd;stroke:#2f6b57;stroke-width:.9}
+.lo-person .foot{fill:#a8dcc0;stroke:#2f6b57;stroke-width:.9}
+.lo-person .leaf-s{fill:#7fcf9a;stroke:#2f6b57;stroke-width:.7;stroke-linejoin:round}
+.lo-person .stem{stroke:#2f6b57;stroke-width:.9;stroke-linecap:round;fill:none}
+.lo-person .eye{fill:#1d3a31}
+.lo-person .cheek{fill:#ffb3c1}
+.lo-person .mouth{stroke:#1d3a31;stroke-width:.7;stroke-linecap:round;fill:none}
 
-.lo-person.walking .j{animation-duration:var(--T);animation-iteration-count:var(--cycles);animation-timing-function:ease-in-out;animation-fill-mode:forwards}
+.lo-person.walking .cb,.lo-person.walking .ft1,.lo-person.walking .ft2,.lo-person.walking .am1,.lo-person.walking .am2,.lo-person.walking .sp{
+  animation-duration:var(--T);animation-iteration-count:var(--cycles);animation-timing-function:ease-in-out;animation-fill-mode:forwards}
 .lo-person.walking .lo-bob{animation:lo-bob var(--T) ease-in-out var(--cycles) forwards}
-.lo-person.walking .thA{animation-name:lo-thA}
-.lo-person.walking .thB{animation-name:lo-thB}
-.lo-person.walking .shA{animation-name:lo-shA}
-.lo-person.walking .shB{animation-name:lo-shB}
-.lo-person.walking .ar1{animation-name:lo-ar1}
-.lo-person.walking .ar2{animation-name:lo-ar2}
-.lo-person.walking .fo1{animation-name:lo-fo1}
-.lo-person.walking .fo2{animation-name:lo-fo2}
+.lo-person.walking .cb{animation-name:lo-waddle}
+.lo-person.walking .ft1{animation-name:lo-ft1}
+.lo-person.walking .ft2{animation-name:lo-ft2}
+.lo-person.walking .am1{animation-name:lo-am1}
+.lo-person.walking .am2{animation-name:lo-am2}
+.lo-person.walking .sp{animation-name:lo-sprout}
+/* khi bước, mặt hướng về phía cửa (đăng xuất). Đăng nhập đã hướng sẵn nhờ chuỗi ngó */
+.lo-person.walking .fc{transform:translateX(1.4px);transition:transform 300ms ease}
 
-@keyframes lo-thA{0%{transform:rotate(0)}25%{transform:rotate(-16deg)}50%{transform:rotate(0)}75%{transform:rotate(13deg)}100%{transform:rotate(0)}}
-@keyframes lo-thB{0%{transform:rotate(0)}25%{transform:rotate(13deg)}50%{transform:rotate(0)}75%{transform:rotate(-16deg)}100%{transform:rotate(0)}}
-@keyframes lo-shA{0%{transform:rotate(20deg)}25%{transform:rotate(3deg)}50%{transform:rotate(1deg)}75%{transform:rotate(12deg)}100%{transform:rotate(20deg)}}
-@keyframes lo-shB{0%{transform:rotate(1deg)}25%{transform:rotate(12deg)}50%{transform:rotate(20deg)}75%{transform:rotate(3deg)}100%{transform:rotate(1deg)}}
-@keyframes lo-ar1{0%{transform:rotate(4deg)}25%{transform:rotate(14deg)}50%{transform:rotate(4deg)}75%{transform:rotate(-16deg)}100%{transform:rotate(4deg)}}
-@keyframes lo-ar2{0%{transform:rotate(4deg)}25%{transform:rotate(-16deg)}50%{transform:rotate(4deg)}75%{transform:rotate(14deg)}100%{transform:rotate(4deg)}}
-@keyframes lo-fo1{0%{transform:rotate(-14deg)}25%{transform:rotate(-6deg)}50%{transform:rotate(-14deg)}75%{transform:rotate(-28deg)}100%{transform:rotate(-14deg)}}
-@keyframes lo-fo2{0%{transform:rotate(-14deg)}25%{transform:rotate(-28deg)}50%{transform:rotate(-14deg)}75%{transform:rotate(-6deg)}100%{transform:rotate(-14deg)}}
-@keyframes lo-bob{0%,50%,100%{transform:translateY(0)}25%,75%{transform:translateY(.9px)}}
+/* thân lắc nghiêng theo bước + nén nhẹ khi chạm đất */
+@keyframes lo-waddle{0%{transform:rotate(0) scale(1,1)}25%{transform:rotate(4deg) scale(1.03,.96)}50%{transform:rotate(0) scale(1,1)}75%{transform:rotate(-4deg) scale(1.03,.96)}100%{transform:rotate(0) scale(1,1)}}
+/* chân: chống phía sau -> nhấc lên vung tới trước -> đặt xuống */
+@keyframes lo-ft1{0%{transform:translate(1px,0)}25%{transform:translate(0,0)}50%{transform:translate(-1px,0)}75%{transform:translate(0,-1.6px)}100%{transform:translate(1px,0)}}
+@keyframes lo-ft2{0%{transform:translate(-1px,0)}25%{transform:translate(0,-1.6px)}50%{transform:translate(1px,0)}75%{transform:translate(0,0)}100%{transform:translate(-1px,0)}}
+/* tay đánh nhẹ, chồi non đung đưa trễ nhịp so với thân */
+@keyframes lo-am1{0%{transform:rotate(0)}25%{transform:rotate(14deg)}50%{transform:rotate(0)}75%{transform:rotate(-14deg)}100%{transform:rotate(0)}}
+@keyframes lo-am2{0%{transform:rotate(0)}25%{transform:rotate(-14deg)}50%{transform:rotate(0)}75%{transform:rotate(14deg)}100%{transform:rotate(0)}}
+@keyframes lo-sprout{0%{transform:rotate(0)}30%{transform:rotate(-8deg)}50%{transform:rotate(0)}80%{transform:rotate(8deg)}100%{transform:rotate(0)}}
+@keyframes lo-bob{0%,50%,100%{transform:translateY(0)}25%,75%{transform:translateY(.7px)}}
 
 .lo-leaf{position:absolute;left:16px;top:0;width:12px;height:26px;background:#a9713f;border-radius:1px;transform-origin:left center;transform:rotateY(-78deg);transition:transform 550ms ease;z-index:3}
 .lo-leaf.closed{transform:rotateY(0deg)}
@@ -2427,15 +2433,13 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .login-card button.li-btn:hover{background:#263049}
 .login-card button.li-btn:disabled{cursor:default;opacity:1}
 
-/* đầu xoay quanh cổ + chấm mắt trượt trong đầu = cảm giác quay đầu nhìn */
-.lo-person .hd{transform-box:view-box;transform-origin:8px 6.5px}
-.lo-person .eye{fill:#1c2333}
+/* ngó quanh: thân nghiêng nhẹ + mặt (mắt, má, miệng) trượt trên thân tròn */
 .lo-person{--LOOK:1600ms}
-.lo-person.looking .hd{animation:lo-look var(--LOOK) ease-in-out forwards}
-.lo-person.looking .gz{animation:lo-gaze var(--LOOK) ease-in-out forwards}
+.lo-person.looking .lk{animation:lo-look var(--LOOK) ease-in-out forwards}
+.lo-person.looking .fc{animation:lo-gaze var(--LOOK) ease-in-out forwards}
 /* 0-15%: quay trái | 15-45%: giữ | 45-75%: quay phải | 75-100%: giữ (nhìn về phía cửa) */
-@keyframes lo-look{0%{transform:rotate(0)}15%,45%{transform:rotate(-10deg)}75%,100%{transform:rotate(10deg)}}
-@keyframes lo-gaze{0%{transform:translateX(0)}15%,45%{transform:translateX(-1.4px)}75%,100%{transform:translateX(1.4px)}}
+@keyframes lo-look{0%{transform:rotate(0)}15%,45%{transform:rotate(-6deg)}75%,100%{transform:rotate(6deg)}}
+@keyframes lo-gaze{0%{transform:translateX(0)}15%,45%{transform:translateX(-1.5px)}75%,100%{transform:translateX(1.5px)}}
 
 /* Đăng nhập: lật ngang cả cụm cửa + người -> người đứng bên phải, bước từ phải sang trái vào cửa
    (ngược hướng với đăng xuất). Toàn bộ chuyển động tự lật theo nên vẫn nhất quán. */
