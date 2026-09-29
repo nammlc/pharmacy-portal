@@ -78,7 +78,31 @@
           </div>
           <a href="{{ url_for('admin_auth.cap_nhat_email') }}">Email khôi phục</a>
           <a href="{{ url_for('admin_auth.doi_mat_khau') }}">Đổi mật khẩu</a>
-          <a class="logout" href="{{ url_for('admin_auth.dang_xuat') }}">Đăng xuất</a>
+          <a id="loBtn" class="lo-btn" href="{{ url_for('admin_auth.dang_xuat') }}">
+            <span id="loLabel">Đăng xuất</span>
+            <span class="lo-icon" aria-hidden="true">
+              <span class="lo-frame"></span>
+              <span id="loPerson" class="lo-person">
+                <span class="lo-bob">
+                  <svg width="16" height="22" viewBox="0 0 16 22" overflow="visible">
+                    <g class="j thB far"><line class="limb" x1="8" y1="14.5" x2="8" y2="17.6"/>
+                      <g class="j shB"><line class="limb" x1="8" y1="17.6" x2="8" y2="20.7"/></g></g>
+                    <g class="j ar2 far"><line class="limb" x1="8" y1="8.5" x2="8" y2="11.3"/>
+                      <g class="j fo2"><line class="limb" x1="8" y1="11.3" x2="8" y2="13.8"/></g></g>
+                    <g class="j lean">
+                      <circle class="head" cx="8" cy="3" r="2.3"/>
+                      <line class="limb" x1="8" y1="6.5" x2="8" y2="14.5"/>
+                      <g class="j thA"><line class="limb" x1="8" y1="14.5" x2="8" y2="17.6"/>
+                        <g class="j shA"><line class="limb" x1="8" y1="17.6" x2="8" y2="20.7"/></g></g>
+                      <g class="j ar1"><line class="limb" x1="8" y1="8.5" x2="8" y2="11.3"/>
+                        <g class="j fo1"><line class="limb" x1="8" y1="11.3" x2="8" y2="13.8"/></g></g>
+                    </g>
+                  </svg>
+                </span>
+              </span>
+              <span id="loLeaf" class="lo-leaf"></span>
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -100,6 +124,7 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dang_xuat_hoat_hinh.js') }}"></script>
 <script src="{{ url_for('static', filename='js/hien_mat_khau.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin_searchable_select.js') }}"></script>
 <script src="{{ url_for('static', filename='js/nen_anh.js') }}"></script>
