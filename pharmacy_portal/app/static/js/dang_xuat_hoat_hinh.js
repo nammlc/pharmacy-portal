@@ -8,7 +8,7 @@
   var url = btn.getAttribute("href");
 
   // Phải khớp với --T và --cycles trong style.css
-  var CYCLE = 900, CYCLES = 2;
+  var CYCLE = 900, CYCLES = 3;
   var WALK = CYCLE * CYCLES;
   var playing = false;
 
@@ -26,7 +26,7 @@
     label.textContent = "Đang đăng xuất";
     person.classList.add("walking");
     person.style.transition = "transform " + WALK + "ms linear";
-    person.style.transform = "translate(9px,0px) rotate(0deg)";
+    person.style.transform = "translate(14px,0px) rotate(0deg)";
 
     setTimeout(function () {                  // tới cửa -> đóng cửa
       person.classList.remove("walking");
@@ -37,7 +37,7 @@
     }, WALK + 560);
     setTimeout(function () {                  // rơi xuống
       person.style.transition = "transform 850ms cubic-bezier(.55,0,1,.45),opacity 500ms ease 450ms";
-      person.style.transform = "translate(11px,34px) rotate(80deg)";
+      person.style.transform = "translate(16px,34px) rotate(80deg)";
       person.style.opacity = "0";
     }, WALK + 940);
     setTimeout(function () {                  // xong -> gọi route đăng xuất thật
