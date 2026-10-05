@@ -103,6 +103,9 @@ class Config:
     # gọi 1 Apps Script (chạy trên tài khoản Gmail của bạn) qua HTTPS.
     # Xem hướng dẫn trong HUONG_DAN_GUI_MAIL_GMAIL.md. Nếu đặt GAS_MAIL_URL thì
     # ưu tiên dùng cách này, bỏ qua Resend.
-    GAS_MAIL_URL = os.environ.get("GAS_MAIL_URL", "")
-    GAS_MAIL_SECRET = os.environ.get("GAS_MAIL_SECRET", "")
-    MAIL_NAME = os.environ.get("MAIL_NAME", "Cổng Tra Cứu Dược")
+    # .strip() để phòng trường hợp copy-paste giá trị vào Render bị dính thừa
+    # khoảng trắng/xuống dòng ở đầu-cuối (rất dễ gặp, và sẽ khiến URL gọi tới
+    # sai địa chỉ -> Apps Script trả về trang lỗi 404 dạng HTML thay vì JSON).
+    GAS_MAIL_URL = os.environ.get("GAS_MAIL_URL", "").strip()
+    GAS_MAIL_SECRET = os.environ.get("GAS_MAIL_SECRET", "").strip()
+    MAIL_NAME = os.environ.get("MAIL_NAME", "Cổng Tra Cứu Dược").strip()

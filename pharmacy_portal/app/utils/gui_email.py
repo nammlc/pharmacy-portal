@@ -29,7 +29,17 @@ def gui_email(den, tieu_de, noi_dung_html, noi_dung_text=None):
     return _gui_qua_resend(den, tieu_de, noi_dung_html, noi_dung_text)
 
 
+def _la_trang_loi_google(noi_dung: str) -> bool:
+    """Nhận diện trang lỗi HTML chung của Google (script.google.com trả về khi
+    deployment bị xoá/sai URL/đổi quyền truy cập) — PHÂN BIỆT với lỗi JSON
+    thật sự do code trong Apps Script trả ra (kiểu {"ok": false, "error": ...}).
+    Giúp log chỉ đúng nguyên nhân thay vì chỉ dán nguyên khối HTML khó đọc."""
+    dau_hieu = ("<!DOCTYPE html", "ppConfig", "<html")
+    return any(d in noi_dung[:500] for d in dau_hieu)
+
+
 def _gui_qua_apps_script(den, tieu_de, html, text):
+    url = current_app.config.get("GAS_MAIL_URL", "")
     payload = {
         "secret": current_app.config.get("GAS_MAIL_SECRET", ""),
         "to": den,
@@ -39,7 +49,7 @@ def _gui_qua_apps_script(den, tieu_de, html, text):
         "name": current_app.config.get("MAIL_NAME", ""),
     }
     req = urllib.request.Request(
-        current_app.config["GAS_MAIL_URL"],
+        url,
         data=json.dumps(payload).encode("utf-8"),
         headers={"Content-Type": "text/plain; charset=utf-8", "User-Agent": "pharmacy-portal/1.0"},
         method="POST",
@@ -48,14 +58,42 @@ def _gui_qua_apps_script(den, tieu_de, html, text):
         # Apps Script chạy script ngay khi nhận POST rồi trả 302 sang địa chỉ chứa kết quả;
         # urllib tự đi theo redirect (chuyển thành GET) để đọc kết quả JSON.
         with urllib.request.urlopen(req, timeout=20) as resp:
-            kq = json.loads(resp.read().decode("utf-8", "replace"))
+            thân = resp.read().decode("utf-8", "replace")
+        try:
+            kq = json.loads(thân)
+        except json.JSONDecodeError:
+            # Vẫn 200 OK nhưng không phải JSON — gần như chắc chắn là trang
+            # Google trả về (chứ không phải code trong Apps Script của bạn),
+            # nghĩa là sai URL/thiếu quyền truy cập, KHÔNG phải lỗi logic script.
+            goi_y = (" → Có vẻ URL đang trỏ sai (không phải link .../exec), "
+                     "hoặc quyền truy cập ứng dụng web chưa đặt \"Bất kỳ ai\"."
+                     if _la_trang_loi_google(thân) else "")
+            log.error(
+                "Apps Script trả 200 nhưng nội dung không phải JSON (dấu hiệu "
+                "URL/quyền truy cập bị sai, không phải lỗi trong code script).%s "
+                "Nội dung nhận được (300 ký tự đầu): %s", goi_y, thân[:300]
+            )
+            return False
         if kq.get("ok"):
             return True
         log.error("Apps Script từ chối gửi mail: %s", kq.get("error"))
     except urllib.error.HTTPError as e:
-        log.error("Apps Script trả lỗi %s: %s", e.code, e.read().decode("utf-8", "replace")[:300])
+        thân = e.read().decode("utf-8", "replace")
+        if _la_trang_loi_google(thân):
+            log.error(
+                "Apps Script trả lỗi %s — ĐÂY LÀ TRANG LỖI CỦA GOOGLE (không phải "
+                "lỗi trong code script bạn viết), nghĩa là: deployment đã bị xoá, "
+                "GAS_MAIL_URL sai/thiếu đoạn '/exec', hoặc quyền truy cập ứng dụng "
+                "web không còn là \"Bất kỳ ai\". Kiểm tra lại theo "
+                "HUONG_DAN_GUI_MAIL_GMAIL.md — đặc biệt bước "
+                "'Triển khai → Quản lý triển khai' xem deployment có còn active không, "
+                "và URL copy ra có đúng kết thúc bằng '/exec' không.",
+                e.code,
+            )
+        else:
+            log.error("Apps Script trả lỗi %s: %s", e.code, thân[:300])
     except Exception as e:
-        log.error("Không gọi được Apps Script: %s", e)
+        log.error("Không gọi được Apps Script (URL đang dùng: %s): %s", url or "(chưa cấu hình)", e)
     return False
 
 

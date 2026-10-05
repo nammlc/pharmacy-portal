@@ -53,3 +53,26 @@ function capQuyen() {
 
 Có `GAS_MAIL_URL` thì web dùng cách này, bỏ qua Resend. Lưu ý: nếu sửa code script sau này, phải
 **Triển khai → Quản lý triển khai → Sửa → Phiên bản mới** thì URL cũ mới nhận code mới.
+
+## Khắc phục lỗi thường gặp
+
+**Log báo "Apps Script trả lỗi 404" kèm theo một đoạn HTML dài (có chữ
+`ppConfig`, `productName`...)** — đây KHÔNG phải lỗi trong code Apps Script
+bạn viết, mà là trang lỗi mặc định của Google khi không gọi được đúng ứng
+dụng web. Kiểm tra lần lượt:
+
+1. **URL có đúng kết thúc bằng `/exec` không** — không phải `/dev`, và
+   không phải link mở trang soạn script (script.google.com/.../edit).
+2. **Deployment còn tồn tại không** — vào Apps Script → Triển khai → Quản
+   lý triển khai, xem deployment "Ứng dụng web" có còn trong danh sách
+   không (nếu bạn lỡ xoá/tạo deployment mới mà quên cập nhật lại biến môi
+   trường `GAS_MAIL_URL` trên Render, URL cũ sẽ gãy y hệt kiểu lỗi này).
+3. **Quyền truy cập** — vẫn phải là "Bất kỳ ai" (Anyone), không phải "Chỉ
+   mình tôi" hay "Bất kỳ ai trong tổ chức".
+4. **Biến môi trường trên Render bị dính khoảng trắng/xuống dòng thừa khi
+   copy-paste** — dán vào thường không thấy bằng mắt nhưng khiến URL sai.
+   Xoá đi và dán lại, kiểm tra không có khoảng trắng ở đầu/cuối.
+
+Nếu log ghi rõ `"Apps Script từ chối gửi mail: ..."` (có kèm lý do) thay vì
+đoạn HTML — đó mới là lỗi THẬT trong code Apps Script (vd. sai `SECRET`,
+hoặc `MailApp` hết quota gửi/ngày) chứ không phải lỗi URL/quyền truy cập.
