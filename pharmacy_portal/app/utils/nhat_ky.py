@@ -106,8 +106,34 @@ def _hanh_dong_tu_ten_ham(ten_ham: str) -> str:
     return t[:30] or "khac"
 
 
+def _bao_loi(e):
+    """Lỗi ghi log: in đầy đủ ra console/log server + nhớ lại để trang Nhật ký hiển thị cảnh báo."""
+    try:
+        current_app.logger.exception(f"Ghi nhật ký lỗi: {e}")
+        current_app.extensions["nhat_ky_loi_cuoi"] = (
+            f"{datetime.utcnow().strftime('%d/%m/%Y %H:%M:%S')} UTC — {type(e).__name__}: {e}"
+        )
+    except Exception:
+        pass
+
+
+def _chen(gia_tri):
+    with db.engine.begin() as conn:
+        conn.execute(NhatKy.__table__.insert().values(**gia_tri))
+        # Thỉnh thoảng tự dọn log quá hạn (mặc định giữ 180 ngày)
+        if random.random() < 0.002:
+            ngay = int(current_app.config.get("NHAT_KY_GIU_NGAY", 180))
+            if ngay > 0:
+                conn.execute(
+                    NhatKy.__table__.delete().where(
+                        NhatKy.__table__.c.thoi_gian < datetime.utcnow() - timedelta(days=ngay)
+                    )
+                )
+
+
 def ghi(loai, **truong):
-    """Ghi 1 dòng nhật ký bằng kết nối riêng (không đụng tới db.session của request)."""
+    """Ghi 1 dòng nhật ký bằng kết nối riêng (không đụng tới db.session của request).
+    Nếu lỗi (vd: bảng chưa tồn tại) thì thử tạo bảng rồi ghi lại 1 lần; vẫn lỗi thì báo rõ."""
     try:
         gia_tri = dict(
             thoi_gian=datetime.utcnow(),
@@ -119,22 +145,17 @@ def ghi(loai, **truong):
             trinh_duyet=_cat(request.headers.get("User-Agent"), 300),
         )
         gia_tri.update(truong)
-        with db.engine.begin() as conn:
-            conn.execute(NhatKy.__table__.insert().values(**gia_tri))
-            # Thỉnh thoảng tự dọn log quá hạn (mặc định giữ 180 ngày)
-            if random.random() < 0.002:
-                ngay = int(current_app.config.get("NHAT_KY_GIU_NGAY", 180))
-                if ngay > 0:
-                    conn.execute(
-                        NhatKy.__table__.delete().where(
-                            NhatKy.__table__.c.thoi_gian < datetime.utcnow() - timedelta(days=ngay)
-                        )
-                    )
-    except Exception as e:  # không bao giờ làm hỏng request
+    except Exception as e:
+        _bao_loi(e)
+        return
+    try:
+        _chen(gia_tri)
+    except Exception:
         try:
-            current_app.logger.warning(f"Ghi nhật ký lỗi: {e}")
-        except Exception:
-            pass
+            NhatKy.__table__.create(bind=db.engine, checkfirst=True)
+            _chen(gia_tri)
+        except Exception as e2:
+            _bao_loi(e2)
 
 
 def _nguoi_dung():
@@ -148,6 +169,9 @@ def _nguoi_dung():
 
 def _ghi_tim_kiem(response):
     if request.method != "GET" or response.status_code != 200:
+        return
+    # Các API nền (vd: gợi ý khi đang gõ /api/goi-y-tim-kiem) không phải lượt tìm kiếm thật
+    if request.path.startswith("/api/"):
         return
     if (request.args.get("page", 1, type=int) or 1) > 1 or (request.args.get("trang", 1, type=int) or 1) > 1:
         return  # chỉ ghi lần tìm đầu, không ghi mỗi lần bấm sang trang

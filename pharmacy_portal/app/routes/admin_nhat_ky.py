@@ -3,7 +3,7 @@ import io
 import re
 from datetime import datetime, timedelta
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, Response, abort
+from flask import Blueprint, render_template, request, redirect, url_for, flash, Response, abort, current_app
 from flask_login import login_required, current_user
 from sqlalchemy import func
 
@@ -156,7 +156,8 @@ def danh_sach():
     return render_template("admin/nhat_ky/danh_sach.html",
                            items=phan_trang.items, phan_trang=phan_trang,
                            tham_so=tham_so, nhan_loai=NHAN_LOAI, nhan_hanh_dong=NHAN_HANH_DONG,
-                           thiet_bi=_thiet_bi, tk=_thong_ke(), f=request.args)
+                           thiet_bi=_thiet_bi, tk=_thong_ke(), f=request.args,
+                           loi_ghi=current_app.extensions.get("nhat_ky_loi_cuoi"))
 
 
 @bp.route("/xuat-csv")

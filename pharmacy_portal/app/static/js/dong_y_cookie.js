@@ -15,6 +15,13 @@
   document.getElementById("ppCookieYes").addEventListener("click", function () { luu("1"); });
   document.getElementById("ppCookieNo").addEventListener("click", function () { luu("0"); });
 
+  // "Xem chi tiết" cuộn xuống footer; thu banner xuống để không che nội dung
+  var chiTiet = banner.querySelector(".pp-cookie-link");
+  if (chiTiet) chiTiet.addEventListener("click", function () {
+    var dich = document.getElementById("ppThongBaoDuLieu");
+    if (dich) { dich.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  });
+
   // Link ở footer: mở lại banner để đổi lựa chọn
   var mo = document.getElementById("ppCookieMo");
   if (mo) mo.addEventListener("click", function (e) { e.preventDefault(); banner.hidden = false; });

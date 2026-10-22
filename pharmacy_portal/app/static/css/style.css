@@ -2502,3 +2502,4 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .pp-cookie-no{background:transparent;color:#f4f6fb;border:1px solid rgba(255,255,255,.35)}
 .pp-cookie-btn:hover{opacity:.9}
 @media (max-width:560px){.pp-cookie{flex-direction:column;align-items:stretch;gap:10px}.pp-cookie-btns{justify-content:flex-end}}
+.pp-cookie-link{color:#fff;text-decoration:underline;white-space:nowrap}

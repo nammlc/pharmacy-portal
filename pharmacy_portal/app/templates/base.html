@@ -55,13 +55,13 @@
 <footer class="site-footer">
   <div class="footer-inner">
     <p>Khoa Dược &middot; Bệnh viện Đa khoa Tâm Đức Cầu Quan. Dữ liệu chỉ dùng tham khảo trong nội bộ, luôn đối chiếu với dược thư và quy trình chuyên môn hiện hành.</p>
-    <p style="margin-top:6px; color:rgba(255,255,255,0.4); font-size:12px;">Khi tra cứu, hệ thống ghi nhận địa chỉ IP và nội dung tra cứu để thống kê sử dụng và bảo mật; chỉ khi bạn đồng ý mới đặt thêm một mã cookie ẩn danh để nhận biết thiết bị. Không lưu họ tên hay thông tin cá nhân của người tra cứu. <a href="#" id="ppCookieMo" style="color:inherit;text-decoration:underline;">Thay đổi lựa chọn cookie</a></p>
+    <p id="ppThongBaoDuLieu" style="margin-top:6px; color:rgba(255,255,255,0.4); font-size:12px;">Khi tra cứu, hệ thống ghi nhận địa chỉ IP và nội dung tra cứu để thống kê sử dụng và bảo mật; chỉ khi bạn đồng ý mới đặt thêm một mã cookie ẩn danh để nhận biết thiết bị. Không lưu họ tên hay thông tin cá nhân của người tra cứu. <a href="#" id="ppCookieMo" style="color:inherit;text-decoration:underline;">Thay đổi lựa chọn cookie</a></p>
     <p style="margin-top:6px; color:rgba(255,255,255,0.3); font-size:12px;">© 2026 Khoa Dược · BVĐK Tâm Đức Cầu Quan · Independently developed by Le Cong Nam</p>
   </div>
 </footer>
 
 <div class="pp-cookie" id="ppCookie" role="dialog" aria-live="polite" aria-label="Thông báo cookie" {% if not chua_chon_cookie %}hidden{% endif %}>
-  <p>Trang web dùng một <strong>cookie ẩn danh</strong> để nhận biết thiết bị khi thống kê tra cứu. Dù bạn chọn gì, hệ thống vẫn ghi nhận địa chỉ IP và nội dung tra cứu để vận hành và bảo mật.</p>
+  <p>🍪 Chúng tôi dùng cookie để nhớ thiết bị của bạn, giúp thống kê lượt tra cứu chính xác hơn và cá nhân hóa trải nghiệm. <a href="#ppThongBaoDuLieu" class="pp-cookie-link">Xem chi tiết</a></p>
   <div class="pp-cookie-btns">
     <button type="button" class="pp-cookie-btn pp-cookie-no" id="ppCookieNo">Từ chối</button>
     <button type="button" class="pp-cookie-btn pp-cookie-yes" id="ppCookieYes">Đồng ý</button>

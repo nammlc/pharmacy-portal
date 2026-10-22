@@ -9,6 +9,10 @@
   <a href="{{ url_for('admin_nhat_ky.xuat_csv', **tham_so) }}" class="btn btn-secondary">⬇ Xuất CSV</a>
 </div>
 
+{% if loi_ghi %}
+<div class="flash-msg flash-danger" style="margin-bottom:14px;">⚠️ Lần ghi nhật ký gần nhất bị lỗi: <code>{{ loi_ghi }}</code><br><small>Xem chi tiết trong log của server (console khi chạy local, tab Logs trên Render).</small></div>
+{% endif %}
+
 <div class="nk-cards">
   <div class="nk-card"><span class="nk-num">{{ tk.so_tim_hom_nay }}</span><span class="nk-lbl">Lượt tìm kiếm hôm nay</span></div>
   <div class="nk-card"><span class="nk-num">{{ tk.so_ip_hom_nay }}</span><span class="nk-lbl">IP khác nhau hôm nay</span></div>
