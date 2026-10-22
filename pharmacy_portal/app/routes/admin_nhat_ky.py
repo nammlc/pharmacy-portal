@@ -97,40 +97,54 @@ def _thong_ke():
                 top_tu_khoa=top_tu_khoa, top_ip=top_ip)
 
 
-def _tom_tat_trinh_duyet(ua):
-    """User-Agent -> 'Chrome · Android' cho gọn."""
+def _thiet_bi(ua):
+    """User-Agent -> (biểu tượng, tên thiết bị dễ đọc, trình duyệt). Vd: ('📱', 'Android · SM-S918B', 'Chrome')."""
     if not ua:
-        return "—"
+        return "❔", "Không rõ", ""
     u = ua.lower()
+
     if "bot" in u or "crawler" in u or "spider" in u:
-        trinh = "Bot"
-    elif "edg/" in u:
+        return "🤖", "Bot / công cụ tự động", ""
+
+    if "edg/" in u or "edga/" in u or "edgios/" in u:
         trinh = "Edge"
     elif "opr/" in u or "opera" in u:
         trinh = "Opera"
     elif "zalo" in u:
         trinh = "Zalo"
-    elif "chrome" in u or "crios" in u:
-        trinh = "Chrome"
+    elif "samsungbrowser" in u:
+        trinh = "Samsung Internet"
     elif "firefox" in u or "fxios" in u:
         trinh = "Firefox"
+    elif "chrome" in u or "crios" in u:
+        trinh = "Chrome"
     elif "safari" in u:
         trinh = "Safari"
     else:
         trinh = "Khác"
+
+    if "iphone" in u:
+        return "📱", "iPhone", trinh
+    if "ipad" in u:
+        return "📱", "iPad", trinh
     if "android" in u:
-        hdh = "Android"
-    elif "iphone" in u or "ipad" in u or "ios" in u:
-        hdh = "iOS"
-    elif "windows" in u:
-        hdh = "Windows"
-    elif "mac os" in u or "macintosh" in u:
-        hdh = "macOS"
-    elif "linux" in u:
-        hdh = "Linux"
-    else:
-        hdh = ""
-    return f"{trinh} · {hdh}" if hdh else trinh
+        m = re.search(r"android [\d.]+; ([^;)]+)", ua, re.I)
+        mau = m.group(1).strip() if m else ""
+        if mau and mau.upper() not in ("K", "U") and len(mau) > 1:
+            ten = f"Android · {mau}"
+        else:
+            ten = "Android"
+        icon = "📱" if "mobile" in u else "📲"
+        return icon, ten, trinh
+    if "windows" in u:
+        return "💻", "Windows", trinh
+    if "mac os" in u or "macintosh" in u:
+        return "💻", "Mac", trinh
+    if "cros" in u:
+        return "💻", "ChromeOS", trinh
+    if "linux" in u:
+        return "💻", "Linux", trinh
+    return "❔", "Không rõ", trinh
 
 
 @bp.route("/")
@@ -142,7 +156,7 @@ def danh_sach():
     return render_template("admin/nhat_ky/danh_sach.html",
                            items=phan_trang.items, phan_trang=phan_trang,
                            tham_so=tham_so, nhan_loai=NHAN_LOAI, nhan_hanh_dong=NHAN_HANH_DONG,
-                           tom_tat=_tom_tat_trinh_duyet, tk=_thong_ke(), f=request.args)
+                           thiet_bi=_thiet_bi, tk=_thong_ke(), f=request.args)
 
 
 @bp.route("/xuat-csv")

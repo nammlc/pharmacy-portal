@@ -12,6 +12,7 @@ route cũ KHÔNG phải sửa gì.
 Việc ghi log dùng kết nối DB RIÊNG và bọc try/except: lỗi ghi log không bao giờ
 làm hỏng request của người dùng.
 """
+import ipaddress
 import random
 import re
 import uuid
@@ -24,6 +25,7 @@ from app import db
 from app.models.models import NhatKy
 
 COOKIE_TEN = "pp_vid"
+COOKIE_DONG_Y = "pp_dongy"                      # lựa chọn của người dùng: "1" = đồng ý, "0" = từ chối
 COOKIE_THOI_HAN = 60 * 60 * 24 * 365          # 1 năm
 _RE_COOKIE = re.compile(r"^[0-9a-f]{32}$")
 
@@ -48,8 +50,38 @@ NHAN_TRANG_TIM_KIEM = {
 _TRUONG_TEN = ("ten_thuoc", "ten_biet_duoc", "ten_nhom", "ten_hoat_chat", "tieu_de", "ten")
 
 
+def _ip_hop_le(gia_tri):
+    try:
+        ipaddress.ip_address(gia_tri)
+        return True
+    except ValueError:
+        return False
+
+
+def _ip_noi_bo(gia_tri):
+    """IP nội bộ/proxy (10.x, 192.168.x, 127.x...) - không phải IP của người truy cập."""
+    try:
+        d = ipaddress.ip_address(gia_tri)
+        return d.is_private or d.is_loopback or d.is_link_local or d.is_reserved
+    except ValueError:
+        return True
+
+
 def lay_ip():
-    """IP của người truy cập. Đằng sau proxy (Render...) cần ProxyFix - xem create_app()."""
+    """IP thật của người truy cập, khi chạy sau Cloudflare/Render.
+    Thứ tự ưu tiên:
+      1. CF-Connecting-IP / True-Client-IP (Cloudflare tự gắn, client không giả được)
+      2. X-Forwarded-For: lấy IP công cộng đầu tiên từ trái sang (bỏ qua 10.x, 192.168.x...)
+      3. request.remote_addr (chạy local / không qua proxy)
+    """
+    h = request.headers
+    for ten in ("CF-Connecting-IP", "True-Client-IP"):
+        v = (h.get(ten) or "").strip()
+        if _ip_hop_le(v) and not _ip_noi_bo(v):
+            return v[:64]
+    for v in [x.strip() for x in (h.get("X-Forwarded-For") or "").split(",")]:
+        if _ip_hop_le(v) and not _ip_noi_bo(v):
+            return v[:64]
     return (request.remote_addr or "")[:64]
 
 
@@ -182,15 +214,27 @@ def _ghi_admin(response):
 
 
 def dang_ky(app):
+    @app.context_processor
+    def _ngu_canh_cookie():
+        # Banner hỏi cookie hiện ở trang công khai cho tới khi người dùng chọn
+        return {"chua_chon_cookie": request.cookies.get(COOKIE_DONG_Y) not in ("0", "1")}
+
     @app.before_request
     def _gan_cookie_an_danh():
         if request.endpoint == "static":
             return
+        dong_y = request.cookies.get(COOKIE_DONG_Y)
         vid = request.cookies.get(COOKIE_TEN, "")
-        if _RE_COOKIE.match(vid):
-            g.vid, g.vid_moi = vid, False
+        g.xoa_vid = False
+        if dong_y == "1":
+            if _RE_COOKIE.match(vid):
+                g.vid, g.vid_moi = vid, False
+            else:
+                g.vid, g.vid_moi = uuid.uuid4().hex, True
         else:
-            g.vid, g.vid_moi = uuid.uuid4().hex, True
+            # Chưa chọn hoặc từ chối: KHÔNG đặt cookie định danh; IP + từ khoá vẫn được ghi.
+            g.vid, g.vid_moi = None, False
+            g.xoa_vid = (dong_y == "0" and bool(vid))     # từ chối -> xoá cookie cũ nếu có
         if request.endpoint == "admin_auth.dang_xuat":
             g.ten_truoc_dang_xuat = _nguoi_dung()[1]
 
@@ -206,6 +250,8 @@ def dang_ky(app):
             if g.vid_moi:
                 response.set_cookie(COOKIE_TEN, g.vid, max_age=COOKIE_THOI_HAN,
                                     httponly=True, samesite="Lax", secure=request.is_secure)
+            elif g.xoa_vid:
+                response.delete_cookie(COOKIE_TEN)
         except Exception as e:
             app.logger.warning(f"Hook nhật ký lỗi: {e}")
         return response

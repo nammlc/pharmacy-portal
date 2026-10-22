@@ -16,12 +16,13 @@ def create_app(config_class=Config):
     import os
     os.makedirs(app.instance_path, exist_ok=True)
 
-    # Đằng sau proxy/CDN (Render, Cloudflare...) thì request.remote_addr là IP của proxy.
-    # TRUSTED_PROXIES = số lớp proxy tin cậy phía trước app (Render: 1). Đặt 0 nếu chạy trực tiếp.
+    # Đằng sau proxy/CDN (Render + Cloudflare...) chỉ dùng ProxyFix để biết request gốc là https.
+    # IP thật của người truy cập được lấy riêng ở app/utils/nhat_ky.py (hàm lay_ip) từ header
+    # CF-Connecting-IP / X-Forwarded-For. TRUSTED_PROXIES = số lớp proxy phía trước; 0 = tắt.
     so_proxy = int(os.environ.get("TRUSTED_PROXIES", "1"))
     if so_proxy > 0:
         from werkzeug.middleware.proxy_fix import ProxyFix
-        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=so_proxy, x_proto=so_proxy)
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=0, x_proto=so_proxy)
 
     db.init_app(app)
     csrf.init_app(app)
