@@ -16,6 +16,13 @@ def create_app(config_class=Config):
     import os
     os.makedirs(app.instance_path, exist_ok=True)
 
+    # Đằng sau proxy/CDN (Render, Cloudflare...) thì request.remote_addr là IP của proxy.
+    # TRUSTED_PROXIES = số lớp proxy tin cậy phía trước app (Render: 1). Đặt 0 nếu chạy trực tiếp.
+    so_proxy = int(os.environ.get("TRUSTED_PROXIES", "1"))
+    if so_proxy > 0:
+        from werkzeug.middleware.proxy_fix import ProxyFix
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=so_proxy, x_proto=so_proxy)
+
     db.init_app(app)
     csrf.init_app(app)
 
@@ -128,6 +135,19 @@ def create_app(config_class=Config):
 
     from app.routes.admin_danh_muc_bai_viet import bp as admin_dmbv_bp
     app.register_blueprint(admin_dmbv_bp)
+
+    from app.routes.admin_nhat_ky import bp as admin_nhat_ky_bp
+    app.register_blueprint(admin_nhat_ky_bp)
+
+    # --- Nhật ký truy cập: hook toàn cục + tự tạo bảng nếu chưa có ---
+    from app.utils import nhat_ky as _nhat_ky
+    _nhat_ky.dang_ky(app)
+    with app.app_context():
+        try:
+            from app.models.models import NhatKy
+            NhatKy.__table__.create(bind=db.engine, checkfirst=True)
+        except Exception as e:
+            app.logger.warning(f"Không tạo được bảng nhat_ky (chạy them_bang_nhat_ky.sql thủ công): {e}")
 
     _tao_tai_khoan_dau_tien_neu_can(app)
 

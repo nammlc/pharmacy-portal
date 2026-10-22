@@ -109,3 +109,7 @@ class Config:
     GAS_MAIL_URL = os.environ.get("GAS_MAIL_URL", "").strip()
     GAS_MAIL_SECRET = os.environ.get("GAS_MAIL_SECRET", "").strip()
     MAIL_NAME = os.environ.get("MAIL_NAME", "Cổng Tra Cứu Dược").strip()
+
+    # --- Nhật ký truy cập ---
+    # Tự xoá log cũ hơn N ngày (0 = giữ vĩnh viễn). Mặc định 180 ngày.
+    NHAT_KY_GIU_NGAY = int(os.environ.get("NHAT_KY_GIU_NGAY", "180"))

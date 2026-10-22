@@ -320,3 +320,33 @@ class CaiDat(db.Model):
         else:
             obj = cls(khoa=khoa, gia_tri=gia_tri)
             db.session.add(obj)
+
+
+class NhatKy(db.Model):
+    """Nhật ký truy cập / thao tác: ai (IP + cookie ẩn danh), lúc nào, làm gì.
+    - loai = tim_kiem      : người dùng công khai tra cứu (tu_khoa = nội dung tìm)
+    - loai = sua_du_lieu   : admin thêm/sửa/xoá dữ liệu (hanh_dong + doi_tuong + doi_tuong_id)
+    - loai = dang_nhap / dang_nhap_that_bai / dang_xuat / tai_khoan : sự kiện tài khoản admin
+    """
+    __tablename__ = "nhat_ky"
+
+    id = db.Column(db.Integer, primary_key=True)
+    thoi_gian = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)  # UTC
+    loai = db.Column(db.String(30), nullable=False, index=True)
+    ip = db.Column(db.String(64), index=True)
+    cookie_id = db.Column(db.String(40), index=True)     # mã ẩn danh trong cookie trình duyệt
+    nguoi_dung_id = db.Column(db.Integer)
+    ten_nguoi_dung = db.Column(db.String(100))
+    phuong_thuc = db.Column(db.String(10))
+    duong_dan = db.Column(db.String(500))
+    tu_khoa = db.Column(db.String(500))
+    hanh_dong = db.Column(db.String(30))                  # them | sua | xoa | xoa_hang_loat | ...
+    doi_tuong = db.Column(db.String(80))                  # vd: "Danh mục thuốc"
+    doi_tuong_id = db.Column(db.Integer)
+    doi_tuong_ten = db.Column(db.String(255))
+    mo_ta = db.Column(db.String(500))
+    ma_trang_thai = db.Column(db.Integer)
+    trinh_duyet = db.Column(db.String(300))
+
+    def __repr__(self):
+        return f"<NhatKy {self.loai} {self.ip}>"
