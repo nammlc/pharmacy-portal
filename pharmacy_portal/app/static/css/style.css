@@ -115,7 +115,6 @@ a { color: inherit; text-decoration: none; }
 .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
 .brand-text strong.brand-primary { font-family: var(--font-display); font-size: 19px; font-weight: 800; letter-spacing: 0.01em; line-height: 1.1; }
 .brand-text small { font-size: 11.5px; color: rgba(255,255,255,0.55); letter-spacing: 0.02em; }
-.brand-text small.brand-credit { font-size: 10.5px; font-style: italic; margin: 3px 0 2px; color: rgba(255,255,255,0.7); letter-spacing: 0.01em; }
 
 /* Menu giờ luôn gói gọn trong 1 dropdown (mọi kích thước màn hình) */
 .nav-dropdown { position: relative; }
@@ -961,6 +960,19 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 .admin-sidebar .brand .brand-text small { color: rgba(255,255,255,0.5); }
+
+/* Dòng credit: tách riêng khỏi link thương hiệu nên không dính hiệu ứng hover của logo */
+.admin-sidebar .sidebar-credit {
+  margin: -6px 0 14px;
+  padding: 0 12px;
+  font-size: 11px;
+  font-style: italic;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: rgba(255,255,255,0.6);
+  cursor: default;
+  user-select: none;
+}
 
 .admin-sidebar a {
   padding: 10px 12px;

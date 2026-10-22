@@ -23,10 +23,11 @@
       <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="brand-logo brand-logo-sm">
       <span class="brand-text">
         <strong class="brand-primary">Cổng Tra Cứu Dược</strong>
-        <small class="brand-credit">Independently developed by Le Cong Nam</small>
         <small>Bảng quản trị</small>
       </span>
     </a>
+
+    <div class="sidebar-credit">Independently developed by Le Cong Nam</div>
 
     <a href="{{ url_for('admin_dashboard.trang_chinh') }}" class="{{ 'active' if request.endpoint == 'admin_dashboard.trang_chinh' }}">🏠 Tổng quan</a>
 
