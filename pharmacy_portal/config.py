@@ -91,10 +91,14 @@ class Config:
     #                  (chỉ gửi được tới email chủ tài khoản Resend). Muốn gửi cho
     #                  email khác phải verify domain riêng trên Resend.
     # APP_BASE_URL   : địa chỉ gốc của web, dùng để tạo link trong email,
-    #                  vd https://pharmacy-portal-xsrn.onrender.com (không có dấu / cuối)
+    #                  vd https://tracuuduoc-bvdktamduccauquan.com (không có dấu / cuối)
     RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
     MAIL_FROM = os.environ.get("MAIL_FROM", "Khoa Dược <onboarding@resend.dev>")
-    APP_BASE_URL = os.environ.get("APP_BASE_URL", "")
+    APP_BASE_URL = os.environ.get("APP_BASE_URL", "").strip()
+    # Tên miền chính (không có https://), vd tracuuduoc-bvdktamduccauquan.com.
+    # Nếu đặt: ai vào bằng địa chỉ *.onrender.com cũ sẽ được chuyển hướng (301) sang tên miền này.
+    # Để trống = tắt chuyển hướng.
+    CANONICAL_HOST = os.environ.get("CANONICAL_HOST", "").strip().lower()
     # Link đặt lại mật khẩu có hiệu lực bao nhiêu giây (mặc định 30 phút)
     RESET_TOKEN_MAX_AGE = int(os.environ.get("RESET_TOKEN_MAX_AGE", "1800"))
 

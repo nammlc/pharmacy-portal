@@ -24,6 +24,19 @@ def create_app(config_class=Config):
         from werkzeug.middleware.proxy_fix import ProxyFix
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=0, x_proto=so_proxy)
 
+    # Chuyển hướng địa chỉ *.onrender.com cũ sang tên miền chính (chỉ bật khi đặt CANONICAL_HOST).
+    if app.config.get("CANONICAL_HOST"):
+        from flask import request, redirect
+
+        @app.before_request
+        def _chuyen_ve_ten_mien_chinh():
+            host = request.host.split(":")[0].lower()
+            if host.endswith(".onrender.com"):
+                return redirect(
+                    f"https://{app.config['CANONICAL_HOST']}{request.full_path.rstrip('?')}",
+                    code=301,
+                )
+
     db.init_app(app)
     csrf.init_app(app)
 

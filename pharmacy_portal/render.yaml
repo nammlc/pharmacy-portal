@@ -15,3 +15,7 @@ services:
         value: sqlite
       - key: PYTHON_VERSION
         value: 3.12.0
+      - key: APP_BASE_URL
+        value: https://tracuuduoc-bvdktamduccauquan.com
+      - key: CANONICAL_HOST
+        value: tracuuduoc-bvdktamduccauquan.com

@@ -80,6 +80,14 @@ public ra Internet.
 (File `render.yaml` trong repo cũng dùng được nếu bạn chọn deploy kiểu
 "Blueprint" thay vì cấu hình tay.)
 
+### Tên miền riêng
+
+Tên miền hiện dùng: `tracuuduoc-bvdktamduccauquan.com` (mua ở Namecheap, đã
+gắn vào Render ở Settings > Custom Domains). Trên Render > Environment cần có:
+
+- `APP_BASE_URL` = `https://tracuuduoc-bvdktamduccauquan.com` (dùng tạo link trong email đặt lại mật khẩu)
+- `CANONICAL_HOST` = `tracuuduoc-bvdktamduccauquan.com` (tuỳ chọn: tự chuyển link `onrender.com` cũ sang tên miền mới)
+
 ### ⚠️ Lưu ý quan trọng về giới hạn free tier
 
 - **App sẽ "ngủ" sau 15 phút không có ai truy cập**, lần truy cập đầu tiên
