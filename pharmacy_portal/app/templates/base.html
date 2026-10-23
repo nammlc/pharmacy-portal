@@ -55,14 +55,18 @@
 <footer class="site-footer">
   <div class="footer-inner">
     <p>Khoa Dược &middot; Bệnh viện Đa khoa Tâm Đức Cầu Quan. Dữ liệu chỉ dùng tham khảo trong nội bộ, luôn đối chiếu với dược thư và quy trình chuyên môn hiện hành.</p>
-    <p id="ppThongBaoDuLieu" style="margin-top:6px; color:rgba(255,255,255,0.4); font-size:12px;">Khi tra cứu, hệ thống ghi nhận địa chỉ IP và nội dung tra cứu để thống kê sử dụng và bảo mật; chỉ khi bạn đồng ý mới đặt thêm một mã cookie ẩn danh để nhận biết thiết bị. Không lưu họ tên hay thông tin cá nhân của người tra cứu. <a href="#" id="ppCookieMo" style="color:inherit;text-decoration:underline;">Thay đổi lựa chọn cookie</a></p>
+  <div class="footer-contact" style="display:flex;flex-wrap:wrap;gap:16px 28px;margin:10px 0 14px;font-size:14px;">
+    <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h6M12 6v6"/></svg><span>Khoa Dược · BVĐK Tâm Đức Cầu Quan</span></div>
+    <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Trưởng khoa: <strong>Tống Văn Tuấn</strong></span></div>
+    <div style="display:flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg><a href="tel:0977755119" style="color:inherit;text-decoration:none;">0977 755 119</a></div>
+  </div>
     <p style="margin-top:6px; font-size:13px;"><a href="https://benhviendakhoatamduccauquan.vn" rel="noopener" target="_blank" style="color:inherit;text-decoration:underline;">Trang chính thức của Bệnh viện Đa khoa Tâm Đức Cầu Quan</a></p>
     <p style="margin-top:6px; color:rgba(255,255,255,0.3); font-size:12px;">© 2026 Khoa Dược · BVĐK Tâm Đức Cầu Quan · Independently developed by Le Cong Nam</p>
   </div>
 </footer>
 
 <div class="pp-cookie" id="ppCookie" role="dialog" aria-live="polite" aria-label="Thông báo cookie" {% if not chua_chon_cookie %}hidden{% endif %}>
-  <p>🍪 Chúng tôi dùng cookie để nhớ thiết bị của bạn, giúp thống kê lượt tra cứu chính xác hơn và cá nhân hóa trải nghiệm. <a href="#ppThongBaoDuLieu" class="pp-cookie-link">Xem chi tiết</a></p>
+  <p>🍪 Chúng tôi dùng cookie để nhớ thiết bị của bạn, giúp thống kê lượt tra cứu chính xác hơn và cá nhân hóa trải nghiệm.</p>
   <div class="pp-cookie-btns">
     <button type="button" class="pp-cookie-btn pp-cookie-no" id="ppCookieNo">Từ chối</button>
     <button type="button" class="pp-cookie-btn pp-cookie-yes" id="ppCookieYes">Đồng ý</button>
