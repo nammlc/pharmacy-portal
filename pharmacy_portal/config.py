@@ -110,6 +110,10 @@ class Config:
     GAS_MAIL_SECRET = os.environ.get("GAS_MAIL_SECRET", "").strip()
     MAIL_NAME = os.environ.get("MAIL_NAME", "Cổng Tra Cứu Dược").strip()
 
-    # --- Nhật ký truy cập ---
-    # Tự xoá log cũ hơn N ngày (0 = giữ vĩnh viễn). Mặc định 180 ngày.
-    NHAT_KY_GIU_NGAY = int(os.environ.get("NHAT_KY_GIU_NGAY", "180"))
+    # --- Nhật ký truy cập: giữ bao lâu (ngày; 0 = không tự xoá) ---
+    # Lượt xem trang (nhiều, nhẹ) giữ ngắn; tìm kiếm giữ vừa; thao tác admin/tài khoản giữ lâu nhất.
+    NHAT_KY_GIU_NGAY_TRUY_CAP = int(os.environ.get("NHAT_KY_GIU_NGAY_TRUY_CAP", "14"))
+    NHAT_KY_GIU_NGAY_TIM_KIEM = int(os.environ.get("NHAT_KY_GIU_NGAY_TIM_KIEM", "90"))
+    NHAT_KY_GIU_NGAY = int(os.environ.get("NHAT_KY_GIU_NGAY", "365"))
+    # Trần tổng số dòng nhật ký (mặc định 100.000 dòng ≈ 50 MB, an toàn cho gói free 500 MB): vượt thì xoá bớt lượt xem cũ nhất.
+    NHAT_KY_TOI_DA = int(os.environ.get("NHAT_KY_TOI_DA", "100000"))

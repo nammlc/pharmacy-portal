@@ -4,7 +4,8 @@
 <div class="admin-page-head">
   <div>
     <h1>Nhật ký truy cập</h1>
-    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">{{ phan_trang.total }} dòng · giờ hiển thị GMT+7 · tự xoá sau {{ config.NHAT_KY_GIU_NGAY }} ngày</p>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">{{ phan_trang.total }} dòng khớp bộ lọc · giờ hiển thị GMT+7 · toàn bộ nhật ký: {{ tk.tong_dong }} dòng (≈ {{ tk.uoc_tinh_mb }} MB)</p>
+    <p style="color:var(--text-muted);font-size:12px;margin:2px 0 0;">Tự xoá: lượt xem {{ config.NHAT_KY_GIU_NGAY_TRUY_CAP }} ngày · tìm kiếm {{ config.NHAT_KY_GIU_NGAY_TIM_KIEM }} ngày · thao tác admin/tài khoản {{ config.NHAT_KY_GIU_NGAY }} ngày · tối đa {{ '{:,}'.format(config.NHAT_KY_TOI_DA) }} dòng</p>
   </div>
   <a href="{{ url_for('admin_nhat_ky.xuat_csv', **tham_so) }}" class="btn btn-secondary">⬇ Xuất CSV</a>
 </div>
@@ -14,6 +15,7 @@
 {% endif %}
 
 <div class="nk-cards">
+  <div class="nk-card"><span class="nk-num">{{ tk.so_xem_hom_nay }}</span><span class="nk-lbl">Lượt truy cập hôm nay</span></div>
   <div class="nk-card"><span class="nk-num">{{ tk.so_tim_hom_nay }}</span><span class="nk-lbl">Lượt tìm kiếm hôm nay</span></div>
   <div class="nk-card"><span class="nk-num">{{ tk.so_ip_hom_nay }}</span><span class="nk-lbl">IP khác nhau hôm nay</span></div>
   <div class="nk-card"><span class="nk-num">{{ tk.so_sua_7_ngay }}</span><span class="nk-lbl">Lượt sửa dữ liệu (7 ngày)</span></div>
@@ -25,6 +27,12 @@
     <h3>Từ khoá tìm nhiều nhất (7 ngày)</h3>
     {% for tu_khoa, n in tk.top_tu_khoa %}
     <a class="nk-top-row" href="{{ url_for('admin_nhat_ky.danh_sach', loai='tim_kiem', q=tu_khoa) }}"><span>{{ tu_khoa[:60] }}</span><b>{{ n }}</b></a>
+    {% else %}<p class="nk-empty">Chưa có dữ liệu.</p>{% endfor %}
+  </div>
+  <div class="nk-top">
+    <h3>Thuốc được xem nhiều nhất (7 ngày)</h3>
+    {% for ten, n in tk.top_thuoc %}
+    <a class="nk-top-row" href="{{ url_for('admin_nhat_ky.danh_sach', loai='xem_thuoc', q=ten) }}"><span>{{ ten[:60] }}</span><b>{{ n }}</b></a>
     {% else %}<p class="nk-empty">Chưa có dữ liệu.</p>{% endfor %}
   </div>
   <div class="nk-top">
@@ -70,11 +78,20 @@
         <td>{{ r.ten_nguoi_dung or '—' }}</td>
         <td class="nk-content">
           {% if r.loai == 'tim_kiem' %}
-            <strong>{{ r.tu_khoa }}</strong>
+            <strong>🔎 {{ r.tu_khoa }}</strong>
             <small>{{ r.doi_tuong }}{% if r.mo_ta %} · {{ r.mo_ta }}{% endif %}</small>
+          {% elif r.loai == 'xem_thuoc' %}
+            <strong>💊 {{ r.doi_tuong_ten or 'Thuốc' }}</strong>
+            <small>Xem chi tiết · {{ r.doi_tuong }}{% if r.doi_tuong_id %} (ID {{ r.doi_tuong_id }}){% endif %}</small>
+          {% elif r.loai == 'truy_cap' %}
+            <strong>{{ r.doi_tuong_ten or r.doi_tuong or 'Trang web' }}</strong>
+            <small>{% if r.doi_tuong_ten %}{{ r.doi_tuong }} · {% endif %}<span class="nk-path">{{ r.duong_dan }}</span></small>
+          {% elif r.loai == 'admin_truy_cap' %}
+            <strong>{{ r.mo_ta or 'Mở trang' }} · {{ r.doi_tuong }}</strong>
+            <small>{% if r.doi_tuong_ten %}{{ r.doi_tuong_ten }}{% endif %}{% if r.doi_tuong_id %} (ID {{ r.doi_tuong_id }}){% endif %} <span class="nk-path">{{ r.duong_dan }}</span></small>
           {% elif r.loai == 'sua_du_lieu' or r.loai == 'tai_khoan' %}
             <strong>{{ nhan_hanh_dong.get(r.hanh_dong, r.hanh_dong) }} · {{ r.doi_tuong }}</strong>
-            <small>{% if r.doi_tuong_ten %}{{ r.doi_tuong_ten }}{% endif %}{% if r.doi_tuong_id %} (ID {{ r.doi_tuong_id }}){% endif %}{% if r.mo_ta %}{{ r.mo_ta }}{% endif %}</small>
+            <small>{% if r.doi_tuong_ten %}{{ r.doi_tuong_ten }}{% endif %}{% if r.doi_tuong_id %} (ID {{ r.doi_tuong_id }}){% endif %}{% if r.mo_ta %} {{ r.mo_ta }}{% endif %}</small>
           {% else %}
             {{ r.mo_ta or '—' }}
           {% endif %}
@@ -106,7 +123,7 @@
 
 <form method="POST" action="{{ url_for('admin_nhat_ky.xoa_cu') }}" class="nk-purge" onsubmit="return confirm('Xoá vĩnh viễn nhật ký cũ hơn số ngày đã chọn?');">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  <span>Dọn nhật ký cũ hơn</span>
+  <span>Dọn thủ công mọi nhật ký cũ hơn</span>
   <select name="ngay"><option value="30">30 ngày</option><option value="90">90 ngày</option><option value="180" selected>180 ngày</option><option value="365">365 ngày</option></select>
   <button type="submit" class="btn btn-secondary">Xoá</button>
 </form>
