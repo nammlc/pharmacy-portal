@@ -145,3 +145,12 @@ pharmacy_portal/
 ├── run.py                         # điểm chạy chính
 └── requirements.txt
 ```
+
+
+## Phiên đăng nhập admin: tự đăng xuất khi không hoạt động
+
+Admin tự bị đăng xuất sau **15 phút không thao tác** (đổi bằng biến môi trường `ADMIN_IDLE_TIMEOUT_MINUTES`).
+- Máy chủ kiểm tra ở mọi request (`app/utils/phien_dang_nhap.py`), nên cửa sổ 15 phút là "trượt": còn thao tác thì phiên còn sống.
+- Trình duyệt (`static/js/phien_het_han.js`) gửi tín hiệu `/admin/keep-alive` mỗi ≤5 phút khi có chuột/bàn phím, để đang soạn bài dài không bị đá ra,
+  và tự chuyển về trang đăng nhập khi hết giờ. Nhiều tab admin dùng chung mốc hoạt động.
+- Phiên đang mở trước khi cập nhật sẽ phải đăng nhập lại một lần.

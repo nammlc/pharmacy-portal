@@ -85,6 +85,11 @@ class Config:
     # nhiều ảnh cùng lúc (nhiều thuốc trong 1 lần lưu) nên để dư ra 40 MB cho cả request.
     MAX_CONTENT_LENGTH = 40 * 1024 * 1024
 
+    # --- Phiên đăng nhập admin: tự đăng xuất sau N phút KHÔNG hoạt động (mặc định 15) ---
+    # Tính từ request gần nhất của admin (trình duyệt tự gửi tín hiệu "còn đang làm việc"
+    # mỗi vài phút khi có thao tác chuột/bàn phím, nên đang soạn bài dài không bị đá ra).
+    ADMIN_IDLE_TIMEOUT_MINUTES = max(1, int(os.environ.get("ADMIN_IDLE_TIMEOUT_MINUTES", "15")))
+
     # --- Gửi email qua Resend (chức năng quên mật khẩu) ---
     # RESEND_API_KEY : tạo tại https://resend.com/api-keys
     # MAIL_FROM      : địa chỉ gửi. Thử nghiệm dùng "Khoa Dược <onboarding@resend.dev>"

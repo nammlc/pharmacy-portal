@@ -67,6 +67,10 @@ def create_app(config_class=Config):
     login_manager.login_message = "Vui lòng đăng nhập để tiếp tục."
     login_manager.login_message_category = "warning"
 
+    # Tự đăng xuất admin khi không hoạt động (đăng ký sớm để chạy trước các hook khác)
+    from app.utils import phien_dang_nhap as _phien
+    _phien.dang_ky(app)
+
     from app.models.models import NguoiDung
 
     @login_manager.user_loader

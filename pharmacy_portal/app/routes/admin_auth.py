@@ -1,7 +1,7 @@
 import hashlib
 from html import escape
 
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from sqlalchemy import func
@@ -10,6 +10,7 @@ from app.forms import (
     DangNhapForm, DoiMatKhauForm, QuenMatKhauForm, DatLaiMatKhauForm, CapNhatEmailForm,
 )
 from app.utils.gui_email import gui_email
+from app.utils.phien_dang_nhap import danh_dau_hoat_dong
 
 bp = Blueprint("admin_auth", __name__, url_prefix="/admin")
 
@@ -34,6 +35,7 @@ def dang_nhap():
             return render_template("admin/dang_nhap.html", form=form)
 
         login_user(nguoi_dung)
+        danh_dau_hoat_dong()   # bắt đầu tính giờ "không hoạt động"
         next_page = request.args.get("next")
         return redirect(next_page or url_for("admin_dashboard.trang_chinh"))
 
@@ -44,8 +46,21 @@ def dang_nhap():
 @login_required
 def dang_xuat():
     logout_user()
-    flash("Đã đăng xuất.", "success")
+    if request.args.get("het_han"):   # trình duyệt tự đăng xuất vì không hoạt động
+        flash(f"Đã tự động đăng xuất do không hoạt động quá "
+              f"{current_app.config['ADMIN_IDLE_TIMEOUT_MINUTES']} phút.", "warning")
+    else:
+        flash("Đã đăng xuất.", "success")
     return redirect(url_for("admin_auth.dang_nhap"))
+
+
+@bp.route("/keep-alive")
+def keep_alive():
+    """Trình duyệt gọi định kỳ khi admin còn thao tác, để phiên không hết hạn oan lúc đang
+    soạn nội dung dài. Hook trong app/utils/phien_dang_nhap.py đã làm mới mốc hoạt động."""
+    resp = jsonify(active=bool(current_user.is_authenticated))
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
 
 
 @bp.route("/doi-mat-khau", methods=["GET", "POST"])
