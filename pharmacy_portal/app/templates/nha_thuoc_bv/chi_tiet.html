@@ -3,6 +3,7 @@
 {% block title %}{{ thuoc.ten_biet_duoc }}{% endblock %}
 
 {% block content %}
+<div class="drug-page">
 <div class="drug-hero">
   <div class="drug-hero-media">
     {% if thuoc.hinh_anh %}
@@ -34,5 +35,6 @@
     <a class="drug-source-link" href="{{ thuoc.link_tham_khao | chuan_hoa_url }}" target="_blank" rel="noopener">{{ thuoc.link_tham_khao }}</a>
   {% endcall %}
   {% endif %}
+</div>
 </div>
 {% endblock %}

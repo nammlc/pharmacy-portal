@@ -71,9 +71,9 @@ a { color: inherit; text-decoration: none; }
 }
 
 .header-inner {
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 0 24px;
+  max-width: none;
+  margin: 0;
+  padding: 0 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -807,6 +807,11 @@ a { color: inherit; text-decoration: none; }
 /* ============================================================
    DRUG DETAIL PAGE (trang chi tiết 1 thuốc) - bố cục hiện đại
    ============================================================ */
+/* Bố cục 3-6-3: nội dung chi tiết thuốc nằm giữa, chiếm 6/12 cột (50%) */
+.drug-page { width: 100%; margin: 0 auto; }
+@media (min-width: 1200px) { .drug-page { width: 50%; } }
+@media (min-width: 800px) and (max-width: 1199px) { .drug-page { width: 75%; } }
+
 .drug-hero {
   display: flex;
   gap: 28px;
@@ -1013,9 +1018,9 @@ a { color: inherit; text-decoration: none; }
 }
 
 .header-inner {
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 0 24px;
+  max-width: none;
+  margin: 0;
+  padding: 0 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1849,7 +1854,7 @@ a { color: inherit; text-decoration: none; }
   height: 3px;
   background: linear-gradient(90deg, var(--sky-400), var(--level-trungbinh), var(--level-nang), var(--level-cctd));
 }
-.footer-inner { max-width: 1180px; margin: 0 auto; font-size: 12.5px; }
+.footer-inner { max-width: none; margin: 0; padding: 0 32px; font-size: 12.5px; }
 
 /* Accessibility: focus visibility */
 a:focus-visible, button:focus-visible, input:focus-visible {
