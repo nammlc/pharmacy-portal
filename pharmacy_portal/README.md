@@ -154,3 +154,10 @@ Admin tự bị đăng xuất sau **15 phút không thao tác** (đổi bằng b
 - Trình duyệt (`static/js/phien_het_han.js`) gửi tín hiệu `/admin/keep-alive` mỗi ≤5 phút khi có chuột/bàn phím, để đang soạn bài dài không bị đá ra,
   và tự chuyển về trang đăng nhập khi hết giờ. Nhiều tab admin dùng chung mốc hoạt động.
 - Phiên đang mở trước khi cập nhật sẽ phải đăng nhập lại một lần.
+
+
+## Soạn thảo văn bản trong form admin (modal)
+
+Các ô văn bản dài (thành phần, chỉ định, cách dùng... — mọi `TextAreaField` đi qua macro `render_field`) hiện **bản xem trước**
+trong form; bấm vào ô (hoặc Tab tới rồi Enter) sẽ mở **modal soạn thảo**: thanh công cụ nằm cố định ở trên cùng, chỉ vùng nội dung cuộn.
+`Ctrl+Enter` = Xong, `Esc` = Huỷ (hỏi lại nếu đã sửa), bấm ra vùng tối không đóng để tránh mất bài. Code: `static/js/main.js`, CSS `.rich-modal*` / `.rich-preview*`.
