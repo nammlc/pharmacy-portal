@@ -3548,3 +3548,22 @@ table { display: block; max-width: 100%; overflow-x: auto; }
   .footer-inner { padding: 0 16px; }
   .drug-section-body ul, .drug-section-body ol { padding-left: 18px; }
 }
+
+/* ============================================================
+   ADMIN: nền sidebar kéo full chiều cao, ảnh & hoạt chất gọn
+   ============================================================ */
+.admin-shell {
+  background: linear-gradient(to right, var(--ink-900) 240px, transparent 240px), var(--paper-0);
+}
+.adm-td-hoatchat { max-width: 260px; }
+.adm-td-hoatchat .col-title-text { max-width: 260px; }
+.adm-table td.adm-td-hoatchat { white-space: nowrap; }
+.adm-thumb {
+  width: 56px; height: 56px;
+  object-fit: contain;
+  padding: 3px;
+  background: #fff;
+}
+.adm-thumb-placeholder { width: 56px; height: 56px; }
+.drug-card-thumb, .drug-card-thumb-fallback { width: 72px; height: 72px; }
+.drug-card-thumb { object-fit: contain; padding: 4px; background: #fff; }
