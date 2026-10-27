@@ -3522,3 +3522,29 @@ body.rich-modal-open { overflow: hidden; }
 .nk-b-xem_thuoc{background:#e0f7f1;color:#00796b}
 .nk-b-admin_truy_cap{background:#ede7f6;color:#5e35b1}
 .nk-path{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;opacity:.8;word-break:break-all}
+
+/* ============================================================
+   CHỐNG TRÀN NGANG TRÊN ĐIỆN THOẠI
+   ============================================================ */
+html, body { max-width: 100%; overflow-x: hidden; }
+*, *::before, *::after { box-sizing: border-box; }
+img, video, iframe, svg { max-width: 100%; }
+img { height: auto; }
+pre, code { white-space: pre-wrap; word-break: break-word; }
+table { display: block; max-width: 100%; overflow-x: auto; }
+.rich-content, .drug-section-body, .drug-hero-title, .drug-hero-sub, .drug-hero-crumbs {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.drug-page, .drug-grid-sections, .drug-section, .drug-section > *, .drug-hero, .drug-hero-text {
+  min-width: 0;
+  max-width: 100%;
+}
+@media (max-width: 640px) {
+  .drug-hero { flex-direction: column; align-items: flex-start; }
+  .drug-hero-media { width: 96px; height: 96px; }
+  .drug-hero-text { min-width: 0; width: 100%; }
+  .header-inner { padding: 0 16px; }
+  .footer-inner { padding: 0 16px; }
+  .drug-section-body ul, .drug-section-body ol { padding-left: 18px; }
+}
