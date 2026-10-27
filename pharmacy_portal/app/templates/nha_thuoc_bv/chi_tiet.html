@@ -36,5 +36,16 @@
   {% endcall %}
   {% endif %}
 </div>
+
+{% if cung_hoat_chat %}
+<section class="drug-related">
+  <h2 class="drug-related-title">Thuốc cùng hoạt chất</h2>
+  <ul class="drug-related-list">
+    {% for t in cung_hoat_chat %}
+    <li><a href="{{ url_for('ntbv.xem_thuoc', thuoc_id=t.id) }}">{{ t.ten_biet_duoc }}</a></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
 </div>
 {% endblock %}
