@@ -3552,18 +3552,25 @@ table { display: block; max-width: 100%; overflow-x: auto; }
 /* ============================================================
    ADMIN: nền sidebar kéo full chiều cao, ảnh & hoạt chất gọn
    ============================================================ */
-.admin-shell {
-  background: linear-gradient(to right, var(--ink-900) 240px, transparent 240px), var(--paper-0);
+/* Chỉ vẽ nền tối bên trái khi sidebar hiện cố định (màn hình > 800px).
+   Trên điện thoại sidebar là menu trượt nên không được có dải nền này. */
+@media (min-width: 801px) {
+  .admin-shell {
+    background: linear-gradient(to right, var(--ink-900) 240px, transparent 240px), var(--paper-0);
+  }
 }
 .adm-td-hoatchat { max-width: 260px; }
 .adm-td-hoatchat .col-title-text { max-width: 260px; }
 .adm-table td.adm-td-hoatchat { white-space: nowrap; }
+/* Ảnh thuốc thường là vỉ/hộp/chai dạng đứng, nên dùng khung đứng cố định
+   và cắt đều (cover) để ảnh luôn đầy khung, không bị co thành vạch mảnh. */
 .adm-thumb {
-  width: 56px; height: 56px;
-  object-fit: contain;
-  padding: 3px;
-  background: #fff;
+  width: 48px; height: 64px;
+  object-fit: cover;
+  background: var(--paper-0);
+  border: 1px solid var(--line-200);
+  border-radius: 6px;
 }
-.adm-thumb-placeholder { width: 56px; height: 56px; }
-.drug-card-thumb, .drug-card-thumb-fallback { width: 72px; height: 72px; }
-.drug-card-thumb { object-fit: contain; padding: 4px; background: #fff; }
+.adm-thumb-placeholder { width: 48px; height: 64px; }
+.drug-card-thumb, .drug-card-thumb-fallback { width: 64px; height: 80px; }
+.drug-card-thumb { object-fit: cover; background: var(--paper-0); padding: 0; }
