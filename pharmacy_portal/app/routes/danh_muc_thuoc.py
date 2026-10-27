@@ -4,6 +4,8 @@ from sqlalchemy.orm import selectinload
 from app import db
 from app.models.models import NhomThuoc, DanhMucThuoc
 from app.utils.tim_kiem import tim_danh_muc_thuoc
+from app.utils.cung_hoat_chat import tim_thuoc_cung_hoat_chat
+from app.models.models import danh_muc_thuoc_hoat_chat
 
 bp = Blueprint("dmt", __name__, url_prefix="/danh-muc-thuoc")
 
@@ -69,13 +71,7 @@ def xem_nhom(nhom_id):
 @bp.route("/thuoc/<int:thuoc_id>")
 def xem_thuoc(thuoc_id):
     thuoc = DanhMucThuoc.query.get_or_404(thuoc_id)
-    # Liên kết nội bộ: các thuốc cùng hoạt chất (so khớp chuỗi hoạt chất hiển thị)
-    cung_hoat_chat = []
-    hc = (thuoc.ten_hoat_chat_hien_thi or "").strip().lower()
-    if hc:
-        for t in DanhMucThuoc.query.filter((DanhMucThuoc.id != thuoc.id)).all():
-            if (t.ten_hoat_chat_hien_thi or "").strip().lower() == hc:
-                cung_hoat_chat.append(t)
-                if len(cung_hoat_chat) >= 8:
-                    break
+    # Liên kết nội bộ: thuốc cùng hoạt chất (1 truy vấn, không so sánh từng thuốc)
+    cung_hoat_chat = tim_thuoc_cung_hoat_chat(
+        thuoc, DanhMucThuoc, danh_muc_thuoc_hoat_chat, "danh_muc_thuoc_id")
     return render_template("danh_muc_thuoc/chi_tiet.html", thuoc=thuoc, cung_hoat_chat=cung_hoat_chat)
