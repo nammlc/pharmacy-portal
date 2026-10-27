@@ -1,5 +1,41 @@
 {% extends "base.html" %}
-{% block title %}Trang chủ — Cổng Tra Cứu Dược
+{% block title %}Tra cứu dược Tâm Đức — Cổng tra cứu thuốc Khoa Dược{% endblock %}
+{% block meta_mo_ta %}Tra cứu dược Tâm Đức: thông tin thuốc, thuốc tiêm truyền, tương tác thuốc và tương hợp – tương kỵ, do Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan cập nhật và kiểm duyệt.{% endblock %}
+{% block og_tieu_de %}Tra cứu dược Tâm Đức — Khoa Dược BV Đa khoa Tâm Đức Cầu Quan{% endblock %}
+{% block og_mo_ta %}Tra cứu thông tin thuốc, thuốc tiêm truyền, tương tác thuốc và tương hợp – tương kỵ.{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
+    <h1>Tra cứu dược <span>Tâm Đức</span><br>thông tin thuốc nhanh chóng</h1>
+    <p>Danh mục thuốc, tương tác, tương hợp–kỵ và hướng dẫn sử dụng được cập nhật và kiểm duyệt bởi Dược sĩ lâm sàng.</p>
+    <form class="hero-search" autocomplete="off" action="{{ url_for('main.tim_kiem') }}" method="get">
+      <input type="text" name="q" placeholder="Nhập tên thuốc hoặc hoạt chất..." data-goi-y="all">
+      <button type="submit">🔍 Tra cứu</button>
+    </form>
+
+    {% if stat %}
+    <div class="hero-stats">
+      {# Đã ẩn 2 số liệu "Danh mục thuốc" và "Nhà thuốc BV" theo yêu cầu —
+         dữ liệu đếm (stat.dmt / stat.ntbv) vẫn được tính ở route, chỉ
+         không hiển thị ở đây nữa. Xoá khối comment này để hiện lại. #}
+      {% if stat.get('thuoc') %}
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ stat.thuoc }}</div>
+        <div class="hero-stat-lbl">Thuốc tra cứu</div>
+      </div>
+      {% endif %}
+      {% if stat.get('thtk') %}
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ stat.thtk }}</div>
+        <div class="hero-stat-lbl">Cặp tương hợp/kỵ</div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
 <!-- Section bài viết mới nhất -->
 {% set bai_moi = [] %}
 {% for bai in bai_viet_moi %}{% if loop.index <= 4 %}{% set _ = bai_moi.append(bai) %}{% endif %}{% endfor %}
@@ -39,40 +75,7 @@
 </section>
 {% endif %}
 
-{% endblock %}
 
-{% block content %}
-<section class="hero">
-  <div class="hero-inner">
-    <div class="hero-badge">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
-    <h1>Tra cứu thông tin<br><span>dược phẩm</span> nhanh chóng</h1>
-    <p>Danh mục thuốc, tương tác, tương hợp–kỵ và hướng dẫn sử dụng được cập nhật và kiểm duyệt bởi Dược sĩ lâm sàng.</p>
-    <form class="hero-search" autocomplete="off" action="{{ url_for('main.tim_kiem') }}" method="get">
-      <input type="text" name="q" placeholder="Nhập tên thuốc hoặc hoạt chất..." data-goi-y="all">
-      <button type="submit">🔍 Tra cứu</button>
-    </form>
-
-    {% if stat %}
-    <div class="hero-stats">
-      {# Đã ẩn 2 số liệu "Danh mục thuốc" và "Nhà thuốc BV" theo yêu cầu —
-         dữ liệu đếm (stat.dmt / stat.ntbv) vẫn được tính ở route, chỉ
-         không hiển thị ở đây nữa. Xoá khối comment này để hiện lại. #}
-      {% if stat.get('thuoc') %}
-      <div class="hero-stat">
-        <div class="hero-stat-num">{{ stat.thuoc }}</div>
-        <div class="hero-stat-lbl">Thuốc tra cứu</div>
-      </div>
-      {% endif %}
-      {% if stat.get('thtk') %}
-      <div class="hero-stat">
-        <div class="hero-stat-num">{{ stat.thtk }}</div>
-        <div class="hero-stat-lbl">Cặp tương hợp/kỵ</div>
-      </div>
-      {% endif %}
-    </div>
-    {% endif %}
-  </div>
-</section>
 
 <div class="category-grid-outer">
   <div class="category-grid">

@@ -9,6 +9,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+<meta name="description" content="{% block meta_mo_ta %}Tra cứu thông tin thuốc tại Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan: danh mục thuốc, tương tác thuốc, thuốc tiêm truyền, tương hợp – tương kỵ và hướng dẫn sử dụng thuốc.{% endblock %}">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="{{ ((config.CANONICAL_HOST and ('https://' ~ config.CANONICAL_HOST)) or request.host_url.rstrip('/')) ~ request.path }}">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="vi_VN">
+<meta property="og:site_name" content="Cổng Tra Cứu Dược – BV Đa khoa Tâm Đức Cầu Quan">
+<meta property="og:title" content="{% block og_tieu_de %}Tra cứu thuốc – BV Đa khoa Tâm Đức Cầu Quan{% endblock %}">
+<meta property="og:description" content="{% block og_mo_ta %}Tra cứu thông tin thuốc tại Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan.{% endblock %}">
+<meta property="og:url" content="{{ ((config.CANONICAL_HOST and ('https://' ~ config.CANONICAL_HOST)) or request.host_url.rstrip('/')) ~ request.path }}">
+<meta property="og:image" content="{{ url_for('static', filename='images/logo.png', _external=True) }}">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Hospital",
+  "name": "Bệnh viện Đa khoa Tâm Đức Cầu Quan",
+  "alternateName": "BVĐK Tâm Đức Cầu Quan",
+  "url": "https://benhviendakhoatamduccauquan.vn",
+  "department": {
+    "@type": "Pharmacy",
+    "name": "Khoa Dược – Cổng Tra Cứu Dược",
+    "url": "{{ ((config.CANONICAL_HOST and ('https://' ~ config.CANONICAL_HOST)) or request.host_url.rstrip('/')) }}"
+  }
+}
+</script>
 </head>
 <body>
 

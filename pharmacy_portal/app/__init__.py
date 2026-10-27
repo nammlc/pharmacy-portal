@@ -209,6 +209,10 @@ def create_app(config_class=Config):
         dich_den = _request.referrer or _url_for("admin_dashboard.trang_chinh")
         return _redirect(dich_den), 302
 
+    # SEO: robots.txt và sitemap.xml
+    from app.routes.seo import dang_ky_seo
+    dang_ky_seo(app)
+
     return app
 
 
