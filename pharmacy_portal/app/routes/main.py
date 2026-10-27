@@ -61,7 +61,7 @@ VCT_MAC_DINH = {
     "vct_tam_nhin": "Trở thành cổng tra cứu dược tin cậy, hiện đại, phục vụ tốt nhất cho cán bộ y tế và người bệnh.",
     "vct_ten_lien_he": "Ds. Tống Văn Tuấn",
     "vct_chuc_vu_lien_he": "Trưởng khoa Dược",
-    "vct_dien_thoai": "0977 755 119",
+    "vct_dien_thoai": "0961.256.092",
 }
 
 
