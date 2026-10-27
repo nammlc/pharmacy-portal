@@ -10,7 +10,8 @@
   var CAC_SELECTOR_ANH = [
     ".bv-detail-anh",       // ảnh đại diện bài viết (trang chi tiết)
     ".rich-content img",    // ảnh chèn trong nội dung bài viết
-    ".drug-detail-media img", // ảnh thuốc (trang chi tiết công khai)
+    ".drug-detail-media img", // ảnh thuốc (trang chi tiết công khai, bản cũ)
+    ".drug-hero-media img",   // ảnh thuốc (trang chi tiết công khai)
   ];
 
   var overlay, anhLon, nutDong;
