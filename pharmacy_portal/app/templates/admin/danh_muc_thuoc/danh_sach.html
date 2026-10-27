@@ -24,7 +24,6 @@
         <th style="width:40px;">#</th>
         <th style="width:42px;"></th>
         <th>Tên biệt dược</th>
-        <th>Hoạt chất</th>
         <th>Nhóm thuốc</th>
         <th></th>
       </tr>
@@ -41,7 +40,6 @@
           {% endif %}
         </td>
         <td class="col-title"><strong class="col-title-text" title="{{ t.ten_biet_duoc }}">{{ t.ten_biet_duoc }}</strong></td>
-        <td style="color:var(--text-muted);" class="adm-td-hoatchat"><span class="col-title-text" title="{{ t.ten_hoat_chat_hien_thi or '' }}">{{ t.ten_hoat_chat_hien_thi or '—' }}</span></td>
         <td>
           {% if t.nhom %}
           <span class="adm-badge">{{ t.nhom.ten_nhom }}</span>

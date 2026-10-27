@@ -3526,12 +3526,11 @@ body.rich-modal-open { overflow: hidden; }
 /* ============================================================
    CHỐNG TRÀN NGANG TRÊN ĐIỆN THOẠI
    ============================================================ */
-html, body { max-width: 100%; overflow-x: hidden; }
+html { overflow-x: clip; }
 *, *::before, *::after { box-sizing: border-box; }
 img, video, iframe, svg { max-width: 100%; }
 img { height: auto; }
 pre, code { white-space: pre-wrap; word-break: break-word; }
-table { display: block; max-width: 100%; overflow-x: auto; }
 .rich-content, .drug-section-body, .drug-hero-title, .drug-hero-sub, .drug-hero-crumbs {
   overflow-wrap: anywhere;
   min-width: 0;
@@ -3559,18 +3558,17 @@ table { display: block; max-width: 100%; overflow-x: auto; }
     background: linear-gradient(to right, var(--ink-900) 240px, transparent 240px), var(--paper-0);
   }
 }
-.adm-td-hoatchat { max-width: 260px; }
-.adm-td-hoatchat .col-title-text { max-width: 260px; }
-.adm-table td.adm-td-hoatchat { white-space: nowrap; }
-/* Ảnh thuốc thường là vỉ/hộp/chai dạng đứng, nên dùng khung đứng cố định
-   và cắt đều (cover) để ảnh luôn đầy khung, không bị co thành vạch mảnh. */
+/* Ảnh thuốc dạng đứng: khung cố định, cắt đều (cover) cho đầy khung.
+   max-width: none để ảnh không bị bộ quy tắc chung làm co lại. */
 .adm-thumb {
-  width: 48px; height: 64px;
+  width: 72px; height: 96px;
+  max-width: none;
   object-fit: cover;
   background: var(--paper-0);
   border: 1px solid var(--line-200);
-  border-radius: 6px;
+  border-radius: 8px;
+  display: block;
 }
-.adm-thumb-placeholder { width: 48px; height: 64px; }
-.drug-card-thumb, .drug-card-thumb-fallback { width: 64px; height: 80px; }
-.drug-card-thumb { object-fit: cover; background: var(--paper-0); padding: 0; }
+.adm-thumb-placeholder { width: 72px; height: 96px; }
+.drug-card-thumb, .drug-card-thumb-fallback { width: 80px; height: 100px; }
+.drug-card-thumb { max-width: none; object-fit: cover; background: var(--paper-0); padding: 0; }
