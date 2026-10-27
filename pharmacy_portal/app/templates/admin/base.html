@@ -32,7 +32,7 @@
     <a href="{{ url_for('admin_dashboard.trang_chinh') }}" class="{{ 'active' if request.endpoint == 'admin_dashboard.trang_chinh' }}">🏠 Tổng quan</a>
 
     <div class="section-label">💊 Danh mục thuốc</div>
-    <a href="{{ url_for('admin_dmt.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_dmt' }}">Danh mục thuốc</a>
+    <a href="{{ url_for('admin_dmt.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_dmt' }}">🧴 Danh mục thuốc</a>
     <a href="{{ url_for('admin_ntbv.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ntbv' }}">🏥 Nhà thuốc BV</a>
     <a href="{{ url_for('admin_nhom_thuoc.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_nhom_thuoc' }}">📂 Nhóm thuốc</a>
     <a href="{{ url_for('admin_hoat_chat.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_hoat_chat' }}">🧬 Hoạt chất</a>

@@ -805,6 +805,933 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* ============================================================
+   DRUG DETAIL PAGE (trang chi tiết 1 thuốc) - bố cục hiện đại
+   ============================================================ */
+.drug-hero {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--ink-900) 0%, var(--navy-600) 100%);
+  color: #fff;
+  box-shadow: 0 18px 40px -22px rgba(11, 31, 58, 0.55);
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.drug-hero-media {
+  flex-shrink: 0;
+  width: 150px;
+  height: 150px;
+  border-radius: var(--radius-md);
+  background: #fff;
+  padding: 8px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.drug-hero-media img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+
+.drug-hero-media-fallback {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 52px;
+}
+
+.drug-hero-text { flex: 1; min-width: 240px; }
+
+.drug-hero-crumbs {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+  margin-bottom: 8px;
+  word-break: break-word;
+}
+.drug-hero-crumbs a { color: inherit; text-decoration: none; }
+.drug-hero-crumbs a:hover { text-decoration: underline; }
+
+.drug-hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3.2vw, 30px);
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0 0 10px;
+}
+
+.drug-hero-sub {
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  opacity: 0.88;
+}
+
+.drug-grid-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.drug-section {
+  background: #fff;
+  border: 1px solid var(--line-200);
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+  box-shadow: 0 1px 2px rgba(11, 31, 58, 0.04);
+}
+.drug-section-wide { grid-column: 1 / -1; }
+
+.drug-section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.drug-section-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--sage-100);
+  color: var(--sage-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.drug-section-icon svg { width: 18px; height: 18px; }
+
+.drug-section-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink-900);
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.drug-section-body { font-size: 14.5px; color: var(--ink-900); line-height: 1.65; }
+.drug-section-body p { margin: 0 0 10px; }
+.drug-section-body p:last-child { margin-bottom: 0; }
+.drug-section-body ul, .drug-section-body ol { padding-left: 20px; margin: 0 0 10px; }
+.drug-section-body li { margin-bottom: 4px; }
+
+.drug-section-empty { color: var(--text-muted); font-size: 14px; margin: 0; }
+
+.drug-source-link {
+  display: inline-block;
+  color: var(--sage-500);
+  font-weight: 600;
+  font-size: 14px;
+  word-break: break-all;
+  text-decoration: none;
+}
+.drug-source-link:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .drug-hero { padding: 20px; gap: 18px; }
+  .drug-hero-media { width: 110px; height: 110px; }
+  .drug-section { padding: 16px 18px; }
+}
+
+/* Thang mức độ - dùng nhất quán cho tương tác / tương kỵ */
+  --level-nhe: #1a4d8f;         /* nhẹ - xanh dương thương hiệu */
+  --level-trungbinh: #d99a3d;   /* trung bình - amber */
+  --level-nang: #d9633d;        /* nặng - burnt orange */
+  --level-cctd: #c73e3e;        /* chống chỉ định - đỏ, khớp chữ thập trên logo */
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-full: 999px;
+  --shadow-sm: 0 8px 20px -14px rgba(16, 25, 43, 0.28);
+  --shadow-md: 0 16px 32px -18px rgba(16, 25, 43, 0.32);
+  --shadow-lg: 0 24px 48px -20px rgba(16, 25, 43, 0.38);
+  --font-display: 'Manrope', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--paper-0);
+  color: var(--ink-900);
+  line-height: 1.55;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.site-main {
+  flex: 1 0 auto;
+}
+.site-footer {
+  flex-shrink: 0;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ============================================================
+   HEADER / NAV
+   ============================================================ */
+.site-header {
+  background: var(--ink-900);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.header-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+}
+
+.brand-mark {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sage-500);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.brand-logo {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.brand-logo-sm { width: 40px; height: 40px; }
+
+.brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+.brand-text strong.brand-primary { font-family: var(--font-display); font-size: 19px; font-weight: 800; letter-spacing: 0.01em; line-height: 1.1; }
+.brand-text small { font-size: 11.5px; color: rgba(255,255,255,0.55); letter-spacing: 0.02em; }
+
+/* Menu giờ luôn gói gọn trong 1 dropdown (mọi kích thước màn hình) */
+.nav-dropdown { position: relative; }
+
+.nav-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  padding: 9px 14px;
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s;
+}
+.nav-toggle:hover { background: rgba(255,255,255,0.11); }
+
+.nav-toggle-icon { display: flex; flex-direction: column; gap: 3px; }
+.nav-toggle-icon span { display: block; width: 16px; height: 2px; background: #fff; border-radius: 1px; }
+
+.nav-toggle-label { white-space: nowrap; }
+
+.nav-toggle-caret { transition: transform 0.15s; flex-shrink: 0; }
+.nav-dropdown[data-open="true"] .nav-toggle-caret { transform: rotate(180deg); }
+.nav-dropdown[data-open="true"] .nav-toggle {
+  background: var(--sky-400);
+  border-color: var(--sky-400);
+}
+
+.main-nav {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  background: var(--ink-900);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+  z-index: 50;
+}
+
+.main-nav.open { display: flex; }
+
+.main-nav a {
+  color: rgba(255,255,255,0.72);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.main-nav a:hover { color: #fff; background: rgba(255,255,255,0.07); }
+.main-nav a.active { color: #fff; background: var(--sky-400); }
+.main-nav a.nav-admin-link {
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.6);
+}
+.main-nav a.nav-admin-link:hover { color: #fff; }
+
+@media (max-width: 900px) {
+  /* Bug cũ: left:0 + right:0 khiến hộp menu bị co hẹp bằng đúng bề rộng
+     nút hamburger (vì .nav-dropdown ở sát mép phải, rất hẹp), chữ trong
+     menu tràn ra ngoài màn hình. Sửa bằng position:fixed neo theo
+     viewport, không phụ thuộc bề rộng của nút bấm. */
+  .main-nav {
+    position: fixed;
+    top: 76px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    min-width: 0;
+    max-height: calc(100dvh - 92px);
+    overflow-y: auto;
+  }
+  .nav-toggle-label { display: none; }
+}
+
+/* ============================================================
+   HERO / SEARCH
+   ============================================================ */
+.hero {
+  background: linear-gradient(165deg, var(--ink-900) 0%, var(--navy-600) 62%, var(--navy-500) 100%);
+  color: #fff;
+  padding: 72px 24px 92px;
+}
+
+.hero-inner { max-width: 780px; margin: 0 auto; text-align: center; }
+
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sky-400);
+  margin-bottom: 18px;
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
+  margin: 0 0 14px;
+}
+
+.hero p {
+  color: rgba(255,255,255,0.7);
+  font-size: 16px;
+  max-width: 560px;
+  margin: 0 auto 34px;
+}
+
+.hero-search {
+  display: flex;
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 6px 6px 22px;
+  box-shadow: 0 20px 40px -12px rgba(0,0,0,0.45);
+  max-width: 560px;
+  margin: 0 auto;
+  border: 2px solid transparent;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.hero-search:focus-within {
+  border-color: var(--sky-400);
+  box-shadow: 0 0 0 5px rgba(74, 159, 224, 0.28), 0 20px 40px -12px rgba(0,0,0,0.45);
+}
+
+.hero-search input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  font-size: 15px;
+  font-family: var(--font-body);
+  color: var(--ink-900);
+  padding-left: 30px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2357708a' stroke-width='2' stroke-linecap='round'><circle cx='11' cy='11' r='7'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>");
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 18px;
+}
+
+.hero-search button {
+  background: var(--ink-900);
+  color: #fff;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.hero-search button:hover { background: var(--navy-500); }
+
+/* ============================================================
+   CATEGORY CARDS (trang chủ)
+   ============================================================ */
+.category-grid {
+  max-width: 1180px;
+  margin: -50px auto 80px;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.category-card {
+  background: var(--paper-50);
+  border: 1px solid var(--line-200);
+  border-radius: var(--radius-md);
+  padding: 26px 22px;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.category-card::before {
+  content: "";
+  position: absolute;
+  top: -44px;
+  right: -44px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--accent-bg, var(--sage-100));
+  z-index: 0;
+}
+
+.category-card > * { position: relative; z-index: 1; }
+
+.category-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-color, var(--sage-500));
+}
+
+.category-card-arrow {
+  position: absolute;
+  top: 22px;
+  right: 20px;
+  color: var(--line-200);
+  transition: transform 0.15s, color 0.15s;
+  z-index: 1;
+}
+.category-card:hover .category-card-arrow { color: var(--accent-color, var(--sage-500)); transform: translate(2px, -2px); }
+
+.category-icon {
+  width: 42px; height: 42px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-bg, var(--sage-100));
+  color: var(--accent-color, var(--sage-500));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+
+.category-card h3 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  margin: 0;
+}
+
+.category-card p {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.category-card-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent-color, var(--sage-500));
+  background: var(--accent-bg, var(--sage-100));
+  padding: 3px 10px;
+  border-radius: 999px;
+  align-self: flex-start;
+}
+
+.category-card-accent-0 { --accent-color: var(--sage-500); --accent-bg: var(--sage-100); }
+.category-card-accent-1 { --accent-color: var(--level-trungbinh); --accent-bg: #faf0dd; }
+.category-card-accent-2 { --accent-color: var(--sky-400); --accent-bg: #e8f4fd; }
+.category-card-accent-3 { --accent-color: var(--level-nang); --accent-bg: #fbe6dd; }
+.category-card-accent-4 { --accent-color: #7a4dd9; --accent-bg: #efe8fb; }
+.category-card-accent-5 { --accent-color: #1f9d7c; --accent-bg: #e2f5ef; }
+.category-card-accent-6 { --accent-color: var(--level-cctd); --accent-bg: #fbdede; }
+
+/* ============================================================
+   NHÓM THUỐC GRID (trang danh mục thuốc / nhà thuốc bv — chọn nhóm)
+   Card có điểm nhấn màu xoay vòng để dễ phân biệt các nhóm,
+   dùng riêng cho trang liệt kê nhóm (khác .category-card trang chủ).
+   ============================================================ */
+.nhom-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 18px;
+}
+
+.nhom-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper-50);
+  border: 1px solid var(--line-200);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.nhom-card::before {
+  content: "";
+  position: absolute;
+  top: -46px;
+  right: -46px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: var(--accent-bg);
+  z-index: 0;
+}
+
+.nhom-card > * { position: relative; z-index: 1; }
+
+.nhom-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 42px -22px rgba(16, 25, 43, 0.38);
+  border-color: var(--accent-color);
+}
+
+.nhom-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--accent-bg);
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.nhom-card h3 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 800;
+  margin: 0;
+  color: var(--ink-900);
+  line-height: 1.3;
+}
+
+.nhom-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.nhom-card-count {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--accent-color);
+  background: var(--accent-bg);
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+.nhom-card-arrow {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--paper-0);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+
+.nhom-card:hover .nhom-card-arrow {
+  background: var(--ink-900);
+  color: #fff;
+  transform: translateX(2px);
+}
+
+.nhom-card-accent-0 { --accent-color: var(--sage-500); --accent-bg: var(--sage-100); }
+.nhom-card-accent-1 { --accent-color: var(--level-trungbinh); --accent-bg: #faf0dd; }
+.nhom-card-accent-2 { --accent-color: var(--sky-400); --accent-bg: #e8f4fd; }
+.nhom-card-accent-3 { --accent-color: var(--level-nang); --accent-bg: #fbe6dd; }
+
+/* ============================================================
+   GENERIC PAGE / SEARCH SECTIONS
+   ============================================================ */
+.page-header {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 44px 24px 8px;
+}
+
+.page-header .eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sage-500);
+}
+
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  margin: 8px 0 6px;
+}
+
+.page-header p { color: var(--text-muted); margin: 0; max-width: 620px; }
+
+.search-panel {
+  max-width: 1180px;
+  margin: 24px auto 0;
+  padding: 0 24px;
+}
+
+.search-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--paper-50);
+  border: 1px solid var(--line-200);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: 0 10px 24px -18px rgba(16, 25, 43, 0.25);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.search-form:focus-within {
+  border-color: var(--sage-500);
+  box-shadow: 0 0 0 3px rgba(26, 77, 143, 0.1);
+}
+
+.search-form input[type="text"] {
+  flex: 1;
+  min-width: 180px;
+  padding: 10px 14px 10px 40px;
+  border: 1px solid var(--line-200);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2357708a' stroke-width='2' stroke-linecap='round'><circle cx='11' cy='11' r='7'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>");
+  background-repeat: no-repeat;
+  background-position: 13px center;
+  background-size: 16px;
+}
+
+.search-form input[type="text"]:focus { outline: none; border-color: var(--sky-400); }
+
+.search-form button {
+  background: var(--ink-900);
+  color: #fff;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.search-form button:hover { background: var(--navy-500); }
+
+.results-panel {
+  max-width: 1180px;
+  margin: 24px auto 80px;
+  padding: 0 24px;
+}
+
+.result-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+  background: transparent;
+}
+
+.result-table thead th {
+  text-align: left;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  background: transparent;
+  padding: 0 20px 8px;
+  border: none;
+}
+
+.result-table tbody tr {
+  background: var(--paper-50);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.result-table tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.result-table td {
+  padding: 16px 20px;
+  border: none;
+  border-top: 1px solid var(--line-100);
+  border-bottom: 1px solid var(--line-100);
+  font-size: 14px;
+  vertical-align: top;
+}
+
+.result-table td:first-child {
+  border-left: 1px solid var(--line-100);
+  border-top-left-radius: 14px;
+  border-bottom-left-radius: 14px;
+}
+
+.result-table td:last-child {
+  border-right: 1px solid var(--line-100);
+  border-top-right-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  background: var(--paper-50);
+  border: 1px dashed var(--line-200);
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 700px) {
+  .result-table { display: block; }
+  .result-table thead { display: none; }
+  .result-table tbody { display: block; }
+  .result-table tbody tr {
+    display: block;
+    padding: 14px 16px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+  }
+  .result-table td {
+    display: flex;
+    gap: 10px;
+    padding: 7px 0;
+    border: none !important;
+    border-radius: 0 !important;
+    font-size: 13.5px;
+  }
+  .result-table td:not(:first-child)::before {
+    content: attr(data-nhan);
+    flex-shrink: 0;
+    width: 40%;
+    color: var(--text-muted);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding-top: 1px;
+  }
+}
+
+.empty-state-icon {
+  width: 52px; height: 52px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: var(--paper-0);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  color: var(--line-200);
+  border: 1px solid var(--line-200);
+}
+
+/* ============================================================
+   DRUG GRID (danh sách thuốc trong 1 nhóm / kết quả tìm kiếm)
+   Card ảnh + tên + hoạt chất — tách riêng khỏi .category-card
+   (dùng cho trang chủ) để dễ tinh chỉnh độc lập.
+   ============================================================ */
+.drug-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.drug-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--paper-50);
+  border: 1px solid var(--line-200);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.drug-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px -16px rgba(16, 25, 43, 0.28);
+  border-color: var(--sage-500);
+}
+
+.drug-card-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--paper-0);
+  border: 1px solid var(--line-100);
+}
+
+.drug-card-thumb-fallback {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--sage-500);
+  background: var(--sage-100);
+}
+
+.drug-card-body { min-width: 0; }
+
+.drug-card-body h3 {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 3px;
+  color: var(--ink-900);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drug-card-body p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 32px;
+}
+
+.page-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-200);
+  background: var(--paper-50);
+  color: var(--ink-900);
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.page-btn:hover { border-color: var(--sage-500); color: var(--sage-500); }
+.page-btn.is-disabled { color: var(--line-200); border-color: var(--line-100); cursor: not-allowed; pointer-events: none; }
+
+.page-numbers { display: flex; align-items: center; gap: 4px; margin: 0 4px; }
+
+.page-num {
+  min-width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: background 0.15s, color 0.15s;
+}
+.page-num:hover { background: var(--paper-0); color: var(--ink-900); }
+.page-num.is-current { background: var(--ink-900); color: #fff; }
+
+.page-ellipsis { color: var(--line-200); padding: 0 2px; font-weight: 700; }
+
+.pagination-summary {
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin: 10px 0 0;
+}
+
+@media (max-width: 480px) {
+  .page-btn span { display: none; }
+  .page-btn { padding: 9px; }
+}
+
+/* ============================================================
    DRUG DETAIL PAGE (trang chi tiết 1 thuốc)
    ============================================================ */
 .drug-detail {
