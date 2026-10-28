@@ -31,7 +31,8 @@ def create_app(config_class=Config):
         @app.before_request
         def _chuyen_ve_ten_mien_chinh():
             host = request.host.split(":")[0].lower()
-            if host.endswith(".onrender.com"):
+            chinh = app.config["CANONICAL_HOST"].lower()
+            if host.endswith(".onrender.com") or host == "www." + chinh:
                 return redirect(
                     f"https://{app.config['CANONICAL_HOST']}{request.full_path.rstrip('?')}",
                     code=301,

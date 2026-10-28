@@ -30,8 +30,10 @@ def dang_ky_seo(app):
     @app.route("/sitemap.xml")
     def sitemap_xml():
         goc = _goc_trang()
+        # "/" chuyển hướng 302 sang /bai-viet/ nên KHÔNG đưa vào sitemap (sitemap chỉ nên chứa URL trả 200);
+        # trang chủ thật nằm ở /trang-chu.
         duong_dan = [
-            "/",
+            "/trang-chu",
             "/ve-chung-toi",
             "/bai-viet/",
             "/danh-muc-thuoc/",
