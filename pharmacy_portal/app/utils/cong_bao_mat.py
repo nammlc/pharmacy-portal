@@ -178,9 +178,19 @@ def ghi_lan_sai(ip: str) -> int:
     GateLanThu.query.filter(GateLanThu.thoi_gian < datetime.utcnow() - timedelta(days=1)) \
         .delete(synchronize_session=False)
     db.session.commit()
+    return con_lai_hien_tai(ip)
+
+
+def con_lai_hien_tai(ip: str) -> int:
+    """Số lần còn được thử của IP này (không ghi thêm lần sai nào)."""
     moc = datetime.utcnow() - timedelta(minutes=current_app.config["ADMIN_GATE_KHOA_PHUT"])
     so = GateLanThu.query.filter(GateLanThu.ip == ip, GateLanThu.thoi_gian > moc).count()
     return max(0, current_app.config["ADMIN_GATE_MAX_SAI"] - so)
+
+
+def dau_lan_thu(ma: str) -> str:
+    """Dấu của lần nhập, dùng để nhận ra cùng một lần gửi bị lặp (có khoá bí mật, không lộ mã)."""
+    return hmac.new(current_app.config["SECRET_KEY"].encode(), ma.encode(), hashlib.sha256).hexdigest()[:16]
 
 
 def vuot_gioi_han(khoa: str, toi_da: int, phut: int) -> bool:

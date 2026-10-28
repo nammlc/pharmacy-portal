@@ -1,9 +1,11 @@
+import re
+import time
 """Cổng mã bảo mật 6 số trước trang admin + thiết lập lần đầu + quên mã (qua email) + đổi mã trong admin.
 Mọi thao tác đều làm trên web, KHÔNG cần truy cập Render hay Neon."""
 import hashlib
 from html import escape
 
-from flask import (Blueprint, abort, current_app, flash, redirect, render_template, request, url_for)
+from flask import (Blueprint, abort, current_app, flash, redirect, render_template, request, session, url_for)
 from flask_login import current_user, login_required
 from sqlalchemy import func
 from werkzeug.security import check_password_hash
@@ -16,6 +18,9 @@ from app.utils.nhat_ky import ghi, lay_ip
 
 # --- Các trang CỔNG (công khai, nằm trước đăng nhập) ---
 bp = Blueprint("admin_cong", __name__, url_prefix="/admin/ma-bao-mat")
+
+
+RE_EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
 
 
 def _loi_ma_moi(ma, xac_nhan):
@@ -55,7 +60,13 @@ def nhap_ma():
             ghi("ma_bao_mat_dung", mo_ta="Nhập đúng mã bảo mật")
             return redirect(dich)
 
-        con_lai = cong.ghi_lan_sai(ip)
+        dau = cong.dau_lan_thu(ma)
+        gan = session.get("_gate_lan_sai")
+        if gan and gan[0] == dau and time.time() - gan[1] < 3:
+            con_lai = cong.con_lai_hien_tai(ip)      # cùng một lần gửi bị lặp: không đếm thêm
+        else:
+            con_lai = cong.ghi_lan_sai(ip)
+            session["_gate_lan_sai"] = [dau, time.time()]
         ghi("ma_bao_mat_sai", mo_ta=f"Nhập sai mã bảo mật (còn {con_lai} lần thử)")
         if con_lai:
             flash(f"Mã bảo mật không đúng. Còn {con_lai} lần thử.", "error")
@@ -109,6 +120,10 @@ def quen_ma():
 
     if request.method == "POST":
         email = (request.form.get("email") or "").strip().lower()
+        # Chỉ kiểm tra ĐỊNH DẠNG email (không tiết lộ email nào có trong hệ thống)
+        if not RE_EMAIL.match(email):
+            flash("Email không đúng định dạng. Ví dụ đúng: ten@gmail.com", "error")
+            return render_template("admin/cong_quen_ma.html", email=email), 400
         khoa_ip = "#q:" + lay_ip()
         khoa_email = "#e:" + hashlib.sha256(email.encode()).hexdigest()[:16]
 

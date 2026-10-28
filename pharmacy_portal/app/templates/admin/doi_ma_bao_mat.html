@@ -20,7 +20,7 @@
     </div>
     <div class="form-row">
       {{ form.ma_moi.label }}
-      {{ form.ma_moi(autocomplete="new-password", inputmode="numeric", maxlength="6", id="maMoi", class_="gate-input gate-input-sm") }}
+      {{ form.ma_moi(autocomplete="new-password", inputmode="numeric", maxlength="6", id="maMoi", class_="gate-input gate-input-sm", data_hien_ma="1") }}
       {% for e in form.ma_moi.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
     </div>
     <div class="form-row">

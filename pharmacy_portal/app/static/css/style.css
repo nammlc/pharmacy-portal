@@ -3621,3 +3621,9 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
 .nk-b-ma_bao_mat_dung{background:#e8f5e9;color:#2e7d32}
 .nk-b-ma_bao_mat_sai{background:#ffebee;color:#c62828}
 .nk-b-doi_ma_bao_mat{background:#fff3e0;color:#e65100}
+
+/* Ô mã bảo mật: nút hiện/ẩn */
+.hien-ma-wrap{position:relative;max-width:240px}
+.hien-ma-wrap input{padding-right:64px}
+.hien-ma-nut{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--navy-600,#1c2333);font-size:13px;font-weight:700;cursor:pointer;padding:4px 6px}
+.hien-ma-wrap .gate-input{padding-right:64px}
