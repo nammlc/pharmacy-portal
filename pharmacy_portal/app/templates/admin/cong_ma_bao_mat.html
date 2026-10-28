@@ -37,8 +37,8 @@
       <input type="hidden" name="next" value="{{ next }}">
       <div class="form-row"><label>Tên đăng nhập</label><input type="text" name="ten_dang_nhap" autocomplete="username" required autofocus></div>
       <div class="form-row"><label>Mật khẩu</label><input type="password" name="mat_khau" autocomplete="current-password" required></div>
-      <div class="form-row"><label>Mã bảo mật mới (6 chữ số)</label><input type="password" data-hien-ma name="ma_moi" class="gate-input gate-input-sm" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]*" autocomplete="new-password" required></div>
-      <div class="form-row"><label>Nhập lại mã</label><input type="password" data-hien-ma name="xac_nhan" class="gate-input gate-input-sm" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]*" autocomplete="new-password" required></div>
+      <div class="form-row"><label>Mã bảo mật mới (6 chữ số)</label><input type="password" name="ma_moi" class="gate-input gate-input-sm" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]*" autocomplete="new-password" required></div>
+      <div class="form-row"><label>Nhập lại mã</label><input type="password" name="xac_nhan" class="gate-input gate-input-sm" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]*" autocomplete="new-password" required></div>
       <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:11px;">Thiết lập mã</button>
     </form>
     {% else %}
@@ -47,7 +47,7 @@
       <input type="hidden" name="next" value="{{ next }}">
       <div class="form-row">
         <label for="gateMa" class="gate-label">Mã bảo mật</label>
-        <input type="password" data-hien-ma id="gateMa" name="ma" class="gate-input" inputmode="numeric" pattern="[0-9]*"
+        <input type="password" id="gateMa" name="ma" class="gate-input" inputmode="numeric" pattern="[0-9]*"
                maxlength="6" minlength="6" autocomplete="one-time-code" autofocus required placeholder="••••••">
       </div>
       <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:11px;">Xác nhận</button>
@@ -58,6 +58,6 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/cong_ma_bao_mat.js') }}"></script>
-<script src="{{ url_for('static', filename='js/hien_thi_ma.js') }}"></script>
+<script src="{{ url_for('static', filename='js/hien_mat_khau.js') }}"></script>
 </body>
 </html>

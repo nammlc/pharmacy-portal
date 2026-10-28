@@ -27,12 +27,12 @@
     {% endwith %}
     <form method="POST" action="{{ url_for('admin_cong.dat_lai_ma', token=token) }}" autocomplete="off">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <div class="form-row"><label>Mã bảo mật mới (6 chữ số)</label><input type="password" data-hien-ma name="ma_moi" class="gate-input gate-input-sm" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]*" autocomplete="new-password" required autofocus></div>
-      <div class="form-row"><label>Nhập lại mã</label><input type="password" data-hien-ma name="xac_nhan" class="gate-input gate-input-sm" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]*" autocomplete="new-password" required></div>
+      <div class="form-row"><label>Mã bảo mật mới (6 chữ số)</label><input type="password" name="ma_moi" class="gate-input gate-input-sm" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]*" autocomplete="new-password" required autofocus></div>
+      <div class="form-row"><label>Nhập lại mã</label><input type="password" name="xac_nhan" class="gate-input gate-input-sm" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]*" autocomplete="new-password" required></div>
       <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:11px;">Lưu mã mới</button>
     </form>
   </div>
 </div>
-<script src="{{ url_for('static', filename='js/hien_thi_ma.js') }}"></script>
+<script src="{{ url_for('static', filename='js/hien_mat_khau.js') }}"></script>
 </body>
 </html>
