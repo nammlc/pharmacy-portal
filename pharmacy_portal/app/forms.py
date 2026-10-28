@@ -244,7 +244,7 @@ class BaiVietForm(FlaskForm):
 
 
 class DoiMaBaoMatForm(FlaskForm):
-    mat_khau_hien_tai = PasswordField("Mật khẩu tài khoản của bạn (để xác nhận)", validators=[DataRequired()])
+    mat_khau_hien_tai = PasswordField("Mật khẩu tài khoản của bạn", validators=[DataRequired()])
     ma_moi = PasswordField("Mã bảo mật mới (6 chữ số)", validators=[
         DataRequired(message="Vui lòng nhập mã mới."),
         Regexp(r"^\d{6}$", message="Mã bảo mật gồm đúng 6 chữ số."),
