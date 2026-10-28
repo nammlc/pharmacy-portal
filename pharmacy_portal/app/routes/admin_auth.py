@@ -46,6 +46,9 @@ def dang_nhap():
 @login_required
 def dang_xuat():
     logout_user()
+    if current_app.config.get("ADMIN_GATE_DONG_KHI_DANG_XUAT"):
+        from app.utils.cong_bao_mat import dong_cong
+        dong_cong()      # đăng xuất xong phải nhập lại mã bảo mật mới vào lại được trang admin
     if request.args.get("het_han"):   # trình duyệt tự đăng xuất vì không hoạt động
         flash(f"Đã tự động đăng xuất do không hoạt động quá "
               f"{current_app.config['ADMIN_IDLE_TIMEOUT_MINUTES']} phút.", "warning")

@@ -56,6 +56,9 @@
     {% if current_user.vai_tro == 'quan_tri' %}
     <a href="{{ url_for('admin_nhat_ky.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_nhat_ky' }}">🛡️ Nhật ký truy cập</a>
     {% endif %}
+    {% if not config.ADMIN_GATE_CHI_QUAN_TRI_DOI or current_user.vai_tro == 'quan_tri' %}
+    <a href="{{ url_for('admin_ma_bao_mat.doi_ma') }}" class="{{ 'active' if request.blueprint == 'admin_ma_bao_mat' }}">🔐 Mã bảo mật</a>
+    {% endif %}
     <a href="{{ url_for('main.trang_chu') }}" target="_blank">🌐 Xem trang công khai ↗</a>
   </aside>
 

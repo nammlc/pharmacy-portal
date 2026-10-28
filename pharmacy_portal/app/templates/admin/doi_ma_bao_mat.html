@@ -1,0 +1,70 @@
+{% extends "admin/base.html" %}
+{% block title %}Mã bảo mật{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head"><h1>Mã bảo mật cổng quản trị</h1></div>
+
+<div class="admin-form-card">
+  <p style="color:var(--text-muted); font-size:13.5px; margin:0 0 16px; line-height:1.6;">
+    Mã gồm <strong>6 chữ số</strong>, bắt buộc nhập trước khi thấy trang đăng nhập quản trị. Mã được lưu dạng băm nên
+    <strong>không xem lại được</strong>, chỉ đặt mã mới. Nếu ai đó quên mã, họ bấm “Quên mã bảo mật?” ở trang nhập mã để nhận link đặt lại qua email. Sau khi đổi, mọi trình duyệt/thiết bị khác sẽ phải nhập mã mới.
+    {% if ngay_doi %}<br>Đổi lần cuối: <strong>{{ (ngay_doi | gio_vn).strftime('%d/%m/%Y %H:%M') }}</strong> (GMT+7).{% endif %}
+  </p>
+
+  <form method="POST" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-row">
+      {{ form.mat_khau_hien_tai.label }}
+      {{ form.mat_khau_hien_tai(autocomplete="current-password") }}
+      {% for e in form.mat_khau_hien_tai.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="form-row">
+      {{ form.ma_moi.label }}
+      {{ form.ma_moi(autocomplete="new-password", inputmode="numeric", maxlength="6", id="maMoi", class_="gate-input gate-input-sm") }}
+      {% for e in form.ma_moi.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="form-row">
+      {{ form.xac_nhan_ma_moi.label }}
+      {{ form.xac_nhan_ma_moi(autocomplete="new-password", inputmode="numeric", maxlength="6", id="maXacNhan", class_="gate-input gate-input-sm") }}
+      {% for e in form.xac_nhan_ma_moi.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="form-row" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <button type="button" class="btn btn-outline" id="maNgauNhien">🎲 Tạo mã ngẫu nhiên</button>
+      <label style="font-size:13px; display:flex; gap:6px; align-items:center; margin:0;">
+        <input type="checkbox" id="maHien"> Hiện mã
+      </label>
+      <span id="maGhiChu" style="font-size:13px; color:var(--text-muted);"></span>
+    </div>
+    <div class="form-actions">
+      {{ form.submit(class="btn btn-primary") }}
+      <a href="{{ url_for('admin_dashboard.trang_chinh') }}" class="btn btn-outline">Huỷ</a>
+    </div>
+  </form>
+</div>
+
+<script>
+(function () {
+  var a = document.getElementById("maMoi"), b = document.getElementById("maXacNhan");
+  var hien = document.getElementById("maHien"), ghiChu = document.getElementById("maGhiChu");
+  function chiSo(o) { o.addEventListener("input", function () { o.value = o.value.replace(/\D/g, "").slice(0, 6); }); }
+  chiSo(a); chiSo(b);
+  hien.addEventListener("change", function () { a.type = b.type = hien.checked ? "text" : "password"; });
+  function yeu(p) {
+    var d = "0123456789";
+    return /^(\d)\1{5}$/.test(p) || d.indexOf(p) >= 0 || (d + d).indexOf(p) >= 0 ||
+           d.split("").reverse().join("").indexOf(p) >= 0 || p.slice(0, 2) === p.slice(2, 4) && p.slice(2, 4) === p.slice(4) ||
+           p.slice(0, 3) === p.slice(3);
+  }
+  document.getElementById("maNgauNhien").addEventListener("click", function () {
+    var p;
+    do {
+      var u = new Uint32Array(1); crypto.getRandomValues(u);
+      p = String(u[0] % 1000000).padStart(6, "0");
+    } while (yeu(p));
+    a.value = b.value = p;
+    hien.checked = true; a.type = b.type = "text";
+    ghiChu.textContent = "Hãy ghi lại mã này trước khi bấm Đổi mã bảo mật.";
+  });
+})();
+</script>
+{% endblock %}

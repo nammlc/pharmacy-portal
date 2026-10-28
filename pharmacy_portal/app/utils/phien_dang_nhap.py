@@ -35,6 +35,8 @@ def dang_ky(app):
         if not isinstance(lan_cuoi, (int, float)) or bay_gio - lan_cuoi > gioi_han:
             logout_user()
             session.pop(KHOA, None)
+            from app.utils.cong_bao_mat import dong_cong
+            dong_cong()
             if request.path.startswith("/admin"):
                 flash(f"Phiên đăng nhập đã hết hạn do không hoạt động quá "
                       f"{app.config['ADMIN_IDLE_TIMEOUT_MINUTES']} phút. Vui lòng đăng nhập lại.", "warning")

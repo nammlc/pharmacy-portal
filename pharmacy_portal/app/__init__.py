@@ -157,15 +157,27 @@ def create_app(config_class=Config):
     from app.routes.admin_nhat_ky import bp as admin_nhat_ky_bp
     app.register_blueprint(admin_nhat_ky_bp)
 
+    from app.routes.admin_cong_bao_mat import bp as admin_cong_bp, bp_doi as admin_ma_bao_mat_bp
+    app.register_blueprint(admin_cong_bp)
+    app.register_blueprint(admin_ma_bao_mat_bp)
+
     # --- Nhật ký truy cập: hook toàn cục + tự tạo bảng nếu chưa có ---
     from app.utils import nhat_ky as _nhat_ky
     _nhat_ky.dang_ky(app)
+
+    # --- Cổng mã bảo mật 6 số trước toàn bộ /admin ---
+    from app.utils import cong_bao_mat as _cong
+    _cong.dang_ky(app)
+
     with app.app_context():
+        # Tự tạo các bảng mới (nhat_ky, cài đặt, lần nhập sai mã) nếu chưa có - không đụng bảng cũ
         try:
-            from app.models.models import NhatKy
-            NhatKy.__table__.create(bind=db.engine, checkfirst=True)
+            from app.models.models import NhatKy, CaiDatHeThong, GateLanThu
+            for _bang in (NhatKy, CaiDatHeThong, GateLanThu):
+                _bang.__table__.create(bind=db.engine, checkfirst=True)
         except Exception as e:
-            app.logger.warning(f"Không tạo được bảng nhat_ky (chạy them_bang_nhat_ky.sql thủ công): {e}")
+            app.logger.warning(f"Không tạo được bảng mới (chạy them_bang_nhat_ky.sql / them_bang_cong_bao_mat.sql thủ công): {e}")
+        _cong.khoi_tao(app)
 
     _tao_tai_khoan_dau_tien_neu_can(app)
 

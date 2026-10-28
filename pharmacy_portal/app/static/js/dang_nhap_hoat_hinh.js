@@ -56,7 +56,7 @@
       credentials: "same-origin",
       redirect: "follow"
     }).then(function (res) {
-      var vaoDuoc = res.redirected && res.url.indexOf("/dang-nhap") === -1;
+      var vaoDuoc = res.redirected && res.url.indexOf("/dang-nhap") === -1 && res.url.indexOf("/ma-bao-mat") === -1;
       if (vaoDuoc) {
         diVaoCua(res.url);
       } else {

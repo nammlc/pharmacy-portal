@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Xác thực truy cập — Cổng Tra Cứu Dược</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="login-shell">
+  <div class="login-card">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo bệnh viện" style="width:72px; height:72px; margin:0 auto 16px; display:block;">
+    <h1>Xác thực truy cập</h1>
+    <p class="sub">Khu vực quản trị nội bộ.<br>Nhập mã bảo mật gồm 6 chữ số để tiếp tục.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div style="margin-bottom:16px;">
+        {% for category, message in messages %}
+        <div class="flash-msg flash-{{ 'error' if category == 'error' else category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    {% if chua_cau_hinh %}
+    <p style="font-size:13.5px; color:var(--text-muted); margin:0 0 14px; line-height:1.6;">
+      <strong>Thiết lập lần đầu.</strong> Hệ thống chưa có mã bảo mật. Đăng nhập bằng tài khoản quản trị rồi đặt mã 6 chữ số.
+    </p>
+    <form method="POST" action="{{ url_for('admin_cong.thiet_lap') }}" autocomplete="off">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="form-row"><label>Tên đăng nhập</label><input type="text" name="ten_dang_nhap" autocomplete="username" required autofocus></div>
+      <div class="form-row"><label>Mật khẩu</label><input type="password" name="mat_khau" autocomplete="current-password" required></div>
+      <div class="form-row"><label>Mã bảo mật mới (6 chữ số)</label><input type="password" name="ma_moi" class="gate-input gate-input-sm" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]*" autocomplete="new-password" required></div>
+      <div class="form-row"><label>Nhập lại mã</label><input type="password" name="xac_nhan" class="gate-input gate-input-sm" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]*" autocomplete="new-password" required></div>
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:11px;">Thiết lập mã</button>
+    </form>
+    {% else %}
+    <form method="POST" action="{{ url_for('admin_cong.nhap_ma') }}" id="gateForm" autocomplete="off">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="form-row">
+        <label for="gateMa" class="gate-label">Mã bảo mật</label>
+        <input type="password" id="gateMa" name="ma" class="gate-input" inputmode="numeric" pattern="[0-9]*"
+               maxlength="6" minlength="6" autocomplete="one-time-code" autofocus required placeholder="••••••">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:11px;">Xác nhận</button>
+    </form>
+    <p style="text-align:center; margin:16px 0 0; font-size:13px;"><a href="{{ url_for('admin_cong.quen_ma') }}">Quên mã bảo mật?</a></p>
+    {% endif %}
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/cong_ma_bao_mat.js') }}"></script>
+</body>
+</html>

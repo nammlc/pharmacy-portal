@@ -161,3 +161,17 @@ Admin tự bị đăng xuất sau **15 phút không thao tác** (đổi bằng b
 Các ô văn bản dài (thành phần, chỉ định, cách dùng... — mọi `TextAreaField` đi qua macro `render_field`) hiện **bản xem trước**
 trong form; bấm vào ô (hoặc Tab tới rồi Enter) sẽ mở **modal soạn thảo**: thanh công cụ nằm cố định ở trên cùng, chỉ vùng nội dung cuộn.
 `Ctrl+Enter` = Xong, `Esc` = Huỷ (hỏi lại nếu đã sửa), bấm ra vùng tối không đóng để tránh mất bài. Code: `static/js/main.js`, CSS `.rich-modal*` / `.rich-preview*`.
+
+
+## Cổng mã bảo mật 6 số trước trang admin
+
+Mọi đường dẫn `/admin/...` (kể cả trang đăng nhập) đều yêu cầu nhập **mã bảo mật 6 chữ số** trước. Trang công khai không bị ảnh hưởng.
+**Mọi thao tác làm trực tiếp trên web, không cần vào Render hay Neon.**
+
+- **Lần đầu (chưa có mã):** mở `/admin` → form "Thiết lập lần đầu": nhập tên đăng nhập + mật khẩu tài khoản admin rồi đặt mã 6 số.
+- **Đổi mã:** đăng nhập admin → menu **🔐 Mã bảo mật** (cần mật khẩu tài khoản để xác nhận; có nút tạo mã ngẫu nhiên). Mặc định mọi tài khoản admin đều đổi được; đặt `ADMIN_GATE_CHI_QUAN_TRI_DOI=1` nếu chỉ muốn vai trò `quan_tri`. Đổi xong, các trình duyệt/thiết bị khác phải nhập mã mới.
+- **Quên mã:** ở trang nhập mã bấm **"Quên mã bảo mật?"** → nhập email của tài khoản admin → nhận link (hiệu lực 30 phút, dùng 1 lần) để đặt mã mới. Tối đa 3 yêu cầu/giờ cho mỗi IP và mỗi email. Cần tài khoản đã có email và đã cấu hình gửi mail (xem `HUONG_DAN_GUI_MAIL_GMAIL.md`).
+- **Phương án cuối** (mất cả email lẫn mật khẩu): đặt biến `ADMIN_GATE_PIN` (6 số) trên Render hoặc chạy `tao_sql_ma_bao_mat.py` rồi dán SQL vào Neon.
+- Mã lưu dạng băm, không xem lại được. Sai 5 lần/IP → khoá IP đó 15 phút; có thêm ngưỡng chung toàn hệ thống.
+- Cổng tự đóng lại khi không thao tác 30 phút, khi hết phiên, và khi đăng xuất. Chỉnh bằng `ADMIN_GATE_IDLE_MINUTES`, `ADMIN_GATE_MAX_SAI`, `ADMIN_GATE_KHOA_PHUT`, `ADMIN_GATE_MAX_SAI_TOAN_CUC`, `ADMIN_GATE_DONG_KHI_DANG_XUAT` (đặt `0` để đăng xuất không đóng cổng).
+- Sự kiện nhập mã đúng/sai và đổi mã được ghi trong **Nhật ký truy cập**.

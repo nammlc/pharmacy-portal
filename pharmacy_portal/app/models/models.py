@@ -350,3 +350,21 @@ class NhatKy(db.Model):
 
     def __repr__(self):
         return f"<NhatKy {self.loai} {self.ip}>"
+
+
+class CaiDatHeThong(db.Model):
+    """Bảng cài đặt dạng khoá-giá trị. Hiện dùng cho mã bảo mật cổng admin (chỉ lưu dạng băm)."""
+    __tablename__ = "cai_dat_he_thong"
+
+    khoa = db.Column(db.String(80), primary_key=True)
+    gia_tri = db.Column(db.Text)
+    ngay_cap_nhat = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class GateLanThu(db.Model):
+    """Mỗi dòng = 1 lần nhập SAI mã bảo mật cổng admin (để khoá tạm theo IP / toàn hệ thống)."""
+    __tablename__ = "cong_bao_mat_lan_sai"
+
+    id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(64), index=True)
+    thoi_gian = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)

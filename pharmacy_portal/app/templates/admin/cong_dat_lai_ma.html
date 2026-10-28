@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Đặt mã bảo mật mới — Cổng Tra Cứu Dược</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="login-shell">
+  <div class="login-card">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo bệnh viện" style="width:72px; height:72px; margin:0 auto 16px; display:block;">
+    <h1>Đặt mã bảo mật mới</h1>
+    <p class="sub">Chọn mã gồm 6 chữ số, không quá dễ đoán.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div style="margin-bottom:16px;">
+        {% for category, message in messages %}
+        <div class="flash-msg flash-{{ 'error' if category == 'error' else category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+    <form method="POST" action="{{ url_for('admin_cong.dat_lai_ma', token=token) }}" autocomplete="off">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-row"><label>Mã bảo mật mới (6 chữ số)</label><input type="password" name="ma_moi" class="gate-input gate-input-sm" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]*" autocomplete="new-password" required autofocus></div>
+      <div class="form-row"><label>Nhập lại mã</label><input type="password" name="xac_nhan" class="gate-input gate-input-sm" inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]*" autocomplete="new-password" required></div>
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:11px;">Lưu mã mới</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>

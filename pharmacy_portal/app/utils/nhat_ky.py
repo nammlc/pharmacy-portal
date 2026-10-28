@@ -50,6 +50,7 @@ NHAN_DOI_TUONG = {
     "admin_bv": "Bài viết - Thông báo", "admin_dmbv": "Danh mục bài viết",
     "admin_ttbn": "Bài viết bệnh nhân", "admin_vct": "Về chúng tôi",
     "admin_nhat_ky": "Nhật ký truy cập", "admin_auth": "Tài khoản",
+    "admin_ma_bao_mat": "Mã bảo mật", "admin_cong": "Cổng mã bảo mật",
 }
 
 NHAN_TRANG_CONG_KHAI = {
@@ -357,6 +358,10 @@ def _ghi_admin(response):
     ep = request.endpoint or ""
     bp = request.blueprint or ""
     uid, ten = _nguoi_dung()
+
+    # Cổng mã bảo mật & đổi mã tự ghi log riêng (ma_bao_mat_dung/sai, doi_ma_bao_mat) -> không ghi trùng
+    if bp == "admin_cong" or (bp == "admin_ma_bao_mat" and request.method == "POST"):
+        return
 
     if ep == "admin_auth.dang_nhap" and request.method == "POST":
         ten_nhap = _cat(request.form.get("ten_dang_nhap"), 100)

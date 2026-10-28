@@ -23,6 +23,9 @@ NHAN_LOAI = {
     "dang_nhap_that_bai": "Đăng nhập sai",
     "dang_xuat": "Đăng xuất",
     "tai_khoan": "Tài khoản",
+    "ma_bao_mat_dung": "Mã bảo mật đúng",
+    "ma_bao_mat_sai": "Mã bảo mật sai",
+    "doi_ma_bao_mat": "Đổi mã bảo mật",
 }
 NHAN_HANH_DONG = {
     "them": "Thêm", "sua": "Sửa", "xoa": "Xoá", "xoa_hang_loat": "Xoá hàng loạt",
@@ -90,6 +93,7 @@ def _thong_ke():
                      .filter(NhatKy.loai.in_(cong_khai), NhatKy.thoi_gian >= dau_ngay_utc).scalar() or 0)
     so_sua_7_ngay = NhatKy.query.filter(NhatKy.loai == "sua_du_lieu", NhatKy.thoi_gian >= bay_ngay).count()
     so_dn_sai_7_ngay = NhatKy.query.filter(NhatKy.loai == "dang_nhap_that_bai", NhatKy.thoi_gian >= bay_ngay).count()
+    so_sai_ma_7_ngay = NhatKy.query.filter(NhatKy.loai == "ma_bao_mat_sai", NhatKy.thoi_gian >= bay_ngay).count()
     tong_dong = NhatKy.query.count()
 
     top_tu_khoa = (db.session.query(NhatKy.tu_khoa, func.count(NhatKy.id).label("n"))
@@ -102,7 +106,7 @@ def _thong_ke():
               .filter(NhatKy.thoi_gian >= bay_ngay, NhatKy.ip.isnot(None), NhatKy.loai.in_(cong_khai))
               .group_by(NhatKy.ip).order_by(func.count(NhatKy.id).desc()).limit(5).all())
     return dict(so_xem_hom_nay=so_xem_hom_nay, so_tim_hom_nay=so_tim_hom_nay, so_ip_hom_nay=so_ip_hom_nay,
-                so_sua_7_ngay=so_sua_7_ngay, so_dn_sai_7_ngay=so_dn_sai_7_ngay,
+                so_sua_7_ngay=so_sua_7_ngay, so_dn_sai_7_ngay=so_dn_sai_7_ngay, so_sai_ma_7_ngay=so_sai_ma_7_ngay,
                 tong_dong=tong_dong, uoc_tinh_mb=round(tong_dong * 0.5 / 1024, 1),
                 top_tu_khoa=top_tu_khoa, top_thuoc=top_thuoc, top_ip=top_ip)
 

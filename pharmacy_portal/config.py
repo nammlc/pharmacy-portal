@@ -126,3 +126,14 @@ class Config:
     NHAT_KY_GIU_NGAY = int(os.environ.get("NHAT_KY_GIU_NGAY", "365"))
     # Trần tổng số dòng nhật ký (mặc định 100.000 dòng ≈ 50 MB, an toàn cho gói free 500 MB): vượt thì xoá bớt lượt xem cũ nhất.
     NHAT_KY_TOI_DA = int(os.environ.get("NHAT_KY_TOI_DA", "100000"))
+
+    # --- Cổng mã bảo mật 6 số trước trang admin ---
+    # Mã đặt/đổi trong admin (menu "Mã bảo mật"). Biến môi trường ADMIN_GATE_PIN (6 số) dùng để
+    # ĐẶT mã lần đầu hoặc ĐẶT LẠI khi quên mã: mỗi giá trị mới của biến này được áp dụng đúng 1 lần.
+    ADMIN_GATE_IDLE_MINUTES = int(os.environ.get("ADMIN_GATE_IDLE_MINUTES", "30"))     # không thao tác > N phút -> hỏi lại mã
+    ADMIN_GATE_MAX_SAI = int(os.environ.get("ADMIN_GATE_MAX_SAI", "5"))                # sai quá N lần / 1 IP ...
+    ADMIN_GATE_KHOA_PHUT = int(os.environ.get("ADMIN_GATE_KHOA_PHUT", "15"))           # ... thì khoá IP đó N phút
+    ADMIN_GATE_MAX_SAI_TOAN_CUC = int(os.environ.get("ADMIN_GATE_MAX_SAI_TOAN_CUC", "40"))  # chặn dò mã bằng nhiều IP
+    ADMIN_GATE_DONG_KHI_DANG_XUAT = os.environ.get("ADMIN_GATE_DONG_KHI_DANG_XUAT", "1") != "0"  # đăng xuất xong phải nhập lại mã
+    # Mặc định MỌI tài khoản admin đang đăng nhập đều đổi được mã bảo mật. Đặt "1" nếu chỉ muốn vai trò quan_tri đổi.
+    ADMIN_GATE_CHI_QUAN_TRI_DOI = os.environ.get("ADMIN_GATE_CHI_QUAN_TRI_DOI", "0") == "1"
