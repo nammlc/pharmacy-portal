@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% block title_full %}Tra cứu dược BV Tâm Đức Cầu Quan | Khoa Dược BV Tâm Đức Cầu Quan{% endblock %}
-{% block meta_mo_ta %}Cổng tra cứu dược BV Tâm Đức Cầu Quan: danh mục thuốc, thuốc tiêm truyền, tương tác thuốc, tương hợp – tương kỵ do Khoa Dược BV Đa khoa Tâm Đức Cầu Quan cập nhật.{% endblock %}
-{% block og_tieu_de %}Tra cứu dược BV Tâm Đức Cầu Quan — Khoa Dược BV Đa khoa Tâm Đức Cầu Quan{% endblock %}
+{% block title %}Tra cứu dược Tâm Đức — Cổng tra cứu thuốc Khoa Dược{% endblock %}
+{% block meta_mo_ta %}Tra cứu dược Tâm Đức: thông tin thuốc, thuốc tiêm truyền, tương tác thuốc và tương hợp – tương kỵ, do Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan cập nhật và kiểm duyệt.{% endblock %}
+{% block og_tieu_de %}Tra cứu dược Tâm Đức — Khoa Dược BV Đa khoa Tâm Đức Cầu Quan{% endblock %}
 {% block og_mo_ta %}Tra cứu thông tin thuốc, thuốc tiêm truyền, tương tác thuốc và tương hợp – tương kỵ.{% endblock %}
 
 {% block content %}
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-badge">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
-    <h1>Tra cứu dược <span>BV Tâm Đức Cầu Quan</span><br>thông tin thuốc nhanh chóng</h1>
+    <h1>Tra cứu dược <span>Tâm Đức</span><br>thông tin thuốc nhanh chóng</h1>
     <p>Danh mục thuốc, tương tác, tương hợp–kỵ và hướng dẫn sử dụng được cập nhật và kiểm duyệt bởi Dược sĩ lâm sàng.</p>
     <form class="hero-search" autocomplete="off" action="{{ url_for('main.tim_kiem') }}" method="get">
       <input type="text" name="q" placeholder="Nhập tên thuốc hoặc hoạt chất..." data-goi-y="all">
@@ -97,11 +97,4 @@
 
   </div>
 </div>
-
-<section class="gioi-thieu-trang" style="max-width:860px;margin:8px auto 40px;padding:0 20px;color:var(--text-muted);font-size:15px;line-height:1.75;text-align:center">
-  <h2 style="font-size:18px;color:var(--ink-900);margin:0 0 8px">Cổng tra cứu dược BV Tâm Đức Cầu Quan</h2>
-  <p style="margin:0">Đây là website tra cứu dược của Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan (BV Tâm Đức Cầu Quan).
-  Tại đây có thể tra cứu danh mục thuốc, thuốc tiêm truyền, tương tác thuốc, tương hợp – tương kỵ và hướng dẫn dùng thuốc
-  cho bệnh nhân, được Dược sĩ của bệnh viện cập nhật và kiểm duyệt.</p>
-</section>
 {% endblock %}

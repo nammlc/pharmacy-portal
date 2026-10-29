@@ -3624,3 +3624,12 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
 
 /* Ô mã 6 số: ô rộng 240px thì nút mắt nằm trong 240px đó */
 .pw-wrap:has(> input.gate-input-sm) { max-width: 240px; }
+
+/* Ô nhập mã chính (căn giữa): khi JS bọc vào .pw-wrap để thêm nút mắt, quy tắc
+   ".pw-wrap input { padding-right: 44px !important }" làm mất phần bù letter-spacing của
+   .gate-input nên các dấu chấm bị lệch trái ~20px. Cân hai bên bằng nhau (44px = vùng nút mắt)
+   và bù thêm .55em bên trái cho khoảng cách chữ nằm sau ký tự cuối -> dấu chấm nằm đúng giữa ô. */
+.pw-wrap > input.gate-input:not(.gate-input-sm) {
+  padding-left: calc(44px + .55em) !important;
+  padding-right: 44px !important;
+}

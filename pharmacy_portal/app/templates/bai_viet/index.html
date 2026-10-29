@@ -1,11 +1,5 @@
 {% extends "base.html" %}
-{# Trang đích của "/" (chuyển hướng 302) nên Google hiển thị trang này cho tên miền gốc → tiêu đề/mô tả mang từ khóa thương hiệu. #}
-{% if danh_muc_hien_tai %}
-{% block title %}{{ danh_muc_hien_tai.ten }}{% endblock %}
-{% else %}
-{% block title_full %}Tra cứu dược BV Tâm Đức Cầu Quan — Bài viết, Thông báo của Khoa Dược{% endblock %}
-{% block meta_mo_ta %}Tra cứu dược BV Tâm Đức Cầu Quan: thông báo nội bộ, tin tức dược phẩm, bài báo khoa học và hướng dẫn chuyên môn từ Khoa Dược BV Đa khoa Tâm Đức Cầu Quan.{% endblock %}
-{% endif %}
+{% block title %}{{ danh_muc_hien_tai.ten if danh_muc_hien_tai else 'Bài viết - Thông báo' }}{% endblock %}
 
 {% block content %}
 <div class="page-header">

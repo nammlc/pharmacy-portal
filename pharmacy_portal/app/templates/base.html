@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{% block title_full %}{% block title %}Cổng Tra Cứu Dược{% endblock %} | Dược BV Tâm Đức Cầu Quan{% endblock %}</title>
+<title>{% block title %}Cổng Tra Cứu Dược{% endblock %} — BV Đa khoa Tâm Đức Cầu Quan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -19,16 +19,6 @@
 <meta property="og:description" content="{% block og_mo_ta %}Tra cứu thông tin thuốc tại Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan.{% endblock %}">
 <meta property="og:url" content="{{ ((config.CANONICAL_HOST and ('https://' ~ config.CANONICAL_HOST)) or request.host_url.rstrip('/')) ~ request.path }}">
 <meta property="og:image" content="{{ url_for('static', filename='images/logo.png', _external=True) }}">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Tra cứu dược BV Tâm Đức Cầu Quan",
-  "alternateName": ["Dược BV Tâm Đức Cầu Quan", "Tra cứu dược BV Tâm Đức", "Tra cứu dược Tâm Đức", "Khoa Dược BV Tâm Đức Cầu Quan"],
-  "url": "{{ ((config.CANONICAL_HOST and ('https://' ~ config.CANONICAL_HOST)) or request.host_url.rstrip('/')) }}/",
-  "inLanguage": "vi-VN"
-}
-</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
