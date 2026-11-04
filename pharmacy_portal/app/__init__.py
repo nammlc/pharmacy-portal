@@ -157,27 +157,26 @@ def create_app(config_class=Config):
     from app.routes.admin_nhat_ky import bp as admin_nhat_ky_bp
     app.register_blueprint(admin_nhat_ky_bp)
 
-    from app.routes.admin_cong_bao_mat import bp as admin_cong_bp, bp_doi as admin_ma_bao_mat_bp
-    app.register_blueprint(admin_cong_bp)
-    app.register_blueprint(admin_ma_bao_mat_bp)
+    from app.routes.admin_otp import bp as admin_otp_bp
+    app.register_blueprint(admin_otp_bp)
 
     # --- Nhật ký truy cập: hook toàn cục + tự tạo bảng nếu chưa có ---
     from app.utils import nhat_ky as _nhat_ky
     _nhat_ky.dang_ky(app)
 
-    # --- Cổng mã bảo mật 6 số trước toàn bộ /admin ---
-    from app.utils import cong_bao_mat as _cong
-    _cong.dang_ky(app)
+    # --- Xác thực 2 lớp OTP: ép thiết lập cho phiên cũ + tự thêm cột vào bảng nguoi_dung ---
+    from app.utils import otp as _otp
+    _otp.dang_ky(app)
 
     with app.app_context():
-        # Tự tạo các bảng mới (nhat_ky, cài đặt, lần nhập sai mã) nếu chưa có - không đụng bảng cũ
+        # Tự tạo các bảng mới (nhat_ky, cài đặt, đếm lần nhập sai) nếu chưa có - không đụng bảng cũ
         try:
             from app.models.models import NhatKy, CaiDatHeThong, GateLanThu
             for _bang in (NhatKy, CaiDatHeThong, GateLanThu):
                 _bang.__table__.create(bind=db.engine, checkfirst=True)
         except Exception as e:
             app.logger.warning(f"Không tạo được bảng mới (chạy them_bang_nhat_ky.sql / them_bang_cong_bao_mat.sql thủ công): {e}")
-        _cong.khoi_tao(app)
+        _otp.khoi_tao(app)     # PHẢI chạy trước mọi truy vấn bảng nguoi_dung (thêm cột OTP nếu còn thiếu)
 
     _tao_tai_khoan_dau_tien_neu_can(app)
 

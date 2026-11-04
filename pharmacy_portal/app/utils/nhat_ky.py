@@ -50,7 +50,8 @@ NHAN_DOI_TUONG = {
     "admin_bv": "Bài viết - Thông báo", "admin_dmbv": "Danh mục bài viết",
     "admin_ttbn": "Bài viết bệnh nhân", "admin_vct": "Về chúng tôi",
     "admin_nhat_ky": "Nhật ký truy cập", "admin_auth": "Tài khoản",
-    "admin_ma_bao_mat": "Mã bảo mật", "admin_cong": "Cổng mã bảo mật",
+    "admin_ma_bao_mat": "Mã bảo mật (cũ)", "admin_cong": "Cổng mã bảo mật (cũ)",
+    "admin_otp": "Xác thực 2 lớp",
 }
 
 NHAN_TRANG_CONG_KHAI = {
@@ -359,16 +360,20 @@ def _ghi_admin(response):
     bp = request.blueprint or ""
     uid, ten = _nguoi_dung()
 
-    # Cổng mã bảo mật & đổi mã tự ghi log riêng (ma_bao_mat_dung/sai, doi_ma_bao_mat) -> không ghi trùng
-    if bp == "admin_cong" or (bp == "admin_ma_bao_mat" and request.method == "POST"):
+    # Các trang OTP (admin_otp) tự ghi log riêng (dang_nhap, otp_sai, otp_bat, doi_otp) -> không ghi trùng
+    if bp == "admin_otp":
         return
 
     if ep == "admin_auth.dang_nhap" and request.method == "POST":
         ten_nhap = _cat(request.form.get("ten_dang_nhap"), 100)
+        if 300 <= response.status_code < 400 and uid is None:
+            return      # mới đúng mật khẩu, đang chờ bước OTP: chưa tính là đăng nhập (admin_otp sẽ ghi khi xong)
         thanh_cong = 300 <= response.status_code < 400
         ghi("dang_nhap" if thanh_cong else "dang_nhap_that_bai",
             ten_nguoi_dung=ten or ten_nhap, nguoi_dung_id=uid,
-            mo_ta=None if thanh_cong else "Sai tên đăng nhập hoặc mật khẩu",
+            mo_ta=None if thanh_cong else (
+                "Bị khoá tạm do sai mật khẩu quá nhiều lần" if response.status_code == 429
+                else "Sai tên đăng nhập hoặc mật khẩu"),
             ma_trang_thai=response.status_code)
         return
 

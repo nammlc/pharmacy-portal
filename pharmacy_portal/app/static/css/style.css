@@ -3633,3 +3633,16 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
   padding-left: calc(44px + .55em) !important;
   padding-right: 44px !important;
 }
+
+/* ===== Xác thực 2 lớp OTP ===== */
+.otp-buoc{margin:0 0 14px;padding-left:20px;font-size:13.5px;line-height:1.7;color:var(--text-muted)}
+.otp-qr{width:210px;height:210px;margin:0 auto 10px;padding:8px;background:#fff;border:1px solid var(--line-200);border-radius:10px;box-sizing:border-box}
+.otp-qr svg{width:100%;height:100%;display:block}
+.otp-tay{margin:0 0 16px;font-size:13px;text-align:center;color:var(--text-muted)}
+.otp-tay summary{cursor:pointer}
+.otp-tay code{display:block;margin:8px 0 4px;padding:8px;background:var(--paper-50,#f6f7f9);border-radius:8px;font-size:15px;letter-spacing:.08em;word-break:break-all;color:var(--ink-900)}
+.otp-codes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.otp-codes code{padding:10px 6px;text-align:center;background:var(--paper-50,#f6f7f9);border:1px dashed var(--line-200);border-radius:8px;font-size:16px;font-weight:700;letter-spacing:.12em;color:var(--ink-900)}
+.nk-b-otp_sai{background:#ffebee;color:#c62828}
+.nk-b-otp_bat,.nk-b-doi_otp{background:#fff3e0;color:#e65100}
+@media print{body *{visibility:hidden}.otp-codes,.otp-codes *{visibility:visible}.otp-codes{position:absolute;left:0;top:0}}

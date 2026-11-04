@@ -56,9 +56,7 @@
     {% if current_user.vai_tro == 'quan_tri' %}
     <a href="{{ url_for('admin_nhat_ky.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_nhat_ky' }}">🛡️ Nhật ký truy cập</a>
     {% endif %}
-    {% if not config.ADMIN_GATE_CHI_QUAN_TRI_DOI or current_user.vai_tro == 'quan_tri' %}
-    <a href="{{ url_for('admin_ma_bao_mat.doi_ma') }}" class="{{ 'active' if request.blueprint == 'admin_ma_bao_mat' }}">🔐 Mã bảo mật</a>
-    {% endif %}
+    <a href="{{ url_for('admin_otp.quan_ly') }}" class="{{ 'active' if request.blueprint == 'admin_otp' }}">🔐 Bảo mật 2 lớp (OTP)</a>
     <a href="{{ url_for('main.trang_chu') }}" target="_blank">🌐 Xem trang công khai ↗</a>
   </aside>
 
@@ -87,6 +85,7 @@
           </div>
           <a href="{{ url_for('admin_auth.cap_nhat_email') }}">Email khôi phục</a>
           <a href="{{ url_for('admin_auth.doi_mat_khau') }}">Đổi mật khẩu</a>
+          <a href="{{ url_for('admin_otp.quan_ly') }}">Bảo mật 2 lớp (OTP)</a>
           <a id="loBtn" class="lo-btn" href="{{ url_for('admin_auth.dang_xuat') }}">
             <span id="loLabel">Đăng xuất</span>
             <span class="lo-icon" aria-hidden="true">

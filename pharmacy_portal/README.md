@@ -163,15 +163,20 @@ trong form; bấm vào ô (hoặc Tab tới rồi Enter) sẽ mở **modal soạ
 `Ctrl+Enter` = Xong, `Esc` = Huỷ (hỏi lại nếu đã sửa), bấm ra vùng tối không đóng để tránh mất bài. Code: `static/js/main.js`, CSS `.rich-modal*` / `.rich-preview*`.
 
 
-## Cổng mã bảo mật 6 số trước trang admin
+## Xác thực 2 lớp (OTP - Google Authenticator) khi đăng nhập admin
 
-Mọi đường dẫn `/admin/...` (kể cả trang đăng nhập) đều yêu cầu nhập **mã bảo mật 6 chữ số** trước. Trang công khai không bị ảnh hưởng.
-**Mọi thao tác làm trực tiếp trên web, không cần vào Render hay Neon.**
+Đăng nhập admin gồm 2 bước: **(1)** tên đăng nhập + mật khẩu, **(2)** mã 6 số trong app Google Authenticator / Microsoft Authenticator / Authy.
+Mỗi tài khoản có secret OTP riêng (không dùng chung). Thay cho "cổng mã bảo mật 6 số" trước đây.
 
-- **Lần đầu (chưa có mã):** mở `/admin` → form "Thiết lập lần đầu": nhập tên đăng nhập + mật khẩu tài khoản admin rồi đặt mã 6 số.
-- **Đổi mã:** đăng nhập admin → menu **🔐 Mã bảo mật** (cần mật khẩu tài khoản để xác nhận; có nút tạo mã ngẫu nhiên). Mặc định mọi tài khoản admin đều đổi được; đặt `ADMIN_GATE_CHI_QUAN_TRI_DOI=1` nếu chỉ muốn vai trò `quan_tri`. Đổi xong, các trình duyệt/thiết bị khác phải nhập mã mới.
-- **Quên mã:** ở trang nhập mã bấm **"Quên mã bảo mật?"** → nhập email của tài khoản admin → nhận link (hiệu lực 30 phút, dùng 1 lần) để đặt mã mới. Tối đa 3 yêu cầu/giờ cho mỗi IP và mỗi email. Cần tài khoản đã có email và đã cấu hình gửi mail (xem `HUONG_DAN_GUI_MAIL_GMAIL.md`).
-- **Phương án cuối** (mất cả email lẫn mật khẩu): đặt biến `ADMIN_GATE_PIN` (6 số) trên Render hoặc chạy `tao_sql_ma_bao_mat.py` rồi dán SQL vào Neon.
-- Mã lưu dạng băm, không xem lại được. Sai 5 lần/IP → khoá IP đó 15 phút; có thêm ngưỡng chung toàn hệ thống.
-- Cổng tự đóng lại khi không thao tác 30 phút, khi hết phiên, và khi đăng xuất. Chỉnh bằng `ADMIN_GATE_IDLE_MINUTES`, `ADMIN_GATE_MAX_SAI`, `ADMIN_GATE_KHOA_PHUT`, `ADMIN_GATE_MAX_SAI_TOAN_CUC`, `ADMIN_GATE_DONG_KHI_DANG_XUAT` (đặt `0` để đăng xuất không đóng cổng).
-- Sự kiện nhập mã đúng/sai và đổi mã được ghi trong **Nhật ký truy cập**.
+- **Lần đầu / tài khoản chưa bật OTP:** đúng mật khẩu xong sẽ được đưa tới trang quét QR → nhập thử 1 mã → nhận **8 mã dự phòng** (chỉ hiện 1 lần) → vào admin.
+  Mặc định bắt buộc (`ADMIN_2FA_BAT_BUOC=1`). Đặt `0` thì OTP là tuỳ chọn (ai chưa bật vẫn đăng nhập bằng mật khẩu, bật ở menu **🔐 Bảo mật 2 lớp**).
+  **Sau khi deploy bản này, hãy cho mọi admin đăng nhập và bật OTP ngay** (ai đăng nhập trước sẽ là người gắn OTP cho tài khoản đó).
+- **Mất điện thoại:** ở bước nhập mã bấm **"Dùng mã dự phòng"** (mỗi mã 1 lần). Hết mã dự phòng → chạy trong Terminal của Coolify: `python reset_otp.py <ten_dang_nhap>`.
+- **Đổi điện thoại / tạo lại mã dự phòng / tắt OTP:** menu **🔐 Bảo mật 2 lớp** (cần nhập lại mật khẩu + mã OTP hiện tại). Không tắt được khi `ADMIN_2FA_BAT_BUOC=1`.
+- **Bảo mật:** secret OTP lưu **mã hoá** (Fernet) trong cột `nguoi_dung.totp_secret`; khoá lấy từ `OTP_ENC_KEY` (hoặc dẫn xuất từ `SECRET_KEY` nếu để trống — khi đó **không được đổi `SECRET_KEY`**, nếu đổi thì mọi người phải thiết lập lại OTP).
+  Mỗi mã chỉ dùng được 1 lần (chống phát lại), chấp nhận lệch ±30 giây. Sai OTP 5 lần/tài khoản (hoặc 20 lần/IP) → khoá 15 phút. Trang đăng nhập cũng khoá tạm khi sai mật khẩu 8 lần/tên đăng nhập hoặc 30 lần/IP.
+- **Cột DB mới:** `totp_secret`, `totp_bat`, `totp_buoc_cuoi`, `totp_ma_du_phong`, `totp_ngay_bat` (bảng `nguoi_dung`). Ứng dụng **tự thêm** khi khởi động; nếu DB user không có quyền ALTER thì chạy `them_cot_otp_nguoi_dung.sql`.
+- **Biến môi trường:** `ADMIN_2FA_BAT_BUOC`, `OTP_ISSUER`, `OTP_ENC_KEY`, `OTP_CHO_PHUT`, `OTP_MAX_SAI`, `OTP_MAX_SAI_IP`, `OTP_KHOA_PHUT`, `DANG_NHAP_MAX_SAI`, `DANG_NHAP_MAX_SAI_IP` (xem `config.py`).
+- **Chạy sau proxy (Coolify/Traefik):** đặt `TRUSTED_PROXIES=1` (mặc định). Máy chủ cloud phải **đồng bộ giờ** (NTP/`chrony`) vì OTP phụ thuộc đồng hồ.
+- Mọi sự kiện (đăng nhập, OTP sai, bật/đổi OTP) được ghi trong **Nhật ký truy cập**.
+

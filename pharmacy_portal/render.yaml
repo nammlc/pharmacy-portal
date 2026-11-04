@@ -19,8 +19,6 @@ services:
         value: https://tracuuduoc-bvdktamduccauquan.com
       - key: CANONICAL_HOST
         value: tracuuduoc-bvdktamduccauquan.com
-      # (TUỲ CHỌN) Mã bảo mật 6 số của cổng admin. KHÔNG bắt buộc: có thể để trống rồi thiết lập/đổi/lấy lại mã
-      # ngay trên web (trang /admin lần đầu, menu "Mã bảo mật", hoặc "Quên mã bảo mật?" gửi qua email).
-      # Đặt giá trị mới ở đây = đặt lại mã (mỗi giá trị chỉ áp dụng 1 lần) - dùng khi mất cả email lẫn mật khẩu.
-      - key: ADMIN_GATE_PIN
-        sync: false
+      # Xác thực 2 lớp OTP (Google Authenticator) khi đăng nhập admin. Mặc định bắt buộc (=1).
+      - key: ADMIN_2FA_BAT_BUOC
+        value: "1"

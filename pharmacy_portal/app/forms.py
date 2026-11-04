@@ -242,14 +242,3 @@ class BaiVietForm(FlaskForm):
     )
     submit = SubmitField("Lưu")
 
-
-class DoiMaBaoMatForm(FlaskForm):
-    mat_khau_hien_tai = PasswordField("Mật khẩu tài khoản của bạn", validators=[DataRequired()])
-    ma_moi = PasswordField("Mã bảo mật mới (6 chữ số)", validators=[
-        DataRequired(message="Vui lòng nhập mã mới."),
-        Regexp(r"^\d{6}$", message="Mã bảo mật gồm đúng 6 chữ số."),
-    ])
-    xac_nhan_ma_moi = PasswordField("Nhập lại mã mới", validators=[
-        DataRequired(), EqualTo("ma_moi", message="Mã nhập lại không khớp."),
-    ])
-    submit = SubmitField("Đổi mã bảo mật")

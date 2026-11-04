@@ -1,0 +1,39 @@
+{% extends "admin/otp_khung.html" %}
+{% block title %}Mã dự phòng{% endblock %}
+{% block tieu_de %}
+<h1>{{ 'Đã bật xác thực 2 lớp' if lan_dau else 'Mã dự phòng mới' }}</h1>
+<p class="sub">Lưu <strong>8 mã dự phòng</strong> này ở nơi an toàn.<br>Mỗi mã dùng được <strong>1 lần</strong> khi mất điện thoại. Trang này chỉ hiện <strong>một lần</strong>.</p>
+{% endblock %}
+
+{% block noi_dung %}
+<div class="otp-codes" id="otpCodes">
+  {% for m in ds %}<code>{{ m }}</code>{% endfor %}
+</div>
+<div style="display:flex; gap:8px; margin:14px 0;">
+  <button type="button" class="btn btn-outline" id="otpCopy" style="flex:1; justify-content:center;">Sao chép</button>
+  <button type="button" class="btn btn-outline" onclick="window.print()" style="flex:1; justify-content:center;">In</button>
+</div>
+<label style="display:flex; gap:8px; align-items:flex-start; font-size:13.5px; margin-bottom:14px;">
+  <input type="checkbox" id="otpDaLuu" style="margin-top:3px;"> Tôi đã lưu các mã này
+</label>
+<a href="{{ tiep }}" class="btn btn-primary" id="otpTiep" style="width:100%; justify-content:center; padding:11px; pointer-events:none; opacity:.45;">Tiếp tục</a>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  var chk = document.getElementById("otpDaLuu"), tiep = document.getElementById("otpTiep");
+  chk.addEventListener("change", function () {
+    tiep.style.pointerEvents = chk.checked ? "auto" : "none";
+    tiep.style.opacity = chk.checked ? "1" : ".45";
+  });
+  document.getElementById("otpCopy").addEventListener("click", function () {
+    var txt = Array.prototype.map.call(document.querySelectorAll("#otpCodes code"), function (c) { return c.textContent; }).join("\n");
+    var btn = this;
+    (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () {
+      btn.textContent = "Đã sao chép ✓";
+    }).catch(function () { btn.textContent = "Hãy bôi đen và sao chép thủ công"; });
+  });
+})();
+</script>
+{% endblock %}

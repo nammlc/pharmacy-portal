@@ -26,6 +26,9 @@ NHAN_LOAI = {
     "ma_bao_mat_dung": "Mã bảo mật đúng",
     "ma_bao_mat_sai": "Mã bảo mật sai",
     "doi_ma_bao_mat": "Đổi mã bảo mật",
+    "otp_sai": "OTP sai",
+    "otp_bat": "Bật OTP",
+    "doi_otp": "Đổi/tắt OTP",
 }
 NHAN_HANH_DONG = {
     "them": "Thêm", "sua": "Sửa", "xoa": "Xoá", "xoa_hang_loat": "Xoá hàng loạt",
@@ -93,7 +96,7 @@ def _thong_ke():
                      .filter(NhatKy.loai.in_(cong_khai), NhatKy.thoi_gian >= dau_ngay_utc).scalar() or 0)
     so_sua_7_ngay = NhatKy.query.filter(NhatKy.loai == "sua_du_lieu", NhatKy.thoi_gian >= bay_ngay).count()
     so_dn_sai_7_ngay = NhatKy.query.filter(NhatKy.loai == "dang_nhap_that_bai", NhatKy.thoi_gian >= bay_ngay).count()
-    so_sai_ma_7_ngay = NhatKy.query.filter(NhatKy.loai == "ma_bao_mat_sai", NhatKy.thoi_gian >= bay_ngay).count()
+    so_sai_ma_7_ngay = NhatKy.query.filter(NhatKy.loai.in_(("otp_sai", "ma_bao_mat_sai")), NhatKy.thoi_gian >= bay_ngay).count()
     tong_dong = NhatKy.query.count()
 
     top_tu_khoa = (db.session.query(NhatKy.tu_khoa, func.count(NhatKy.id).label("n"))

@@ -11,6 +11,8 @@ from app.forms import (
 )
 from app.utils.gui_email import gui_email
 from app.utils.phien_dang_nhap import danh_dau_hoat_dong
+from app.utils import otp
+from app.utils.nhat_ky import lay_ip
 
 bp = Blueprint("admin_auth", __name__, url_prefix="/admin")
 
@@ -22,11 +24,23 @@ def dang_nhap():
 
     form = DangNhapForm()
     if form.validate_on_submit():
-        nguoi_dung = NguoiDung.query.filter_by(ten_dang_nhap=form.ten_dang_nhap.data.strip()).first()
+        ten = form.ten_dang_nhap.data.strip()
+        cfg = current_app.config
+        k_tk, k_ip = otp.khoa_tai_khoan_mk(ten), otp.khoa_ip_mk(lay_ip())
+
+        # Chặn dò mật khẩu: sai quá nhiều lần với 1 tên đăng nhập / 1 IP thì khoá tạm
+        cho = max(otp.da_vuot(k_tk, cfg["DANG_NHAP_MAX_SAI"]), otp.da_vuot(k_ip, cfg["DANG_NHAP_MAX_SAI_IP"]))
+        if cho:
+            flash(f"Đăng nhập sai quá nhiều lần. Vui lòng thử lại sau khoảng {cho} phút.", "error")
+            return render_template("admin/dang_nhap.html", form=form), 429
+
+        nguoi_dung = NguoiDung.query.filter_by(ten_dang_nhap=ten).first()
 
         # So sánh chung 1 thông báo lỗi cho cả 2 trường hợp (sai tên đăng nhập
         # HOẶC sai mật khẩu) để tránh lộ thông tin tài khoản nào tồn tại.
         if nguoi_dung is None or not nguoi_dung.check_password(form.mat_khau.data):
+            otp.ghi_sai(k_tk)
+            otp.ghi_sai(k_ip)
             flash("Tên đăng nhập hoặc mật khẩu không đúng.", "error")
             return render_template("admin/dang_nhap.html", form=form)
 
@@ -34,10 +48,16 @@ def dang_nhap():
             flash("Tài khoản này đã bị khoá. Liên hệ quản trị viên.", "error")
             return render_template("admin/dang_nhap.html", form=form)
 
+        otp.xoa_sai(k_tk)
+
+        # Đúng mật khẩu -> sang bước OTP (chưa đăng nhập thật). Chưa bật OTP mà hệ thống bắt buộc -> thiết lập ngay.
+        if otp.phai_dung_otp(nguoi_dung):
+            otp.bat_dau_cho(nguoi_dung, request.args.get("next"))
+            return redirect(url_for("admin_otp.xac_thuc" if nguoi_dung.totp_bat else "admin_otp.thiet_lap"))
+
         login_user(nguoi_dung)
         danh_dau_hoat_dong()   # bắt đầu tính giờ "không hoạt động"
-        next_page = request.args.get("next")
-        return redirect(next_page or url_for("admin_dashboard.trang_chinh"))
+        return redirect(otp.an_toan_next(request.args.get("next")) or url_for("admin_dashboard.trang_chinh"))
 
     return render_template("admin/dang_nhap.html", form=form)
 
@@ -46,9 +66,7 @@ def dang_nhap():
 @login_required
 def dang_xuat():
     logout_user()
-    if current_app.config.get("ADMIN_GATE_DONG_KHI_DANG_XUAT"):
-        from app.utils.cong_bao_mat import dong_cong
-        dong_cong()      # đăng xuất xong phải nhập lại mã bảo mật mới vào lại được trang admin
+    otp.xoa_cho()
     if request.args.get("het_han"):   # trình duyệt tự đăng xuất vì không hoạt động
         flash(f"Đã tự động đăng xuất do không hoạt động quá "
               f"{current_app.config['ADMIN_IDLE_TIMEOUT_MINUTES']} phút.", "warning")

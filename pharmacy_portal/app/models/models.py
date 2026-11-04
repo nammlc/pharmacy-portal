@@ -18,6 +18,15 @@ class NguoiDung(UserMixin, db.Model):
     dang_hoat_dong = db.Column(db.Boolean, default=True)
     ngay_tao = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # --- Xác thực 2 lớp (OTP Google Authenticator / TOTP) ---
+    # Secret lưu dạng MÃ HOÁ (Fernet), xem app/utils/otp.py. Sửa cột ở đây thì cũng sửa
+    # danh sách cột trong otp.CAC_COT_OTP và file them_cot_otp_nguoi_dung.sql.
+    totp_secret = db.Column(db.Text)
+    totp_bat = db.Column(db.Boolean, nullable=False, default=False, server_default=db.false())
+    totp_buoc_cuoi = db.Column(db.BigInteger)        # bước 30s của mã OTP vừa dùng (chống dùng lại mã)
+    totp_ma_du_phong = db.Column(db.Text)            # JSON: danh sách BĂM của các mã dự phòng còn lại
+    totp_ngay_bat = db.Column(db.DateTime)
+
     def set_password(self, mat_khau):
         self.mat_khau_hash = generate_password_hash(mat_khau)
 

@@ -127,13 +127,20 @@ class Config:
     # Trần tổng số dòng nhật ký (mặc định 100.000 dòng ≈ 50 MB, an toàn cho gói free 500 MB): vượt thì xoá bớt lượt xem cũ nhất.
     NHAT_KY_TOI_DA = int(os.environ.get("NHAT_KY_TOI_DA", "100000"))
 
-    # --- Cổng mã bảo mật 6 số trước trang admin ---
-    # Mã đặt/đổi trong admin (menu "Mã bảo mật"). Biến môi trường ADMIN_GATE_PIN (6 số) dùng để
-    # ĐẶT mã lần đầu hoặc ĐẶT LẠI khi quên mã: mỗi giá trị mới của biến này được áp dụng đúng 1 lần.
-    ADMIN_GATE_IDLE_MINUTES = int(os.environ.get("ADMIN_GATE_IDLE_MINUTES", "30"))     # không thao tác > N phút -> hỏi lại mã
-    ADMIN_GATE_MAX_SAI = int(os.environ.get("ADMIN_GATE_MAX_SAI", "5"))                # sai quá N lần / 1 IP ...
-    ADMIN_GATE_KHOA_PHUT = int(os.environ.get("ADMIN_GATE_KHOA_PHUT", "15"))           # ... thì khoá IP đó N phút
-    ADMIN_GATE_MAX_SAI_TOAN_CUC = int(os.environ.get("ADMIN_GATE_MAX_SAI_TOAN_CUC", "40"))  # chặn dò mã bằng nhiều IP
-    ADMIN_GATE_DONG_KHI_DANG_XUAT = os.environ.get("ADMIN_GATE_DONG_KHI_DANG_XUAT", "1") != "0"  # đăng xuất xong phải nhập lại mã
-    # Mặc định MỌI tài khoản admin đang đăng nhập đều đổi được mã bảo mật. Đặt "1" nếu chỉ muốn vai trò quan_tri đổi.
-    ADMIN_GATE_CHI_QUAN_TRI_DOI = os.environ.get("ADMIN_GATE_CHI_QUAN_TRI_DOI", "0") == "1"
+    # --- Xác thực 2 lớp OTP (Google Authenticator) khi đăng nhập admin ---
+    # Đúng mật khẩu xong còn phải nhập mã 6 số trong app. Xem app/utils/otp.py.
+    # ADMIN_2FA_BAT_BUOC=1 (mặc định): tài khoản chưa bật OTP sẽ bị buộc thiết lập ngay lần đăng nhập kế tiếp.
+    #                      =0        : tài khoản chưa bật OTP vẫn đăng nhập bằng mật khẩu như cũ (OTP là tuỳ chọn).
+    ADMIN_2FA_BAT_BUOC = os.environ.get("ADMIN_2FA_BAT_BUOC", "1") != "0"
+    # Tên hiển thị trong app Authenticator. Nên viết không dấu cho app nào cũng đọc được.
+    OTP_ISSUER = os.environ.get("OTP_ISSUER", "Cong Tra Cuu Duoc").strip() or "Cong Tra Cuu Duoc"
+    # Khoá mã hoá secret OTP trong DB. Để trống = dẫn xuất từ SECRET_KEY (khi đó ĐỪNG đổi SECRET_KEY, nếu đổi thì
+    # mọi người phải thiết lập lại OTP). Đặt riêng (chuỗi ngẫu nhiên dài) nếu muốn tách khỏi SECRET_KEY.
+    OTP_ENC_KEY = os.environ.get("OTP_ENC_KEY", "").strip()
+    OTP_CHO_PHUT = int(os.environ.get("OTP_CHO_PHUT", "5"))        # đúng mật khẩu -> có N phút để nhập OTP
+    OTP_MAX_SAI = int(os.environ.get("OTP_MAX_SAI", "5"))          # sai OTP quá N lần / 1 tài khoản ...
+    OTP_MAX_SAI_IP = int(os.environ.get("OTP_MAX_SAI_IP", "20"))   # ... hoặc N lần / 1 IP ...
+    OTP_KHOA_PHUT = int(os.environ.get("OTP_KHOA_PHUT", "15"))     # ... thì khoá N phút
+    # Chống dò mật khẩu ở trang đăng nhập (trước đây có cổng 6 số chặn giúp, nay thay bằng giới hạn này)
+    DANG_NHAP_MAX_SAI = int(os.environ.get("DANG_NHAP_MAX_SAI", "8"))          # sai mật khẩu quá N lần / 1 tên đăng nhập
+    DANG_NHAP_MAX_SAI_IP = int(os.environ.get("DANG_NHAP_MAX_SAI_IP", "30"))   # hoặc N lần / 1 IP

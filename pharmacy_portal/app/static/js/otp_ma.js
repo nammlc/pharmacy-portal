@@ -1,4 +1,4 @@
-// Ô nhập mã 6 số: chỉ nhận chữ số, tự gửi đúng 1 lần khi đủ 6 số.
+// Ô nhập mã OTP 6 số: chỉ nhận chữ số (cho phép dán "123 456"), tự gửi đúng 1 lần khi đủ 6 số.
 (function () {
   var o = document.getElementById("gateMa");
   var f = document.getElementById("gateForm");
@@ -10,7 +10,7 @@
     if (chiSo.length === 6 && !da_gui) { da_gui = true; f.submit(); }
   });
   f.addEventListener("submit", function (e) {
-    if (da_gui) { e.preventDefault(); return; }
+    if (da_gui && e.isTrusted) { e.preventDefault(); return; }
     da_gui = true;
   });
 })();
