@@ -2545,6 +2545,59 @@ body.rich-modal-open { overflow: hidden; }
   .user-dropdown { right: -4px; width: 210px; }
 }
 
+/* ---------- Chống tràn ngang trên điện thoại (grid blowout) ----------
+   Ô lưới / flex có "min-width:auto" nên bị nội dung rộng (bảng, ảnh, chuỗi dài không ngắt) ĐẨY RỘNG ra khỏi màn hình.
+   Cho phép chúng co lại; bảng đã có cuộn ngang riêng trong .adm-table-wrap. */
+.admin-main, .admin-body { min-width: 0; }
+.admin-body > *, .dash-recent-grid > *, .form-grid-2 > *, .buoc1-grid > *, .pv-grid > *, .vct-two-col > * { min-width: 0; }
+.admin-body img, .admin-body video, .admin-body iframe { max-width: 100%; height: auto; }
+.admin-body .adm-table-wrap, .admin-body .ql-container, .admin-body .ql-toolbar { max-width: 100%; }
+@media (max-width: 800px) {
+  .admin-shell { overflow-x: clip; }            /* lưới an toàn cuối cùng: không bao giờ để trang rộng hơn màn hình */
+  .admin-body { overflow-wrap: anywhere; }
+  .admin-body .adm-table-wrap { overflow-wrap: normal; }
+}
+
+/* ============================================================
+   Ô THỐNG KÊ NGƯỜI ĐANG ONLINE (admin)
+   Máy tính: ghim góc dưới bên phải màn hình. Điện thoại: nằm ở cuối trang, trong luồng nội dung.
+   ============================================================ */
+.online-box {
+  position: fixed; right: 18px; bottom: 18px; z-index: 35;
+  width: max-content; max-width: min(340px, calc(100vw - 36px));
+  background: #fff; border: 1px solid var(--line-200); border-radius: 14px;
+  box-shadow: 0 10px 30px -8px rgba(11, 31, 58, 0.28);
+  font-family: var(--font-body); color: var(--ink-900);
+}
+.online-toggle {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  padding: 10px 14px; background: transparent; border: 0; cursor: pointer;
+  font: inherit; color: inherit; text-align: left;
+}
+.online-dot {
+  flex: none; width: 9px; height: 9px; border-radius: 50%; background: #16a34a;
+  box-shadow: 0 0 0 0 rgba(22, 163, 74, .55); animation: onlinePulse 2s infinite;
+}
+.online-box.is-off .online-dot { background: #9ca3af; animation: none; }
+@keyframes onlinePulse { 70% { box-shadow: 0 0 0 7px rgba(22, 163, 74, 0); } 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); } }
+.online-stats { display: flex; gap: 16px; }
+.online-stat { display: flex; flex-direction: column; line-height: 1.15; }
+.online-stat b { font-family: var(--font-display); font-size: 19px; font-weight: 800; }
+.online-stat small { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
+.online-chevron { flex: none; margin-left: auto; color: var(--text-muted); transition: transform .15s; }
+.online-box.is-open .online-chevron { transform: rotate(180deg); }
+.online-detail { padding: 2px 14px 12px; border-top: 1px solid var(--line-100); font-size: 12.5px; color: var(--text-muted); }
+.online-detail-title { margin: 10px 0 6px; font-weight: 700; color: var(--ink-900); font-size: 12px; }
+.online-names { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.online-names li { background: var(--sage-100); color: var(--navy-600); border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600; overflow-wrap: anywhere; }
+.online-note { margin: 8px 0 0; font-size: 11.5px; }
+@media (min-width: 801px) { .admin-body { padding-bottom: 92px; } }      /* chừa chỗ để ô ghim không che nội dung cuối trang */
+@media (max-width: 800px) {
+  .online-box { position: static; width: auto; max-width: none; margin: 22px 14px 18px; }
+  .online-stats { flex: 1; gap: 0; }
+  .online-stat { flex: 1; }
+}
+
 /* ============================================================
    ADMIN PAGINATION
    ============================================================ */

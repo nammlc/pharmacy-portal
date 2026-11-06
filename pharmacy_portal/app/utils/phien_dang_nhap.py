@@ -14,6 +14,9 @@ from flask_login import logout_user
 KHOA = "_last_active"
 # Các endpoint KHÔNG bị chuyển hướng khi hết phiên (tự xử lý riêng)
 _KHONG_CHUYEN_HUONG = ("admin_auth.keep_alive", "admin_auth.dang_nhap")
+# Tín hiệu đếm người online + ô thống kê tự làm mới: chạy nền định kỳ nên KHÔNG được gia hạn phiên
+# (nếu gia hạn thì admin bỏ máy mở trang vẫn không bao giờ bị tự đăng xuất).
+_KHONG_GIA_HAN = ("online.ping", "online.thong_ke")
 
 
 def danh_dau_hoat_dong():
@@ -42,5 +45,7 @@ def dang_ky(app):
                     return redirect(url_for("admin_auth.dang_nhap"))
             return None
 
+        if request.endpoint in _KHONG_GIA_HAN:
+            return None
         session[KHOA] = bay_gio
         return None

@@ -370,6 +370,18 @@ class CaiDatHeThong(db.Model):
     ngay_cap_nhat = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
+class DangOnline(db.Model):
+    """Ai đang trực tuyến: mỗi thiết bị / tài khoản 1 dòng, trình duyệt báo "còn ở đây" mỗi ~45 giây.
+    Đếm = số dòng có lan_cuoi trong ONLINE_CUA_SO_GIAY giây gần nhất. KHÔNG lưu IP thô (khách chỉ lưu mã băm có muối),
+    dòng cũ tự xoá. Xem app/utils/online.py."""
+    __tablename__ = "dang_online"
+
+    khoa = db.Column(db.String(64), primary_key=True)          # a:<id admin> | v:<cookie ẩn danh> | k:<mã băm thiết bị>
+    loai = db.Column(db.String(10), nullable=False, index=True)    # "admin" | "khach"
+    ten = db.Column(db.String(150))                              # tên admin (để hiện danh sách), khách để trống
+    lan_cuoi = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+
+
 class GateLanThu(db.Model):
     """Mỗi dòng = 1 lần nhập SAI mã bảo mật cổng admin (để khoá tạm theo IP / toàn hệ thống)."""
     __tablename__ = "cong_bao_mat_lan_sai"

@@ -137,6 +137,8 @@
     <div class="admin-body">
       {% block admin_content %}{% endblock %}
     </div>
+
+    {% include "admin/_online_widget.html" %}
   </div>
 </div>
 
@@ -146,6 +148,11 @@
 <script src="{{ url_for('static', filename='js/admin_searchable_select.js') }}"></script>
 <script src="{{ url_for('static', filename='js/nen_anh.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dan_anh_clipboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/online.js') }}" defer
+        data-khu="admin"
+        data-ping-url="{{ url_for('online.ping') }}"
+        data-stat-url="{{ url_for('online.thong_ke') }}"
+        data-login-url="{{ url_for('admin_auth.dang_nhap') }}"></script>
 <script src="{{ url_for('static', filename='js/phien_het_han.js') }}"
         data-idle-minutes="{{ config.ADMIN_IDLE_TIMEOUT_MINUTES }}"
         data-keep-alive-url="{{ url_for('admin_auth.keep_alive') }}"

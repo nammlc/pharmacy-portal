@@ -160,6 +160,11 @@ def create_app(config_class=Config):
     from app.routes.admin_otp import bp as admin_otp_bp
     app.register_blueprint(admin_otp_bp)
 
+    # --- Đếm người đang online: tín hiệu "còn ở đây" từ trình duyệt (không cần CSRF, chỉ ghi thời điểm) ---
+    from app.routes.online import bp as online_bp
+    app.register_blueprint(online_bp)
+    csrf.exempt(online_bp)
+
     # --- Nhật ký truy cập: hook toàn cục + tự tạo bảng nếu chưa có ---
     from app.utils import nhat_ky as _nhat_ky
     _nhat_ky.dang_ky(app)
@@ -171,8 +176,8 @@ def create_app(config_class=Config):
     with app.app_context():
         # Tự tạo các bảng mới (nhat_ky, cài đặt, đếm lần nhập sai) nếu chưa có - không đụng bảng cũ
         try:
-            from app.models.models import NhatKy, CaiDatHeThong, GateLanThu
-            for _bang in (NhatKy, CaiDatHeThong, GateLanThu):
+            from app.models.models import NhatKy, CaiDatHeThong, GateLanThu, DangOnline
+            for _bang in (NhatKy, CaiDatHeThong, GateLanThu, DangOnline):
                 _bang.__table__.create(bind=db.engine, checkfirst=True)
         except Exception as e:
             app.logger.warning(f"Không tạo được bảng mới (chạy them_bang_nhat_ky.sql / them_bang_cong_bao_mat.sql thủ công): {e}")
