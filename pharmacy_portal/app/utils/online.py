@@ -10,8 +10,8 @@ Cách hoạt động
   - Ô thống kê ở trang quản trị hỏi lại server mỗi 5 giây (không cần tải lại trang).
 
 Phân loại
-  - "admin": người đã đăng nhập (kể cả khi đang xem trang công khai). Đếm theo TÀI KHOẢN (mở 2 tab vẫn là 1).
-  - "khach": người chưa đăng nhập. Khoá = cookie ẩn danh pp_vid (nếu người dùng đã đồng ý cookie), nếu không thì
+  - "admin": tài khoản đang MỞ TRANG QUẢN TRỊ. Đếm theo TÀI KHOẢN (mở 2 tab vẫn là 1).
+  - "khach": người đang xem WEBSITE CÔNG KHAI (kể cả admin xem thử bằng trình duyệt đã đăng nhập). Khoá = cookie ẩn danh pp_vid (nếu người dùng đã đồng ý cookie), nếu không thì
     mã băm có muối của (IP + trình duyệt + ngày) — KHÔNG lưu IP thô. Nhiều máy cùng 1 IP + cùng loại trình duyệt
     (vd. wifi bệnh viện) có thể bị gộp thành 1 → con số khách là ước lượng, có thể thấp hơn thực tế.
 
@@ -51,15 +51,19 @@ def khoa_khach():
 
 
 def nhan_dien(khu):
-    """Ai đang gửi tín hiệu? Trả (loai, khoa, ten); None nếu là bot; 'het_phien' nếu là tab quản trị mà phiên đã hết hạn."""
+    """Ai đang gửi tín hiệu? Trả (loai, khoa, ten); None nếu là bot; 'het_phien' nếu là tab quản trị mà phiên đã hết hạn.
+    Phân loại theo NƠI gửi tín hiệu, không theo việc trình duyệt có đăng nhập hay không:
+      - từ trang quản trị (khu=admin)  → "admin"  (đếm theo tài khoản)
+      - từ website công khai           → "khach"  — kể cả admin đang xem thử website bằng trình duyệt đã đăng nhập
+                                         (người đó lúc này đang đóng vai người dùng; nhờ vậy tự thử là thấy số nhảy ngay)."""
     from flask_login import current_user
     if la_bot():
         return None
-    if current_user.is_authenticated:
+    if khu == "admin":
+        if not current_user.is_authenticated:
+            return "het_phien"
         ten = getattr(current_user, "ho_ten", None) or current_user.ten_dang_nhap
         return ("admin", f"a:{current_user.id}", ten)
-    if khu == "admin":
-        return "het_phien"
     return ("khach", khoa_khach(), None)
 
 

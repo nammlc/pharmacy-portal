@@ -105,7 +105,7 @@
         datSo(elAdmin, d.admin);
         datSo(elKhach, d.khach);
         veTen(d.ten_admin);
-        if (elNote) elNote.textContent = "Cập nhật trực tiếp mỗi " + (STAT_MS / 1000) + " giây. Số người dùng là ước lượng.";
+        if (elNote) elNote.textContent = "Cập nhật mỗi " + (STAT_MS / 1000) + " giây. Admin: đang mở trang quản trị. Người dùng: đang xem website (ước lượng, gồm cả admin xem thử).";
       })
       .catch(function () { box.classList.add("is-off"); })
       .then(function () { dangHoi = false; });

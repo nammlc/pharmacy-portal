@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify
+from app.utils.upload_anh import anh_thu_nho
 from sqlalchemy import text
 from app import db
 from app.models.models import CaiDat, DanhMucThuoc, NhaThuocBV, HoatChat
@@ -187,6 +188,7 @@ def goi_y_tim_kiem():
             ket_qua.append({
                 "ten": t.ten_biet_duoc,
                 "phu": t.ten_hoat_chat_hien_thi or "",
+                "anh": anh_thu_nho(t.hinh_anh),
                 "url": url_for("dmt.xem_thuoc", thuoc_id=t.id),
                 "loai": "Danh mục thuốc" if pham_vi == "all" else "",
             })
@@ -196,6 +198,7 @@ def goi_y_tim_kiem():
             ket_qua.append({
                 "ten": t.ten_biet_duoc,
                 "phu": t.ten_hoat_chat_hien_thi or "",
+                "anh": anh_thu_nho(t.hinh_anh),
                 "url": url_for("ntbv.xem_thuoc", thuoc_id=t.id),
                 "loai": "Nhà thuốc BV" if pham_vi == "all" else "",
             })

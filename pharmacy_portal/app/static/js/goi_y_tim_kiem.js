@@ -56,6 +56,10 @@
 
     var pham_vi = input.dataset.goiY;
 
+    // Dropdown rộng đúng bằng cả thanh tìm kiếm (form, gồm cả nút "Tra cứu"), không chỉ bằng ô nhập:
+    // đánh dấu form để CSS lấy form làm khung định vị cho dropdown.
+    if (form) form.classList.add("goi-y-form");
+
     var wrap = document.createElement("div");
     wrap.className = "goi-y-wrap";
     input.parentNode.insertBefore(wrap, input);
@@ -81,16 +85,32 @@
       if (!danh_sach.length) { dong(); return; }
       var tu_khoa = input.value.trim();
       hop.innerHTML = danh_sach.map(function (it, i) {
+        // Ảnh thuốc; chưa có ảnh (hoặc ảnh lỗi) thì hiện chữ cái đầu như ở danh sách kết quả
+        var chu = (it.ten || "?").trim().charAt(0).toUpperCase();
+        var anh = it.anh
+          ? '<img class="goi-y-anh" src="' + thoat_html(it.anh) + '" alt="" loading="lazy" decoding="async">'
+          : '<span class="goi-y-anh goi-y-anh-trong">' + thoat_html(chu) + "</span>";
         return (
           '<div class="goi-y-item" data-idx="' + i + '">' +
-            '<div class="goi-y-ten-dong">' +
-              '<span class="goi-y-ten">' + lam_dam(it.ten, tu_khoa) + "</span>" +
-              (it.loai ? '<span class="goi-y-badge">' + thoat_html(it.loai) + "</span>" : "") +
+            anh +
+            '<div class="goi-y-noidung">' +
+              '<div class="goi-y-ten-dong">' +
+                '<span class="goi-y-ten">' + lam_dam(it.ten, tu_khoa) + "</span>" +
+                (it.loai ? '<span class="goi-y-badge">' + thoat_html(it.loai) + "</span>" : "") +
+              "</div>" +
+              (it.phu ? '<div class="goi-y-phu">' + thoat_html(it.phu) + "</div>" : "") +
             "</div>" +
-            (it.phu ? '<div class="goi-y-phu">' + thoat_html(it.phu) + "</div>" : "") +
           "</div>"
         );
       }).join("");
+      hop.querySelectorAll("img.goi-y-anh").forEach(function (img) {
+        img.addEventListener("error", function () {           // ảnh hỏng / bị chặn → chữ cái đầu
+          var cho = document.createElement("span");
+          cho.className = "goi-y-anh goi-y-anh-trong";
+          cho.textContent = (img.closest(".goi-y-item").querySelector(".goi-y-ten").textContent || "?").trim().charAt(0).toUpperCase();
+          img.replaceWith(cho);
+        });
+      });
       hop.hidden = false;
     }
 

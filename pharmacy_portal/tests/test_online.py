@@ -149,11 +149,19 @@ class OnlineTests(unittest.TestCase):
         self.assertEqual((d["admin"], d["khach"]), (2, 1))
         self.assertEqual(sorted(d["ten_admin"], key=str.lower), ["duocsi2", "Lê Công Nam"])
 
-    def test_logged_in_admin_on_public_pages_counts_as_admin_not_visitor(self):
+    def test_logged_in_admin_browsing_the_public_site_counts_as_a_user(self):
+        """Đúng ca thực tế: admin mở website công khai bằng trình duyệt đã đăng nhập để xem thử → số "Người dùng" phải nhảy."""
         c = self.client(); self.login(c)
         c.post("/api/online/ping?khu=cong_khai")
         d = self.dem()
-        self.assertEqual((d["admin"], d["khach"]), (1, 0))
+        self.assertEqual((d["admin"], d["khach"]), (0, 1))
+
+    def test_admin_with_admin_tab_and_public_tab_is_one_admin_and_one_user(self):
+        c = self.client(); self.login(c)
+        c.post("/api/online/ping?khu=admin")                               # tab trang quản trị
+        c.post("/api/online/ping?khu=cong_khai")                           # tab website công khai (cùng trình duyệt)
+        d = c.get("/api/online/thong-ke").get_json()
+        self.assertEqual((d["admin"], d["khach"]), (1, 1))
 
     def test_expired_admin_tab_is_not_counted_as_visitor(self):
         c = self.client(); self.login(c)

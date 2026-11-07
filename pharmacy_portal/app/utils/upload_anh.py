@@ -5,6 +5,7 @@ Logic: luôn xoá ảnh cũ TRƯỚC khi upload ảnh mới để tránh CDN cac
 import cloudinary
 import cloudinary.uploader
 from flask import current_app
+import re
 import uuid
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif"}
@@ -37,6 +38,20 @@ def _lay_public_id_tu_url(url_anh: str) -> str | None:
         return public_id_raw
     except Exception:
         return None
+
+
+def anh_thu_nho(url_anh: str, canh: int = 112) -> str:
+    """URL ảnh vuông thu nhỏ cho danh sách gợi ý (tải nhanh trên điện thoại).
+    Ảnh Cloudinary dạng .../upload/v123/... → chèn biến đổi c_fill,w,h,f_auto,q_auto; ảnh ở nơi khác hoặc đã có sẵn
+    biến đổi thì giữ nguyên. Rỗng → rỗng."""
+    if not url_anh:
+        return ""
+    if "res.cloudinary.com" not in url_anh or "/upload/" not in url_anh:
+        return url_anh
+    dau, duoi = url_anh.split("/upload/", 1)
+    if not re.match(r"v\d+/", duoi):                 # đã có biến đổi / dạng lạ → không đụng vào
+        return url_anh
+    return f"{dau}/upload/c_fill,w_{canh},h_{canh},f_auto,q_auto/{duoi}"
 
 
 def xoa_anh_cloudinary(url_anh: str) -> bool:
