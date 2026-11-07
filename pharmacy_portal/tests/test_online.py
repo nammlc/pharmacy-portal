@@ -93,6 +93,47 @@ class OnlineTests(unittest.TestCase):
             DangOnline.query.update({"lan_cuoi": datetime.utcnow() - timedelta(seconds=300)}); db.session.commit()
         self.assertEqual(self.dem()["khach"], 0)
 
+    # ---- gần thời gian thực: báo rời trang ----
+    def lan_cuoi(self, khoa):
+        with self.app.app_context():
+            return DangOnline.query.get(khoa).lan_cuoi
+
+    def test_leaving_the_page_drops_the_count_quickly(self):
+        c = self.client(); c.post("/api/online/ping")
+        khoa = self.rows()[0][0]
+        self.assertEqual(self.dem()["khach"], 1)
+        cua_so = self.app.config["ONLINE_CUA_SO_GIAY"]
+        self.assertEqual(c.post("/api/online/roi").status_code, 204)
+        con_lai = cua_so - (datetime.utcnow() - self.lan_cuoi(khoa)).total_seconds()      # còn được tính bao lâu nữa
+        self.assertTrue(3 <= con_lai <= self.online.ROI_GIU_GIAY + 2, con_lai)             # ~6 giây thay vì cả phút
+        self.assertEqual(self.dem()["khach"], 1)                                           # chưa tụt ngay (chống nháy khi đổi trang)
+        with self.app.app_context():                                                       # hết 6 giây mà không có tín hiệu mới
+            DangOnline.query.update({"lan_cuoi": datetime.utcnow() - timedelta(seconds=cua_so + 1)}); db.session.commit()
+        self.assertEqual(self.dem()["khach"], 0)
+
+    def test_next_page_signal_right_after_leaving_restores_the_count(self):
+        c = self.client(); c.post("/api/online/ping")
+        c.post("/api/online/roi")
+        c.post("/api/online/ping")                                                         # trang kế tiếp báo lại ngay
+        khoa = self.rows()[0][0]
+        self.assertLess((datetime.utcnow() - self.lan_cuoi(khoa)).total_seconds(), 3)
+
+    def test_leaving_unknown_visitor_and_bot_is_harmless(self):
+        self.assertEqual(self.client().post("/api/online/roi").status_code, 204)
+        self.assertEqual(self.client(UA_BOT).post("/api/online/roi").status_code, 204)
+        self.assertEqual(self.rows(), [])
+
+    def test_admin_leaving_and_expired_admin_tab(self):
+        c = self.client(); self.login(c); c.post("/api/online/ping?khu=admin")
+        c.post("/api/online/roi?khu=admin")
+        self.assertEqual(self.dem()["admin"], 1)
+        with c.session_transaction() as s:
+            s["_last_active"] = time.time() - 16 * 60
+        self.assertEqual(c.post("/api/online/roi?khu=admin").status_code, 204)           # hết phiên: không tính thành khách
+
+    def test_default_window_is_short_for_near_realtime(self):
+        self.assertEqual(self.app.config["ONLINE_CUA_SO_GIAY"], 60)
+
     # ---- admin ----
     def test_stats_requires_login(self):
         self.assertEqual(self.client().get("/api/online/thong-ke").status_code, 401)
@@ -139,13 +180,18 @@ class OnlineTests(unittest.TestCase):
         c = self.client(); self.login(c)
         h = c.get("/admin/").get_data(as_text=True)
         for chuoi in ('id="onlineBox"', 'id="onlineAdmin"', 'id="onlineKhach"', "Admin online", "Người dùng online",
-                      'data-khu="admin"', "/api/online/ping", "/api/online/thong-ke", "js/online.js"):
+                      'data-khu="admin"', "/api/online/ping", "/api/online/roi", "/api/online/thong-ke", "js/online.js"):
             self.assertIn(chuoi, h, chuoi)
         self.assertLess(h.index("admin-body"), h.index('id="onlineBox"'))   # ô nằm SAU nội dung → cuối trang trên mobile
 
     def test_public_pages_only_send_the_signal(self):
         h = self.client().get("/", follow_redirects=True).get_data(as_text=True)
-        self.assertIn('data-khu="cong_khai"', h); self.assertNotIn("onlineBox", h)
+        self.assertIn('data-khu="cong_khai"', h); self.assertIn("/api/online/roi", h); self.assertNotIn("onlineBox", h)
+
+    def test_script_polls_fast_and_reports_leaving(self):
+        js = open(os.path.join(os.path.dirname(__file__), "..", "app", "static", "js", "online.js"), encoding="utf-8").read()
+        self.assertIn("STAT_MS = 5000", js); self.assertIn("PING_MS = 20000", js)
+        self.assertIn("sendBeacon", js); self.assertIn('"pagehide"', js)
 
     def test_css_pins_box_on_desktop_and_puts_it_at_the_end_on_mobile(self):
         css = open(os.path.join(os.path.dirname(__file__), "..", "app", "static", "css", "style.css"), encoding="utf-8").read()

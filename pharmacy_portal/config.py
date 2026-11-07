@@ -129,7 +129,8 @@ class Config:
 
     # --- Đếm người đang trực tuyến (ô thống kê góc dưới trang quản trị) ---
     # Ai có tín hiệu "còn ở đây" trong N giây gần nhất thì tính là đang online (trình duyệt báo mỗi ~45 giây).
-    ONLINE_CUA_SO_GIAY = max(60, int(os.environ.get("ONLINE_CUA_SO_GIAY", "120")))
+    # Trình duyệt báo mỗi ~20 giây và báo "tôi rời trang" ngay khi đóng tab, nên cửa sổ 60 giây là đủ → số liệu gần thời gian thực.
+    ONLINE_CUA_SO_GIAY = max(40, int(os.environ.get("ONLINE_CUA_SO_GIAY", "60")))
 
     # --- Xác thực 2 lớp OTP (Google Authenticator) khi đăng nhập admin ---
     # Đúng mật khẩu xong còn phải nhập mã 6 số trong app. Xem app/utils/otp.py.

@@ -2,10 +2,12 @@
 Đếm người đang trực tuyến (hiện ở ô thống kê góc dưới trang quản trị).
 
 Cách hoạt động
-  - Trình duyệt (static/js/online.js) gửi tín hiệu "còn ở đây" ~45 giây/lần, CHỈ khi tab đang hiện và người dùng
-    có thao tác trong 5 phút gần nhất (tab bỏ quên không tính, cũng không giữ database thức).
+  - Trình duyệt (static/js/online.js) gửi tín hiệu "còn ở đây" ~20 giây/lần, CHỈ khi tab đang hiện và người dùng
+    có thao tác gần đây (tab bỏ quên không tính). Khi đóng tab / rời trang, trình duyệt báo "tôi rời" (sendBeacon)
+    → số liệu giảm gần như ngay, không phải đợi hết cửa sổ.
   - Server ghi/cập nhật 1 dòng trong bảng `dang_online` cho mỗi tài khoản admin hoặc mỗi thiết bị khách.
-  - Đang online = có tín hiệu trong ONLINE_CUA_SO_GIAY giây gần nhất (mặc định 120).
+  - Đang online = có tín hiệu trong ONLINE_CUA_SO_GIAY giây gần nhất (mặc định 60).
+  - Ô thống kê ở trang quản trị hỏi lại server mỗi 5 giây (không cần tải lại trang).
 
 Phân loại
   - "admin": người đã đăng nhập (kể cả khi đang xem trang công khai). Đếm theo TÀI KHOẢN (mở 2 tab vẫn là 1).
@@ -30,7 +32,8 @@ from app.utils.nhat_ky import _RE_BOT, lay_ip
 
 GIU_DONG_CU_GIO = 1              # dòng không còn tín hiệu quá 1 giờ thì xoá
 _GHI_LAN_CUOI = {}               # khoá -> thời điểm (monotonic) đã ghi, để không ghi quá dày khi nhiều tab / bấm liên tục
-_GIAN_CACH_GHI = 20              # giây
+_GIAN_CACH_GHI = 10              # giây
+ROI_GIU_GIAY = 6                 # báo "rời trang": còn được tính thêm ngần này giây, nếu trang kế tiếp báo lại thì không bị tụt
 
 
 def la_bot():
@@ -45,6 +48,33 @@ def khoa_khach():
     muoi = current_app.config.get("SECRET_KEY", "")
     tho = f"{muoi}|{datetime.utcnow():%Y-%m-%d}|{lay_ip()}|{request.headers.get('User-Agent', '')}"
     return "k:" + hashlib.sha256(tho.encode("utf-8")).hexdigest()[:40]
+
+
+def nhan_dien(khu):
+    """Ai đang gửi tín hiệu? Trả (loai, khoa, ten); None nếu là bot; 'het_phien' nếu là tab quản trị mà phiên đã hết hạn."""
+    from flask_login import current_user
+    if la_bot():
+        return None
+    if current_user.is_authenticated:
+        ten = getattr(current_user, "ho_ten", None) or current_user.ten_dang_nhap
+        return ("admin", f"a:{current_user.id}", ten)
+    if khu == "admin":
+        return "het_phien"
+    return ("khach", khoa_khach(), None)
+
+
+def danh_dau_roi(khoa):
+    """Người dùng đóng tab / rời trang: rút ngắn thời gian còn được tính xuống ROI_GIU_GIAY giây.
+    (Không xoá hẳn: chuyển giữa 2 trang của site sẽ có tín hiệu mới ngay sau đó, tránh số nhảy xuống rồi lên.)"""
+    _GHI_LAN_CUOI.pop(khoa, None)                  # để tín hiệu kế tiếp của khoá này luôn được ghi, không bị giảm tần suất
+    cua_so = int(current_app.config.get("ONLINE_CUA_SO_GIAY", 60))
+    T = DangOnline.__table__
+    try:
+        with db.engine.begin() as conn:
+            conn.execute(T.update().where(T.c.khoa == khoa).values(
+                lan_cuoi=datetime.utcnow() - timedelta(seconds=max(0, cua_so - ROI_GIU_GIAY))))
+    except Exception as e:                          # noqa: BLE001
+        current_app.logger.warning(f"Không ghi được tín hiệu rời trang: {e}")
 
 
 def ghi_hien_dien(loai, khoa, ten=None):
@@ -81,7 +111,7 @@ def ghi_hien_dien(loai, khoa, ten=None):
 
 def dem():
     """{'admin': n, 'khach': m, 'ten_admin': [...], 'cua_so': giây}. Lỗi DB → ném ngoại lệ cho nơi gọi xử lý."""
-    cua_so = int(current_app.config.get("ONLINE_CUA_SO_GIAY", 120))
+    cua_so = int(current_app.config.get("ONLINE_CUA_SO_GIAY", 60))
     moc = datetime.utcnow() - timedelta(seconds=cua_so)
     T = DangOnline.__table__
     with db.engine.connect() as conn:

@@ -16,7 +16,7 @@ KHOA = "_last_active"
 _KHONG_CHUYEN_HUONG = ("admin_auth.keep_alive", "admin_auth.dang_nhap")
 # Tín hiệu đếm người online + ô thống kê tự làm mới: chạy nền định kỳ nên KHÔNG được gia hạn phiên
 # (nếu gia hạn thì admin bỏ máy mở trang vẫn không bao giờ bị tự đăng xuất).
-_KHONG_GIA_HAN = ("online.ping", "online.thong_ke")
+_KHONG_GIA_HAN = ("online.ping", "online.roi", "online.thong_ke")
 
 
 def danh_dau_hoat_dong():

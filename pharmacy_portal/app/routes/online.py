@@ -1,4 +1,4 @@
-"""API đếm người đang online. Chỉ có 2 đường dẫn, đều trả JSON / 204, không có trang HTML."""
+"""API đếm người đang online. Chỉ có 3 đường dẫn, đều trả JSON / 204, không có trang HTML."""
 from flask import Blueprint, jsonify, request, current_app
 from flask_login import current_user
 
@@ -12,21 +12,31 @@ def _khong_cache(resp):
     return resp
 
 
+def _204():
+    return _khong_cache(current_app.response_class("", 204))
+
+
 @bp.route("/ping", methods=["POST"])
 def ping():
     """Trình duyệt báo "tôi còn đang xem trang". Người đã đăng nhập tính là admin, còn lại là khách.
     ?khu=admin (gửi từ trang quản trị): nếu phiên đã hết hạn thì KHÔNG tính thành khách, trả 401 để trình duyệt dừng."""
-    khu = request.args.get("khu", "cong_khai")
-    if _online.la_bot():
-        return ("", 204)
-    if current_user.is_authenticated:
-        ten = getattr(current_user, "ho_ten", None) or current_user.ten_dang_nhap
-        _online.ghi_hien_dien("admin", f"a:{current_user.id}", ten)
-        return _khong_cache(current_app.response_class("", 204))
-    if khu == "admin":
+    kq = _online.nhan_dien(request.args.get("khu", "cong_khai"))
+    if kq is None:                                         # bot
+        return _204()
+    if kq == "het_phien":
         return _khong_cache(jsonify(active=False)), 401
-    _online.ghi_hien_dien("khach", _online.khoa_khach())
-    return _khong_cache(current_app.response_class("", 204))
+    loai, khoa, ten = kq
+    _online.ghi_hien_dien(loai, khoa, ten)
+    return _204()
+
+
+@bp.route("/roi", methods=["POST"])
+def roi():
+    """Trình duyệt báo "tôi vừa đóng tab / rời trang" (sendBeacon) → số liệu giảm gần như ngay."""
+    kq = _online.nhan_dien(request.args.get("khu", "cong_khai"))
+    if kq and kq != "het_phien":
+        _online.danh_dau_roi(kq[1])
+    return _204()
 
 
 @bp.route("/thong-ke")
