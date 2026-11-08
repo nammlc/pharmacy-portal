@@ -177,13 +177,6 @@ a { color: inherit; text-decoration: none; }
 
 .main-nav a:hover { color: #fff; background: rgba(255,255,255,0.07); }
 .main-nav a.active { color: #fff; background: var(--sky-400); }
-.main-nav a.nav-admin-link {
-  margin-top: 6px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.6);
-}
-.main-nav a.nav-admin-link:hover { color: #fff; }
 
 @media (max-width: 900px) {
   /* Bug cũ: left:0 + right:0 khiến hộp menu bị co hẹp bằng đúng bề rộng
@@ -1125,13 +1118,6 @@ a { color: inherit; text-decoration: none; }
 
 .main-nav a:hover { color: #fff; background: rgba(255,255,255,0.07); }
 .main-nav a.active { color: #fff; background: var(--sky-400); }
-.main-nav a.nav-admin-link {
-  margin-top: 6px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.6);
-}
-.main-nav a.nav-admin-link:hover { color: #fff; }
 
 @media (max-width: 900px) {
   /* Bug cũ: left:0 + right:0 khiến hộp menu bị co hẹp bằng đúng bề rộng
@@ -3735,7 +3721,11 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
   padding-top: 72px;
   padding-bottom: 104px;
 }
-.hero--anh .hero-media { position: absolute; inset: 0; z-index: 0; }
+/* LƯU Ý xếp lớp: KHÔNG đặt z-index lên .hero-media và .hero-inner. Chỉ cần cả hai là 'positioned' (hero-media nằm trước
+   hero-inner trong HTML nên bị che bởi nội dung). Nếu đặt z-index, .hero-inner thành một lớp xếp chồng riêng ở mức 1, ngang với
+   '.category-card > *' (z-index:1, nằm sau trong trang) -> các thẻ danh mục vẽ ĐÈ lên danh sách gợi ý tìm kiếm
+   (z-index:60 của nó bị nhốt bên trong lớp đó). Để auto thì gợi ý vẫn so z-index với cả trang như trước. */
+.hero--anh .hero-media { position: absolute; inset: 0; }
 .hero--anh .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .hero--anh .hero-phu {
   position: absolute;
@@ -3745,7 +3735,7 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
     rgba(11, 31, 58, var(--hero-a2, 0.66)) 55%,
     rgba(11, 31, 58, var(--hero-a3, 0.78)) 100%);
 }
-.hero--anh .hero-inner { position: relative; z-index: 1; width: 100%; }
+.hero--anh .hero-inner { position: relative; width: 100%; }
 .hero--anh h1,
 .hero--anh .hero-badge { text-shadow: 0 2px 18px rgba(5, 15, 30, 0.45); }
 .hero--anh p { color: rgba(255, 255, 255, 0.92); text-shadow: 0 1px 12px rgba(5, 15, 30, 0.5); }
