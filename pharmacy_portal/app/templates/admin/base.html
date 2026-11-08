@@ -204,13 +204,13 @@ function moModal(form, ten) {
     : 'Bạn có chắc muốn xoá mục này? Hành động này không thể hoàn tác.';
   document.getElementById('xoaModalMsg').innerHTML = msg;
   document.getElementById('xoaModal').style.display = 'flex';
-  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';      // khoá cuộn trên <html>: đặt trên <body> sẽ làm sidebar mất ghim
   document.getElementById('xoaModalConfirm').focus();
 }
 
 function dongModal() {
   document.getElementById('xoaModal').style.display = 'none';
-  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
   _xoaForm = null;
 }
 
