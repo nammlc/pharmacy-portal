@@ -2728,21 +2728,7 @@ html.rich-modal-open { overflow: hidden; scrollbar-gutter: stable; }
 }
 .adm-badge-alt { background: var(--line-100); color: var(--text-muted); }
 
-.adm-thumb {
-  width: 38px; height: 38px;
-  border-radius: 6px;
-  object-fit: cover;
-  background: var(--paper-0);
-  border: 1px solid var(--line-200);
-}
-.adm-thumb-placeholder {
-  width: 38px; height: 38px;
-  border-radius: 6px;
-  background: var(--sage-100);
-  display: inline-flex; align-items: center; justify-content: center;
-  color: var(--navy-600);
-  font-size: 16px;
-}
+/* Ảnh thu nhỏ trong các bảng danh sách admin: xem kích thước ở khối ".adm-thumb" cuối file. */
 
 .row-act { display: inline-flex; align-items: center; gap: 6px; }
 .row-act a, .row-act button {
@@ -3649,18 +3635,31 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
     background: linear-gradient(to right, var(--ink-900) 240px, transparent 240px), var(--paper-0);
   }
 }
-/* Ảnh thuốc dạng đứng: khung cố định, cắt đều (cover) cho đầy khung.
-   max-width: none để ảnh không bị bộ quy tắc chung làm co lại. */
+/* Ảnh thuốc trong bảng danh sách admin: dạng đứng 3:4, khung cố định, cắt đều (cover) cho đầy khung.
+   Kích thước đổi ở 2 biến bên dưới. max-width:none + flex:none + min-width để KHÔNG bị bộ quy tắc "img { max-width:100% }"
+   hay độ rộng cột bảng ép nhỏ lại (trước đây ảnh bị co còn vài chục px). */
+:root { --adm-thumb-w: 64px; --adm-thumb-h: 84px; }
 .adm-thumb {
-  width: 72px; height: 96px;
-  max-width: none;
+  width: var(--adm-thumb-w); height: var(--adm-thumb-h);
+  min-width: var(--adm-thumb-w); max-width: none; flex: none;
   object-fit: cover;
   background: var(--paper-0);
   border: 1px solid var(--line-200);
   border-radius: 8px;
   display: block;
 }
-.adm-thumb-placeholder { width: 72px; height: 96px; }
+.adm-thumb-placeholder {
+  width: var(--adm-thumb-w); height: var(--adm-thumb-h);
+  border-radius: 8px;
+  background: var(--sage-100);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--navy-600); font-size: 24px;
+}
+/* Cột ảnh luôn đủ rộng cho ảnh + lề ô (16px mỗi bên) */
+.adm-table th.adm-col-thumb { width: calc(var(--adm-thumb-w) + 32px); }
+/* Danh sách Nhóm thuốc: ảnh biểu tượng nhóm → khung vuông nhỏ hơn */
+.adm-thumb.adm-thumb--vuong, .adm-thumb-placeholder.adm-thumb--vuong { --adm-thumb-w: 52px; --adm-thumb-h: 52px; }
+.adm-table th.adm-col-thumb--vuong { width: calc(52px + 32px); }
 .drug-card-thumb, .drug-card-thumb-fallback { width: 80px; height: 100px; }
 .drug-card-thumb { max-width: none; object-fit: cover; background: var(--paper-0); padding: 0; }
 
