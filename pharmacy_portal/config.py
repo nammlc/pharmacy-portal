@@ -84,3 +84,68 @@ class Config:
     # nên thường chỉ còn vài trăm KB, nhưng màn hình "Nhập hàng loạt" có thể gửi
     # nhiều ảnh cùng lúc (nhiều thuốc trong 1 lần lưu) nên để dư ra 40 MB cho cả request.
     MAX_CONTENT_LENGTH = 40 * 1024 * 1024
+
+    # --- Phiên đăng nhập admin: tự đăng xuất sau N phút KHÔNG hoạt động (mặc định 15) ---
+    # Tính từ request gần nhất của admin (trình duyệt tự gửi tín hiệu "còn đang làm việc"
+    # mỗi vài phút khi có thao tác chuột/bàn phím, nên đang soạn bài dài không bị đá ra).
+    ADMIN_IDLE_TIMEOUT_MINUTES = max(1, int(os.environ.get("ADMIN_IDLE_TIMEOUT_MINUTES", "15")))
+
+    # --- Gửi email qua Resend (chức năng quên mật khẩu) ---
+    # RESEND_API_KEY : tạo tại https://resend.com/api-keys
+    # MAIL_FROM      : địa chỉ gửi. Thử nghiệm dùng "Khoa Dược <onboarding@resend.dev>"
+    #                  (chỉ gửi được tới email chủ tài khoản Resend). Muốn gửi cho
+    #                  email khác phải verify domain riêng trên Resend.
+    # APP_BASE_URL   : địa chỉ gốc của web, dùng để tạo link trong email,
+    #                  vd https://tracuuduoc-bvdktamduccauquan.com (không có dấu / cuối)
+    RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+    MAIL_FROM = os.environ.get("MAIL_FROM", "Khoa Dược <onboarding@resend.dev>")
+    APP_BASE_URL = os.environ.get("APP_BASE_URL", "").strip()
+    # Tên miền chính (không có https://), vd tracuuduoc-bvdktamduccauquan.com.
+    # Nếu đặt: ai vào bằng địa chỉ *.onrender.com cũ sẽ được chuyển hướng (301) sang tên miền này.
+    # Để trống = tắt chuyển hướng.
+    CANONICAL_HOST = os.environ.get("CANONICAL_HOST", "").strip().lower()
+    # Link đặt lại mật khẩu có hiệu lực bao nhiêu giây (mặc định 30 phút)
+    RESET_TOKEN_MAX_AGE = int(os.environ.get("RESET_TOKEN_MAX_AGE", "1800"))
+
+    # --- Cách 2: gửi email qua Google Apps Script (không cần tên miền) ---
+    # Render free chặn cổng SMTP nên không gửi Gmail trực tiếp được; thay vào đó
+    # gọi 1 Apps Script (chạy trên tài khoản Gmail của bạn) qua HTTPS.
+    # Xem hướng dẫn trong HUONG_DAN_GUI_MAIL_GMAIL.md. Nếu đặt GAS_MAIL_URL thì
+    # ưu tiên dùng cách này, bỏ qua Resend.
+    # .strip() để phòng trường hợp copy-paste giá trị vào Render bị dính thừa
+    # khoảng trắng/xuống dòng ở đầu-cuối (rất dễ gặp, và sẽ khiến URL gọi tới
+    # sai địa chỉ -> Apps Script trả về trang lỗi 404 dạng HTML thay vì JSON).
+    GAS_MAIL_URL = os.environ.get("GAS_MAIL_URL", "").strip()
+    GAS_MAIL_SECRET = os.environ.get("GAS_MAIL_SECRET", "").strip()
+    MAIL_NAME = os.environ.get("MAIL_NAME", "Cổng Tra Cứu Dược").strip()
+
+    # --- Nhật ký truy cập: giữ bao lâu (ngày; 0 = không tự xoá) ---
+    # Lượt xem trang (nhiều, nhẹ) giữ ngắn; tìm kiếm giữ vừa; thao tác admin/tài khoản giữ lâu nhất.
+    NHAT_KY_GIU_NGAY_TRUY_CAP = int(os.environ.get("NHAT_KY_GIU_NGAY_TRUY_CAP", "14"))
+    NHAT_KY_GIU_NGAY_TIM_KIEM = int(os.environ.get("NHAT_KY_GIU_NGAY_TIM_KIEM", "90"))
+    NHAT_KY_GIU_NGAY = int(os.environ.get("NHAT_KY_GIU_NGAY", "365"))
+    # Trần tổng số dòng nhật ký (mặc định 100.000 dòng ≈ 50 MB, an toàn cho gói free 500 MB): vượt thì xoá bớt lượt xem cũ nhất.
+    NHAT_KY_TOI_DA = int(os.environ.get("NHAT_KY_TOI_DA", "100000"))
+
+    # --- Đếm người đang trực tuyến (ô thống kê góc dưới trang quản trị) ---
+    # Ai có tín hiệu "còn ở đây" trong N giây gần nhất thì tính là đang online (trình duyệt báo mỗi ~45 giây).
+    # Trình duyệt báo mỗi ~20 giây và báo "tôi rời trang" ngay khi đóng tab, nên cửa sổ 60 giây là đủ → số liệu gần thời gian thực.
+    ONLINE_CUA_SO_GIAY = max(40, int(os.environ.get("ONLINE_CUA_SO_GIAY", "60")))
+
+    # --- Xác thực 2 lớp OTP (Google Authenticator) khi đăng nhập admin ---
+    # Đúng mật khẩu xong còn phải nhập mã 6 số trong app. Xem app/utils/otp.py.
+    # ADMIN_2FA_BAT_BUOC=1 (mặc định): tài khoản chưa bật OTP sẽ bị buộc thiết lập ngay lần đăng nhập kế tiếp.
+    #                      =0        : tài khoản chưa bật OTP vẫn đăng nhập bằng mật khẩu như cũ (OTP là tuỳ chọn).
+    ADMIN_2FA_BAT_BUOC = os.environ.get("ADMIN_2FA_BAT_BUOC", "1") != "0"
+    # Tên hiển thị trong app Authenticator. Nên viết không dấu cho app nào cũng đọc được.
+    OTP_ISSUER = os.environ.get("OTP_ISSUER", "Cong Tra Cuu Duoc").strip() or "Cong Tra Cuu Duoc"
+    # Khoá mã hoá secret OTP trong DB. Để trống = dẫn xuất từ SECRET_KEY (khi đó ĐỪNG đổi SECRET_KEY, nếu đổi thì
+    # mọi người phải thiết lập lại OTP). Đặt riêng (chuỗi ngẫu nhiên dài) nếu muốn tách khỏi SECRET_KEY.
+    OTP_ENC_KEY = os.environ.get("OTP_ENC_KEY", "").strip()
+    OTP_CHO_PHUT = int(os.environ.get("OTP_CHO_PHUT", "5"))        # đúng mật khẩu -> có N phút để nhập OTP
+    OTP_MAX_SAI = int(os.environ.get("OTP_MAX_SAI", "5"))          # sai OTP quá N lần / 1 tài khoản ...
+    OTP_MAX_SAI_IP = int(os.environ.get("OTP_MAX_SAI_IP", "20"))   # ... hoặc N lần / 1 IP ...
+    OTP_KHOA_PHUT = int(os.environ.get("OTP_KHOA_PHUT", "15"))     # ... thì khoá N phút
+    # Chống dò mật khẩu ở trang đăng nhập (trước đây có cổng 6 số chặn giúp, nay thay bằng giới hạn này)
+    DANG_NHAP_MAX_SAI = int(os.environ.get("DANG_NHAP_MAX_SAI", "8"))          # sai mật khẩu quá N lần / 1 tên đăng nhập
+    DANG_NHAP_MAX_SAI_IP = int(os.environ.get("DANG_NHAP_MAX_SAI_IP", "30"))   # hoặc N lần / 1 IP

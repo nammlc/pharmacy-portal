@@ -16,6 +16,27 @@ def create_app(config_class=Config):
     import os
     os.makedirs(app.instance_path, exist_ok=True)
 
+    # Đằng sau proxy/CDN (Render + Cloudflare...) chỉ dùng ProxyFix để biết request gốc là https.
+    # IP thật của người truy cập được lấy riêng ở app/utils/nhat_ky.py (hàm lay_ip) từ header
+    # CF-Connecting-IP / X-Forwarded-For. TRUSTED_PROXIES = số lớp proxy phía trước; 0 = tắt.
+    so_proxy = int(os.environ.get("TRUSTED_PROXIES", "1"))
+    if so_proxy > 0:
+        from werkzeug.middleware.proxy_fix import ProxyFix
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=0, x_proto=so_proxy)
+
+    # Chuyển hướng địa chỉ *.onrender.com cũ sang tên miền chính (chỉ bật khi đặt CANONICAL_HOST).
+    if app.config.get("CANONICAL_HOST"):
+        from flask import request, redirect
+
+        @app.before_request
+        def _chuyen_ve_ten_mien_chinh():
+            host = request.host.split(":")[0].lower()
+            if host.endswith(".onrender.com"):
+                return redirect(
+                    f"https://{app.config['CANONICAL_HOST']}{request.full_path.rstrip('?')}",
+                    code=301,
+                )
+
     db.init_app(app)
     csrf.init_app(app)
 
@@ -45,6 +66,10 @@ def create_app(config_class=Config):
     login_manager.login_view = "admin_auth.dang_nhap"
     login_manager.login_message = "Vui lòng đăng nhập để tiếp tục."
     login_manager.login_message_category = "warning"
+
+    # Tự đăng xuất admin khi không hoạt động (đăng ký sớm để chạy trước các hook khác)
+    from app.utils import phien_dang_nhap as _phien
+    _phien.dang_ky(app)
 
     from app.models.models import NguoiDung
 
@@ -120,6 +145,9 @@ def create_app(config_class=Config):
     from app.routes.admin_ve_chung_toi import bp as admin_vct_bp
     app.register_blueprint(admin_vct_bp)
 
+    from app.routes.admin_hero import bp as admin_hero_bp
+    app.register_blueprint(admin_hero_bp)
+
     from app.routes.admin_nhap_hang_loat import bp as admin_nhap_hang_loat_bp
     app.register_blueprint(admin_nhap_hang_loat_bp)
 
@@ -128,6 +156,35 @@ def create_app(config_class=Config):
 
     from app.routes.admin_danh_muc_bai_viet import bp as admin_dmbv_bp
     app.register_blueprint(admin_dmbv_bp)
+
+    from app.routes.admin_nhat_ky import bp as admin_nhat_ky_bp
+    app.register_blueprint(admin_nhat_ky_bp)
+
+    from app.routes.admin_otp import bp as admin_otp_bp
+    app.register_blueprint(admin_otp_bp)
+
+    # --- Đếm người đang online: tín hiệu "còn ở đây" từ trình duyệt (không cần CSRF, chỉ ghi thời điểm) ---
+    from app.routes.online import bp as online_bp
+    app.register_blueprint(online_bp)
+    csrf.exempt(online_bp)
+
+    # --- Nhật ký truy cập: hook toàn cục + tự tạo bảng nếu chưa có ---
+    from app.utils import nhat_ky as _nhat_ky
+    _nhat_ky.dang_ky(app)
+
+    # --- Xác thực 2 lớp OTP: ép thiết lập cho phiên cũ + tự thêm cột vào bảng nguoi_dung ---
+    from app.utils import otp as _otp
+    _otp.dang_ky(app)
+
+    with app.app_context():
+        # Tự tạo các bảng mới (nhat_ky, cài đặt, đếm lần nhập sai) nếu chưa có - không đụng bảng cũ
+        try:
+            from app.models.models import NhatKy, CaiDatHeThong, GateLanThu, DangOnline
+            for _bang in (NhatKy, CaiDatHeThong, GateLanThu, DangOnline):
+                _bang.__table__.create(bind=db.engine, checkfirst=True)
+        except Exception as e:
+            app.logger.warning(f"Không tạo được bảng mới (chạy them_bang_nhat_ky.sql / them_bang_cong_bao_mat.sql thủ công): {e}")
+        _otp.khoi_tao(app)     # PHẢI chạy trước mọi truy vấn bảng nguoi_dung (thêm cột OTP nếu còn thiếu)
 
     _tao_tai_khoan_dau_tien_neu_can(app)
 
@@ -171,6 +228,10 @@ def create_app(config_class=Config):
         dich_den = _request.referrer or _url_for("admin_dashboard.trang_chinh")
         return _redirect(dich_den), 302
 
+    # SEO: robots.txt và sitemap.xml
+    from app.routes.seo import dang_ky_seo
+    dang_ky_seo(app)
+
     return app
 
 
@@ -195,7 +256,8 @@ def _tao_tai_khoan_dau_tien_neu_can(app):
     with app.app_context():
         db.create_all()
         if NguoiDung.query.count() == 0:
-            nguoi_dung = NguoiDung(ten_dang_nhap=ten_dang_nhap, vai_tro="quan_tri")
+            email_admin = (os.environ.get("ADMIN_EMAIL") or "").strip().lower() or None
+            nguoi_dung = NguoiDung(ten_dang_nhap=ten_dang_nhap, vai_tro="quan_tri", email=email_admin)
             nguoi_dung.set_password(mat_khau)
             db.session.add(nguoi_dung)
             db.session.commit()

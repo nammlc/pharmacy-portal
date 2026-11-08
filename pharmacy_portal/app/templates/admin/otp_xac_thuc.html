@@ -1,0 +1,36 @@
+{% extends "admin/otp_khung.html" %}
+{% block tieu_de %}
+<h1>Xác thực 2 lớp</h1>
+<p class="sub">Xin chào <strong>{{ nd.ho_ten or nd.ten_dang_nhap }}</strong>.<br>
+{% if du_phong %}Nhập 1 mã dự phòng (dạng XXXX-XXXX).{% else %}Mở Google Authenticator và nhập mã 6 chữ số.{% endif %}</p>
+{% endblock %}
+
+{% block noi_dung %}
+<form method="POST" action="{{ url_for('admin_otp.xac_thuc', du_phong=1 if du_phong else None) }}" id="gateForm" autocomplete="off">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-row">
+    {% if du_phong %}
+    <label for="gateMa" class="gate-label">Mã dự phòng</label>
+    <input type="text" id="gateMa" name="ma" class="gate-input gate-input-sm" style="max-width:100%; text-align:center; letter-spacing:.2em; padding-left:14px;"
+           maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" autofocus required placeholder="XXXX-XXXX">
+    {% else %}
+    <label for="gateMa" class="gate-label">Mã OTP</label>
+    <input type="text" id="gateMa" name="ma" class="gate-input" inputmode="numeric" pattern="[0-9 ]*"
+           maxlength="7" autocomplete="one-time-code" autofocus required placeholder="••••••">
+    {% endif %}
+  </div>
+  <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:11px;">Xác nhận</button>
+</form>
+<p style="text-align:center; margin:16px 0 0; font-size:13px; line-height:1.9;">
+  {% if du_phong %}
+  <a href="{{ url_for('admin_otp.xac_thuc') }}">← Dùng mã trong Authenticator</a>
+  {% else %}
+  <a href="{{ url_for('admin_otp.xac_thuc', du_phong=1) }}">Mất điện thoại? Dùng mã dự phòng</a>
+  {% endif %}
+  <br><a href="{{ url_for('admin_auth.dang_nhap') }}">Quay lại đăng nhập</a>
+</p>
+{% endblock %}
+
+{% block scripts %}
+{% if not du_phong %}<script src="{{ url_for('static', filename='js/otp_ma.js') }}"></script>{% endif %}
+{% endblock %}

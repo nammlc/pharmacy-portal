@@ -5,6 +5,7 @@ Logic: luôn xoá ảnh cũ TRƯỚC khi upload ảnh mới để tránh CDN cac
 import cloudinary
 import cloudinary.uploader
 from flask import current_app
+import re
 import uuid
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif"}
@@ -37,6 +38,32 @@ def _lay_public_id_tu_url(url_anh: str) -> str | None:
         return public_id_raw
     except Exception:
         return None
+
+
+def anh_thu_nho(url_anh: str, canh: int = 112) -> str:
+    """URL ảnh vuông thu nhỏ cho danh sách gợi ý (tải nhanh trên điện thoại).
+    Ảnh Cloudinary dạng .../upload/v123/... → chèn biến đổi c_fill,w,h,f_auto,q_auto; ảnh ở nơi khác hoặc đã có sẵn
+    biến đổi thì giữ nguyên. Rỗng → rỗng."""
+    if not url_anh:
+        return ""
+    if "res.cloudinary.com" not in url_anh or "/upload/" not in url_anh:
+        return url_anh
+    dau, duoi = url_anh.split("/upload/", 1)
+    if not re.match(r"v\d+/", duoi):                 # đã có biến đổi / dạng lạ → không đụng vào
+        return url_anh
+    return f"{dau}/upload/c_fill,w_{canh},h_{canh},f_auto,q_auto/{duoi}"
+
+
+def anh_theo_chieu_rong(url_anh: str, rong: int) -> str:
+    """URL ảnh Cloudinary thu về chiều rộng `rong` px (tự chọn WebP/AVIF + chất lượng tối ưu).
+    Dùng cho ảnh nền lớn (hero) để điện thoại không phải tải ảnh 2400px. Ảnh không phải Cloudinary,
+    hoặc đã có sẵn biến đổi → giữ nguyên."""
+    if not url_anh or "res.cloudinary.com" not in url_anh or "/upload/" not in url_anh:
+        return url_anh or ""
+    dau, duoi = url_anh.split("/upload/", 1)
+    if not re.match(r"v\d+/", duoi):
+        return url_anh
+    return f"{dau}/upload/f_auto,q_auto,c_limit,w_{int(rong)}/{duoi}"
 
 
 def xoa_anh_cloudinary(url_anh: str) -> bool:
@@ -106,6 +133,12 @@ def upload_anh_thuoc(file_object, url_cu: str | None = None) -> str | None:
 def upload_anh_ve_chung_toi(file_object, url_cu: str | None = None) -> str | None:
     return _upload_len_cloudinary(file_object, "pharmacy/ve_chung_toi",
                                    url_cu=url_cu, width=1200, height=800, crop="fill")
+
+
+def upload_anh_hero(file_object, url_cu: str | None = None) -> str | None:
+    """Ảnh nền trang chủ: giữ nguyên tỉ lệ (không cắt), tối đa 2400px chiều rộng."""
+    return _upload_len_cloudinary(file_object, "pharmacy/hero",
+                                   url_cu=url_cu, width=2400, height=1600, crop="limit")
 
 
 def upload_anh_bai_viet(file_object, url_cu: str | None = None) -> str | None:

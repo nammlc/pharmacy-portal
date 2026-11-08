@@ -1,54 +1,23 @@
 {% extends "base.html" %}
-{% block title %}Trang chủ — Cổng Tra Cứu Dược
-<!-- Section bài viết mới nhất -->
-{% set bai_moi = [] %}
-{% for bai in bai_viet_moi %}{% if loop.index <= 4 %}{% set _ = bai_moi.append(bai) %}{% endif %}{% endfor %}
-{% if bai_viet_moi %}
-<section class="tc-bai-viet-wrap">
-  <div class="tc-bai-viet-inner">
-    <div class="tc-bai-viet-head">
-      <div class="tc-bai-viet-title">
-        <span class="tc-bv-dot"></span>
-        📰 Tin tức & Thông báo mới nhất
-      </div>
-      <a href="{{ url_for('bv.index') }}" class="tc-bv-xem-them">Xem tất cả →</a>
-    </div>
-    <div class="tc-bv-grid">
-      {% for bv in bai_viet_moi %}
-      <a class="tc-bv-card" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
-        <div class="tc-bv-thumb" {% if bv.anh_dai_dien %}style="background-image:url('{{ bv.anh_dai_dien }}')"{% endif %}>
-          {% if not bv.anh_dai_dien %}<span class="tc-bv-thumb-icon">📰</span>{% endif %}
-          {% if bv.ghim %}<span class="tc-bv-pin">📌</span>{% endif %}
-          {% if bv.danh_muc %}
-          <span class="tc-bv-tag" style="--tc-bv-color:{{ bv.danh_muc.mau_sac }}">{{ bv.danh_muc.ten }}</span>
-          {% endif %}
-        </div>
-        <div class="tc-bv-body">
-          <h3>{{ bv.tieu_de }}</h3>
-          {% if bv.mo_ta_ngan %}<p>{{ bv.mo_ta_ngan }}</p>{% endif %}
-          <div class="tc-bv-meta">
-            <span>🗓 {{ (bv.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bv.ngay_xuat_ban else (bv.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}</span>
-            {% if bv.luot_xem %}<span>👁 {{ bv.luot_xem }}</span>{% endif %}
-          </div>
-        </div>
-        <div class="tc-bv-arrow">→</div>
-      </a>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-{% endif %}
-
-{% endblock %}
+{% block title %}Tra cứu dược Tâm Đức — Cổng tra cứu thuốc Khoa Dược{% endblock %}
+{% block meta_mo_ta %}Tra cứu dược Tâm Đức: thông tin thuốc, thuốc tiêm truyền, tương tác thuốc và tương hợp – tương kỵ, do Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan cập nhật và kiểm duyệt.{% endblock %}
+{% block og_tieu_de %}Tra cứu dược Tâm Đức — Khoa Dược BV Đa khoa Tâm Đức Cầu Quan{% endblock %}
+{% block og_mo_ta %}Tra cứu thông tin thuốc, thuốc tiêm truyền, tương tác thuốc và tương hợp – tương kỵ.{% endblock %}
 
 {% block content %}
-<section class="hero">
+<section class="hero{% if hero %} hero--anh{% endif %}"{% if hero %} style="--hero-a1:{{ hero.a1 }};--hero-a2:{{ hero.a2 }};--hero-a3:{{ hero.a3 }}"{% endif %}>
+  {% if hero %}
+  <div class="hero-media" aria-hidden="false">
+    <img class="hero-bg" src="{{ hero.src }}"{% if hero.srcset %} srcset="{{ hero.srcset }}" sizes="100vw"{% endif %} alt="{{ hero.alt }}" fetchpriority="high" decoding="async" style="object-position: {{ hero.vi_tri }}">
+    <div class="hero-phu" aria-hidden="true"></div>
+  </div>
+  {% endif %}
   <div class="hero-inner">
     <div class="hero-badge">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
-    <h1>Tra cứu thông tin<br><span>dược phẩm</span> nhanh chóng</h1>
+    <h1>Tra cứu dược <span>Tâm Đức</span><br>thông tin thuốc nhanh chóng</h1>
     <p>Danh mục thuốc, tương tác, tương hợp–kỵ và hướng dẫn sử dụng được cập nhật và kiểm duyệt bởi Dược sĩ lâm sàng.</p>
-    <form class="hero-search" action="{{ url_for('main.tim_kiem') }}" method="get">
-      <input type="text" name="q" placeholder="Nhập tên thuốc hoặc hoạt chất...">
+    <form class="hero-search" autocomplete="off" action="{{ url_for('main.tim_kiem') }}" method="get">
+      <input type="text" name="q" placeholder="Nhập tên thuốc hoặc hoạt chất..." data-goi-y="all">
       <button type="submit">🔍 Tra cứu</button>
     </form>
 
@@ -73,7 +42,6 @@
     {% endif %}
   </div>
 </section>
-
 <div class="category-grid-outer">
   <div class="category-grid">
 
@@ -124,6 +92,13 @@
       <h3>Thông tin bệnh nhân</h3>
       <p>Hướng dẫn dùng thuốc tại nhà, ngôn ngữ đơn giản dễ hiểu cho người bệnh.</p>
       <div class="cat-arrow">Xem hướng dẫn →</div>
+    </a>
+
+    <a class="category-card cat-bv" href="{{ url_for('bv.index') }}">
+      <div class="cat-icon-wrap">📰</div>
+      <h3>Bài viết - Thông báo</h3>
+      <p>Tin tức, thông báo nội bộ và bài viết chuyên môn mới nhất từ Khoa Dược.</p>
+      <div class="cat-arrow">Xem bài viết →</div>
     </a>
 
   </div>

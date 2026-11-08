@@ -12,9 +12,20 @@ class NguoiDung(UserMixin, db.Model):
     ten_dang_nhap = db.Column(db.String(100), unique=True, nullable=False, index=True)
     mat_khau_hash = db.Column(db.String(255), nullable=False)
     ho_ten = db.Column(db.String(150))
+    # Email dùng để nhận link đặt lại mật khẩu (gửi qua Resend). Có thể để trống.
+    email = db.Column(db.String(255), unique=True, index=True)
     vai_tro = db.Column(db.String(50), default="duoc_si")   # duoc_si, quan_tri...
     dang_hoat_dong = db.Column(db.Boolean, default=True)
     ngay_tao = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # --- Xác thực 2 lớp (OTP Google Authenticator / TOTP) ---
+    # Secret lưu dạng MÃ HOÁ (Fernet), xem app/utils/otp.py. Sửa cột ở đây thì cũng sửa
+    # danh sách cột trong otp.CAC_COT_OTP và file them_cot_otp_nguoi_dung.sql.
+    totp_secret = db.Column(db.Text)
+    totp_bat = db.Column(db.Boolean, nullable=False, default=False, server_default=db.false())
+    totp_buoc_cuoi = db.Column(db.BigInteger)        # bước 30s của mã OTP vừa dùng (chống dùng lại mã)
+    totp_ma_du_phong = db.Column(db.Text)            # JSON: danh sách BĂM của các mã dự phòng còn lại
+    totp_ngay_bat = db.Column(db.DateTime)
 
     def set_password(self, mat_khau):
         self.mat_khau_hash = generate_password_hash(mat_khau)
@@ -318,3 +329,63 @@ class CaiDat(db.Model):
         else:
             obj = cls(khoa=khoa, gia_tri=gia_tri)
             db.session.add(obj)
+
+
+class NhatKy(db.Model):
+    """Nhật ký truy cập / thao tác: ai (IP + cookie ẩn danh), lúc nào, làm gì.
+    - loai = tim_kiem      : người dùng công khai tra cứu (tu_khoa = nội dung tìm)
+    - loai = sua_du_lieu   : admin thêm/sửa/xoá dữ liệu (hanh_dong + doi_tuong + doi_tuong_id)
+    - loai = dang_nhap / dang_nhap_that_bai / dang_xuat / tai_khoan : sự kiện tài khoản admin
+    """
+    __tablename__ = "nhat_ky"
+
+    id = db.Column(db.Integer, primary_key=True)
+    thoi_gian = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)  # UTC
+    loai = db.Column(db.String(30), nullable=False, index=True)
+    ip = db.Column(db.String(64), index=True)
+    cookie_id = db.Column(db.String(40), index=True)     # mã ẩn danh trong cookie trình duyệt
+    nguoi_dung_id = db.Column(db.Integer)
+    ten_nguoi_dung = db.Column(db.String(100))
+    phuong_thuc = db.Column(db.String(10))
+    duong_dan = db.Column(db.String(500))
+    tu_khoa = db.Column(db.String(500))
+    hanh_dong = db.Column(db.String(30))                  # them | sua | xoa | xoa_hang_loat | ...
+    doi_tuong = db.Column(db.String(80))                  # vd: "Danh mục thuốc"
+    doi_tuong_id = db.Column(db.Integer)
+    doi_tuong_ten = db.Column(db.String(255))
+    mo_ta = db.Column(db.String(500))
+    ma_trang_thai = db.Column(db.Integer)
+    trinh_duyet = db.Column(db.String(300))
+
+    def __repr__(self):
+        return f"<NhatKy {self.loai} {self.ip}>"
+
+
+class CaiDatHeThong(db.Model):
+    """Bảng cài đặt dạng khoá-giá trị. Hiện dùng cho mã bảo mật cổng admin (chỉ lưu dạng băm)."""
+    __tablename__ = "cai_dat_he_thong"
+
+    khoa = db.Column(db.String(80), primary_key=True)
+    gia_tri = db.Column(db.Text)
+    ngay_cap_nhat = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class DangOnline(db.Model):
+    """Ai đang trực tuyến: mỗi thiết bị / tài khoản 1 dòng, trình duyệt báo "còn ở đây" mỗi ~45 giây.
+    Đếm = số dòng có lan_cuoi trong ONLINE_CUA_SO_GIAY giây gần nhất. KHÔNG lưu IP thô (khách chỉ lưu mã băm có muối),
+    dòng cũ tự xoá. Xem app/utils/online.py."""
+    __tablename__ = "dang_online"
+
+    khoa = db.Column(db.String(64), primary_key=True)          # a:<id admin> | v:<cookie ẩn danh> | k:<mã băm thiết bị>
+    loai = db.Column(db.String(10), nullable=False, index=True)    # "admin" | "khach"
+    ten = db.Column(db.String(150))                              # tên admin (để hiện danh sách), khách để trống
+    lan_cuoi = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+
+
+class GateLanThu(db.Model):
+    """Mỗi dòng = 1 lần nhập SAI mã bảo mật cổng admin (để khoá tạm theo IP / toàn hệ thống)."""
+    __tablename__ = "cong_bao_mat_lan_sai"
+
+    id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(64), index=True)
+    thoi_gian = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)

@@ -1,0 +1,37 @@
+{% extends "admin/otp_khung.html" %}
+{% block title %}Thiết lập xác thực 2 lớp{% endblock %}
+{% block tieu_de %}
+<h1>Thiết lập xác thực 2 lớp</h1>
+<p class="sub">{% if cho_dang_nhap %}Tài khoản <strong>{{ nd.ten_dang_nhap }}</strong> cần bật OTP để đăng nhập.{% else %}Quét mã QR bằng thiết bị mới.{% endif %}</p>
+{% endblock %}
+
+{% block noi_dung %}
+<ol class="otp-buoc">
+  <li>Cài <strong>Google Authenticator</strong> (hoặc Microsoft Authenticator, Authy...) trên điện thoại.</li>
+  <li>Chọn <strong>Thêm tài khoản → Quét mã QR</strong> và quét hình dưới đây.</li>
+  <li>Nhập mã 6 số app đang hiển thị để xác nhận.</li>
+</ol>
+
+<div class="otp-qr">{{ qr | safe }}</div>
+<details class="otp-tay">
+  <summary>Không quét được? Nhập khoá thủ công</summary>
+  <code>{{ secret_hien }}</code>
+  <small>Loại khoá: theo thời gian (TOTP). Tài khoản: {{ nd.ten_dang_nhap }}</small>
+</details>
+
+<form method="POST" id="gateForm" autocomplete="off">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="form-row">
+    <label for="gateMa" class="gate-label">Mã 6 số từ app</label>
+    <input type="text" id="gateMa" name="ma" class="gate-input" inputmode="numeric" pattern="[0-9 ]*"
+           maxlength="7" autocomplete="one-time-code" autofocus required placeholder="••••••">
+  </div>
+  <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:11px;">Xác nhận &amp; bật OTP</button>
+</form>
+<p style="text-align:center; margin:16px 0 0; font-size:13px;">
+  {% if cho_dang_nhap %}<a href="{{ url_for('admin_auth.dang_nhap') }}">Huỷ, quay lại đăng nhập</a>
+  {% else %}<a href="{{ url_for('admin_otp.quan_ly') }}">Huỷ</a>{% endif %}
+</p>
+{% endblock %}
+
+{% block scripts %}<script src="{{ url_for('static', filename='js/otp_ma.js') }}"></script>{% endblock %}

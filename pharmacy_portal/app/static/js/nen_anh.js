@@ -45,7 +45,7 @@
     return el;
   }
 
-  function nenMotAnh(file) {
+  function nenMotAnh(file, toiDa, chatLuong) {
     return new Promise(function (resolve, reject) {
       // GIF (có thể là ảnh động) và ảnh đã đủ nhỏ thì giữ nguyên, khỏi nén.
       if (file.type === "image/gif" || file.size <= BO_QUA_NEU_NHO_HON) {
@@ -58,8 +58,8 @@
       img.onload = function () {
         var rong = img.naturalWidth, cao = img.naturalHeight;
         var canhDaiNhat = Math.max(rong, cao);
-        if (canhDaiNhat > KICH_THUOC_TOI_DA) {
-          var ti_le = KICH_THUOC_TOI_DA / canhDaiNhat;
+        if (canhDaiNhat > toiDa) {
+          var ti_le = toiDa / canhDaiNhat;
           rong = Math.round(rong * ti_le);
           cao = Math.round(cao * ti_le);
         }
@@ -83,7 +83,7 @@
             resolve(fileMoi);
           },
           "image/jpeg",
-          CHAT_LUONG
+          chatLuong
         );
       };
       img.onerror = function () {
@@ -103,7 +103,10 @@
     input.dataset.dangNen = "1";
     trangThai.textContent = "Đang nén ảnh...";
 
-    nenMotAnh(file).then(function (fileMoi) {
+    // Ô ảnh có thể tự đặt cỡ riêng, vd. ảnh nền trang chủ cần rộng hơn: data-nen-toi-da="2400" data-nen-chat-luong="0.85"
+    var toiDa = parseInt(input.getAttribute("data-nen-toi-da"), 10) || KICH_THUOC_TOI_DA;
+    var chatLuong = parseFloat(input.getAttribute("data-nen-chat-luong")) || CHAT_LUONG;
+    nenMotAnh(file, toiDa, chatLuong).then(function (fileMoi) {
       var dt = new DataTransfer();
       dt.items.add(fileMoi);
       input.files = dt.files;

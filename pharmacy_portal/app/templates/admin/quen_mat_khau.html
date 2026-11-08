@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quên mật khẩu — Cổng Tra Cứu Dược</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="login-shell">
+  <div class="login-card">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo bệnh viện" style="width:72px; height:72px; margin:0 auto 16px; display:block;">
+    <h1>Quên mật khẩu</h1>
+    <p class="sub">Nhập email đã đăng ký cho tài khoản,<br>chúng tôi sẽ gửi link đặt lại mật khẩu.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div style="margin-bottom:16px;">
+        {% for category, message in messages %}
+        <div class="flash-msg flash-{{ 'error' if category == 'error' else category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="form-row">
+        {{ form.email.label }}
+        {{ form.email(autofocus=true, autocomplete="email", type="email", placeholder=(goi_y[0] if goi_y else "")) }}
+        {% for e in form.email.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+        {% if goi_y %}
+        <div style="margin-top:6px; font-size:12.5px; color:var(--text-muted);">
+          Gợi ý email đã đăng ký: <strong>{{ goi_y|join(", ") }}</strong>
+        </div>
+        {% endif %}
+      </div>
+      {{ form.submit(class="btn btn-primary", style="width:100%; justify-content:center; padding:11px;") }}
+    </form>
+    <p style="text-align:center; margin:16px 0 0; font-size:13px;">
+      <a href="{{ url_for('admin_auth.dang_nhap') }}">← Quay lại đăng nhập</a>
+    </p>
+  </div>
+</div>
+</body>
+</html>

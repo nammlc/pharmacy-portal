@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đặt lại mật khẩu — Cổng Tra Cứu Dược</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="login-shell">
+  <div class="login-card">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo bệnh viện" style="width:72px; height:72px; margin:0 auto 16px; display:block;">
+    <h1>Đặt lại mật khẩu</h1>
+    <p class="sub">Nhập mật khẩu mới cho tài khoản quản trị.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div style="margin-bottom:16px;">
+        {% for category, message in messages %}
+        <div class="flash-msg flash-{{ 'error' if category == 'error' else category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+      {% for field in [form.mat_khau_moi, form.xac_nhan_mat_khau_moi] %}
+      <div class="form-row">
+        {{ field.label }}
+        {{ field(autocomplete="new-password") }}
+        {% for e in field.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+      </div>
+      {% endfor %}
+      {{ form.submit(class="btn btn-primary", style="width:100%; justify-content:center; padding:11px;") }}
+    </form>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/hien_mat_khau.js') }}"></script>
+</body>
+</html>

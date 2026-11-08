@@ -39,10 +39,48 @@
         {{ form.mat_khau(autocomplete="current-password") }}
         {% for e in form.mat_khau.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
       </div>
-      {{ form.submit(class="btn btn-primary", style="width:100%; justify-content:center; padding:11px;") }}
+      <button type="submit" id="liBtn" class="lo-btn li-btn">
+        <span id="liLabel">{{ form.submit.label.text }}</span>
+        <span class="lo-icon" aria-hidden="true">
+          <span class="lo-frame"></span>
+          <span id="liPerson" class="lo-person">
+            <span class="lo-bob">
+              <svg width="16" height="22" viewBox="0 0 16 22" overflow="visible">
+  <g class="lk">
+    <ellipse class="foot ft2" cx="10.6" cy="20.4" rx="2.2" ry="1.1"/>
+    <ellipse class="foot ft1" cx="5.4" cy="20.4" rx="2.2" ry="1.1"/>
+    <g class="cb">
+      <ellipse class="arm am1" cx="1.5" cy="15" rx="1.2" ry="1.9" transform="rotate(12 1.5 15)"/>
+      <ellipse class="arm am2" cx="14.5" cy="15" rx="1.2" ry="1.9" transform="rotate(-12 14.5 15)"/>
+      <ellipse class="body" cx="8" cy="14" rx="6.8" ry="6.2"/>
+      <g class="fc">
+        <ellipse class="cheek" cx="4.2" cy="15.6" rx="1.4" ry=".9"/>
+        <ellipse class="cheek" cx="11.8" cy="15.6" rx="1.4" ry=".9"/>
+        <circle class="eye" cx="5.9" cy="13.4" r=".85"/>
+        <circle class="eye" cx="10.1" cy="13.4" r=".85"/>
+        <path class="mouth" d="M7.2 15.5 q.8 .9 1.6 0"/>
+      </g>
+      <g class="sp">
+        <path class="stem" d="M8 7.9 L8 5.2"/>
+        <ellipse class="leaf-s" cx="6.1" cy="4.4" rx="2.1" ry="1.1" transform="rotate(-28 6.1 4.4)"/>
+        <ellipse class="leaf-s" cx="9.9" cy="4.4" rx="2.1" ry="1.1" transform="rotate(28 9.9 4.4)"/>
+      </g>
+    </g>
+  </g>
+</svg>
+            </span>
+          </span>
+          <span id="liLeaf" class="lo-leaf closed"></span>
+        </span>
+      </button>
     </form>
+    <p style="text-align:center; margin:16px 0 0; font-size:13px;">
+      <a href="{{ url_for('admin_auth.quen_mat_khau') }}">Quên mật khẩu?</a>
+    </p>
   </div>
 </div>
 
+<script src="{{ url_for('static', filename='js/hien_mat_khau.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dang_nhap_hoat_hinh.js') }}"></script>
 </body>
 </html>

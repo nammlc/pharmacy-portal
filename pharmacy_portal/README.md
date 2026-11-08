@@ -80,6 +80,14 @@ public ra Internet.
 (File `render.yaml` trong repo cũng dùng được nếu bạn chọn deploy kiểu
 "Blueprint" thay vì cấu hình tay.)
 
+### Tên miền riêng
+
+Tên miền hiện dùng: `tracuuduoc-bvdktamduccauquan.com` (mua ở Namecheap, đã
+gắn vào Render ở Settings > Custom Domains). Trên Render > Environment cần có:
+
+- `APP_BASE_URL` = `https://tracuuduoc-bvdktamduccauquan.com` (dùng tạo link trong email đặt lại mật khẩu)
+- `CANONICAL_HOST` = `tracuuduoc-bvdktamduccauquan.com` (tuỳ chọn: tự chuyển link `onrender.com` cũ sang tên miền mới)
+
 ### ⚠️ Lưu ý quan trọng về giới hạn free tier
 
 - **App sẽ "ngủ" sau 15 phút không có ai truy cập**, lần truy cập đầu tiên
@@ -137,3 +145,38 @@ pharmacy_portal/
 ├── run.py                         # điểm chạy chính
 └── requirements.txt
 ```
+
+
+## Phiên đăng nhập admin: tự đăng xuất khi không hoạt động
+
+Admin tự bị đăng xuất sau **15 phút không thao tác** (đổi bằng biến môi trường `ADMIN_IDLE_TIMEOUT_MINUTES`).
+- Máy chủ kiểm tra ở mọi request (`app/utils/phien_dang_nhap.py`), nên cửa sổ 15 phút là "trượt": còn thao tác thì phiên còn sống.
+- Trình duyệt (`static/js/phien_het_han.js`) gửi tín hiệu `/admin/keep-alive` mỗi ≤5 phút khi có chuột/bàn phím, để đang soạn bài dài không bị đá ra,
+  và tự chuyển về trang đăng nhập khi hết giờ. Nhiều tab admin dùng chung mốc hoạt động.
+- Phiên đang mở trước khi cập nhật sẽ phải đăng nhập lại một lần.
+
+
+## Soạn thảo văn bản trong form admin (modal)
+
+Các ô văn bản dài (thành phần, chỉ định, cách dùng... — mọi `TextAreaField` đi qua macro `render_field`) hiện **bản xem trước**
+trong form; bấm vào ô (hoặc Tab tới rồi Enter) sẽ mở **modal soạn thảo**: thanh công cụ nằm cố định ở trên cùng, chỉ vùng nội dung cuộn.
+`Ctrl+Enter` = Xong, `Esc` = Huỷ (hỏi lại nếu đã sửa), bấm ra vùng tối không đóng để tránh mất bài. Code: `static/js/main.js`, CSS `.rich-modal*` / `.rich-preview*`.
+
+
+## Xác thực 2 lớp (OTP - Google Authenticator) khi đăng nhập admin
+
+Đăng nhập admin gồm 2 bước: **(1)** tên đăng nhập + mật khẩu, **(2)** mã 6 số trong app Google Authenticator / Microsoft Authenticator / Authy.
+Mỗi tài khoản có secret OTP riêng (không dùng chung). Thay cho "cổng mã bảo mật 6 số" trước đây.
+
+- **Lần đầu / tài khoản chưa bật OTP:** đúng mật khẩu xong sẽ được đưa tới trang quét QR → nhập thử 1 mã → nhận **8 mã dự phòng** (chỉ hiện 1 lần) → vào admin.
+  Mặc định bắt buộc (`ADMIN_2FA_BAT_BUOC=1`). Đặt `0` thì OTP là tuỳ chọn (ai chưa bật vẫn đăng nhập bằng mật khẩu, bật ở menu **🔐 Bảo mật 2 lớp**).
+  **Sau khi deploy bản này, hãy cho mọi admin đăng nhập và bật OTP ngay** (ai đăng nhập trước sẽ là người gắn OTP cho tài khoản đó).
+- **Mất điện thoại:** ở bước nhập mã bấm **"Dùng mã dự phòng"** (mỗi mã 1 lần). Hết mã dự phòng → chạy trong Terminal của Coolify: `python reset_otp.py <ten_dang_nhap>`.
+- **Đổi điện thoại / tạo lại mã dự phòng / tắt OTP:** menu **🔐 Bảo mật 2 lớp** (cần nhập lại mật khẩu + mã OTP hiện tại). Không tắt được khi `ADMIN_2FA_BAT_BUOC=1`.
+- **Bảo mật:** secret OTP lưu **mã hoá** (Fernet) trong cột `nguoi_dung.totp_secret`; khoá lấy từ `OTP_ENC_KEY` (hoặc dẫn xuất từ `SECRET_KEY` nếu để trống — khi đó **không được đổi `SECRET_KEY`**, nếu đổi thì mọi người phải thiết lập lại OTP).
+  Mỗi mã chỉ dùng được 1 lần (chống phát lại), chấp nhận lệch ±30 giây. Sai OTP 5 lần/tài khoản (hoặc 20 lần/IP) → khoá 15 phút. Trang đăng nhập cũng khoá tạm khi sai mật khẩu 8 lần/tên đăng nhập hoặc 30 lần/IP.
+- **Cột DB mới:** `totp_secret`, `totp_bat`, `totp_buoc_cuoi`, `totp_ma_du_phong`, `totp_ngay_bat` (bảng `nguoi_dung`). Ứng dụng **tự thêm** khi khởi động; nếu DB user không có quyền ALTER thì chạy `them_cot_otp_nguoi_dung.sql`.
+- **Biến môi trường:** `ADMIN_2FA_BAT_BUOC`, `OTP_ISSUER`, `OTP_ENC_KEY`, `OTP_CHO_PHUT`, `OTP_MAX_SAI`, `OTP_MAX_SAI_IP`, `OTP_KHOA_PHUT`, `DANG_NHAP_MAX_SAI`, `DANG_NHAP_MAX_SAI_IP` (xem `config.py`).
+- **Chạy sau proxy (Coolify/Traefik):** đặt `TRUSTED_PROXIES=1` (mặc định). Máy chủ cloud phải **đồng bộ giờ** (NTP/`chrony`) vì OTP phụ thuộc đồng hồ.
+- Mọi sự kiện (đăng nhập, OTP sai, bật/đổi OTP) được ghi trong **Nhật ký truy cập**.
+

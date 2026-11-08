@@ -135,9 +135,12 @@
 .stat-card { position: relative; }
 .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px; }
 
-.dash-recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 28px; }
-.dash-recent-block {}
-.dash-recent-head { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; gap: 10px; }
+/* minmax(0,1fr) + min-width:0: nếu để "1fr" trần thì ô lưới KHÔNG thu nhỏ dưới độ rộng nội dung → bảng rộng đẩy cả cột
+   (và cả trang) tràn ra ngoài màn hình điện thoại, thanh cuộn ngang của bảng không có tác dụng. */
+.dash-recent-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 28px; }
+.dash-recent-block { min-width: 0; }
+.dash-recent-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; gap: 10px; }
+.dash-recent-head > span { min-width: 0; overflow-wrap: anywhere; }
 
 .dash-quick-links { margin-top: 28px; }
 .dash-quick-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text-muted); margin-bottom: 10px; }
@@ -145,6 +148,6 @@
 .dash-quick-btn { display: inline-flex; align-items: center; gap: 7px; background: var(--paper-50); border: 1.5px solid var(--line-200); border-radius: var(--radius-sm); padding: 9px 16px; font-size: 13.5px; font-weight: 600; color: var(--ink-900); transition: all .13s; }
 .dash-quick-btn:hover { border-color: var(--navy-500); color: var(--navy-500); background: var(--sage-100); }
 
-@media (max-width: 800px) { .dash-recent-grid { grid-template-columns: 1fr; } }
+@media (max-width: 800px) { .dash-recent-grid { grid-template-columns: minmax(0, 1fr); } }
 </style>
 {% endblock %}

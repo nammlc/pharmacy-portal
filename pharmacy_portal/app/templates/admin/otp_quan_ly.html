@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% block title %}Bảo mật 2 lớp (OTP){% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head"><h1>Bảo mật 2 lớp (OTP)</h1></div>
+
+<div class="admin-form-card">
+  {% if nd.totp_bat %}
+    <p><strong style="color:#2e7d32;">● Đã bật</strong>
+       {% if nd.totp_ngay_bat %}— từ {{ (nd.totp_ngay_bat | gio_vn).strftime('%d/%m/%Y %H:%M') }}{% endif %}</p>
+    <p style="color:var(--text-muted); font-size:14px;">Còn <strong>{{ so_du_phong }}</strong> mã dự phòng chưa dùng.
+       {% if so_du_phong <= 2 %}<strong style="color:#c62828;">Nên tạo lại mã dự phòng.</strong>{% endif %}</p>
+  {% else %}
+    <p><strong style="color:#c62828;">● Chưa bật</strong></p>
+    <p style="color:var(--text-muted); font-size:14px;">Bật OTP để đăng nhập cần thêm mã 6 số từ Google Authenticator.</p>
+    <a href="{{ url_for('admin_otp.thiet_lap') }}" class="btn btn-primary">Bật xác thực 2 lớp</a>
+  {% endif %}
+</div>
+
+{% if nd.totp_bat %}
+<div class="admin-form-card" style="margin-top:16px;">
+  <h2 style="font-size:16px; margin:0 0 6px;">Xác nhận danh tính để thao tác</h2>
+  <p style="color:var(--text-muted); font-size:13.5px; margin:0 0 12px;">Các thao tác dưới đây cần mật khẩu và mã OTP hiện tại.</p>
+  <form method="POST" id="otpHanhDong" autocomplete="off">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-row"><label for="mkXn">Mật khẩu</label><input type="password" id="mkXn" name="mat_khau" autocomplete="current-password" required></div>
+    <div class="form-row"><label for="maXn">Mã OTP 6 số</label><input type="text" id="maXn" name="ma" inputmode="numeric" maxlength="7" autocomplete="one-time-code" required style="max-width:180px; letter-spacing:.3em;"></div>
+    <div class="form-actions" style="flex-wrap:wrap;">
+      <button type="submit" class="btn btn-outline" formaction="{{ url_for('admin_otp.doi_thiet_bi') }}">Đổi thiết bị (QR mới)</button>
+      <button type="submit" class="btn btn-outline" formaction="{{ url_for('admin_otp.tao_lai_du_phong') }}">Tạo lại mã dự phòng</button>
+      {% if not config.ADMIN_2FA_BAT_BUOC %}
+      <button type="submit" class="btn btn-outline" formaction="{{ url_for('admin_otp.tat') }}" onclick="return confirm('Tắt xác thực 2 lớp cho tài khoản này?');">Tắt OTP</button>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

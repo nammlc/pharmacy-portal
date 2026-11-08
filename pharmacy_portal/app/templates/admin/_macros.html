@@ -2,16 +2,16 @@
    Macro dùng chung cho form admin.
    render_field(field): render 1 field trong .form-row — nếu là
    TextAreaField thì tự động gắn trình soạn thảo rich-text (Quill)
-   kiểu Word (in đậm, danh sách, tiêu đề...), các field khác giữ
-   nguyên như cũ.
+   kiểu Word (in đậm, danh sách, tiêu đề...): ô trong form chỉ hiện bản
+   xem trước, bấm vào sẽ mở MODAL soạn thảo có thanh công cụ đứng yên.
+   Các field khác giữ nguyên như cũ.
    ============================================================ #}
 {% macro render_field(field) %}
 <div class="form-row">
   {{ field.label }}
   {% if field.type == 'TextAreaField' %}
-    <div class="rich-editor-wrap" data-rich-editor data-target="{{ field.id }}">
-      <div class="quill-editor"></div>
-    </div>
+    {# JS (main.js) tự dựng ô xem trước ở đây; bấm vào ô đó sẽ mở modal soạn thảo toàn màn hình #}
+    <div class="rich-editor-wrap" data-rich-editor data-target="{{ field.id }}" data-label="{{ field.label.text }}"></div>
     {{ field(class_="rich-editor-hidden") }}
   {% else %}
     {{ field() }}
