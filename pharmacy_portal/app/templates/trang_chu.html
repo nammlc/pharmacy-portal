@@ -8,7 +8,7 @@
 <section class="hero{% if hero %} hero--anh{% endif %}"{% if hero %} style="--hero-a1:{{ hero.a1 }};--hero-a2:{{ hero.a2 }};--hero-a3:{{ hero.a3 }}"{% endif %}>
   {% if hero %}
   <div class="hero-media" aria-hidden="false">
-    <img class="hero-bg" src="{{ hero.src }}"{% if hero.srcset %} srcset="{{ hero.srcset }}" sizes="100vw"{% endif %} alt="{{ hero.alt }}" fetchpriority="high" decoding="async">
+    <img class="hero-bg" src="{{ hero.src }}"{% if hero.srcset %} srcset="{{ hero.srcset }}" sizes="100vw"{% endif %} alt="{{ hero.alt }}" fetchpriority="high" decoding="async" style="object-position: {{ hero.vi_tri }}">
     <div class="hero-phu" aria-hidden="true"></div>
   </div>
   {% endif %}

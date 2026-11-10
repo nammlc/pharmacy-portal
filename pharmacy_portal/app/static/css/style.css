@@ -3707,32 +3707,37 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
 @media print{body *{visibility:hidden}.otp-codes,.otp-codes *{visibility:visible}.otp-codes{position:absolute;left:0;top:0}}
 
 /* ============================================================
-   HERO ảnh trang chủ: ảnh ngang co theo chiều rộng màn hình, KHÔNG CẮT.
-   Ảnh nằm ở luồng tài liệu với height:auto nên giữ nguyên tỷ lệ gốc trên desktop/mobile.
-   Phần chữ và ô tìm kiếm nằm ngay bên dưới ảnh để không bị chật trên màn hình điện thoại.
+   HERO có ảnh nền (trang chủ) - bật khi admin đã chọn ảnh ở "Ảnh trang chủ"
+   Lớp phủ dùng màu navy #0b1f3a đậm dần từ trên xuống (--hero-a1/a2/a3 do server tính từ "độ phủ"),
+   vì navy đậm cho độ tương phản chữ trắng cao nhất trên mỗi đơn vị độ phủ -> giữ được nhiều ảnh nhất.
+   KHÔNG đặt overflow:hidden / isolation lên .hero: danh sách gợi ý của ô tìm kiếm cần tràn xuống dưới hero.
    ============================================================ */
 .hero--anh {
   position: relative;
-  display: block;
-  min-height: 0;
-  padding: 0;
   background: var(--ink-900);
-  color: #fff;
+  min-height: clamp(460px, 38vw, 560px);
+  display: flex;
+  align-items: center;
+  padding-top: 72px;
+  padding-bottom: 104px;
 }
+/* LƯU Ý xếp lớp: KHÔNG đặt z-index lên .hero-media và .hero-inner. Chỉ cần cả hai là 'positioned' (hero-media nằm trước
+   hero-inner trong HTML nên bị che bởi nội dung). Nếu đặt z-index, .hero-inner thành một lớp xếp chồng riêng ở mức 1, ngang với
+   '.category-card > *' (z-index:1, nằm sau trong trang) -> các thẻ danh mục vẽ ĐÈ lên danh sách gợi ý tìm kiếm
+   (z-index:60 của nó bị nhốt bên trong lớp đó). Để auto thì gợi ý vẫn so z-index với cả trang như trước. */
 .hero--anh .hero-media {
-  position: relative;
-  display: block;
-  width: 100%;
-  line-height: 0;
-  overflow: hidden;
+  position: absolute;
+  inset: 0;
+  /* Phần nền này lộ ra ở mobile khi ảnh ngang được giữ nguyên tỷ lệ. */
+  background: var(--ink-900);
 }
 .hero--anh .hero-bg {
-  position: relative;
-  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
-  max-height: none;
-  object-fit: contain;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 .hero--anh .hero-phu {
   position: absolute;
@@ -3742,23 +3747,22 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
     rgba(11, 31, 58, var(--hero-a2, 0.66)) 55%,
     rgba(11, 31, 58, var(--hero-a3, 0.78)) 100%);
 }
-.hero--anh .hero-inner {
-  position: relative;
-  width: 100%;
-  max-width: none;
-  box-sizing: border-box;
-  margin: 0;
-  padding: clamp(38px, 5vw, 68px) 24px clamp(42px, 5.5vw, 76px);
-  text-align: center;
-  background: linear-gradient(165deg, var(--ink-900) 0%, var(--navy-600) 62%, var(--navy-500) 100%);
-}
-.hero--anh .hero-inner > * { max-width: 780px; margin-left: auto; margin-right: auto; }
+.hero--anh .hero-inner { position: relative; width: 100%; }
 .hero--anh h1,
 .hero--anh .hero-badge { text-shadow: 0 2px 18px rgba(5, 15, 30, 0.45); }
 .hero--anh p { color: rgba(255, 255, 255, 0.92); text-shadow: 0 1px 12px rgba(5, 15, 30, 0.5); }
 @media (max-width: 700px) {
-  .hero--anh .hero-inner { padding: 34px 16px 42px; }
-  .hero--anh h1 { font-size: clamp(25px, 7vw, 32px); line-height: 1.18; }
-  .hero--anh p { font-size: 14px; margin-bottom: 22px; }
-  .hero--anh .hero-search { width: 100%; max-width: 560px; box-sizing: border-box; }
+  .hero--anh {
+    min-height: 0;
+    padding-top: 56px;
+    padding-bottom: 92px;
+  }
+
+  /* Điện thoại: giữ toàn bộ ảnh ngang, không crop mạnh như cover.
+     Ảnh tự thu theo chiều rộng; nền navy lấp phần trống theo chiều cao.
+     Nội dung, vị trí chữ và kích thước các thành phần không thay đổi. */
+  .hero--anh .hero-bg {
+    object-fit: contain;
+    object-position: center;
+  }
 }

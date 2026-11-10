@@ -14,7 +14,7 @@
 
   <div class="hp-section-title">Xem trước</div>
   <div class="hp-preview{{ '' if cd.anh else ' hp-khong-anh' }}" id="hpPreview">
-    <img id="hpImg" src="{{ cd.anh_xem_truoc or '#' }}" alt="" >
+    <img id="hpImg" src="{{ cd.anh_xem_truoc or '#' }}" alt="" style="object-position: {{ H.VI_TRI[cd.vi_tri][1] }};">
     <div class="hp-phu" id="hpPhu"></div>
     <div class="hp-noidung">
       <div class="hp-badge">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
@@ -54,6 +54,14 @@
         <div class="hp-thang"><span>Thấy rõ ảnh</span><span>Chữ nổi bật</span></div>
         <div class="hp-doc-duoc" id="hpDocDuoc"></div>
       </div>
+      <div class="form-row">
+        <label>Vị trí ưu tiên của ảnh khi hiển thị</label>
+        <div class="hp-radio-nhom">
+          {% for ma, (nhan, _css) in H.VI_TRI.items() %}
+          <label class="hp-radio"><input type="radio" name="vi_tri" value="{{ ma }}" {{ 'checked' if cd.vi_tri == ma }}> {{ nhan }}</label>
+          {% endfor %}
+        </div>
+      </div>
     </div>
   </div>
 
@@ -65,13 +73,13 @@
 
 <style>
 .hp-section-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); margin:0 0 10px 2px; }
-.hp-preview { position:relative; width:100%; aspect-ratio:auto; min-height:0; border-radius:var(--radius-md); overflow:hidden; color:#fff;
-  background:#0b1f3a; font-size:clamp(9px,1.25vw,13px); display:block; text-align:center; }
+.hp-preview { position:relative; width:100%; aspect-ratio: 16 / 6; min-height:260px; border-radius:var(--radius-md); overflow:hidden; color:#fff;
+  background:#0b1f3a; font-size:clamp(9px,1.25vw,13px); display:flex; align-items:center; justify-content:center; text-align:center; }
 .hp-preview.hp-khong-anh { background:linear-gradient(165deg,var(--ink-900) 0%,var(--navy-600) 62%,var(--navy-500) 100%); }
-.hp-preview.hp-khong-anh #hpImg, .hp-preview.hp-khong-anh .hp-phu { position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg,rgba(11,31,58,var(--a1,.6)) 0%,rgba(11,31,58,var(--a2,.66)) 55%,rgba(11,31,58,var(--a3,.78)) 100%); }
-.hp-preview img { position:relative; display:block; width:100%; height:auto; max-height:none; object-fit:contain; }
-.hp-phu { position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg,rgba(11,31,58,var(--a1,.6)) 0%,rgba(11,31,58,var(--a2,.66)) 55%,rgba(11,31,58,var(--a3,.78)) 100%); }
-.hp-noidung { position:relative; z-index:1; width:100%; max-width:780px; box-sizing:border-box; margin:0 auto; padding:clamp(22px,4vw,42px) 18px; text-shadow:0 2px 14px rgba(5,15,30,.45); background:linear-gradient(165deg,#0b1f3a 0%,#173b63 100%); }
+.hp-preview.hp-khong-anh #hpImg, .hp-preview.hp-khong-anh .hp-phu { display:none; }
+.hp-preview img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
+.hp-phu { position:absolute; inset:0; background:linear-gradient(180deg,rgba(11,31,58,var(--a1,.6)) 0%,rgba(11,31,58,var(--a2,.66)) 55%,rgba(11,31,58,var(--a3,.78)) 100%); }
+.hp-noidung { position:relative; z-index:1; max-width:62%; padding:1em; text-shadow:0 2px 14px rgba(5,15,30,.45); }
 .hp-badge { font-size:1em; margin-bottom:.8em; }
 .hp-h1 { font-family:var(--font-display); font-weight:800; font-size:2.3em; line-height:1.15; margin-bottom:.5em; }
 .hp-h1 span { color:var(--sky-400); }
@@ -86,7 +94,15 @@
 .hp-radio-nhom { display:flex; gap:10px; flex-wrap:wrap; }
 .hp-radio { display:inline-flex; align-items:center; gap:6px; font-weight:500; cursor:pointer; padding:8px 12px; border:1px solid var(--line-200); border-radius:var(--radius-sm); }
 .hp-xoa { font-weight:500; color:var(--level-cctd); cursor:pointer; display:inline-flex; gap:8px; align-items:center; }
-@media (max-width: 800px) { .hp-luoi { grid-template-columns:1fr; } .hp-noidung { max-width:100%; padding:24px 14px; } .hp-h1 { font-size:2em; } .hp-p { max-width:100%; } }
+@media (max-width: 800px) {
+  .hp-luoi { grid-template-columns:1fr; }
+  .hp-noidung { max-width:92%; }
+}
+/* Xem trước mobile: cùng nguyên tắc với trang chủ, giữ trọn ảnh ngang. */
+@media (max-width: 700px) {
+  .hp-preview { background-color:#0b1f3a; }
+  .hp-preview img { object-fit:contain; object-position:center; }
+}
 </style>
 
 <script>
