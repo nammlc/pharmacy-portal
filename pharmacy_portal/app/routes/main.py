@@ -95,7 +95,12 @@ def trang_chu():
         .order_by(BaiViet.ghim.desc(), BaiViet.ngay_xuat_ban.desc())
         .limit(4).all()
     )
-    return render_template("trang_chu.html", stat=stat, bai_viet_moi=bai_viet_moi)
+    try:
+        from app.utils.hero import lay_hero
+        hero = lay_hero()
+    except Exception:   # lỗi đọc cài đặt không được làm sập trang chủ -> quay về nền xanh
+        hero = None
+    return render_template("trang_chu.html", stat=stat, bai_viet_moi=bai_viet_moi, hero=hero)
 
 
 @bp.route("/tim-kiem")

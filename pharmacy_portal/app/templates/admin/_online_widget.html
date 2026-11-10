@@ -1,17 +1,14 @@
-{# Ô thống kê người đang online: máy tính = ghim góc dưới phải; điện thoại = nằm cuối trang (xem .online-box trong style.css) #}
+{# Ô thống kê người đang online (gọn): máy tính = ghim góc dưới phải; điện thoại = nằm cuối trang (xem .online-box trong style.css) #}
 <div class="online-box" id="onlineBox" role="status" aria-live="polite">
   <button type="button" class="online-toggle" id="onlineToggle" aria-expanded="false" aria-controls="onlineDetail"
-          title="Cập nhật trực tiếp, không cần tải lại trang. Bấm để xem ai đang online.">
+          title="Đang online, cập nhật trực tiếp. Bấm để xem tên admin.">
     <span class="online-dot" aria-hidden="true"></span>
-    <span class="online-stats">
-      <span class="online-stat"><b id="onlineAdmin">–</b><small>Admin online</small></span>
-      <span class="online-stat"><b id="onlineKhach">–</b><small>Người dùng online</small></span>
-    </span>
-    <svg class="online-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="online-stat" title="Admin online"><b id="onlineAdmin">–</b> admin</span>
+    <span class="online-stat" title="Người dùng online"><b id="onlineKhach">–</b> người dùng</span>
+    <svg class="online-chevron" width="9" height="5" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
   <div class="online-detail" id="onlineDetail" hidden>
     <div class="online-detail-title">Admin đang online</div>
     <ul class="online-names" id="onlineNames"><li>—</li></ul>
-    <p class="online-note" id="onlineNote">Admin: đang mở trang quản trị. Người dùng: đang xem website (ước lượng, gồm cả admin xem thử).</p>
   </div>
 </div>

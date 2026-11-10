@@ -204,7 +204,7 @@ class OnlineTests(unittest.TestCase):
     def test_css_pins_box_on_desktop_and_puts_it_at_the_end_on_mobile(self):
         css = open(os.path.join(os.path.dirname(__file__), "..", "app", "static", "css", "style.css"), encoding="utf-8").read()
         box = css[css.index(".online-box {"):]
-        self.assertIn("position: fixed; right: 18px; bottom: 18px", box.split("}")[0])
+        self.assertIn("position: fixed; right: 12px; bottom: 12px", box.split("}")[0])
         mobile = css[css.index("@media (max-width: 800px) {\n  .online-box"):]
         self.assertIn("position: static", mobile.split("}")[0])
 
@@ -213,6 +213,35 @@ class OnlineTests(unittest.TestCase):
         h = c.get("/admin/").get_data(as_text=True)
         self.assertIn("repeat(2, minmax(0, 1fr))", h); self.assertIn("minmax(0, 1fr)", h.split("max-width: 800px")[1])
         self.assertIn(".dash-recent-block { min-width: 0; }", h)
+
+
+class GiaoDienGon(unittest.TestCase):
+    """Ô đếm gọn, không còn dòng chú thích; khoá cuộn trang không làm menu trái (sticky) trôi đi."""
+    ROOT = os.path.join(os.path.dirname(__file__), "..", "app")
+
+    def doc(self, *p):
+        return open(os.path.join(self.ROOT, *p), encoding="utf-8").read()
+
+    def test_widget_has_no_footnote_and_is_compact(self):
+        html = self.doc("templates", "admin", "_online_widget.html")
+        self.assertNotIn("online-note", html); self.assertNotIn("ước lượng", html); self.assertNotIn("xem thử", html)
+        self.assertNotIn("online-note", self.doc("static", "css", "style.css"))
+        self.assertNotIn("onlineNote", self.doc("static", "js", "online.js"))
+        css = self.doc("static", "css", "style.css")
+        box = css[css.index(".online-box {"):].split("}")[0]
+        self.assertIn("border-radius: 999px", box); self.assertIn("max-width: min(260px", box)   # viên thuốc nhỏ, không phải thẻ to
+
+    def test_scroll_lock_never_goes_on_body(self):
+        """html có overflow-x: clip nên overflow:hidden đặt trên <body> sẽ làm sidebar sticky mất ghim (menu trái trôi)."""
+        css = self.doc("static", "css", "style.css")
+        self.assertIn("html { overflow-x: clip; }", css)
+        self.assertIn("html.rich-modal-open { overflow: hidden; scrollbar-gutter: stable; }", css)
+        self.assertNotIn("body.rich-modal-open", css)
+        for f in (("static", "js", "main.js"), ("static", "js", "lightbox.js"), ("templates", "admin", "base.html")):
+            t = self.doc(*f)
+            self.assertNotIn("body.style.overflow", t, f)
+            self.assertNotIn('body.classList.add("rich-modal-open")', t, f)
+        self.assertIn('document.documentElement.classList.add("rich-modal-open")', self.doc("static", "js", "main.js"))
 
 
 if __name__ == "__main__":

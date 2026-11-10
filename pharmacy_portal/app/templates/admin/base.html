@@ -52,6 +52,7 @@
     <a href="{{ url_for('admin_ttbn.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ttbn' }}">🧑‍⚕️ Bài viết bệnh nhân</a>
 
     <div class="section-label">Khác</div>
+    <a href="{{ url_for('admin_hero.chinh_sua') }}" class="{{ 'active' if request.blueprint == 'admin_hero' }}">🖼️ Ảnh trang chủ</a>
     <a href="{{ url_for('admin_vct.chinh_sua') }}" class="{{ 'active' if request.blueprint == 'admin_vct' }}">✏️ Về chúng tôi</a>
     {% if current_user.vai_tro == 'quan_tri' %}
     <a href="{{ url_for('admin_nhat_ky.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_nhat_ky' }}">🛡️ Nhật ký truy cập</a>
@@ -203,13 +204,13 @@ function moModal(form, ten) {
     : 'Bạn có chắc muốn xoá mục này? Hành động này không thể hoàn tác.';
   document.getElementById('xoaModalMsg').innerHTML = msg;
   document.getElementById('xoaModal').style.display = 'flex';
-  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';      // khoá cuộn trên <html>: đặt trên <body> sẽ làm sidebar mất ghim
   document.getElementById('xoaModalConfirm').focus();
 }
 
 function dongModal() {
   document.getElementById('xoaModal').style.display = 'none';
-  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
   _xoaForm = null;
 }
 

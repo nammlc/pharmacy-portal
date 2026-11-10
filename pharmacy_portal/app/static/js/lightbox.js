@@ -42,13 +42,13 @@
     anhLon.src = src;
     anhLon.alt = alt || "";
     overlay.classList.add("is-open");
-    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
   }
 
   function dong() {
     if (!overlay) return;
     overlay.classList.remove("is-open");
-    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
   }
 
   function ganSuKien() {

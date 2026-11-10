@@ -57,13 +57,13 @@ document.addEventListener("DOMContentLoaded", function () {
       sidebar.classList.add("is-open");
       overlay.classList.add("is-open");
       menuBtn.setAttribute("aria-expanded", "true");
-      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
     }
     function closeSidebar() {
       sidebar.classList.remove("is-open");
       overlay.classList.remove("is-open");
       menuBtn.setAttribute("aria-expanded", "false");
-      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     }
     menuBtn.addEventListener("click", function () {
       if (sidebar.classList.contains("is-open")) closeSidebar();
@@ -296,7 +296,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (dangMo.htmlGoc) modal.quill.clipboard.dangerouslyPasteHTML(locHtml(dangMo.htmlGoc));
     dangMo.htmlChuan = htmlHienTai();           // so sánh "đã sửa chưa" theo dạng Quill chuẩn hoá
     modal.overlay.hidden = false;
-    document.body.classList.add("rich-modal-open");
+    document.documentElement.classList.add("rich-modal-open");      // khoá cuộn trên <html> (xem style.css), không đụng vào <body>
     modal.quill.focus();
     modal.quill.setSelection(modal.quill.getLength(), 0);
   }
@@ -313,7 +313,7 @@ document.addEventListener("DOMContentLoaded", function () {
       dangMo.textarea.dispatchEvent(new Event("change", { bubbles: true }));
     }
     modal.overlay.hidden = true;
-    document.body.classList.remove("rich-modal-open");
+    document.documentElement.classList.remove("rich-modal-open");
     var tra = triggerTruoc; dangMo = null; triggerTruoc = null;
     if (tra && tra.focus) tra.focus();
   }

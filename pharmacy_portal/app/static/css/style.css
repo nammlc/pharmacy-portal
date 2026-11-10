@@ -177,13 +177,6 @@ a { color: inherit; text-decoration: none; }
 
 .main-nav a:hover { color: #fff; background: rgba(255,255,255,0.07); }
 .main-nav a.active { color: #fff; background: var(--sky-400); }
-.main-nav a.nav-admin-link {
-  margin-top: 6px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.6);
-}
-.main-nav a.nav-admin-link:hover { color: #fff; }
 
 @media (max-width: 900px) {
   /* Bug cũ: left:0 + right:0 khiến hộp menu bị co hẹp bằng đúng bề rộng
@@ -1125,13 +1118,6 @@ a { color: inherit; text-decoration: none; }
 
 .main-nav a:hover { color: #fff; background: rgba(255,255,255,0.07); }
 .main-nav a.active { color: #fff; background: var(--sky-400); }
-.main-nav a.nav-admin-link {
-  margin-top: 6px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.6);
-}
-.main-nav a.nav-admin-link:hover { color: #fff; }
 
 @media (max-width: 900px) {
   /* Bug cũ: left:0 + right:0 khiến hộp menu bị co hẹp bằng đúng bề rộng
@@ -2360,7 +2346,10 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 }
 
 /* Modal soạn thảo: thanh công cụ (Quill) nằm NGOÀI vùng cuộn => đứng yên như Word */
-body.rich-modal-open { overflow: hidden; }
+/* Khoá cuộn trang khi mở cửa sổ soạn thảo: đặt trên <html>, KHÔNG đặt trên <body>.
+   html đã có overflow-x: clip (chống tràn ngang) nên overflow của body không còn được chuyển lên khung nhìn; body trở thành
+   vùng cuộn riêng và làm sidebar "sticky" mất ghim → menu trái trôi khỏi màn hình. scrollbar-gutter giữ nguyên bề rộng trang. */
+html.rich-modal-open { overflow: hidden; scrollbar-gutter: stable; }
 .rich-modal-overlay {
   position: fixed; inset: 0; z-index: 9990;
   display: flex; align-items: center; justify-content: center; padding: 20px;
@@ -2563,40 +2552,38 @@ body.rich-modal-open { overflow: hidden; }
    Máy tính: ghim góc dưới bên phải màn hình. Điện thoại: nằm ở cuối trang, trong luồng nội dung.
    ============================================================ */
 .online-box {
-  position: fixed; right: 18px; bottom: 18px; z-index: 35;
-  width: max-content; max-width: min(340px, calc(100vw - 36px));
-  background: #fff; border: 1px solid var(--line-200); border-radius: 14px;
-  box-shadow: 0 10px 30px -8px rgba(11, 31, 58, 0.28);
+  position: fixed; right: 12px; bottom: 12px; z-index: 35;
+  width: max-content; max-width: min(260px, calc(100vw - 24px));
+  background: rgba(255, 255, 255, .96); border: 1px solid var(--line-200); border-radius: 999px;
+  box-shadow: 0 4px 14px -4px rgba(11, 31, 58, 0.25);
   font-family: var(--font-body); color: var(--ink-900);
+  opacity: .92; transition: opacity .15s;
 }
+.online-box:hover, .online-box.is-open { opacity: 1; }
+.online-box.is-open { border-radius: 14px; }
 .online-toggle {
-  display: flex; align-items: center; gap: 14px; width: 100%;
-  padding: 10px 14px; background: transparent; border: 0; cursor: pointer;
-  font: inherit; color: inherit; text-align: left;
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 5px 11px; background: transparent; border: 0; cursor: pointer;
+  font: inherit; color: inherit; text-align: left; line-height: 1.2;
 }
 .online-dot {
-  flex: none; width: 9px; height: 9px; border-radius: 50%; background: #16a34a;
+  flex: none; width: 7px; height: 7px; border-radius: 50%; background: #16a34a;
   box-shadow: 0 0 0 0 rgba(22, 163, 74, .55); animation: onlinePulse 2s infinite;
 }
 .online-box.is-off .online-dot { background: #9ca3af; animation: none; }
-@keyframes onlinePulse { 70% { box-shadow: 0 0 0 7px rgba(22, 163, 74, 0); } 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); } }
-.online-stats { display: flex; gap: 16px; }
-.online-stat { display: flex; flex-direction: column; line-height: 1.15; }
-.online-stat b { font-family: var(--font-display); font-size: 19px; font-weight: 800; transition: color .3s, transform .3s; }
-.online-stat b.is-changed { color: #16a34a; transform: scale(1.18); }        /* nháy xanh khi số vừa đổi, để thấy ngay mà không cần tải lại trang */
-.online-stat small { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
-.online-chevron { flex: none; margin-left: auto; color: var(--text-muted); transition: transform .15s; }
+@keyframes onlinePulse { 70% { box-shadow: 0 0 0 5px rgba(22, 163, 74, 0); } 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); } }
+.online-stat { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
+.online-stat b { font-family: var(--font-display); font-size: 13px; font-weight: 800; color: var(--ink-900); display: inline-block; transition: color .3s, transform .3s; }
+.online-stat b.is-changed { color: #16a34a; transform: scale(1.2); }        /* nháy xanh khi số vừa đổi, để thấy ngay mà không cần tải lại trang */
+.online-chevron { flex: none; margin-left: 2px; color: var(--text-muted); transition: transform .15s; }
 .online-box.is-open .online-chevron { transform: rotate(180deg); }
-.online-detail { padding: 2px 14px 12px; border-top: 1px solid var(--line-100); font-size: 12.5px; color: var(--text-muted); }
-.online-detail-title { margin: 10px 0 6px; font-weight: 700; color: var(--ink-900); font-size: 12px; }
-.online-names { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
-.online-names li { background: var(--sage-100); color: var(--navy-600); border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600; overflow-wrap: anywhere; }
-.online-note { margin: 8px 0 0; font-size: 11.5px; }
-@media (min-width: 801px) { .admin-body { padding-bottom: 92px; } }      /* chừa chỗ để ô ghim không che nội dung cuối trang */
+.online-detail { padding: 0 12px 9px; border-top: 1px solid var(--line-100); }
+.online-detail-title { margin: 7px 0 5px; font-weight: 700; color: var(--ink-900); font-size: 11.5px; }
+.online-names { display: flex; flex-wrap: wrap; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.online-names li { background: var(--sage-100); color: var(--navy-600); border-radius: 999px; padding: 2px 9px; font-size: 11.5px; font-weight: 600; overflow-wrap: anywhere; }
+@media (min-width: 801px) { .admin-body { padding-bottom: 56px; } }      /* chừa chỗ để ô ghim không che nội dung cuối trang */
 @media (max-width: 800px) {
-  .online-box { position: static; width: auto; max-width: none; margin: 22px 14px 18px; }
-  .online-stats { flex: 1; gap: 0; }
-  .online-stat { flex: 1; }
+  .online-box { position: static; margin: 16px 14px 14px; max-width: calc(100% - 28px); opacity: 1; }
 }
 
 /* ============================================================
@@ -2741,21 +2728,7 @@ body.rich-modal-open { overflow: hidden; }
 }
 .adm-badge-alt { background: var(--line-100); color: var(--text-muted); }
 
-.adm-thumb {
-  width: 38px; height: 38px;
-  border-radius: 6px;
-  object-fit: cover;
-  background: var(--paper-0);
-  border: 1px solid var(--line-200);
-}
-.adm-thumb-placeholder {
-  width: 38px; height: 38px;
-  border-radius: 6px;
-  background: var(--sage-100);
-  display: inline-flex; align-items: center; justify-content: center;
-  color: var(--navy-600);
-  font-size: 16px;
-}
+/* Ảnh thu nhỏ trong các bảng danh sách admin: xem kích thước ở khối ".adm-thumb" cuối file. */
 
 .row-act { display: inline-flex; align-items: center; gap: 6px; }
 .row-act a, .row-act button {
@@ -3662,18 +3635,31 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
     background: linear-gradient(to right, var(--ink-900) 240px, transparent 240px), var(--paper-0);
   }
 }
-/* Ảnh thuốc dạng đứng: khung cố định, cắt đều (cover) cho đầy khung.
-   max-width: none để ảnh không bị bộ quy tắc chung làm co lại. */
+/* Ảnh thuốc trong bảng danh sách admin: dạng đứng 3:4, khung cố định, cắt đều (cover) cho đầy khung.
+   Kích thước đổi ở 2 biến bên dưới. max-width:none + flex:none + min-width để KHÔNG bị bộ quy tắc "img { max-width:100% }"
+   hay độ rộng cột bảng ép nhỏ lại (trước đây ảnh bị co còn vài chục px). */
+:root { --adm-thumb-w: 64px; --adm-thumb-h: 84px; }
 .adm-thumb {
-  width: 72px; height: 96px;
-  max-width: none;
+  width: var(--adm-thumb-w); height: var(--adm-thumb-h);
+  min-width: var(--adm-thumb-w); max-width: none; flex: none;
   object-fit: cover;
   background: var(--paper-0);
   border: 1px solid var(--line-200);
   border-radius: 8px;
   display: block;
 }
-.adm-thumb-placeholder { width: 72px; height: 96px; }
+.adm-thumb-placeholder {
+  width: var(--adm-thumb-w); height: var(--adm-thumb-h);
+  border-radius: 8px;
+  background: var(--sage-100);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--navy-600); font-size: 24px;
+}
+/* Cột ảnh luôn đủ rộng cho ảnh + lề ô (16px mỗi bên) */
+.adm-table th.adm-col-thumb { width: calc(var(--adm-thumb-w) + 32px); }
+/* Danh sách Nhóm thuốc: ảnh biểu tượng nhóm → khung vuông nhỏ hơn */
+.adm-thumb.adm-thumb--vuong, .adm-thumb-placeholder.adm-thumb--vuong { --adm-thumb-w: 52px; --adm-thumb-h: 52px; }
+.adm-table th.adm-col-thumb--vuong { width: calc(52px + 32px); }
 .drug-card-thumb, .drug-card-thumb-fallback { width: 80px; height: 100px; }
 .drug-card-thumb { max-width: none; object-fit: cover; background: var(--paper-0); padding: 0; }
 
@@ -3719,3 +3705,60 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
 .nk-b-otp_sai{background:#ffebee;color:#c62828}
 .nk-b-otp_bat,.nk-b-doi_otp{background:#fff3e0;color:#e65100}
 @media print{body *{visibility:hidden}.otp-codes,.otp-codes *{visibility:visible}.otp-codes{position:absolute;left:0;top:0}}
+
+/* ============================================================
+   HERO ảnh trang chủ: ảnh ngang co theo chiều rộng màn hình, KHÔNG CẮT.
+   Ảnh nằm ở luồng tài liệu với height:auto nên giữ nguyên tỷ lệ gốc trên desktop/mobile.
+   Phần chữ và ô tìm kiếm nằm ngay bên dưới ảnh để không bị chật trên màn hình điện thoại.
+   ============================================================ */
+.hero--anh {
+  position: relative;
+  display: block;
+  min-height: 0;
+  padding: 0;
+  background: var(--ink-900);
+  color: #fff;
+}
+.hero--anh .hero-media {
+  position: relative;
+  display: block;
+  width: 100%;
+  line-height: 0;
+  overflow: hidden;
+}
+.hero--anh .hero-bg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  object-fit: contain;
+}
+.hero--anh .hero-phu {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    rgba(11, 31, 58, var(--hero-a1, 0.60)) 0%,
+    rgba(11, 31, 58, var(--hero-a2, 0.66)) 55%,
+    rgba(11, 31, 58, var(--hero-a3, 0.78)) 100%);
+}
+.hero--anh .hero-inner {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  margin: 0;
+  padding: clamp(38px, 5vw, 68px) 24px clamp(42px, 5.5vw, 76px);
+  text-align: center;
+  background: linear-gradient(165deg, var(--ink-900) 0%, var(--navy-600) 62%, var(--navy-500) 100%);
+}
+.hero--anh .hero-inner > * { max-width: 780px; margin-left: auto; margin-right: auto; }
+.hero--anh h1,
+.hero--anh .hero-badge { text-shadow: 0 2px 18px rgba(5, 15, 30, 0.45); }
+.hero--anh p { color: rgba(255, 255, 255, 0.92); text-shadow: 0 1px 12px rgba(5, 15, 30, 0.5); }
+@media (max-width: 700px) {
+  .hero--anh .hero-inner { padding: 34px 16px 42px; }
+  .hero--anh h1 { font-size: clamp(25px, 7vw, 32px); line-height: 1.18; }
+  .hero--anh p { font-size: 14px; margin-bottom: 22px; }
+  .hero--anh .hero-search { width: 100%; max-width: 560px; box-sizing: border-box; }
+}

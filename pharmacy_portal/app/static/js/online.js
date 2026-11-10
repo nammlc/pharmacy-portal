@@ -52,7 +52,6 @@
   var elAdmin = document.getElementById("onlineAdmin");
   var elKhach = document.getElementById("onlineKhach");
   var elNames = document.getElementById("onlineNames");
-  var elNote = document.getElementById("onlineNote");
   var btn = document.getElementById("onlineToggle");
   var detail = document.getElementById("onlineDetail");
 
@@ -105,7 +104,6 @@
         datSo(elAdmin, d.admin);
         datSo(elKhach, d.khach);
         veTen(d.ten_admin);
-        if (elNote) elNote.textContent = "Cập nhật mỗi " + (STAT_MS / 1000) + " giây. Admin: đang mở trang quản trị. Người dùng: đang xem website (ước lượng, gồm cả admin xem thử).";
       })
       .catch(function () { box.classList.add("is-off"); })
       .then(function () { dangHoi = false; });

@@ -16,7 +16,7 @@
     <thead>
       <tr>
         <th style="width:40px;">#</th>
-        <th style="width:42px;"></th>
+        <th class="adm-col-thumb adm-col-thumb--vuong"></th>
         <th>Tên nhóm</th>
         <th>Loại</th>
         <th>Thứ tự</th>
@@ -29,9 +29,9 @@
         <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
         <td>
           {% if n.hinh_anh %}
-          <img src="{{ n.hinh_anh }}" class="adm-thumb" alt="">
+          <img src="{{ n.hinh_anh }}" class="adm-thumb adm-thumb--vuong" alt="">
           {% else %}
-          <span class="adm-thumb-placeholder">📂</span>
+          <span class="adm-thumb-placeholder adm-thumb--vuong">📂</span>
           {% endif %}
         </td>
         <td class="col-title"><strong class="col-title-text" title="{{ n.ten_nhom }}">{{ n.ten_nhom }}</strong></td>
