@@ -46,60 +46,61 @@
     {% endif %}
   </div>
 </section>
+{# Điện thoại (≤ 700px): các ô chức năng hiển thị dạng thẻ sản phẩm 2 cột (xem CSS "Trang chủ điện thoại"); máy tính giữ nguyên #}
 <div class="category-grid-outer">
   <div class="category-grid">
 
     <a class="category-card cat-dmt" href="{{ url_for('dmt.index') }}">
-      <div class="cat-icon-wrap">💊</div>
+      <div class="cat-icon-wrap">💊<span class="cat-tag">Danh mục</span></div>
       <h3>Danh mục thuốc</h3>
       <p>Tra cứu theo nhóm dược lý, đầy đủ thông tin chỉ định và liều dùng.</p>
       <div class="cat-arrow">Xem danh mục →</div>
     </a>
 
     <a class="category-card cat-ntbv" href="{{ url_for('ntbv.index') }}">
-      <div class="cat-icon-wrap">🏥</div>
+      <div class="cat-icon-wrap">🏥<span class="cat-tag">Nhà thuốc</span></div>
       <h3>Nhà thuốc BV</h3>
       <p>Danh mục thuốc bán tại Nhà thuốc Bệnh viện, tra theo nhóm và hoạt chất.</p>
       <div class="cat-arrow">Xem danh mục →</div>
     </a>
 
     <a class="category-card cat-tt" href="{{ url_for('tttt.index') }}">
-      <div class="cat-icon-wrap">💉</div>
+      <div class="cat-icon-wrap">💉<span class="cat-tag">Tiêm truyền</span></div>
       <h3>Thuốc tiêm truyền</h3>
       <p>Dung môi pha loãng, tốc độ truyền, độ ổn định và thời hạn sau pha.</p>
       <div class="cat-arrow">Tra cứu →</div>
     </a>
 
     <a class="category-card cat-thtk" href="{{ url_for('thtk.index') }}">
-      <div class="cat-icon-wrap">🧪</div>
+      <div class="cat-icon-wrap">🧪<span class="cat-tag">Pha chung</span></div>
       <h3>Tương hợp - Tương kỵ</h3>
       <p>Kiểm tra khả năng pha chung và phối hợp giữa hai thuốc truyền tĩnh mạch.</p>
       <div class="cat-arrow">Kiểm tra →</div>
     </a>
 
     <a class="category-card cat-ttt" href="{{ url_for('ttt.index') }}">
-      <div class="cat-icon-wrap">⚠️</div>
+      <div class="cat-icon-wrap">⚠️<span class="cat-tag">Tương tác</span></div>
       <h3>Tương tác thuốc</h3>
       <p>Mức độ, cơ chế tương tác và hướng xử trí khi dùng đồng thời hai thuốc.</p>
       <div class="cat-arrow">Kiểm tra →</div>
     </a>
 
     <a class="category-card cat-ttth" href="{{ url_for('ttth.index') }}">
-      <div class="cat-icon-wrap">📋</div>
+      <div class="cat-icon-wrap">📋<span class="cat-tag">Thông tin</span></div>
       <h3>Thông tin thuốc</h3>
       <p>Chỉ định, chống chỉ định, liều dùng theo đối tượng và tác dụng phụ.</p>
       <div class="cat-arrow">Tra cứu →</div>
     </a>
 
     <a class="category-card cat-ttbn" href="{{ url_for('ttbn.index') }}">
-      <div class="cat-icon-wrap">🧑‍⚕️</div>
+      <div class="cat-icon-wrap">🧑‍⚕️<span class="cat-tag">Người bệnh</span></div>
       <h3>Thông tin bệnh nhân</h3>
       <p>Hướng dẫn dùng thuốc tại nhà, ngôn ngữ đơn giản dễ hiểu cho người bệnh.</p>
       <div class="cat-arrow">Xem hướng dẫn →</div>
     </a>
 
     <a class="category-card cat-bv" href="{{ url_for('bv.index') }}">
-      <div class="cat-icon-wrap">📰</div>
+      <div class="cat-icon-wrap">📰<span class="cat-tag">Tin mới</span></div>
       <h3>Bài viết - Thông báo</h3>
       <p>Tin tức, thông báo nội bộ và bài viết chuyên môn mới nhất từ Khoa Dược.</p>
       <div class="cat-arrow">Xem bài viết →</div>

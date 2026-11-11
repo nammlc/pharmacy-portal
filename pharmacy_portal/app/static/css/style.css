@@ -3911,3 +3911,45 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
 .tn-preview { max-width: 420px; overflow-wrap: anywhere; font-size: 13.5px; } .tn-who { color: var(--text-muted); font-weight: 600; }
 
 .ht-note-inline { font-weight: 400; font-size: 12px; color: var(--text-muted); }
+
+/* ============================================================
+   TRANG CHỦ ĐIỆN THOẠI - các ô chức năng dạng THẺ SẢN PHẨM kiểu Shopee (lưới 2 cột, nền xám, thẻ trắng bo góc,
+   ảnh vuông ở trên, tên tối đa 2 dòng, mô tả mờ, dòng hành động nổi bật như giá). Chỉ áp dụng ≤ 700px (cùng mốc với hero);
+   hero / header / footer và giao diện máy tính KHÔNG đổi.
+   LƯU Ý: KHÔNG đặt transform / filter / z-index lên .category-card: chúng tạo lớp xếp chồng riêng và làm thẻ vẽ ĐÈ lên
+   danh sách gợi ý tìm kiếm của hero (xem ghi chú ở phần "HERO có ảnh nền").
+   ============================================================ */
+.cat-tag { display: none; }
+@media (max-width: 700px) {
+  .category-grid-outer { background: #f3f4f6; padding: 0 8px 28px; }
+  .category-grid { max-width: none; margin: -34px auto 0; padding: 0; grid-template-columns: 1fr 1fr; gap: 8px; align-items: stretch; }
+  .category-card { padding: 0; gap: 0; background: #fff; border: 0; border-radius: 8px; box-shadow: 0 1px 3px rgba(15, 30, 55, 0.12);
+                   overflow: hidden; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+  .category-card::before { display: none; }
+  .category-card:hover { transform: none; box-shadow: 0 1px 3px rgba(15, 30, 55, 0.12); }
+  .category-card:active { background: #f7f8fa; }
+
+  /* "Ảnh sản phẩm": ô vuông tô màu theo từng chức năng, biểu tượng lớn ở giữa */
+  .cat-icon-wrap { position: relative; display: flex; align-items: center; justify-content: center; aspect-ratio: 1 / 1;
+                   font-size: clamp(54px, 18vw, 76px); line-height: 1; background: radial-gradient(circle at 50% 38%, var(--cat-bg1) 0%, var(--cat-bg2) 100%); }
+  /* nhãn góc phải như "-30%" của Shopee */
+  .cat-tag { display: block; position: absolute; top: 0; right: 0; padding: 3px 9px 4px 10px; border-radius: 0 0 0 8px;
+             background: var(--cat-ink); color: #fff; font-family: var(--font-body, inherit); font-size: 11px; font-weight: 700; line-height: 1.3; }
+
+  .category-card h3 { margin: 9px 9px 0; font-size: 14px; font-weight: 600; line-height: 1.3; color: var(--ink-900);
+                      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
+  .category-card p { margin: 3px 9px 0; font-size: 12px; line-height: 1.35; color: var(--text-muted, #6b7a8c);
+                     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  /* dòng hành động nổi bật như "giá" */
+  .cat-arrow { margin: auto 9px 0; padding: 7px 0 10px; font-size: 14px; font-weight: 700; color: var(--cat-ink); }
+  .category-card p { margin-bottom: 0; }
+
+  .category-card.cat-dmt  { --cat-bg1: #f1f8fe; --cat-bg2: #cfe6fa; --cat-ink: #1769aa; }
+  .category-card.cat-ntbv { --cat-bg1: #eefaf6; --cat-bg2: #c6ecdf; --cat-ink: #12805f; }
+  .category-card.cat-tt   { --cat-bg1: #f0f4ff; --cat-bg2: #d3defc; --cat-ink: #3b5bdb; }
+  .category-card.cat-thtk { --cat-bg1: #f6f1fd; --cat-bg2: #ddd0f6; --cat-ink: #6b3fc9; }
+  .category-card.cat-ttt  { --cat-bg1: #fff6ea; --cat-bg2: #fdddb8; --cat-ink: #c2570c; }
+  .category-card.cat-ttth { --cat-bg1: #eef6fb; --cat-bg2: #c9e0ef; --cat-ink: #0b5a86; }
+  .category-card.cat-ttbn { --cat-bg1: #fff0f3; --cat-bg2: #fbcfd8; --cat-ink: #c2314d; }
+  .category-card.cat-bv   { --cat-bg1: #fdf6e3; --cat-bg2: #f6e2a8; --cat-ink: #946200; }
+}
