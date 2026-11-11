@@ -5,7 +5,7 @@
 <div class="admin-page-head">
   <div>
     <h1>Ảnh nền trang chủ</h1>
-    <p>Thay mảng xanh ở đầu trang chủ bằng ảnh toàn cảnh bệnh viện. Khung xem trước bên dưới đổi ngay khi bạn kéo thanh trượt hoặc chọn ảnh.</p>
+    <p>Chọn riêng 1 ảnh cho máy tính và 1 ảnh cho điện thoại. Ảnh luôn được kéo giãn vừa khít khung, <strong>không bị cắt</strong> và không làm đổi kích thước trang. Khung xem trước đổi ngay khi bạn chọn ảnh hoặc kéo thanh trượt.</p>
   </div>
   <a href="{{ url_for('main.trang_chu') }}" target="_blank" class="btn btn-outline">Xem trang chủ ↗</a>
 </div>
@@ -14,26 +14,43 @@
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
   <div class="hp-section-title">Xem trước</div>
-  <div class="hp-preview{{ '' if cd.anh else ' hp-khong-anh' }}" id="hpPreview">
-    <img id="hpImg" src="{{ cd.anh_xem_truoc or '#' }}" alt="" style="object-position: {{ H.VI_TRI[cd.vi_tri][1] }};">
-    <div class="hp-phu" id="hpPhu"></div>
-    <div class="hp-noidung">
-      <div class="hp-badge">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
-      <div class="hp-h1">Tra cứu dược <span>Tâm Đức</span><br>thông tin thuốc nhanh chóng</div>
-      <div class="hp-p">Danh mục thuốc, tương tác, tương hợp–kỵ và hướng dẫn sử dụng được cập nhật và kiểm duyệt bởi Dược sĩ lâm sàng.</div>
-      <div class="hp-search">🔍 Nhập tên thuốc hoặc hoạt chất…</div>
+  <div class="hp-xem-luoi">
+    <div>
+      <div class="hp-nhan-khung">💻 Máy tính</div>
+      <div class="hp-preview hp-khong-anh" id="hpPreviewPc">
+        <img id="hpImgPc" alt="">
+        <div class="hp-phu"></div>
+        <div class="hp-noidung">
+          <div class="hp-badge">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
+          <div class="hp-h1">Tra cứu dược <span>Tâm Đức</span><br>thông tin thuốc nhanh chóng</div>
+          <div class="hp-p">Danh mục thuốc, tương tác, tương hợp–kỵ và hướng dẫn sử dụng được cập nhật và kiểm duyệt bởi Dược sĩ lâm sàng.</div>
+          <div class="hp-search">🔍 Nhập tên thuốc hoặc hoạt chất…</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="hp-nhan-khung">📱 Điện thoại</div>
+      <div class="hp-preview hp-mobile hp-khong-anh" id="hpPreviewMb">
+        <img id="hpImgMb" alt="">
+        <div class="hp-phu"></div>
+        <div class="hp-noidung">
+          <div class="hp-badge">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
+          <div class="hp-h1">Tra cứu dược <span>Tâm Đức</span><br>thông tin thuốc nhanh chóng</div>
+          <div class="hp-search">🔍 Nhập tên thuốc…</div>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="hp-ghi-chu">Khung xem trước dùng tỉ lệ màn hình máy tính. Trên điện thoại ảnh sẽ được cắt hẹp hơn, hãy xem lại bằng điện thoại sau khi lưu.</div>
+  <div class="hp-ghi-chu">Khung xem trước chỉ gần đúng tỉ lệ thật (chiều cao trang chủ phụ thuộc nội dung chữ). Hãy xem lại trên máy tính và điện thoại thật sau khi lưu. Thiếu 1 trong 2 ảnh thì ảnh còn lại được dùng cho cả hai loại màn hình.</div>
 
   <div class="hp-luoi">
     <div class="admin-form-card" style="max-width:100%;">
-      <div class="hp-section-title" style="margin-top:0;">Ảnh</div>
+      <div class="hp-section-title" style="margin-top:0;">💻 Ảnh cho máy tính</div>
       <div class="form-row">
-        <label>Chọn ảnh toàn cảnh bệnh viện</label>
-        <input type="file" name="file_anh" id="hpFile" accept="image/png,image/jpeg,image/webp"
+        <label>Chọn ảnh ngang</label>
+        <input type="file" name="file_anh" id="hpFilePc" accept="image/png,image/jpeg,image/webp"
                data-nen-toi-da="2400" data-nen-chat-luong="0.86">
-        <div class="vct-file-hint">JPG/PNG/WEBP. Nên dùng ảnh ngang, rộng từ 1600px trở lên, chụp ban ngày, bầu trời không cháy sáng. Ảnh quá lớn sẽ được trình duyệt tự nén trước khi gửi.</div>
+        <div class="vct-file-hint">Nên dùng ảnh <strong>ngang, tỉ lệ khoảng 3:1</strong> (ví dụ 1920×640). JPG/PNG/WEBP; ảnh quá lớn được trình duyệt tự nén trước khi gửi.</div>
         <div class="anh-paste-zone" tabindex="0" data-target-input="file_anh">
           <span class="anh-paste-zone-icon">&#128203;</span>
           Bấm vào đây rồi <kbd>Ctrl</kbd>+<kbd>V</kbd> để dán ảnh đã copy
@@ -41,17 +58,35 @@
       </div>
       {% if cd.anh %}
       <div class="form-row">
-        <label class="hp-xoa"><input type="checkbox" name="xoa_anh" value="1" id="hpXoa"> Xoá ảnh, quay về nền xanh như cũ</label>
+        <label class="hp-xoa"><input type="checkbox" name="xoa_anh" value="1" id="hpXoaPc"> Xoá ảnh máy tính</label>
       </div>
       {% endif %}
-      <div class="form-row">
-        <label>Mô tả ảnh (hiển thị cho người dùng đọc màn hình và Google Hình ảnh)</label>
-        <input type="text" name="alt" maxlength="150" value="{{ cd.alt }}" placeholder="{{ H.ALT_MAC_DINH }}">
-      </div>
     </div>
 
     <div class="admin-form-card" style="max-width:100%;">
-      <div class="hp-section-title" style="margin-top:0;">Hiển thị</div>
+      <div class="hp-section-title" style="margin-top:0;">📱 Ảnh cho điện thoại</div>
+      <div class="form-row">
+        <label>Chọn ảnh dọc</label>
+        <input type="file" name="file_anh_mobile" id="hpFileMb" accept="image/png,image/jpeg,image/webp"
+               data-nen-toi-da="1600" data-nen-chat-luong="0.86">
+        <div class="vct-file-hint">Nên dùng ảnh <strong>dọc, tỉ lệ khoảng 3:4</strong> (ví dụ 900×1200). JPG/PNG/WEBP; ảnh quá lớn được trình duyệt tự nén trước khi gửi.</div>
+        <div class="anh-paste-zone" tabindex="0" data-target-input="file_anh_mobile">
+          <span class="anh-paste-zone-icon">&#128203;</span>
+          Bấm vào đây rồi <kbd>Ctrl</kbd>+<kbd>V</kbd> để dán ảnh đã copy
+        </div>
+      </div>
+      {% if cd.anh_mobile %}
+      <div class="form-row">
+        <label class="hp-xoa"><input type="checkbox" name="xoa_anh_mobile" value="1" id="hpXoaMb"> Xoá ảnh điện thoại</label>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="admin-form-card" style="max-width:100%; margin-bottom:18px;">
+    <div class="hp-section-title" style="margin-top:0;">Hiển thị</div>
+    <div class="vct-file-hint" style="margin:0 0 14px;">Ảnh được kéo giãn cho vừa khít khung, không cắt: ảnh sai tỉ lệ sẽ bị méo, ảnh nhỏ sẽ bị mờ. Hãy chọn ảnh có tỉ lệ gần với gợi ý ở trên để đẹp nhất.</div>
+    <div class="hp-luoi" style="margin-bottom:0;">
       <div class="form-row">
         <label>Độ phủ màu xanh: <strong id="hpDoPhuNhan">{{ cd.do_phu }}%</strong></label>
         <input type="range" name="do_phu" id="hpDoPhu" min="{{ H.DO_PHU_MIN }}" max="{{ H.DO_PHU_MAX }}" step="1" value="{{ cd.do_phu }}">
@@ -59,13 +94,8 @@
         <div class="hp-doc-duoc" id="hpDocDuoc"></div>
       </div>
       <div class="form-row">
-        <label>Phần ảnh được giữ lại khi khung bị cắt bớt</label>
-        <div class="hp-radio-nhom">
-          {% for ma, (nhan, _css) in H.VI_TRI.items() %}
-          <label class="hp-radio"><input type="radio" name="vi_tri" value="{{ ma }}" {{ 'checked' if cd.vi_tri == ma }}> {{ nhan }}</label>
-          {% endfor %}
-        </div>
-        <div class="vct-file-hint">Ảnh toàn cảnh rộng hơn khung trang chủ nên sẽ bị cắt trên/dưới. Chọn phần có toà nhà chính.</div>
+        <label>Mô tả ảnh (hiển thị cho người dùng đọc màn hình và Google Hình ảnh)</label>
+        <input type="text" name="alt" maxlength="150" value="{{ cd.alt }}" placeholder="{{ H.ALT_MAC_DINH }}">
       </div>
     </div>
   </div>
@@ -78,13 +108,18 @@
 
 <style>
 .hp-section-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); margin:0 0 10px 2px; }
-.hp-preview { position:relative; width:100%; aspect-ratio: 16 / 6; min-height:260px; border-radius:var(--radius-md); overflow:hidden; color:#fff;
-  background:#0b1f3a; font-size:clamp(9px,1.25vw,13px); display:flex; align-items:center; justify-content:center; text-align:center; }
+.hp-xem-luoi { display:grid; grid-template-columns:1fr 250px; gap:18px; align-items:start; }
+.hp-nhan-khung { font-size:12.5px; font-weight:700; color:var(--text-muted); margin:0 0 6px 2px; }
+.hp-preview { position:relative; width:100%; aspect-ratio: 16 / 6; border-radius:var(--radius-md); overflow:hidden; color:#fff;
+  background:#0b1f3a; font-size:clamp(8px,1.1vw,12px); display:flex; align-items:center; justify-content:center; text-align:center; }
+.hp-preview.hp-mobile { aspect-ratio: 390 / 560; font-size:7.5px; }
 .hp-preview.hp-khong-anh { background:linear-gradient(165deg,var(--ink-900) 0%,var(--navy-600) 62%,var(--navy-500) 100%); }
-.hp-preview.hp-khong-anh #hpImg, .hp-preview.hp-khong-anh .hp-phu { display:none; }
-.hp-preview img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.hp-preview.hp-khong-anh img, .hp-preview.hp-khong-anh .hp-phu { display:none; }
+/* Xem trước ảnh KÉO GIÃN vừa khung (fill), giống trang chủ thật: không cắt */
+.hp-preview img { position:absolute; inset:0; width:100%; height:100%; object-fit:fill; }
 .hp-phu { position:absolute; inset:0; background:linear-gradient(180deg,rgba(11,31,58,var(--a1,.6)) 0%,rgba(11,31,58,var(--a2,.66)) 55%,rgba(11,31,58,var(--a3,.78)) 100%); }
 .hp-noidung { position:relative; z-index:1; max-width:62%; padding:1em; text-shadow:0 2px 14px rgba(5,15,30,.45); }
+.hp-mobile .hp-noidung { max-width:92%; }
 .hp-badge { font-size:1em; margin-bottom:.8em; }
 .hp-h1 { font-family:var(--font-display); font-weight:800; font-size:2.3em; line-height:1.15; margin-bottom:.5em; }
 .hp-h1 span { color:var(--sky-400); }
@@ -96,22 +131,20 @@
 .hp-doc-duoc { font-size:12.5px; margin-top:8px; font-weight:600; }
 .hp-doc-duoc.tot { color:#1a7f4b; } .hp-doc-duoc.kha { color:#b27400; } .hp-doc-duoc.thap { color:var(--level-cctd); }
 #hpDoPhu { width:100%; accent-color:var(--navy-600); }
-.hp-radio-nhom { display:flex; gap:10px; flex-wrap:wrap; }
-.hp-radio { display:inline-flex; align-items:center; gap:6px; font-weight:500; cursor:pointer; padding:8px 12px; border:1px solid var(--line-200); border-radius:var(--radius-sm); }
 .hp-xoa { font-weight:500; color:var(--level-cctd); cursor:pointer; display:inline-flex; gap:8px; align-items:center; }
-@media (max-width: 800px) { .hp-luoi { grid-template-columns:1fr; } .hp-noidung { max-width:92%; } }
+@media (max-width: 800px) { .hp-luoi, .hp-xem-luoi { grid-template-columns:1fr; } .hp-noidung { max-width:92%; } .hp-preview.hp-mobile { max-width:260px; } }
 </style>
 
 <script>
 (function () {
   var MIN = {{ H.DO_PHU_MIN }}, MAX = {{ H.DO_PHU_MAX }};
-  var VI_TRI = {{ H.vi_tri_css() | tojson }};
-  var xemTruoc = document.getElementById('hpPreview'), img = document.getElementById('hpImg');
-  var thanh = document.getElementById('hpDoPhu'), nhan = document.getElementById('hpDoPhuNhan');
-  var docDuoc = document.getElementById('hpDocDuoc'), file = document.getElementById('hpFile');
-  var xoa = document.getElementById('hpXoa');
-  var coAnhGoc = {{ 'true' if cd.anh else 'false' }};
-  var urlTam = null;
+  var xemPc = document.getElementById('hpPreviewPc'), imgPc = document.getElementById('hpImgPc');
+  var xemMb = document.getElementById('hpPreviewMb'), imgMb = document.getElementById('hpImgMb');
+  var thanh = document.getElementById('hpDoPhu'), nhan = document.getElementById('hpDoPhuNhan'), docDuoc = document.getElementById('hpDocDuoc');
+  var filePc = document.getElementById('hpFilePc'), fileMb = document.getElementById('hpFileMb');
+  var xoaPc = document.getElementById('hpXoaPc'), xoaMb = document.getElementById('hpXoaMb');
+  var DA_LUU_PC = {{ cd.anh_xem_truoc | tojson }}, DA_LUU_MB = {{ cd.anh_mobile_xem_truoc | tojson }};
+  var tamPc = null, tamMb = null;
 
   // PHẢI khớp với tinh_alpha() trong app/utils/hero.py để xem trước giống hệt trang chủ thật.
   function tinhAlpha(p) {
@@ -125,32 +158,39 @@
     var ink = [11, 31, 58], nen = [228, 236, 246];
     return 1.05 / (lum(ink.map(function (v, i) { return v * a + nen[i] * (1 - a); })) + 0.05);
   }
-  function capNhat() {
+  function capNhatPhu() {
     var a = tinhAlpha(thanh.value);
-    xemTruoc.style.setProperty('--a1', a[0]); xemTruoc.style.setProperty('--a2', a[1]); xemTruoc.style.setProperty('--a3', a[2]);
+    [xemPc, xemMb].forEach(function (x) { x.style.setProperty('--a1', a[0]); x.style.setProperty('--a2', a[1]); x.style.setProperty('--a3', a[2]); });
     nhan.textContent = thanh.value + '%';
     var tp = tuongPhan(a[1]);
     var loai = tp >= 4.5 ? ['tot', 'Chữ rất dễ đọc'] : tp >= 3.6 ? ['kha', 'Chữ đọc được; nếu ảnh nền rất sáng nên tăng độ phủ'] : ['thap', 'Chữ khó đọc trên ảnh sáng, nên tăng độ phủ'];
     docDuoc.className = 'hp-doc-duoc ' + loai[0];
     docDuoc.textContent = loai[1] + ' (độ tương phản ' + tp.toFixed(1) + ':1 trên nền ảnh sáng)';
   }
-  function capNhatCoAnh() {
-    var coAnh = (urlTam || coAnhGoc) && !(xoa && xoa.checked);
-    xemTruoc.classList.toggle('hp-khong-anh', !coAnh);
+  function datAnh(khung, img, url) {
+    if (url) { img.src = url; khung.classList.remove('hp-khong-anh'); }
+    else { img.removeAttribute('src'); khung.classList.add('hp-khong-anh'); }
   }
-  thanh.addEventListener('input', capNhat);
-  document.querySelectorAll('input[name="vi_tri"]').forEach(function (r) {
-    r.addEventListener('change', function () { img.style.objectPosition = VI_TRI[r.value]; });
-  });
-  if (file) file.addEventListener('change', function () {
-    if (urlTam) URL.revokeObjectURL(urlTam);
-    var f = file.files[0];
-    urlTam = f ? URL.createObjectURL(f) : null;
-    if (urlTam) { img.src = urlTam; if (xoa) xoa.checked = false; }
-    capNhatCoAnh();
-  });
-  if (xoa) xoa.addEventListener('change', capNhatCoAnh);
-  capNhat(); capNhatCoAnh();
+  // Giống trang chủ thật: thiếu ảnh nào thì dùng ảnh còn lại; thiếu cả hai thì nền xanh gradient.
+  function capNhatAnh() {
+    var pc = tamPc || ((DA_LUU_PC && !(xoaPc && xoaPc.checked)) ? DA_LUU_PC : '');
+    var mb = tamMb || ((DA_LUU_MB && !(xoaMb && xoaMb.checked)) ? DA_LUU_MB : '');
+    datAnh(xemPc, imgPc, pc || mb);
+    datAnh(xemMb, imgMb, mb || pc);
+  }
+  function theoDoi(file, xoa, datTam) {
+    if (file) file.addEventListener('change', function () {
+      var f = file.files[0];
+      datTam(f ? URL.createObjectURL(f) : null);
+      if (f && xoa) xoa.checked = false;
+      capNhatAnh();
+    });
+    if (xoa) xoa.addEventListener('change', capNhatAnh);
+  }
+  theoDoi(filePc, xoaPc, function (u) { if (tamPc) URL.revokeObjectURL(tamPc); tamPc = u; });
+  theoDoi(fileMb, xoaMb, function (u) { if (tamMb) URL.revokeObjectURL(tamMb); tamMb = u; });
+  thanh.addEventListener('input', capNhatPhu);
+  capNhatPhu(); capNhatAnh();
 })();
 </script>
 {% endblock %}

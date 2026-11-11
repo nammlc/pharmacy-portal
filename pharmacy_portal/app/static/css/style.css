@@ -3725,8 +3725,11 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
    hero-inner trong HTML nên bị che bởi nội dung). Nếu đặt z-index, .hero-inner thành một lớp xếp chồng riêng ở mức 1, ngang với
    '.category-card > *' (z-index:1, nằm sau trong trang) -> các thẻ danh mục vẽ ĐÈ lên danh sách gợi ý tìm kiếm
    (z-index:60 của nó bị nhốt bên trong lớp đó). Để auto thì gợi ý vẫn so z-index với cả trang như trước. */
-.hero--anh .hero-media { position: absolute; inset: 0; }
-.hero--anh .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero--anh .hero-media { position: absolute; inset: 0; overflow: hidden; }
+.hero--anh .hero-media picture { display: contents; }
+/* Ảnh KÉO GIÃN vừa khít khung (fill), KHÔNG cắt (không dùng cover). Ảnh là lớp nền tuyệt đối nên kích thước ảnh gốc không
+   bao giờ làm đổi kích thước hero / trang; ảnh sai tỉ lệ chỉ bị méo hoặc mờ. */
+.hero--anh .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: fill; }
 .hero--anh .hero-phu {
   position: absolute;
   inset: 0;
