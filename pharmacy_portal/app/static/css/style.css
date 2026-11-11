@@ -24,6 +24,11 @@
   --level-nang: #d9633d;        /* nặng - burnt orange */
   --level-cctd: #c73e3e;        /* chống chỉ định - đỏ, khớp chữ thập trên logo */
 
+  /* Thẻ trên điện thoại (trang chủ / nhóm thuốc / thuốc): MỘT họ xanh thương hiệu, không dùng cầu vồng nhiều màu */
+  --m-tile-1: #f4f9fe;     /* nền ô "ảnh" - tâm sáng */
+  --m-tile-2: #d5e6f7;     /* nền ô "ảnh" - mép đậm hơn */
+  --m-card-shadow: 0 1px 2px rgba(11, 31, 58, 0.06);
+
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 22px;
@@ -3725,8 +3730,11 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
    hero-inner trong HTML nên bị che bởi nội dung). Nếu đặt z-index, .hero-inner thành một lớp xếp chồng riêng ở mức 1, ngang với
    '.category-card > *' (z-index:1, nằm sau trong trang) -> các thẻ danh mục vẽ ĐÈ lên danh sách gợi ý tìm kiếm
    (z-index:60 của nó bị nhốt bên trong lớp đó). Để auto thì gợi ý vẫn so z-index với cả trang như trước. */
-.hero--anh .hero-media { position: absolute; inset: 0; }
-.hero--anh .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero--anh .hero-media { position: absolute; inset: 0; overflow: hidden; }
+.hero--anh .hero-media picture { display: contents; }
+/* Ảnh KÉO GIÃN vừa khít khung (fill), KHÔNG cắt (không dùng cover). Ảnh là lớp nền tuyệt đối nên kích thước ảnh gốc không
+   bao giờ làm đổi kích thước hero / trang; ảnh sai tỉ lệ chỉ bị méo hoặc mờ. */
+.hero--anh .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: fill; }
 .hero--anh .hero-phu {
   position: absolute;
   inset: 0;
@@ -3740,5 +3748,276 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
 .hero--anh .hero-badge { text-shadow: 0 2px 18px rgba(5, 15, 30, 0.45); }
 .hero--anh p { color: rgba(255, 255, 255, 0.92); text-shadow: 0 1px 12px rgba(5, 15, 30, 0.5); }
 @media (max-width: 700px) {
-  .hero--anh { min-height: 0; padding-top: 56px; padding-bottom: 92px; }
+  .hero--anh { min-height: 0; padding-top: 56px; padding-bottom: 44px; }   /* lưới thẻ nằm dưới hero, không đè lên nữa */
+}
+
+/* ============================================================
+   HỎI ĐÁP CÔNG KHAI · CHAT RIÊNG · CHUÔNG THÔNG BÁO · QUẢN TRỊ Ý KIẾN
+   ============================================================ */
+/* ---- Khối hỏi đáp dưới thuốc / bài viết ---- */
+/* Khối hỏi đáp cuối bài: MỘT khối liền rộng bằng header (mép logo → mép nút Menu), chia đôi 2 nửa bằng nhau, có đường kẻ giữa.
+   Nửa trái = nút "Lịch sử hỏi đáp", nửa phải = nút "Đặt câu hỏi"; bấm nút nào thì ngăn đó xổ ngay bên dưới nửa của nó
+   (có cuộn riêng để trang không dài). Hai ngăn mở độc lập, mở được cùng lúc. */
+.hd { box-sizing: border-box; max-width: 1180px; margin: 32px auto 8px; padding: 0 24px; }
+.hd [hidden] { display: none !important; }
+.hd-cols { display: grid; grid-template-columns: 1fr 1fr; background: #fff; border: 1px solid var(--line-200); border-radius: 16px; overflow: hidden; }
+.hd-col { min-width: 0; }
+.hd-col + .hd-col { border-left: 1px solid var(--line-200); }
+.hd-tab { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-width: 0; padding: 15px 12px;
+          border: 0; border-radius: 0; background: var(--paper-0); color: var(--ink-900);
+          font: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer; transition: background 0.15s, color 0.15s; }
+.hd-tab:hover { background: #eef2f7; }
+.hd-tab:focus-visible { outline: 2px solid var(--sky-400); outline-offset: -2px; }
+.hd-tab[aria-expanded="true"] { background: var(--ink-900); color: #fff; }
+.hd-tab[aria-expanded="true"] .hd-count { color: rgba(255,255,255,0.75); }
+.hd-caret { flex: none; transition: transform 0.15s; }
+.hd-tab[aria-expanded="true"] .hd-caret { transform: rotate(180deg); }
+.hd-panel { border-top: 1px solid var(--line-200); }
+.hd-scroll { max-height: min(60vh, 440px); overflow-y: auto; overscroll-behavior: contain; padding: 18px 20px 20px; }
+.hd-scroll .hd-form { margin: 0; padding: 0; border: 0; }
+@media (max-width: 760px) {                 /* màn hẹp: 2 nửa xếp thành 2 hàng */
+  .hd-cols { grid-template-columns: 1fr; }
+  .hd-col + .hd-col { border-left: 0; border-top: 1px solid var(--line-200); }
+}
+.hd-list { display: grid; gap: 12px; margin-bottom: 14px; }
+.hd-empty { margin: 0; padding: 14px; text-align: center; color: var(--text-muted); font-size: 14px; background: var(--paper-0); border-radius: 12px; }
+.hd-item { padding: 12px 14px; background: var(--paper-0); border-radius: 12px; min-width: 0; }
+.hd-item-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 13px; }
+.hd-item-head small, .hd-reply-head small { color: var(--text-muted); font-weight: 400; }
+.hd-avatar { flex: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: #dbeafe; color: #1d4ed8; font-weight: 800; font-size: 13px; }
+.hd-item-body { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14.5px; line-height: 1.55; color: var(--ink-900); }
+.hd-reply { margin: 10px 0 0 14px; padding: 10px 12px; background: #eff6ff; border-left: 3px solid #2563eb; border-radius: 0 10px 10px 0; }
+.hd-reply-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; font-size: 13px; }
+.hd-badge { font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: #dcfce7; color: #166534; }
+.hd-form { margin-top: 18px; padding-top: 18px; border-top: 1px dashed var(--line-200); display: grid; gap: 12px; }
+.hd-form h3 { margin: 0; font-size: 16px; }
+.hd-form label, .ht-form label { display: grid; gap: 5px; font-size: 13.5px; font-weight: 600; color: var(--ink-900); }
+.hd-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.hd-form input[type=text], .hd-form input[type=tel], .hd-form textarea,
+.ht-form input[type=text], .ht-form input[type=tel], .ht-form input[type=password], .ht-form textarea, .ht-select,
+.ht-send textarea, .yk-reply-form textarea, .yk-reply-form input[type=text] {
+  width: 100%; padding: 10px 12px; font: inherit; font-weight: 400; color: var(--ink-900);
+  border: 1px solid var(--line-200); border-radius: 10px; background: #fff;
+}
+.hd-form textarea, .ht-form textarea, .ht-send textarea { resize: vertical; min-height: 84px; }
+.hd-form input:focus, .hd-form textarea:focus, .ht-form input:focus, .ht-form textarea:focus, .ht-send textarea:focus, .ht-select:focus {
+  outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+}
+.hd-req { color: #dc2626; }
+.hd-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; }   /* ô bẫy bot, người thật không thấy */
+.hd-note, .ht-hint { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--text-muted); font-weight: 400; }
+.hd-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.hd-msg { font-size: 13.5px; }
+.hd-msg-ok { color: #15803d; } .hd-msg-loi { color: #b91c1c; }
+.hd-private { margin: 16px 0 0; font-size: 14px; }
+.hd-more { margin: 0 0 6px; }
+@media (max-width: 640px) { .hd { padding: 0 14px; } .hd-row { grid-template-columns: 1fr; } .hd-tab { font-size: 13.5px; padding: 12px 8px; gap: 6px; } .hd-scroll { padding: 14px; } }
+
+/* ---- Thanh "Báo lỗi thông tin" ---- */
+.bao-loi-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 14px;
+  margin: 0 0 14px; padding: 9px 14px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; font-size: 13.5px; color: #92400e; }
+.btn-bao-loi { padding: 5px 12px; border-radius: 999px; background: #fff; border: 1px solid #f59e0b; color: #b45309; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.btn-bao-loi:hover { background: #fef3c7; }
+
+/* ---- Chat riêng (khách + admin) ---- */
+.ht { max-width: 720px; margin: 0 auto 28px; }
+.ht-card { background: #fff; border: 1px solid var(--line-200); border-radius: 16px; padding: 18px; }
+.ht-form { display: grid; gap: 12px; }
+.ht-context { padding: 8px 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; font-size: 13px; color: #92400e; overflow-wrap: anywhere; }
+.ht-select { margin-bottom: 8px; }
+.ht-chat-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--line-100); }
+.ht-chat-head small { color: var(--text-muted); }
+.ht-msgs { display: flex; flex-direction: column; gap: 12px; max-height: min(60vh, 520px); min-height: 160px; overflow-y: auto; padding: 4px 2px 8px; }
+.ht-msg { display: flex; flex-direction: column; max-width: 86%; min-width: 0; }
+.ht-msg.ht-khach { align-self: flex-end; align-items: flex-end; }
+.ht-msg.ht-admin { align-self: flex-start; align-items: flex-start; }
+.ht-bubble { padding: 9px 13px; border-radius: 16px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14.5px; line-height: 1.5; }
+.ht-khach .ht-bubble { background: #2563eb; color: #fff; border-bottom-right-radius: 4px; }
+.ht-admin .ht-bubble { background: #eef2f7; color: var(--ink-900); border-bottom-left-radius: 4px; }
+.ht-meta { margin-top: 3px; font-size: 11.5px; color: var(--text-muted); }
+.ht-msg-ctx { margin-bottom: 3px; font-size: 12px; color: #92400e; overflow-wrap: anywhere; }
+.ht-send { display: flex; gap: 10px; align-items: flex-end; margin-top: 12px; flex-wrap: wrap; }
+.ht-send .ht-context { flex: 1 0 100%; }
+.ht-send textarea { flex: 1; min-width: 0; min-height: 52px; }
+/* admin: khách bên TRÁI, Khoa Dược bên PHẢI (ngược với phía khách) */
+.adm-chat .ht-msgs { max-height: min(62vh, 560px); }
+.adm-chat .ht-msg.ht-adm-khach { align-self: flex-start; align-items: flex-start; }
+.adm-chat .ht-msg.ht-adm-admin { align-self: flex-end; align-items: flex-end; }
+.adm-chat .ht-adm-khach .ht-bubble { background: #eef2f7; color: var(--ink-900); border-radius: 16px 16px 16px 4px; }
+.adm-chat .ht-adm-admin .ht-bubble { background: #2563eb; color: #fff; border-radius: 16px 16px 4px 16px; }
+.adm-chat-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; margin-top: 14px; }
+.adm-chat-tools .yk-reply-form { flex: 1 1 260px; margin: 0; }
+.tb-link { background: none; border: 0; padding: 0; color: #2563eb; cursor: pointer; font: inherit; font-size: 13px; }
+.tb-link:hover { text-decoration: underline; }
+
+/* ---- Chuông thông báo (thanh trên trang quản trị) ---- */
+.admin-topbar > .tb-bell { margin-left: auto; margin-right: 10px; }
+.tb-bell { position: relative; }
+.tb-bell-btn { position: relative; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px;
+  background: transparent; border: 1px solid var(--line-200); border-radius: 50%; color: var(--ink-900); cursor: pointer; }
+.tb-bell-btn:hover { background: var(--paper-0); }
+.tb-bell-badge { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
+  background: #dc2626; color: #fff; font-size: 11px; font-weight: 800; line-height: 18px; text-align: center; border: 2px solid #fff; box-sizing: content-box; }
+.tb-ring { animation: tbRing .9s ease; }
+@keyframes tbRing { 0%,100% { transform: rotate(0) } 15% { transform: rotate(14deg) } 30% { transform: rotate(-12deg) } 45% { transform: rotate(9deg) } 60% { transform: rotate(-6deg) } }
+.tb-panel { position: absolute; right: 0; top: calc(100% + 8px); z-index: 60; width: min(380px, calc(100vw - 24px));
+  background: #fff; border: 1px solid var(--line-200); border-radius: 14px; box-shadow: 0 18px 40px -12px rgba(11, 31, 58, .35); overflow: hidden; }
+.tb-panel-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--line-100); font-size: 14px; }
+.tb-list, .tb-page-list { list-style: none; margin: 0; padding: 0; }
+.tb-list { max-height: min(60vh, 420px); overflow-y: auto; }
+.tb-list li a, .tb-page-list li a { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; text-decoration: none; color: var(--ink-900); border-bottom: 1px solid var(--line-100); }
+.tb-list li a:hover, .tb-page-list li a:hover { background: var(--paper-0); }
+.tb-unread a { background: #eff6ff; }
+.tb-ico { flex: none; font-size: 18px; line-height: 1.3; }
+.tb-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.tb-txt strong { font-size: 13.5px; overflow-wrap: anywhere; }
+.tb-txt small { font-size: 12.5px; color: var(--text-muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+.tb-time { flex: none; font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
+.tb-count { display: inline-block; margin-left: 4px; padding: 0 6px; border-radius: 999px; background: #dc2626; color: #fff; font-size: 11px; }
+.tb-empty { padding: 22px; text-align: center; color: var(--text-muted); font-size: 13.5px; }
+.tb-panel-foot { display: block; padding: 10px 14px; text-align: center; font-size: 13px; font-weight: 700; color: #2563eb; text-decoration: none; border-top: 1px solid var(--line-100); }
+.tb-page-list { background: #fff; border: 1px solid var(--line-200); border-radius: 14px; overflow: hidden; }
+.tb-page-list li:last-child a { border-bottom: 0; }
+.nav-badge { display: inline-block; margin-left: 8px; min-width: 20px; padding: 0 6px; border-radius: 999px; background: #dc2626; color: #fff;
+  font-size: 11px; font-weight: 800; line-height: 18px; text-align: center; vertical-align: middle; }
+@media (max-width: 800px) { .tb-panel { position: fixed; left: 12px; right: 12px; top: 64px; width: auto; } }
+
+/* ---- Trang quản trị ý kiến ---- */
+.yk-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.yk-tab { padding: 6px 14px; border: 1px solid var(--line-200); border-radius: 999px; background: #fff; color: var(--ink-900); text-decoration: none; font-size: 13.5px; font-weight: 600; }
+.yk-tab span { margin-left: 4px; color: var(--text-muted); font-weight: 700; }
+.yk-tab.active { background: #0f2642; border-color: #0f2642; color: #fff; } .yk-tab.active span { color: #cbd5e1; }
+.adm-select { padding: 8px 10px; border: 1px solid var(--line-200); border-radius: 10px; background: #fff; font: inherit; max-width: 100%; }
+.yk-bulk { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
+.yk-check-all { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; }
+.yk-list { display: grid; gap: 12px; }
+.yk-card { padding: 14px 16px; background: #fff; border: 1px solid var(--line-200); border-left: 4px solid #f59e0b; border-radius: 12px; min-width: 0; }
+.yk-card.yk-da_duyet { border-left-color: #16a34a; } .yk-card.yk-tu_choi { border-left-color: #9ca3af; } .yk-card.yk-spam { border-left-color: #dc2626; }
+.yk-card:target { box-shadow: 0 0 0 3px rgba(37, 99, 235, .35); }
+.yk-card-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.yk-who { flex: 1; min-width: 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+.yk-phone, .yk-phone-sub { font-size: 13px; color: #2563eb; text-decoration: none; }
+.yk-time { font-size: 12px; color: var(--text-muted); }
+.yk-badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; background: #e5e7eb; color: #374151; }
+.yk-badge-cho_duyet { background: #fef3c7; color: #b45309; } .yk-badge-da_duyet { background: #dcfce7; color: #166534; }
+.yk-badge-tu_choi { background: #e5e7eb; color: #4b5563; } .yk-badge-spam { background: #fee2e2; color: #b91c1c; }
+.yk-target { margin: 8px 0 4px; font-size: 13px; color: var(--text-muted); overflow-wrap: anywhere; }
+.yk-body { margin: 6px 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14.5px; line-height: 1.55; }
+.yk-reply { margin: 8px 0; padding: 8px 12px; background: #eff6ff; border-radius: 10px; font-size: 14px; } .yk-reply p { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.yk-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.inline-form { display: inline-flex; gap: 8px; align-items: center; margin: 0; flex-wrap: wrap; }
+.yk-del { color: #b91c1c; border-color: #fecaca; }
+.yk-reply-form { margin-top: 10px; } .yk-reply-form summary { cursor: pointer; font-size: 13.5px; font-weight: 600; color: #2563eb; }
+.yk-reply-form form { display: grid; gap: 8px; margin-top: 8px; justify-items: start; } .yk-reply-form textarea { min-height: 70px; }
+.yk-pager { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 18px 0; font-size: 13.5px; }
+.yk-pager a { color: #2563eb; font-weight: 700; text-decoration: none; }
+.adm-empty { padding: 36px 16px; text-align: center; color: var(--text-muted); background: #fff; border: 1px dashed var(--line-200); border-radius: 14px; }
+.tn-preview { max-width: 420px; overflow-wrap: anywhere; font-size: 13.5px; } .tn-who { color: var(--text-muted); font-weight: 600; }
+
+.ht-note-inline { font-weight: 400; font-size: 12px; color: var(--text-muted); }
+
+/* ============================================================
+   TRANG CHỦ ĐIỆN THOẠI - các ô chức năng dạng THẺ SẢN PHẨM kiểu Shopee (lưới 2 cột, nền xám, thẻ trắng bo góc,
+   ảnh vuông ở trên, tên tối đa 2 dòng, mô tả mờ, dòng hành động nổi bật như giá). Chỉ áp dụng ≤ 700px (cùng mốc với hero);
+   hero / header / footer và giao diện máy tính KHÔNG đổi.
+   LƯU Ý: KHÔNG đặt transform / filter / z-index lên .category-card: chúng tạo lớp xếp chồng riêng và làm thẻ vẽ ĐÈ lên
+   danh sách gợi ý tìm kiếm của hero (xem ghi chú ở phần "HERO có ảnh nền").
+   ============================================================ */
+.cat-tag { display: none; }
+@media (max-width: 700px) {
+  /* Lưới nằm HẲN bên dưới hero (không đè lên ảnh nền): 18px nền trang giữa đáy hero và hàng thẻ đầu */
+  .category-grid-outer { background: var(--paper-0); padding: 18px 14px 32px; }
+  .category-grid { max-width: none; margin: 0 auto; padding: 0; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; }
+  .category-card { padding: 0; gap: 0; background: #fff; border: 1px solid var(--line-200); border-radius: 14px; box-shadow: var(--m-card-shadow);
+                   overflow: hidden; text-decoration: none; -webkit-tap-highlight-color: transparent;
+                   --cat-bg1: var(--m-tile-1); --cat-bg2: var(--m-tile-2); --cat-ink: var(--navy-600); }
+  .hero { padding-bottom: 44px; }   /* hero nền xanh (chưa đặt ảnh) cũng cùng khoảng cách đáy */
+  .category-card::before { display: none; }
+  .category-card:hover { transform: none; box-shadow: var(--m-card-shadow); }
+  .category-card:active { background: #f7f9fc; }
+
+  /* "Ảnh sản phẩm": ô vuông cùng một tông xanh thương hiệu cho cả 8 chức năng (màu sắc do biểu tượng emoji mang lại), biểu tượng lớn ở giữa */
+  .cat-icon-wrap { position: relative; display: flex; align-items: center; justify-content: center; aspect-ratio: 1 / 1;
+                   font-size: clamp(54px, 18vw, 76px); line-height: 1; background: radial-gradient(circle at 50% 38%, var(--cat-bg1) 0%, var(--cat-bg2) 100%); }
+  /* nhãn góc phải như "-30%" của Shopee */
+  .cat-tag { display: block; position: absolute; top: 0; right: 0; padding: 3px 9px 4px 10px; border-radius: 0 0 0 10px;
+             background: var(--cat-ink); color: #fff; font-family: var(--font-body, inherit); font-size: 11px; font-weight: 700; line-height: 1.3; }
+
+  .category-card h3 { margin: 10px 11px 0; font-family: var(--font-display); font-size: 14px; font-weight: 700; line-height: 1.3; color: var(--ink-900);
+                      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
+  .category-card p { margin: 3px 11px 0; font-size: 12px; line-height: 1.35; color: var(--text-muted, #6b7a8c);
+                     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  /* dòng hành động nổi bật như "giá" */
+  .cat-arrow { margin: auto 11px 0; padding: 8px 0 11px; font-size: 14px; font-weight: 700; color: var(--cat-ink); }
+  .category-card p { margin-bottom: 0; }
+}
+
+/* ============================================================
+   ĐIỆN THOẠI (≤ 700px): DANH MỤC THUỐC / NHÓM THUỐC dạng LƯỚI 2 CỘT + bảng màu đồng bộ với trang chủ
+   - Cùng một họ xanh thương hiệu (navy / xanh trời nhạt) cho mọi thẻ; KHÔNG còn màu xoay vòng cam / vàng / xanh lá.
+   - Áp dụng cho .nhom-card (danh sách nhóm) và .drug-card (danh sách thuốc trong nhóm + kết quả tìm kiếm), kể cả Nhà thuốc BV
+     vì dùng chung class. Giao diện máy tính KHÔNG đổi.
+   - Không đặt hover:transform trên điện thoại (cảm ứng sẽ bị "dính" trạng thái hover sau khi chạm).
+   ============================================================ */
+@media (max-width: 700px) {
+  /* Lề hai bên thống nhất 14px cho các trang có lưới thẻ (tiêu đề, ô tìm kiếm và lưới thẳng hàng với nhau) */
+  body:has(.nhom-grid, .drug-grid) .page-header { padding: 26px 14px 4px; }
+  body:has(.nhom-grid, .drug-grid) .page-header h1 { font-size: 24px; line-height: 1.25; text-wrap: balance; }
+  body:has(.nhom-grid, .drug-grid) .search-panel,
+  body:has(.nhom-grid, .drug-grid) .results-panel { padding-left: 14px; padding-right: 14px; }
+  body:has(.nhom-grid, .drug-grid) .search-panel { margin-top: 18px; }
+  body:has(.nhom-grid, .drug-grid) .search-form { padding: 10px; border-radius: 14px; box-shadow: var(--m-card-shadow); }
+  body:has(.nhom-grid, .drug-grid) .results-panel { margin-top: 16px; margin-bottom: 48px; }
+
+  .nhom-grid, .drug-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+
+  /* ---- Danh sách NHÓM thuốc: thẻ nhỏ gọn, một tông xanh ---- */
+  .nhom-grid .nhom-card { --accent-color: var(--navy-600); --accent-bg: var(--sage-100);
+                          padding: 12px; gap: 10px; border: 1px solid var(--line-200); border-radius: 14px; box-shadow: var(--m-card-shadow);
+                          -webkit-tap-highlight-color: transparent; }
+  .nhom-card::before { display: none; }
+  .nhom-card:hover { transform: none; box-shadow: var(--m-card-shadow); border-color: var(--line-200); }
+  .nhom-card:active { background: #f7f9fc; }
+  .nhom-card-icon { width: 40px; height: 40px; border-radius: 11px; font-size: 20px; }
+  .nhom-card h3 { font-size: 14px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .nhom-card-count { font-size: 12px; padding: 3px 10px; }
+  .nhom-card-arrow { width: 28px; height: 28px; }
+  .nhom-card:hover .nhom-card-arrow { background: var(--paper-0); color: var(--text-muted); transform: none; }
+  .nhom-card:active .nhom-card-arrow { background: var(--ink-900); color: #fff; }
+
+  /* ---- Danh sách THUỐC: thẻ sản phẩm, ảnh (tỉ lệ 4:5 như ảnh thuốc đang dùng) ở trên, chữ ở dưới ---- */
+  .drug-grid .drug-card { flex-direction: column; align-items: stretch; gap: 0; padding: 0; overflow: hidden;
+                          border: 1px solid var(--line-200); border-radius: 14px; box-shadow: var(--m-card-shadow);
+                          -webkit-tap-highlight-color: transparent; }
+  .drug-card:hover { transform: none; box-shadow: var(--m-card-shadow); border-color: var(--line-200); }
+  .drug-card:active { background: #f7f9fc; }
+  .drug-card .drug-card-thumb,
+  .drug-card .drug-card-thumb-fallback { width: 100%; height: auto; aspect-ratio: 4 / 5; border: 0; border-radius: 0; border-bottom: 1px solid var(--line-100); }
+  .drug-card .drug-card-thumb { display: block; object-fit: cover; }
+  /* Ô chữ cái khi chưa có ảnh: cùng nền xanh nhạt như trang chủ (màu inline cũ ở trang tìm kiếm cần !important mới ghi đè được) */
+  .drug-card .drug-card-thumb-fallback { font-size: 44px; color: var(--navy-600) !important;
+                                         background: radial-gradient(circle at 50% 38%, var(--m-tile-1) 0%, var(--m-tile-2) 100%) !important; }
+  .drug-card-body { padding: 10px 12px 12px; }
+  .drug-card-body h3 { margin: 0 0 4px; font-size: 13.5px; line-height: 1.3; white-space: normal;
+                       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .drug-card-body p { font-size: 12px; line-height: 1.35; white-space: normal;
+                      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+  /* Dải màu trên chân trang: bỏ dải cam - đỏ (thang mức độ cảnh báo), dùng đúng tông xanh của trang */
+  .site-footer::before { background: linear-gradient(90deg, var(--navy-600), var(--sky-400)); }
+}
+
+/* ============================================================
+   ĐIỆN THOẠI (≤ 640px): ẢNH THUỐC Ở TRANG CHI TIẾT to hơn
+   Trước đây khung ảnh chỉ 96px (khoảng 1/4 bề ngang màn hình) nên khó nhìn rõ hộp thuốc. Giờ khung ảnh vuông rộng hết
+   khung tiêu đề (tối đa 420px để màn hình xoay ngang không bị quá cao), ảnh vẫn nguyên vẹn (contain, không cắt) và bấm vào
+   vẫn mở xem phóng to (lightbox.js). Dùng chung cho Danh mục thuốc và Nhà thuốc BV (cùng class .drug-hero-media).
+   ============================================================ */
+@media (max-width: 640px) {
+  .drug-hero { padding: 16px; gap: 16px; }
+  .drug-hero-media { width: 100%; max-width: 420px; height: auto; aspect-ratio: 1 / 1; margin: 0 auto; padding: 10px; border-radius: 14px; }
+  .drug-hero-media img { width: 100%; height: 100%; max-width: none; max-height: none; object-fit: contain; }
+  .drug-hero-media-fallback { font-size: 96px; }
+  .drug-hero-text { padding: 0 4px 4px; }
 }

@@ -1,0 +1,16 @@
+{# Chuông thông báo trên thanh trên trang quản trị. Số chưa đọc + danh sách tự cập nhật (static/js/thong_bao.js, ~15 giây/lần) #}
+<div class="tb-bell" id="tbBell">
+  <button type="button" class="tb-bell-btn" id="tbBellBtn" aria-haspopup="true" aria-expanded="false" aria-label="Thông báo"
+          title="Thông báo">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+    <span class="tb-bell-badge" id="tbBellBadge" {% if not dem_thong_bao %}hidden{% endif %}>{{ dem_thong_bao if dem_thong_bao and dem_thong_bao < 100 else ('99+' if dem_thong_bao else '') }}</span>
+  </button>
+  <div class="tb-panel" id="tbPanel" hidden>
+    <div class="tb-panel-head">
+      <strong>Thông báo</strong>
+      <button type="button" class="tb-link" id="tbReadAll">Đánh dấu đã đọc hết</button>
+    </div>
+    <ul class="tb-list" id="tbList"><li class="tb-empty">Đang tải…</li></ul>
+    <a class="tb-panel-foot" href="{{ url_for('admin_thong_bao.danh_sach') }}">Xem tất cả thông báo →</a>
+  </div>
+</div>

@@ -136,9 +136,15 @@ def upload_anh_ve_chung_toi(file_object, url_cu: str | None = None) -> str | Non
 
 
 def upload_anh_hero(file_object, url_cu: str | None = None) -> str | None:
-    """Ảnh nền trang chủ: giữ nguyên tỉ lệ (không cắt), tối đa 2400px chiều rộng."""
+    """Ảnh nền trang chủ cho MÁY TÍNH: giữ nguyên tỉ lệ (không cắt), tối đa 2400px chiều rộng."""
     return _upload_len_cloudinary(file_object, "pharmacy/hero",
                                    url_cu=url_cu, width=2400, height=1600, crop="limit")
+
+
+def upload_anh_hero_mobile(file_object, url_cu: str | None = None) -> str | None:
+    """Ảnh nền trang chủ cho ĐIỆN THOẠI: giữ nguyên tỉ lệ (không cắt), tối đa 1600px chiều rộng / 2400px chiều cao."""
+    return _upload_len_cloudinary(file_object, "pharmacy/hero_mobile",
+                                   url_cu=url_cu, width=1600, height=2400, crop="limit")
 
 
 def upload_anh_bai_viet(file_object, url_cu: str | None = None) -> str | None:

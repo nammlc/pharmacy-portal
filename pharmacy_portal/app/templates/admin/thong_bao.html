@@ -1,0 +1,48 @@
+{% extends "admin/base.html" %}
+{% block title %}Thông báo{% endblock %}
+{% block page_eyebrow %}Phản hồi{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Thông báo</h1>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">{{ chua_doc }} chưa đọc · {{ tong }} thông báo.</p>
+  </div>
+  <form method="post" action="{{ url_for('admin_thong_bao.doc_tat_ca_trang') }}" class="inline-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-outline">Đánh dấu đã đọc hết</button>
+  </form>
+</div>
+
+<div class="yk-tabs">
+  <a href="{{ url_for('admin_thong_bao.danh_sach') }}" class="yk-tab {{ 'active' if not chi_chua_doc }}">Tất cả</a>
+  <a href="{{ url_for('admin_thong_bao.danh_sach', chua_doc=1) }}" class="yk-tab {{ 'active' if chi_chua_doc }}">Chưa đọc <span>{{ chua_doc }}</span></a>
+</div>
+
+{% if muc %}
+<ul class="tb-page-list">
+  {% for t in muc %}
+  <li class="{{ '' if t.da_doc else 'tb-unread' }}">
+    <a href="{{ url_for('admin_thong_bao.mo', tb_id=t.id) }}">
+      <span class="tb-ico">{{ '💬' if t.loai == 'y_kien_moi' else '✉️' }}</span>
+      <span class="tb-txt">
+        <strong>{{ t.tieu_de }}{% if t.so_luong and t.so_luong > 1 %} <span class="tb-count">×{{ t.so_luong }}</span>{% endif %}</strong>
+        <small>{{ t.noi_dung }}</small>
+      </span>
+      <span class="tb-time">{{ (t.ngay_tao | gio_vn).strftime('%H:%M %d/%m/%Y') }}</span>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% set tong_trang = (tong // moi_trang) + (1 if tong % moi_trang else 0) %}
+{% if tong_trang > 1 %}
+<nav class="yk-pager" aria-label="Phân trang">
+  {% if trang > 1 %}<a href="{{ url_for('admin_thong_bao.danh_sach', chua_doc=1 if chi_chua_doc else None, trang=trang - 1) }}">‹ Trước</a>{% endif %}
+  <span>Trang {{ trang }} / {{ tong_trang }}</span>
+  {% if trang < tong_trang %}<a href="{{ url_for('admin_thong_bao.danh_sach', chua_doc=1 if chi_chua_doc else None, trang=trang + 1) }}">Sau ›</a>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+<div class="adm-empty">Không có thông báo nào.</div>
+{% endif %}
+{% endblock %}

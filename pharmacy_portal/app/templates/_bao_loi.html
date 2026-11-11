@@ -1,0 +1,5 @@
+{# Thanh "Báo lỗi thông tin" (gửi RIÊNG cho Khoa Dược qua chat riêng). Dùng: {% set bl_ten = 'Tương tác thuốc' %}{% include "_bao_loi.html" %} #}
+<div class="bao-loi-bar">
+  <span>Phát hiện thông tin chưa đúng hoặc còn thiếu?</span>
+  <a class="btn-bao-loi" href="{{ url_for('ho_tro.trang', loai='bao_loi', ngu_canh='Báo lỗi: ' ~ bl_ten, url=request.full_path.rstrip('?')) }}">⚠️ Báo lỗi thông tin</a>
+</div>
