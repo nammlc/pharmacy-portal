@@ -4022,3 +4022,14 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
   .drug-hero-media-fallback { font-size: 96px; }
   .drug-hero-text { padding: 0 4px 4px; }
 }
+
+/* ============================================================
+   ĐIỆN THOẠI (≤ 480px): Ô TÌM KIẾM Ở TRANG CHỦ - chữ gợi ý không bị cắt cụt
+   Chữ nhỏ lại, nút "Tra cứu" gọn hơn để ô nhập có thêm chỗ; nếu vẫn dài thì hiện dấu "…" thay vì bị cắt lửng.
+   ============================================================ */
+@media (max-width: 480px) {
+  .hero-search { padding: 5px 5px 5px 14px; }
+  .hero-search input { min-width: 0; font-size: 13px; padding-left: 24px; background-size: 16px; text-overflow: ellipsis; }
+  .hero-search input::placeholder { font-size: 13px; text-overflow: ellipsis; }
+  .hero-search button { padding: 11px 14px; font-size: 13px; white-space: nowrap; flex-shrink: 0; }
+}
