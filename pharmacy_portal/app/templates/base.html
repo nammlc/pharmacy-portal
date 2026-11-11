@@ -46,18 +46,6 @@
       </span>
     </a>
 
-    <div class="header-actions">
-    <div class="nav-dropdown hd-dropdown" id="hdDropdown">
-      <button class="nav-toggle hd-toggle" id="hdToggle" type="button" aria-haspopup="dialog" aria-expanded="false"
-              aria-label="Hỏi đáp và góp ý" data-href="{{ url_for('ho_tro.trang') }}">
-        <span class="hd-toggle-icon" aria-hidden="true">💬</span>
-        <span class="nav-toggle-label">Hỏi đáp</span>
-        <svg class="nav-toggle-caret" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
-
     <div class="nav-dropdown" id="navDropdown">
       <button class="nav-toggle" id="navToggle" aria-haspopup="true" aria-expanded="false">
         <span class="nav-toggle-icon"><span></span><span></span><span></span></span>
@@ -80,7 +68,6 @@
         <a href="{{ url_for('ho_tro.trang') }}" class="{{ 'active' if request.blueprint == 'ho_tro' }}">💬 Hỗ trợ &amp; góp ý</a>
         <a href="{{ url_for('main.ve_chung_toi') }}" class="{{ 'active' if request.endpoint == 'main.ve_chung_toi' }}">ℹ️ Về chúng tôi</a>
       </nav>
-    </div>
     </div>
   </div>
 </header>
