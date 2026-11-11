@@ -55,23 +55,14 @@
   more.addEventListener("click", function () { tai(false); });
   tai(true);                                              // tải sớm để nút "Lịch sử hỏi đáp" hiện được số ý kiến
 
-  // 2 ngăn: bấm nút nào thì xổ ngăn đó ra (đóng ngăn kia); bấm lại thì thu gọn
-  var tabs = [
-    { nut: document.getElementById("hdTabList"), ngan: document.getElementById("hdPanelList") },
-    { nut: document.getElementById("hdTabAsk"), ngan: document.getElementById("hdPanelAsk") }
-  ];
-  function datNgan(chon) {
-    tabs.forEach(function (t) {
-      var mo = t === chon;
-      t.ngan.hidden = !mo;
-      t.nut.setAttribute("aria-expanded", mo ? "true" : "false");
-    });
-  }
-  tabs.forEach(function (t) {
-    t.nut.addEventListener("click", function () {
-      var dangMo = !t.ngan.hidden;
-      datNgan(dangMo ? null : t);
-      if (!dangMo && t.ngan.id === "hdPanelAsk") { moFormLuc = Date.now(); form.elements.ten.focus({ preventScroll: true }); }
+  // 2 ngăn độc lập (có thể mở cùng lúc): bấm nút nào thì xổ / thu gọn ngăn đó
+  [["hdTabList", "hdPanelList"], ["hdTabAsk", "hdPanelAsk"]].forEach(function (c) {
+    var nut = document.getElementById(c[0]), ngan = document.getElementById(c[1]);
+    nut.addEventListener("click", function () {
+      var mo = ngan.hidden;
+      ngan.hidden = !mo;
+      nut.setAttribute("aria-expanded", mo ? "true" : "false");
+      if (mo && c[1] === "hdPanelAsk") { moFormLuc = Date.now(); form.elements.ten.focus({ preventScroll: true }); }
     });
   });
 

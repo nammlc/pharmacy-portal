@@ -1,52 +1,55 @@
 {# Khối HỎI ĐÁP công khai dưới 1 thuốc / bài viết. Ý kiến mới phải được Khoa Dược duyệt mới hiện.
    Dùng: {% set hd_loai = 'dmt' %}{% set hd_id = thuoc.id %}{% set hd_ten = thuoc.ten_biet_duoc %}{% include "_hoi_dap.html" %}
    hd_loai: dmt | ntbv | tt | bv | ttbn (xem utils/phan_hoi.py)
-   Giao diện: 2 nút cạnh nhau (Lịch sử hỏi đáp | Đặt câu hỏi); bấm nút nào thì xổ nội dung ngăn đó ra, có thanh cuộn riêng
-   để trang không bị dài. Mỗi lúc chỉ mở 1 ngăn. #}
+   Giao diện: chia đôi 2 cột (Lịch sử hỏi đáp | Đặt câu hỏi), mỗi cột có nút + ngăn riêng; bấm nút nào thì xổ ngăn đó ra,
+   có thanh cuộn riêng để trang không dài. Hai ngăn mở độc lập, có thể mở cùng lúc. #}
 <section class="hd" id="hoi-dap" data-loai="{{ hd_loai }}" data-id="{{ hd_id }}" data-csrf="{{ csrf_token() }}"
          data-api="{{ url_for('hoi_dap.danh_sach') }}" aria-label="Hỏi đáp và góp ý">
-  <div class="hd-tabs">
+  <div class="hd-cols">
+    <div class="hd-col">
     <button type="button" class="hd-tab" id="hdTabList" aria-expanded="false" aria-controls="hdPanelList">
       <span>💬 Lịch sử hỏi đáp <span class="hd-count" id="hdCount"></span></span>
       <svg class="hd-caret" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
+    <div class="hd-panel" id="hdPanelList" hidden>
+      <div class="hd-scroll">
+        <div class="hd-list" id="hdList" aria-live="polite"><p class="hd-empty">Đang tải ý kiến…</p></div>
+        <button type="button" class="btn btn-outline btn-sm hd-more" id="hdMore" hidden>Xem thêm ý kiến</button>
+      </div>
+    </div>
+
+    </div>
+    <div class="hd-col">
     <button type="button" class="hd-tab" id="hdTabAsk" aria-expanded="false" aria-controls="hdPanelAsk">
       <span>✍️ Đặt câu hỏi</span>
       <svg class="hd-caret" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
-  </div>
-
-  <div class="hd-panel" id="hdPanelList" hidden>
-    <div class="hd-scroll">
-      <div class="hd-list" id="hdList" aria-live="polite"><p class="hd-empty">Đang tải ý kiến…</p></div>
-      <button type="button" class="btn btn-outline btn-sm hd-more" id="hdMore" hidden>Xem thêm ý kiến</button>
+    <div class="hd-panel" id="hdPanelAsk" hidden>
+      <div class="hd-scroll">
+        <form class="hd-form" id="hdForm" novalidate>
+          <div class="hd-row">
+            <label><span>Họ tên <span class="hd-req">*</span></span>
+              <input type="text" name="ten" maxlength="60" required autocomplete="name" placeholder="Nguyễn Văn A">
+            </label>
+            <label><span>Số điện thoại <span class="hd-req">*</span></span>
+              <input type="tel" name="sdt" inputmode="tel" maxlength="15" required autocomplete="tel" placeholder="09xx xxx xxx">
+            </label>
+          </div>
+          <label><span>Nội dung <span class="hd-req">*</span></span>
+            <textarea name="noi_dung" rows="4" maxlength="1000" required placeholder="Câu hỏi hoặc ý kiến của bạn…"></textarea>
+          </label>
+          <input type="text" name="website" class="hd-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <p class="hd-note">Ý kiến sẽ hiển thị sau khi Khoa Dược duyệt. Chỉ hiện <b>họ tên</b>; số điện thoại chỉ để Khoa Dược liên hệ khi cần.
+            Vui lòng <b>không</b> nhập thông tin sức khoẻ cá nhân, số căn cước hay đường dẫn (link). Trường hợp cấp cứu hãy gọi <b>115</b> hoặc đến cơ sở y tế gần nhất.</p>
+          <div class="hd-actions">
+            <button type="submit" class="btn btn-primary" id="hdSend">Gửi ý kiến</button>
+            <span class="hd-msg" id="hdMsg" role="status"></span>
+          </div>
+        </form>
+        <p class="hd-private">Cần được hỗ trợ riêng, kín đáo?
+          <a href="{{ url_for('ho_tro.trang', loai='ho_tro', ngu_canh=hd_ten, url=request.path) }}">Nhắn riêng cho Khoa Dược →</a></p>
+      </div>
     </div>
-  </div>
-
-  <div class="hd-panel" id="hdPanelAsk" hidden>
-    <div class="hd-scroll">
-      <form class="hd-form" id="hdForm" novalidate>
-        <div class="hd-row">
-          <label><span>Họ tên <span class="hd-req">*</span></span>
-            <input type="text" name="ten" maxlength="60" required autocomplete="name" placeholder="Nguyễn Văn A">
-          </label>
-          <label><span>Số điện thoại <span class="hd-req">*</span></span>
-            <input type="tel" name="sdt" inputmode="tel" maxlength="15" required autocomplete="tel" placeholder="09xx xxx xxx">
-          </label>
-        </div>
-        <label><span>Nội dung <span class="hd-req">*</span></span>
-          <textarea name="noi_dung" rows="4" maxlength="1000" required placeholder="Câu hỏi hoặc ý kiến của bạn…"></textarea>
-        </label>
-        <input type="text" name="website" class="hd-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <p class="hd-note">Ý kiến sẽ hiển thị sau khi Khoa Dược duyệt. Chỉ hiện <b>họ tên</b>; số điện thoại chỉ để Khoa Dược liên hệ khi cần.
-          Vui lòng <b>không</b> nhập thông tin sức khoẻ cá nhân, số căn cước hay đường dẫn (link). Trường hợp cấp cứu hãy gọi <b>115</b> hoặc đến cơ sở y tế gần nhất.</p>
-        <div class="hd-actions">
-          <button type="submit" class="btn btn-primary" id="hdSend">Gửi ý kiến</button>
-          <span class="hd-msg" id="hdMsg" role="status"></span>
-        </div>
-      </form>
-      <p class="hd-private">Cần được hỗ trợ riêng, kín đáo?
-        <a href="{{ url_for('ho_tro.trang', loai='ho_tro', ngu_canh=hd_ten, url=request.path) }}">Nhắn riêng cho Khoa Dược →</a></p>
     </div>
   </div>
 </section>

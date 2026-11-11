@@ -3747,14 +3747,13 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
    HỎI ĐÁP CÔNG KHAI · CHAT RIÊNG · CHUÔNG THÔNG BÁO · QUẢN TRỊ Ý KIẾN
    ============================================================ */
 /* ---- Khối hỏi đáp dưới thuốc / bài viết ---- */
-/* Khối hỏi đáp cuối bài: rộng bằng header (mép logo → mép nút Menu). 2 nút chia lưới 3-9-3: nút trái dưới logo, nút phải dưới Menu;
-   bấm nút nào xổ ngăn đó ra full bề ngang, có cuộn riêng để trang không dài */
+/* Khối hỏi đáp cuối bài: rộng bằng header (mép logo → mép nút Menu), chia đôi 2 cột bằng nhau.
+   Mỗi cột = 1 nút + 1 ngăn xổ ra bên dưới (có cuộn riêng để trang không dài); hai ngăn mở độc lập. */
 .hd { box-sizing: border-box; max-width: 1180px; margin: 32px auto 8px; padding: 0 24px; }
 .hd [hidden] { display: none !important; }
-.hd-tabs { display: grid; grid-template-columns: 3fr 9fr 3fr; }
-.hd-tab { grid-column: 1; }
-.hd-tab + .hd-tab { grid-column: 3; }
-.hd-tab { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 13px 12px; min-width: 0;
+.hd-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.hd-col { min-width: 0; }
+.hd-tab { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px 12px; min-width: 0;
           border: 1px solid var(--line-200); border-radius: 12px; background: #fff; color: var(--ink-900);
           font: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
 .hd-tab:hover { background: #eef2f7; }
@@ -3766,10 +3765,7 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
 .hd-panel { margin-top: 10px; background: #fff; border: 1px solid var(--line-200); border-radius: 16px; overflow: hidden; }
 .hd-scroll { max-height: min(60vh, 440px); overflow-y: auto; overscroll-behavior: contain; padding: 18px 20px 20px; }
 .hd-scroll .hd-form { margin: 0; padding: 0; border: 0; }
-@media (max-width: 760px) {                 /* màn hẹp: 3-9-3 làm nút quá nhỏ nên chia đôi 2 nút */
-  .hd-tabs { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .hd-tab, .hd-tab + .hd-tab { grid-column: auto; }
-}
+@media (max-width: 760px) { .hd-cols { grid-template-columns: 1fr; gap: 12px; } }   /* màn hẹp: xếp 2 cột thành 2 hàng */
 .hd-list { display: grid; gap: 12px; margin-bottom: 14px; }
 .hd-empty { margin: 0; padding: 14px; text-align: center; color: var(--text-muted); font-size: 14px; background: var(--paper-0); border-radius: 12px; }
 .hd-item { padding: 12px 14px; background: var(--paper-0); border-radius: 12px; min-width: 0; }
