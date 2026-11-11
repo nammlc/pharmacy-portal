@@ -1,4 +1,4 @@
-// Chat riêng của khách: không mã bí mật. Họ tên + SĐT + tin nhắn mở cuộc trò chuyện gắn với thiết bị (cookie), gửi / nhận tin, tự cập nhật.
+// Chat riêng của khách: không mã bí mật. Nhập SĐT: đã đăng ký → hiện lại cuộc trò chuyện cũ; chưa → tự đăng ký (cần họ tên). Gửi / nhận tin, tự cập nhật.
 (function () {
   var app = document.getElementById("htApp");
   if (!app) return;
@@ -50,22 +50,27 @@
   if (dangNhap) batDau();
   document.addEventListener("visibilitychange", function () { if (!document.hidden) hoiTinMoi(); });
 
-  // ── Form đầu tiên: mở cuộc trò chuyện (họ tên + SĐT) rồi gửi tin ──
+  // ── Form đầu tiên: nhập SĐT (kiểm tra / tự đăng ký) rồi vào cuộc trò chuyện ──
   var msgDN = document.getElementById("htMsgDangNhap"), nutMoi = document.getElementById("htGuiMoi");
   fDangNhap.addEventListener("submit", function (e) {
     e.preventDefault();
     var f = new FormData(fDangNhap);
     var sdt = String(f.get("sdt") || "").trim(), ten = String(f.get("ten") || "").trim(), nd = String(f.get("noi_dung") || "").trim();
-    if (!sdt || !ten || !nd) { bao(msgDN, "Vui lòng nhập họ tên, số điện thoại và nội dung tin nhắn.", true); return; }
+    if (!sdt) { bao(msgDN, "Vui lòng nhập số điện thoại.", true); return; }
     if (Date.now() - t0 < 3000) { bao(msgDN, "Bạn gửi quá nhanh, vui lòng kiểm tra lại rồi gửi.", true); return; }
-    nutMoi.disabled = true; bao(msgDN, "Đang gửi…", false);
+    nutMoi.disabled = true; bao(msgDN, "Đang kiểm tra…", false);
     post(D.dangNhapUrl, { sdt: sdt, ten: ten, website: f.get("website") }).then(function (d) {
       if (!d.ok) { bao(msgDN, d.loi || "Không đăng nhập được.", true); nutMoi.disabled = false; return null; }
       tName.textContent = d.ten || "";
-      return post(D.guiUrl, { noi_dung: nd, loai: f.get("loai"), ngu_canh: D.nguCanh, ngu_canh_url: D.nguCanhUrl, website: f.get("website") }).then(function (g) {
+      // SĐT đã đăng ký → vào cuộc trò chuyện cũ (tin nhắn là tuỳ chọn); SĐT mới → đã tự đăng ký. Có nội dung thì gửi luôn.
+      var gui = nd ? post(D.guiUrl, { noi_dung: nd, loai: f.get("loai"), ngu_canh: D.nguCanh, ngu_canh_url: D.nguCanhUrl, website: f.get("website") }) : Promise.resolve({ ok: true });
+      return gui.then(function (g) {
         if (!g.ok) { bao(msgDN, g.loi || "Không gửi được tin nhắn.", true); nutMoi.disabled = false; return; }
-        fDangNhap.reset(); batDau(); themTin(g.tin);
-        nutMoi.disabled = false;
+        fDangNhap.reset(); batDau();
+        return fetch(D.tinUrl + "?sau=0", { credentials: "same-origin" }).then(function (r) { return r.json(); }).then(function (h) {
+          if (h && h.ok) { msgs.innerHTML = ""; cuoiId = 0; themTin(h.tin); msgs.scrollTop = msgs.scrollHeight; }
+          nutMoi.disabled = false;
+        });
       });
     }).catch(function () { bao(msgDN, "Không kết nối được, vui lòng thử lại.", true); nutMoi.disabled = false; });
   });
@@ -86,8 +91,6 @@
   fGui.elements.noi_dung.addEventListener("keydown", function (e) { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); guiTiep(); } });
 
   document.getElementById("htThoat").addEventListener("click", function () {
-    // Không có mã bí mật để vào lại, nên thoát = không xem lại được cuộc trò chuyện này trên thiết bị này nữa
-    if (!confirm("Thoát khỏi thiết bị này? Bạn sẽ không xem lại được cuộc trò chuyện này nữa (Khoa Dược vẫn giữ nội dung).")) return;
     post(D.thoatUrl).then(function () { location.href = location.pathname; });
   });
 })();

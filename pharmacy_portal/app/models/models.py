@@ -417,13 +417,12 @@ class YKien(db.Model):
 
 
 class KhachHang(db.Model):
-    """Một cuộc trò chuyện riêng của khách, tự tạo ở lần nhắn đầu tiên và gắn với THIẾT BỊ (cookie đã ký), không có mã bí mật.
-    SĐT chỉ là thông tin liên hệ (không xác minh qua SMS, không dùng để vào xem cuộc trò chuyện) nên KHÔNG unique:
-    cùng 1 SĐT có thể có nhiều cuộc trò chuyện (mỗi thiết bị một cuộc)."""
+    """Tài khoản chat riêng của khách: mỗi SỐ ĐIỆN THOẠI 1 tài khoản, tự đăng ký khi nhập số mới. KHÔNG có mã bí mật
+    (SĐT không xác minh qua SMS nên ai biết số đều vào xem được; có giới hạn thử theo thiết bị)."""
     __tablename__ = "khach_hang"
 
     id = db.Column(db.Integer, primary_key=True)
-    so_dien_thoai = db.Column(db.String(15), nullable=False, index=True)
+    so_dien_thoai = db.Column(db.String(15), unique=True, nullable=False, index=True)
     ten = db.Column(db.String(100), nullable=False)
     pin_hash = db.Column(db.String(255), nullable=False, default="")   # CỘT CŨ, không còn dùng (giữ để khỏi phải đổi DB)
     phien_ver = db.Column(db.Integer, nullable=False, default=1)      # tăng lên khi admin chặn → mọi thiết bị của khách bị đăng xuất
@@ -468,7 +467,7 @@ class ThongBao(db.Model):
 
 
 class ChatLanThu(db.Model):
-    """Đếm số lần tạo cuộc trò chuyện mới theo THIẾT BỊ (mã băm) để chống spam."""
+    """Đếm số lần nhập SĐT / đăng ký mới theo THIẾT BỊ (mã băm) để chống dò số và spam."""
     __tablename__ = "chat_lan_thu"
 
     id = db.Column(db.Integer, primary_key=True)

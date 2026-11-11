@@ -2,7 +2,7 @@
 -- PostgreSQL:
 CREATE TABLE IF NOT EXISTS khach_hang (
     id            SERIAL PRIMARY KEY,
-    so_dien_thoai VARCHAR(15)  NOT NULL,      -- KHÔNG unique: 1 SĐT có thể có nhiều cuộc trò chuyện (mỗi thiết bị một cuộc)
+    so_dien_thoai VARCHAR(15)  NOT NULL UNIQUE,
     ten           VARCHAR(100) NOT NULL,
     pin_hash      VARCHAR(255) NOT NULL DEFAULT '',   -- cột cũ, không còn dùng
     phien_ver     INTEGER      NOT NULL DEFAULT 1,
@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS khach_hang (
     ngay_tao      TIMESTAMP    NOT NULL DEFAULT NOW(),
     lan_cuoi      TIMESTAMP
 );
-CREATE INDEX IF NOT EXISTS ix_khach_hang_so_dien_thoai ON khach_hang (so_dien_thoai);
 CREATE TABLE IF NOT EXISTS y_kien (
     id               SERIAL PRIMARY KEY,
     doi_tuong_loai   VARCHAR(10)  NOT NULL,

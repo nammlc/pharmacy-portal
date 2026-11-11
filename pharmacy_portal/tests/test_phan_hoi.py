@@ -1,4 +1,4 @@
-"""Hỏi đáp công khai (duyệt trước) + chat riêng (không mã bí mật, gắn với thiết bị) + thông báo cho admin."""
+"""Hỏi đáp công khai (duyệt trước) + chat riêng (vào bằng SĐT, không mã bí mật) + thông báo cho admin."""
 import os
 import re
 import tempfile
@@ -259,57 +259,56 @@ class ChatRieng(Co):
                                                 ngu_canh_url=kw.get("url", ""), website=""))
         return r, g
 
-    def test_first_message_opens_a_conversation_bound_to_the_device(self):
+    def test_new_phone_registers_and_old_phone_returns_to_old_chat(self):
         c = self.client()
-        r, g = self.vao(c)
+        r, g = self.vao(c)                                                      # SĐT mới → tự đăng ký
         self.assertTrue(r.get_json()["moi"]); self.assertTrue(g.get_json()["ok"])
         with self.app.app_context():
             k = KhachHang.query.one()
             self.assertEqual((k.so_dien_thoai, k.ten), ("0912345678", "Trần Thị B"))
-            self.assertEqual(TinNhanRieng.query.count(), 1)
-        # cùng thiết bị gọi lại: dùng lại cuộc trò chuyện, không tạo thêm
-        r1 = c.post("/api/ho-tro/dang-nhap", json=dict(sdt="0912345678", ten="Trần Thị B"))
-        self.assertTrue(r1.get_json()["ok"]); self.assertFalse(r1.get_json()["moi"])
+        c2 = self.client(UA2, "6.6.6.6")                                        # cùng SĐT, thiết bị khác, KHÔNG nhập họ tên → vào lại cuộc trò chuyện cũ
+        r2 = c2.post("/api/ho-tro/dang-nhap", json=dict(sdt="+84912345678"))
+        self.assertTrue(r2.get_json()["ok"]); self.assertFalse(r2.get_json()["moi"]); self.assertEqual(r2.get_json()["ten"], "Trần Thị B")
         self.assertEqual(self.q(lambda: KhachHang.query.count()), 1)
-        tin = c.get("/api/ho-tro/tin-nhan?sau=0").get_json()["tin"]
+        tin = c2.get("/api/ho-tro/tin-nhan?sau=0").get_json()["tin"]
         self.assertEqual([t["noi_dung"] for t in tin], ["Tôi cần hỏi về đơn thuốc"])
 
-    def test_knowing_a_phone_number_does_not_open_someone_elses_conversation(self):
-        self.vao(self.client(), nd="Chuyện riêng của chủ số")
-        c2 = self.client(UA2, "6.6.6.6")                                    # người khác nhập đúng SĐT đó từ thiết bị khác
-        r2 = c2.post("/api/ho-tro/dang-nhap", json=dict(sdt="+84912345678", ten="Người lạ"))
-        self.assertTrue(r2.get_json()["ok"]); self.assertTrue(r2.get_json()["moi"])      # chỉ mở được cuộc trò chuyện MỚI
-        self.assertEqual(c2.get("/api/ho-tro/tin-nhan?sau=0").get_json()["tin"], [])      # trống: không thấy tin của chủ số
-        self.assertEqual(self.q(lambda: KhachHang.query.count()), 2)
+    def test_returning_customer_can_log_in_without_sending_a_message(self):
+        self.vao(self.client())
+        c = self.client(UA2, "6.6.6.6")
+        self.assertTrue(c.post("/api/ho-tro/dang-nhap", json=dict(sdt="0912345678")).get_json()["ok"])
+        self.assertEqual(len(c.get("/api/ho-tro/tin-nhan?sau=0").get_json()["tin"]), 1)      # chỉ có tin cũ, không tạo thêm tin
 
     def test_no_session_means_no_access(self):
         self.vao(self.client())
         c = self.client(UA2, "6.6.6.6")
         self.assertEqual(c.get("/api/ho-tro/tin-nhan").status_code, 401)
-        self.assertEqual(c.post("/api/ho-tro/gui", json=dict(noi_dung="Thử gửi khi chưa có phiên", website="")).status_code, 401)
+        self.assertEqual(c.post("/api/ho-tro/gui", json=dict(noi_dung="Thử gửi khi chưa nhập SĐT", website="")).status_code, 401)
 
     def test_no_secret_code_in_page_or_api(self):
         h = self.client().get("/ho-tro").get_data(as_text=True)
         self.assertNotIn("Mã bí mật", h); self.assertNotIn('name="ma"', h)
-        c = self.client()
-        r = c.post("/api/ho-tro/dang-nhap", json=dict(sdt="0912345678", ten="An Bình", ma="000000"))   # tham số cũ bị bỏ qua
+        r = self.client().post("/api/ho-tro/dang-nhap", json=dict(sdt="0912345678", ten="An Bình", ma="000000"))   # tham số cũ bị bỏ qua
         self.assertTrue(r.get_json()["ok"])
 
-    def test_per_device_limit_on_new_conversations(self):
+    def test_per_device_limits_against_phone_enumeration(self):
         c = self.client(UA2, "6.6.6.6")
-        for i in range(5):
-            c.cookie_jar.clear() if hasattr(c, "cookie_jar") else c.delete_cookie("pp_chat")
+        for i in range(5):                                                     # tối đa 5 SĐT MỚI / thiết bị / 24 giờ
             self.assertEqual(c.post("/api/ho-tro/dang-nhap", json=dict(sdt=f"09123456{i:02d}", ten="An Bình")).status_code, 200)
-        c.cookie_jar.clear() if hasattr(c, "cookie_jar") else c.delete_cookie("pp_chat")
         r = c.post("/api/ho-tro/dang-nhap", json=dict(sdt="0912345699", ten="An Bình"))
+        self.assertEqual(r.status_code, 429); self.assertIn("quá nhiều", r.get_json()["loi"])
+        c2 = self.client(UA, "7.7.7.7")                                         # dò số có sẵn: tối đa 30 lần / 15 phút / thiết bị
+        for i in range(30):
+            c2.post("/api/ho-tro/dang-nhap", json=dict(sdt=f"09123456{i % 5:02d}"))
+        r = c2.post("/api/ho-tro/dang-nhap", json=dict(sdt="0912345600"))
         self.assertEqual(r.status_code, 429); self.assertIn("quá nhiều", r.get_json()["loi"])
 
     def test_phone_and_name_validation(self):
         c = self.client()
-        for kw, mong in ((dict(sdt="999"), "Số điện thoại"), (dict(ten=""), "Họ tên")):
-            d = dict(sdt="0912345678", ten="An Bình"); d.update(kw)
-            r = c.post("/api/ho-tro/dang-nhap", json=d)
-            self.assertEqual(r.status_code, 400, kw); self.assertIn(mong, r.get_json()["loi"], kw)
+        r = c.post("/api/ho-tro/dang-nhap", json=dict(sdt="999", ten="An Bình"))
+        self.assertEqual(r.status_code, 400); self.assertIn("Số điện thoại", r.get_json()["loi"])
+        r = c.post("/api/ho-tro/dang-nhap", json=dict(sdt="0912345678", ten=""))             # số mới mà thiếu họ tên
+        self.assertEqual(r.status_code, 400); self.assertIn("chưa đăng ký", r.get_json()["loi"]); self.assertIn("Họ tên", r.get_json()["loi"])
         self.assertEqual(self.q(lambda: KhachHang.query.count()), 0)
 
     def test_customers_only_see_their_own_conversation(self):
@@ -400,15 +399,14 @@ class QuanTriChat(Co):
         kc = self.khach(); a = self.admin(); kid = self.kid()
         a.post(f"/admin/tin-nhan/{kid}/chan")
         self.assertEqual(kc.get("/api/ho-tro/tin-nhan").status_code, 401)                      # bị chặn: cookie cũ vô hiệu
-        kn = self.client(UA, "3.3.3.3")                                                        # đổi thiết bị vẫn không mở được cuộc mới bằng SĐT đã bị chặn
-        self.assertEqual(kn.post("/api/ho-tro/dang-nhap", json=dict(sdt="0912345678", ten="Trần Thị B")).status_code, 400)
+        kn = self.client(UA, "3.3.3.3")                                                        # đổi thiết bị vẫn không vào được bằng SĐT đã bị chặn
+        self.assertEqual(kn.post("/api/ho-tro/dang-nhap", json=dict(sdt="0912345678")).status_code, 400)
         a.post(f"/admin/tin-nhan/{kid}/chan", data={"bo_chan": "1"})
-        kc2 = self.client(UA, "3.3.3.3")
-        self.assertTrue(kc2.post("/api/ho-tro/dang-nhap", json=dict(sdt="0912345678", ten="Trần Thị B")).get_json()["ok"])
+        self.assertTrue(kn.post("/api/ho-tro/dang-nhap", json=dict(sdt="0912345678")).get_json()["ok"])
         self.assertEqual(a.post(f"/admin/tin-nhan/{kid}/dat-lai-ma", data={"ma_moi": "654321"}).status_code, 404)   # đã bỏ chức năng đặt lại mã
         a.post(f"/admin/tin-nhan/{kid}/xoa")
         self.assertEqual(self.q(lambda: TinNhanRieng.query.count()), 0)
-        self.assertEqual(kc2.get("/api/ho-tro/tin-nhan").status_code, 200)                     # cuộc trò chuyện mới (kc2) không bị ảnh hưởng
+        self.assertEqual(self.q(lambda: KhachHang.query.count()), 0)
 
     def test_anonymous_cannot_reach_admin_chat_or_moderation(self):
         self.khach()

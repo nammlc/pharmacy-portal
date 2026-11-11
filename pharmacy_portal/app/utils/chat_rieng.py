@@ -1,12 +1,10 @@
 """
-Chat riêng giữa khách và Khoa Dược. KHÔNG có mã bí mật: khách chỉ nhập họ tên + SĐT + tin nhắn.
-
-SĐT KHÔNG được xác minh (không có SMS), nên SĐT chỉ là thông tin LIÊN HỆ cho Khoa Dược, KHÔNG dùng để vào xem cuộc trò chuyện
-(nếu dùng thì ai biết số cũng đọc được, mà nội dung có thể chứa thông tin sức khoẻ). Thay vào đó:
-  - mỗi cuộc trò chuyện (1 dòng KhachHang) gắn với THIẾT BỊ / trình duyệt tạo ra nó, qua cookie ĐÃ KÝ nhớ 30 ngày (không đoán / sửa được)
-  - cùng 1 SĐT có thể có nhiều cuộc trò chuyện (mỗi thiết bị một cuộc); người khác nhập SĐT của bạn chỉ mở được cuộc trò chuyện MỚI, trống
-  - giới hạn số cuộc trò chuyện mới theo thiết bị; SĐT đã bị admin chặn thì không mở cuộc mới được
-  - admin chặn → mọi thiết bị của khách đó bị vô hiệu (phien_ver tăng)
+Chat riêng giữa khách và Khoa Dược. Khách chỉ nhập SỐ ĐIỆN THOẠI (+ họ tên nếu là số mới), KHÔNG có mã bí mật:
+  - SĐT chưa đăng ký  → tự đăng ký (cần họ tên) và mở cuộc trò chuyện mới
+  - SĐT đã đăng ký    → vào thẳng cuộc trò chuyện cũ (mỗi SĐT = 1 cuộc trò chuyện)
+LƯU Ý: SĐT không được xác minh bằng SMS, nên AI BIẾT SĐT đều xem được cuộc trò chuyện của số đó. Vì vậy có giới hạn số lần thử theo thiết bị
+(chống dò hàng loạt số), SĐT bị admin chặn thì không vào được, và trang nhắc khách không gửi thông tin sức khoẻ cá nhân.
+Sau khi vào, thiết bị được nhớ 30 ngày bằng cookie đã ký (phien_ver tăng khi admin chặn → mọi thiết bị bị đăng xuất).
 """
 import random
 from datetime import datetime, timedelta
@@ -26,7 +24,8 @@ THOI_HAN_COOKIE = 30 * 24 * 3600
 LOAI_TIN = {"ho_tro": "Hỗ trợ", "gop_y": "Góp ý", "bao_loi": "Báo lỗi thông tin"}
 TIN_MOI_10_PHUT = 8
 TIN_MOI_24_GIO = 60
-TAO_MOI_TOI_DA_THIET_BI = 5           # số cuộc trò chuyện mới tối đa / thiết bị / 24 giờ
+TAO_MOI_TOI_DA_THIET_BI = 5           # số SĐT MỚI được đăng ký tối đa / thiết bị / 24 giờ
+THU_TOI_DA_THIET_BI = 30              # số lần nhập SĐT tối đa / thiết bị / 15 phút (chống dò hàng loạt số)
 
 
 # ───────────────────────────── phiên đăng nhập của khách (cookie ký) ─────────────────────────────
@@ -76,29 +75,40 @@ def _ghi_lan(khoa, loai):
         ChatLanThu.query.filter(ChatLanThu.thoi_gian < datetime.utcnow() - timedelta(days=2)).delete(synchronize_session=False)
 
 
-def bat_dau(sdt_tho, ten_tho):
-    """Mở 1 cuộc trò chuyện MỚI gắn với thiết bị này (không cần mã bí mật). Trả về (khach, loi). Hàm tự commit."""
+def vao_bang_sdt(sdt_tho, ten_tho):
+    """Kiểm tra SĐT: đã có → vào cuộc trò chuyện cũ; chưa có → đăng ký mới (cần họ tên). Trả (khach, moi, loi). Hàm tự commit."""
     sdt = chuan_hoa_sdt(sdt_tho)
     if not sdt:
-        return None, "Số điện thoại chưa đúng. Nhập 10 số, bắt đầu bằng số 0."
-    ten, loi = kiem_tra_ten(ten_tho)
-    if loi:
-        return None, loi
-    if KhachHang.query.filter_by(so_dien_thoai=sdt, bi_chan=True).first() is not None:
-        return None, "Không thể mở cuộc trò chuyện với số điện thoại này."
+        return None, False, "Số điện thoại chưa đúng. Nhập 10 số, bắt đầu bằng số 0."
     khoa = khoa_khach()
+    if _so_lan(khoa, "dang_nhap", 15) >= THU_TOI_DA_THIET_BI:
+        return None, False, "Bạn đã thử quá nhiều lần, vui lòng thử lại sau ít phút."
+    _ghi_lan(khoa, "dang_nhap")
+    khach = KhachHang.query.filter_by(so_dien_thoai=sdt).first()
+    if khach is not None:                                                # SĐT đã đăng ký → vào cuộc trò chuyện cũ
+        db.session.commit()
+        if khach.bi_chan:
+            return None, False, "Không thể mở cuộc trò chuyện với số điện thoại này."
+        return khach, False, None
+    ten, loi = kiem_tra_ten(ten_tho)                                     # SĐT chưa đăng ký → đăng ký mới
+    if loi:
+        db.session.commit()
+        return None, False, "Số điện thoại này chưa đăng ký. " + loi
     if _so_lan(khoa, "tao_moi", 24 * 60) >= TAO_MOI_TOI_DA_THIET_BI:
-        return None, "Thiết bị này đã mở quá nhiều cuộc trò chuyện hôm nay."
+        db.session.commit()
+        return None, False, "Thiết bị này đã đăng ký quá nhiều số điện thoại hôm nay."
     khach = KhachHang(so_dien_thoai=sdt, ten=ten, pin_hash="")          # pin_hash: cột cũ, không còn dùng (giữ để khỏi phải đổi DB)
     db.session.add(khach)
     _ghi_lan(khoa, "tao_moi")
     try:
         db.session.commit()
-    except IntegrityError:                                               # DB cũ còn ràng buộc UNIQUE trên số điện thoại → cần chạy bo_ma_bi_mat.sql
+    except IntegrityError:                                               # 2 yêu cầu cùng lúc đăng ký cùng 1 số → lấy tài khoản vừa được tạo
         db.session.rollback()
-        current_app.logger.error("khach_hang.so_dien_thoai còn UNIQUE: hãy chạy bo_ma_bi_mat.sql")
-        return None, "Hệ thống đang được cập nhật, vui lòng thử lại sau hoặc liên hệ Khoa Dược."
-    return khach, None
+        khach = KhachHang.query.filter_by(so_dien_thoai=sdt).first()
+        if khach is None or khach.bi_chan:
+            return None, False, "Có lỗi xảy ra, vui lòng thử lại."
+        return khach, False, None
+    return khach, True, None
 
 
 # ───────────────────────────── tin nhắn ─────────────────────────────

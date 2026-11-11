@@ -3906,3 +3906,5 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
 .yk-pager a { color: #2563eb; font-weight: 700; text-decoration: none; }
 .adm-empty { padding: 36px 16px; text-align: center; color: var(--text-muted); background: #fff; border: 1px dashed var(--line-200); border-radius: 14px; }
 .tn-preview { max-width: 420px; overflow-wrap: anywhere; font-size: 13.5px; } .tn-who { color: var(--text-muted); font-weight: 600; }
+
+.ht-note-inline { font-weight: 400; font-size: 12px; color: var(--text-muted); }
