@@ -102,5 +102,36 @@ class NhomThuocMobile(unittest.TestCase):
         self.assertRegex(trong, r"\.site-footer::before \{ background: linear-gradient\(90deg, var\(--navy-600\), var\(--sky-400\)\)")
 
 
+class AnhThuocChiTietMobile(unittest.TestCase):
+    """Trang chi tiết thuốc trên điện thoại: ảnh thuốc là khung vuông rộng hết khung tiêu đề (trước đây chỉ 96px)."""
+
+    def _khoi(self):
+        css = _css()
+        a = css.index("ẢNH THUỐC Ở TRANG CHI TIẾT to hơn")
+        k = css[a:]
+        return k[k.index("@media (max-width: 640px)"):]
+
+    def test_image_box_fills_hero_width_on_phones(self):
+        k = self._khoi()
+        self.assertRegex(k, r"\.drug-hero-media \{[^}]*width: 100%;[^}]*max-width: 420px;[^}]*aspect-ratio: 1 / 1")
+        self.assertNotRegex(k, r"\.drug-hero-media \{[^}]*width: (96|110|150)px")      # không còn khung nhỏ cố định
+
+    def test_image_is_scaled_up_but_never_cropped(self):
+        k = self._khoi()
+        self.assertRegex(k, r"\.drug-hero-media img \{[^}]*width: 100%; height: 100%;[^}]*object-fit: contain")
+        self.assertNotIn("object-fit: cover", k)                                        # ảnh hộp thuốc không được bị cắt chữ
+
+    def test_desktop_size_is_unchanged(self):
+        css = _css()
+        self.assertRegex(css, r"\.drug-hero-media \{\s*flex-shrink: 0;\s*width: 150px;\s*height: 150px;")
+
+
+class ChiTietThuocRender(Co):
+    def test_detail_page_still_has_clickable_hero_image(self):
+        c = self.client()
+        h = c.get("/danh-muc-thuoc/thuoc/%d" % self.ids["dmt"]).get_data(as_text=True)
+        self.assertIn('class="drug-hero-media"', h)                                     # khung ảnh vẫn nằm trong khối tiêu đề
+
+
 if __name__ == "__main__":
     unittest.main()

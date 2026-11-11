@@ -4005,3 +4005,17 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
   /* Dải màu trên chân trang: bỏ dải cam - đỏ (thang mức độ cảnh báo), dùng đúng tông xanh của trang */
   .site-footer::before { background: linear-gradient(90deg, var(--navy-600), var(--sky-400)); }
 }
+
+/* ============================================================
+   ĐIỆN THOẠI (≤ 640px): ẢNH THUỐC Ở TRANG CHI TIẾT to hơn
+   Trước đây khung ảnh chỉ 96px (khoảng 1/4 bề ngang màn hình) nên khó nhìn rõ hộp thuốc. Giờ khung ảnh vuông rộng hết
+   khung tiêu đề (tối đa 420px để màn hình xoay ngang không bị quá cao), ảnh vẫn nguyên vẹn (contain, không cắt) và bấm vào
+   vẫn mở xem phóng to (lightbox.js). Dùng chung cho Danh mục thuốc và Nhà thuốc BV (cùng class .drug-hero-media).
+   ============================================================ */
+@media (max-width: 640px) {
+  .drug-hero { padding: 16px; gap: 16px; }
+  .drug-hero-media { width: 100%; max-width: 420px; height: auto; aspect-ratio: 1 / 1; margin: 0 auto; padding: 10px; border-radius: 14px; }
+  .drug-hero-media img { width: 100%; height: 100%; max-width: none; max-height: none; object-fit: contain; }
+  .drug-hero-media-fallback { font-size: 96px; }
+  .drug-hero-text { padding: 0 4px 4px; }
+}
