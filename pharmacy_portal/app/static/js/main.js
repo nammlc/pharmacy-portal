@@ -362,3 +362,53 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 });
+
+// Nút "Hỏi đáp" trên header: mở / đóng khối #hoi-dap (có ở các trang chi tiết) dạng dropdown ngay dưới header.
+// Trang không có khối hỏi đáp thì nút dẫn sang trang Hỗ trợ & góp ý.
+document.addEventListener("DOMContentLoaded", function () {
+  var btn = document.getElementById("hdToggle");
+  if (!btn) return;
+  var wrap = document.getElementById("hdDropdown");
+  var panel = document.getElementById("hoi-dap");
+
+  function dat() {                      // desktop: neo panel theo mép phải của nút; mobile: CSS tự căn full chiều ngang
+    if (!panel) return;
+    if (window.innerWidth > 900) {
+      var w = panel.offsetWidth || 440, r = btn.getBoundingClientRect();
+      panel.style.left = Math.max(12, Math.min(r.right - w, window.innerWidth - w - 12)) + "px";
+    } else {
+      panel.style.left = "";
+    }
+  }
+  function mo() {
+    panel.classList.add("open");
+    wrap.setAttribute("data-open", "true");
+    btn.setAttribute("aria-expanded", "true");
+    dat();
+    panel.dispatchEvent(new CustomEvent("hd:open"));
+  }
+  function dong() {
+    if (!panel) return;
+    panel.classList.remove("open");
+    wrap.setAttribute("data-open", "false");
+    btn.setAttribute("aria-expanded", "false");
+  }
+
+  btn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    if (!panel) { window.location.href = btn.getAttribute("data-href"); return; }
+    if (panel.classList.contains("open")) dong(); else mo();
+  });
+  if (!panel) return;
+
+  // Bấm ra ngoài thì đóng (pha capture để vẫn chạy khi menu bên cạnh gọi stopPropagation)
+  document.addEventListener("click", function (e) {
+    if (!panel.classList.contains("open")) return;
+    if (panel.contains(e.target) || wrap.contains(e.target)) return;
+    dong();
+  }, true);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") dong(); });
+  window.addEventListener("resize", function () { if (panel.classList.contains("open")) dat(); });
+  var dongBtn = document.getElementById("hdClose");
+  if (dongBtn) dongBtn.addEventListener("click", dong);
+});

@@ -53,7 +53,18 @@
       .catch(function () { if (lanDau) { list.innerHTML = ""; list.appendChild(el("p", "hd-empty", "Không tải được ý kiến.")); } });
   }
   more.addEventListener("click", function () { tai(false); });
-  tai(true);
+  // Khối đang ẩn: chỉ tải danh sách ý kiến khi người dùng mở panel lần đầu (nút "Hỏi đáp" trên header, xem main.js)
+  var daTai = false;
+  root.addEventListener("hd:open", function () { if (!daTai) { daTai = true; tai(true); } });
+
+  // Form đặt câu hỏi thu gọn, chỉ bung ra khi bấm nút
+  var ask = document.getElementById("hdAsk");
+  if (ask) ask.addEventListener("click", function () {
+    var mo = form.hidden;
+    form.hidden = !mo;
+    ask.setAttribute("aria-expanded", mo ? "true" : "false");
+    if (mo) { moFormLuc = Date.now(); form.elements.ten.focus(); }
+  });
 
   function bao(text, loi) { msg.textContent = text; msg.className = "hd-msg " + (loi ? "hd-msg-loi" : "hd-msg-ok"); }
 

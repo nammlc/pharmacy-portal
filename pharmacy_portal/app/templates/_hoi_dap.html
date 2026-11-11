@@ -1,14 +1,22 @@
 {# Khối HỎI ĐÁP công khai dưới 1 thuốc / bài viết. Ý kiến mới phải được Khoa Dược duyệt mới hiện.
    Dùng: {% set hd_loai = 'dmt' %}{% set hd_id = thuoc.id %}{% set hd_ten = thuoc.ten_biet_duoc %}{% include "_hoi_dap.html" %}
    hd_loai: dmt | ntbv | tt | bv | ttbn (xem utils/phan_hoi.py) #}
+{# Khối này mặc định ẨN (CSS). Nút "Hỏi đáp" trên header (base.html + main.js) mở nó ra dạng dropdown ngay dưới header.
+   Danh sách ý kiến chỉ được tải khi mở lần đầu; form đặt câu hỏi lại thu gọn sau nút "Đặt câu hỏi". #}
 <section class="hd" id="hoi-dap" data-loai="{{ hd_loai }}" data-id="{{ hd_id }}" data-csrf="{{ csrf_token() }}"
-         data-api="{{ url_for('hoi_dap.danh_sach') }}" aria-labelledby="hdTitle">
-  <h2 class="hd-title" id="hdTitle">💬 Hỏi đáp &amp; góp ý <span class="hd-count" id="hdCount"></span></h2>
+         data-api="{{ url_for('hoi_dap.danh_sach') }}" aria-labelledby="hdTitle" role="dialog" aria-modal="false">
+  <div class="hd-head">
+    <h2 class="hd-title" id="hdTitle">💬 Hỏi đáp &amp; góp ý <span class="hd-count" id="hdCount"></span></h2>
+    <button type="button" class="hd-close" id="hdClose" aria-label="Đóng hỏi đáp">&times;</button>
+  </div>
 
+  <div class="hd-body">
   <div class="hd-list" id="hdList" aria-live="polite"><p class="hd-empty">Đang tải ý kiến…</p></div>
   <button type="button" class="btn btn-outline btn-sm hd-more" id="hdMore" hidden>Xem thêm ý kiến</button>
 
-  <form class="hd-form" id="hdForm" novalidate>
+  <button type="button" class="btn btn-primary btn-sm hd-ask" id="hdAsk" aria-expanded="false" aria-controls="hdForm">✍️ Đặt câu hỏi hoặc góp ý</button>
+
+  <form class="hd-form" id="hdForm" novalidate hidden>
     <h3>Đặt câu hỏi hoặc để lại ý kiến</h3>
     <div class="hd-row">
       <label>Họ tên <span class="hd-req">*</span>
@@ -32,5 +40,6 @@
 
   <p class="hd-private">Cần được hỗ trợ riêng, kín đáo?
     <a href="{{ url_for('ho_tro.trang', loai='ho_tro', ngu_canh=hd_ten, url=request.path) }}">Nhắn riêng cho Khoa Dược →</a></p>
+  </div>
 </section>
 <script src="{{ url_for('static', filename='js/hoi_dap.js') }}" defer></script>
