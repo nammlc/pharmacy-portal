@@ -3747,25 +3747,30 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
    HỎI ĐÁP CÔNG KHAI · CHAT RIÊNG · CHUÔNG THÔNG BÁO · QUẢN TRỊ Ý KIẾN
    ============================================================ */
 /* ---- Khối hỏi đáp dưới thuốc / bài viết ---- */
-/* Khối hỏi đáp cuối bài: rộng bằng header (mép logo → mép nút Menu), chia đôi 2 cột bằng nhau.
-   Mỗi cột = 1 nút + 1 ngăn xổ ra bên dưới (có cuộn riêng để trang không dài); hai ngăn mở độc lập. */
+/* Khối hỏi đáp cuối bài: MỘT khối liền rộng bằng header (mép logo → mép nút Menu), chia đôi 2 nửa bằng nhau, có đường kẻ giữa.
+   Nửa trái = nút "Lịch sử hỏi đáp", nửa phải = nút "Đặt câu hỏi"; bấm nút nào thì ngăn đó xổ ngay bên dưới nửa của nó
+   (có cuộn riêng để trang không dài). Hai ngăn mở độc lập, mở được cùng lúc. */
 .hd { box-sizing: border-box; max-width: 1180px; margin: 32px auto 8px; padding: 0 24px; }
 .hd [hidden] { display: none !important; }
-.hd-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.hd-cols { display: grid; grid-template-columns: 1fr 1fr; background: #fff; border: 1px solid var(--line-200); border-radius: 16px; overflow: hidden; }
 .hd-col { min-width: 0; }
-.hd-tab { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px 12px; min-width: 0;
-          border: 1px solid var(--line-200); border-radius: 12px; background: #fff; color: var(--ink-900);
-          font: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+.hd-col + .hd-col { border-left: 1px solid var(--line-200); }
+.hd-tab { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-width: 0; padding: 15px 12px;
+          border: 0; border-radius: 0; background: var(--paper-0); color: var(--ink-900);
+          font: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer; transition: background 0.15s, color 0.15s; }
 .hd-tab:hover { background: #eef2f7; }
-.hd-tab:focus-visible { outline: 2px solid var(--sky-400); outline-offset: 2px; }
-.hd-tab[aria-expanded="true"] { background: var(--ink-900); border-color: var(--ink-900); color: #fff; }
+.hd-tab:focus-visible { outline: 2px solid var(--sky-400); outline-offset: -2px; }
+.hd-tab[aria-expanded="true"] { background: var(--ink-900); color: #fff; }
 .hd-tab[aria-expanded="true"] .hd-count { color: rgba(255,255,255,0.75); }
 .hd-caret { flex: none; transition: transform 0.15s; }
 .hd-tab[aria-expanded="true"] .hd-caret { transform: rotate(180deg); }
-.hd-panel { margin-top: 10px; background: #fff; border: 1px solid var(--line-200); border-radius: 16px; overflow: hidden; }
+.hd-panel { border-top: 1px solid var(--line-200); }
 .hd-scroll { max-height: min(60vh, 440px); overflow-y: auto; overscroll-behavior: contain; padding: 18px 20px 20px; }
 .hd-scroll .hd-form { margin: 0; padding: 0; border: 0; }
-@media (max-width: 760px) { .hd-cols { grid-template-columns: 1fr; gap: 12px; } }   /* màn hẹp: xếp 2 cột thành 2 hàng */
+@media (max-width: 760px) {                 /* màn hẹp: 2 nửa xếp thành 2 hàng */
+  .hd-cols { grid-template-columns: 1fr; }
+  .hd-col + .hd-col { border-left: 0; border-top: 1px solid var(--line-200); }
+}
 .hd-list { display: grid; gap: 12px; margin-bottom: 14px; }
 .hd-empty { margin: 0; padding: 14px; text-align: center; color: var(--text-muted); font-size: 14px; background: var(--paper-0); border-radius: 12px; }
 .hd-item { padding: 12px 14px; background: var(--paper-0); border-radius: 12px; min-width: 0; }
