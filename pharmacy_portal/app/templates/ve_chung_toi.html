@@ -16,7 +16,7 @@
       <h1>{{ d.vct_tieu_de or 'Về chúng tôi' }}</h1>
       {% if d.vct_mo_ta_ngan %}
       <p class="vct-mota vct-mota--pc">{{ d.vct_mo_ta_ngan }}</p>
-      <p class="vct-mota vct-mota--mb">{{ d.vct_mo_ta_ngan|truncate(90, False, '…') }}</p>
+      <p class="vct-mota vct-mota--mb">{{ d.vct_mo_ta_ngan|truncate(110, False, '…') }}</p>
       {% endif %}
     </div>
   </div>
