@@ -339,20 +339,25 @@ a.vct-contact-row:hover { color: var(--navy-500); }
 @media (max-width: 640px) {
   .vct-hero { padding: 16px 12px 0; }
   .vct-hero-inner { border-radius: 14px; }
-  .vct-hero-gradient { height: 220px; }
-  /* Mobile: khung chữ nằm trong luồng (không absolute) để mô tả ngắn hiển thị đủ, không bị cắt hay tràn ra ngoài ảnh */
-  .vct-hero-inner { min-height: 0; }
-  .vct-hero-textbox {
-    position: relative;
-    left: auto; right: auto; bottom: auto;
-    margin: -56px 12px 12px;
-    padding: 16px 18px;
-    max-width: none;
-    background: rgba(255, 255, 255, 0.94);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+  /* Mobile: giữ kiểu như PC (khung kính mờ đè lên ảnh, ở đáy), ảnh phủ kín hero nên không còn mảng đen */
+  .vct-hero-inner { min-height: 300px; }
+  .vct-hero-img,
+  .vct-hero-img.vct-hero-gradient {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
-  .vct-hero-textbox p { font-size: 14px; }
+  .vct-hero-textbox {
+    left: 12px; right: 12px; bottom: 12px;
+    max-width: none;
+    padding: 14px 16px;
+    border-radius: 14px;
+  }
+  .vct-eyebrow { font-size: 11px; margin-bottom: 6px; }
+  .vct-hero-textbox h1 { font-size: 22px; margin-bottom: 6px; }
+  .vct-hero-textbox p { font-size: 13.5px; line-height: 1.55; }
   .vct-container { gap: 36px; padding: 0 16px; }
   .vct-cards-row { grid-template-columns: 1fr; }
   .vct-main-section { padding: 36px 0 60px; }
