@@ -3993,15 +3993,16 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
   .drug-card:hover { transform: none; box-shadow: var(--m-card-shadow); border-color: var(--line-200); }
   .drug-card:active { background: #f7f9fc; }
   .drug-card .drug-card-thumb,
-  .drug-card .drug-card-thumb-fallback { width: 100%; height: auto; aspect-ratio: 4 / 5; border: 0; border-radius: 0; border-bottom: 1px solid var(--line-100); }
-  .drug-card .drug-card-thumb { display: block; object-fit: cover; }
+  /* Thu nhỏ: khung ảnh ngang 4:3 (trước là 4:5 rất cao), ảnh hiển thị trọn vẹn (contain) trên nền sáng, không bị cắt */
+  .drug-card .drug-card-thumb-fallback { width: 100%; height: auto; aspect-ratio: 4 / 3; border: 0; border-radius: 0; border-bottom: 1px solid var(--line-100); }
+  .drug-card .drug-card-thumb { display: block; object-fit: contain; padding: 6px; background: #fff; max-width: none; }
   /* Ô chữ cái khi chưa có ảnh: cùng nền xanh nhạt như trang chủ (màu inline cũ ở trang tìm kiếm cần !important mới ghi đè được) */
-  .drug-card .drug-card-thumb-fallback { font-size: 44px; color: var(--navy-600) !important;
+  .drug-card .drug-card-thumb-fallback { font-size: 34px; color: var(--navy-600) !important;
                                          background: radial-gradient(circle at 50% 38%, var(--m-tile-1) 0%, var(--m-tile-2) 100%) !important; }
-  .drug-card-body { padding: 10px 12px 12px; }
-  .drug-card-body h3 { margin: 0 0 4px; font-size: 13.5px; line-height: 1.3; white-space: normal;
+  .drug-card-body { padding: 8px 10px 10px; }
+  .drug-card-body h3 { margin: 0 0 2px; font-size: 13px; line-height: 1.3; white-space: normal;
                        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-  .drug-card-body p { font-size: 12px; line-height: 1.35; white-space: normal;
+  .drug-card-body p { font-size: 11.5px; line-height: 1.3; white-space: normal;
                       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
   /* Dải màu trên chân trang: bỏ dải cam - đỏ (thang mức độ cảnh báo), dùng đúng tông xanh của trang */
