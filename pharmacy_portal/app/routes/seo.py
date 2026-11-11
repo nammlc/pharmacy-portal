@@ -20,6 +20,8 @@ def dang_ky_seo(app):
             "User-agent: *",
             "Disallow: /admin/",
             "Disallow: /tim-kiem",
+            "Disallow: /ho-tro",
+            "Disallow: /api/",
             "Disallow: /api/",
             "",
             f"Sitemap: {goc}/sitemap.xml",

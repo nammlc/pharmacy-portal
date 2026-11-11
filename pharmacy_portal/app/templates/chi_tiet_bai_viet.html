@@ -11,4 +11,7 @@
     {{ bai_viet.noi_dung | safe }}
   </div>
 </div>
+
+{% set hd_loai = 'ttbn' %}{% set hd_id = bai_viet.id %}{% set hd_ten = bai_viet.tieu_de %}
+{% include "_hoi_dap.html" %}
 {% endblock %}

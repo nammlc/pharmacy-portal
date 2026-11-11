@@ -389,3 +389,88 @@ class GateLanThu(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ip = db.Column(db.String(64), index=True)
     thoi_gian = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+
+
+# ============================================================================================
+# HỎI ĐÁP / BÌNH LUẬN CÔNG KHAI + CHAT RIÊNG TƯ + THÔNG BÁO ADMIN
+# ============================================================================================
+class YKien(db.Model):
+    """Hỏi đáp / bình luận CÔNG KHAI dưới 1 thuốc hoặc bài viết. Chỉ hiện ra trang công khai khi admin DUYỆT.
+    SĐT chỉ để Khoa Dược liên hệ, KHÔNG bao giờ hiển thị công khai."""
+    __tablename__ = "y_kien"
+
+    id = db.Column(db.Integer, primary_key=True)
+    doi_tuong_loai = db.Column(db.String(10), nullable=False, index=True)    # dmt | ntbv | tt | bv | ttbn (xem utils/phan_hoi.py)
+    doi_tuong_id = db.Column(db.Integer, nullable=False, index=True)
+    doi_tuong_ten = db.Column(db.String(255))                                # tên lúc gửi, để admin đọc nhanh
+    ten = db.Column(db.String(100), nullable=False)
+    so_dien_thoai = db.Column(db.String(15), nullable=False)
+    noi_dung = db.Column(db.Text, nullable=False)
+    trang_thai = db.Column(db.String(12), nullable=False, default="cho_duyet", index=True)   # cho_duyet | da_duyet | tu_choi | spam
+    khoa_khach = db.Column(db.String(64), index=True)                       # mã băm thiết bị (chống spam), không phải IP thô
+    tra_loi = db.Column(db.Text)                                             # câu trả lời công khai của Khoa Dược
+    nguoi_tra_loi_id = db.Column(db.Integer, db.ForeignKey("nguoi_dung.id", ondelete="SET NULL"))
+    ngay_tra_loi = db.Column(db.DateTime)
+    nguoi_duyet_id = db.Column(db.Integer, db.ForeignKey("nguoi_dung.id", ondelete="SET NULL"))
+    ngay_duyet = db.Column(db.DateTime)
+    ngay_tao = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+
+
+class KhachHang(db.Model):
+    """Tài khoản chat riêng của khách: mỗi SỐ ĐIỆN THOẠI 1 tài khoản, tự tạo ở lần nhắn đầu tiên.
+    Bảo vệ bằng MÃ BÍ MẬT 6 SỐ do khách tự đặt (lưu dạng băm) vì SĐT không được xác minh qua SMS."""
+    __tablename__ = "khach_hang"
+
+    id = db.Column(db.Integer, primary_key=True)
+    so_dien_thoai = db.Column(db.String(15), unique=True, nullable=False, index=True)
+    ten = db.Column(db.String(100), nullable=False)
+    pin_hash = db.Column(db.String(255), nullable=False)
+    phien_ver = db.Column(db.Integer, nullable=False, default=1)      # tăng lên khi đặt lại mã → mọi thiết bị cũ bị đăng xuất
+    so_lan_sai = db.Column(db.Integer, nullable=False, default=0)
+    khoa_den = db.Column(db.DateTime)                                  # đang bị khoá thử mã tới lúc này
+    bi_chan = db.Column(db.Boolean, nullable=False, default=False)
+    ngay_tao = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    lan_cuoi = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class TinNhanRieng(db.Model):
+    """Tin nhắn trong cuộc trò chuyện riêng giữa 1 khách (theo SĐT) và Khoa Dược."""
+    __tablename__ = "tin_nhan_rieng"
+
+    id = db.Column(db.Integer, primary_key=True)
+    khach_id = db.Column(db.Integer, db.ForeignKey("khach_hang.id", ondelete="CASCADE"), nullable=False, index=True)
+    tu = db.Column(db.String(8), nullable=False)                      # khach | admin
+    noi_dung = db.Column(db.Text, nullable=False)
+    loai = db.Column(db.String(10), nullable=False, default="ho_tro")  # ho_tro | gop_y | bao_loi
+    ngu_canh = db.Column(db.String(200))                              # vd "Báo lỗi: Tương tác thuốc"
+    ngu_canh_url = db.Column(db.String(300))                          # đường dẫn nội bộ của trang bị báo lỗi
+    admin_id = db.Column(db.Integer, db.ForeignKey("nguoi_dung.id", ondelete="SET NULL"))
+    da_doc_khach = db.Column(db.Boolean, nullable=False, default=False)
+    da_doc_admin = db.Column(db.Boolean, nullable=False, default=False)
+    ngay_tao = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+
+
+class ThongBao(db.Model):
+    """Thông báo cho TỪNG admin (chuông ở thanh trên trang quản trị). Cùng 1 nguồn (khoa_gop) mà chưa đọc thì gộp lại."""
+    __tablename__ = "thong_bao"
+
+    id = db.Column(db.Integer, primary_key=True)
+    nguoi_nhan_id = db.Column(db.Integer, db.ForeignKey("nguoi_dung.id", ondelete="CASCADE"), nullable=False, index=True)
+    loai = db.Column(db.String(20), nullable=False)                   # y_kien_moi | tin_nhan_moi
+    tieu_de = db.Column(db.String(200), nullable=False)
+    noi_dung = db.Column(db.String(300))
+    url = db.Column(db.String(300))
+    khoa_gop = db.Column(db.String(64), index=True)
+    so_luong = db.Column(db.Integer, nullable=False, default=1)
+    da_doc = db.Column(db.Boolean, nullable=False, default=False, index=True)
+    ngay_tao = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+
+
+class ChatLanThu(db.Model):
+    """Đếm số lần nhập sai mã / tạo tài khoản theo THIẾT BỊ (mã băm) để chặn dò mã bí mật."""
+    __tablename__ = "chat_lan_thu"
+
+    id = db.Column(db.Integer, primary_key=True)
+    khoa = db.Column(db.String(64), nullable=False, index=True)
+    loai = db.Column(db.String(12), nullable=False)                   # sai_ma | tao_moi
+    thoi_gian = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)

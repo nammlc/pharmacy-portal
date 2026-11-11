@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Hỗ trợ &amp; góp ý{% endblock %}
+{% block meta_robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">💬 Hỗ trợ</div>
+  <h1>Hỗ trợ &amp; góp ý riêng tư</h1>
+  <p>Nhắn riêng cho Khoa Dược để được hỗ trợ, góp ý hoặc báo lỗi thông tin. Cuộc trò chuyện chỉ bạn và Khoa Dược xem được.</p>
+</div>
+
+<div class="ht" id="htApp" data-csrf="{{ csrf_token() }}"
+     data-dang-nhap-url="{{ url_for('ho_tro.dang_nhap') }}" data-gui-url="{{ url_for('ho_tro.gui') }}"
+     data-tin-url="{{ url_for('ho_tro.tin_nhan') }}" data-thoat-url="{{ url_for('ho_tro.thoat') }}"
+     data-da-dang-nhap="{{ '1' if khach else '0' }}" data-loai="{{ loai }}"
+     data-ngu-canh="{{ ngu_canh }}" data-ngu-canh-url="{{ ngu_canh_url }}">
+
+  {# ───── Chưa đăng nhập: SĐT + mã bí mật + (tên) + tin nhắn ───── #}
+  <form class="ht-card ht-form" id="htDangNhap" novalidate {% if khach %}hidden{% endif %}>
+    {% if ngu_canh %}<div class="ht-context">📎 {{ ngu_canh }}</div>{% endif %}
+    <div class="hd-row">
+      <label>Số điện thoại <span class="hd-req">*</span>
+        <input type="tel" name="sdt" inputmode="tel" maxlength="15" required autocomplete="tel" placeholder="09xx xxx xxx">
+      </label>
+      <label>Họ tên <span class="hd-req">*</span>
+        <input type="text" name="ten" maxlength="60" autocomplete="name" placeholder="Nguyễn Văn A">
+      </label>
+    </div>
+    <label>Mã bí mật 6 số <span class="hd-req">*</span>
+      <input type="password" name="ma" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" placeholder="••••••">
+      <small class="ht-hint"><b>Lần đầu:</b> bạn tự đặt một mã 6 số, nhớ mã này để xem lại cuộc trò chuyện. <b>Lần sau:</b> nhập lại đúng mã đã đặt. Không dùng mã ngân hàng của bạn. Quên mã, hãy liên hệ Khoa Dược để được đặt lại.</small>
+    </label>
+    <label>Tin nhắn <span class="hd-req">*</span>
+      <select name="loai" class="ht-select">
+        {% for k, v in loai_tin.items() %}<option value="{{ k }}" {% if k == loai %}selected{% endif %}>{{ v }}</option>{% endfor %}
+      </select>
+      <textarea name="noi_dung" rows="4" maxlength="2000" required placeholder="Nội dung bạn cần hỗ trợ…"></textarea>
+    </label>
+    <input type="text" name="website" class="hd-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <p class="hd-note">Vui lòng không gửi số căn cước hay thông tin thẻ ngân hàng. Trường hợp cấp cứu hãy gọi <b>115</b> hoặc đến cơ sở y tế gần nhất.
+      Chúng tôi lưu cuộc trò chuyện theo số điện thoại của bạn để lần sau bạn xem lại được.</p>
+    <div class="hd-actions">
+      <button type="submit" class="btn btn-primary" id="htGuiMoi">Gửi tin nhắn</button>
+      <span class="hd-msg" id="htMsgDangNhap" role="status"></span>
+    </div>
+  </form>
+
+  {# ───── Đã đăng nhập: cuộc trò chuyện ───── #}
+  <div class="ht-card ht-chat" id="htChat" {% if not khach %}hidden{% endif %}>
+    <div class="ht-chat-head">
+      <div><strong id="htTen">{{ khach.ten if khach }}</strong><small> · cuộc trò chuyện riêng với Khoa Dược</small></div>
+      <button type="button" class="tb-link" id="htThoat">Thoát khỏi thiết bị này</button>
+    </div>
+    <div class="ht-msgs" id="htMsgs" aria-live="polite">
+      {% for t in tin_nhan %}
+      <div class="ht-msg ht-{{ t.tu }}" data-id="{{ t.id }}">
+        {% if t.ngu_canh %}<div class="ht-msg-ctx">📎 {% if t.ngu_canh_url %}<a href="{{ t.ngu_canh_url }}">{{ t.ngu_canh }}</a>{% else %}{{ t.ngu_canh }}{% endif %}</div>{% endif %}
+        <div class="ht-bubble">{{ t.noi_dung }}</div>
+        <div class="ht-meta">{% if t.tu == 'admin' %}{{ t.ten }} · {% endif %}{{ t.gio }}</div>
+      </div>
+      {% else %}
+      <p class="hd-empty" id="htTrong">Chưa có tin nhắn nào. Hãy gửi tin đầu tiên cho Khoa Dược.</p>
+      {% endfor %}
+    </div>
+    <form class="ht-send" id="htGui" novalidate>
+      {% if ngu_canh %}<div class="ht-context">📎 {{ ngu_canh }}</div>{% endif %}
+      <textarea name="noi_dung" rows="2" maxlength="2000" placeholder="Nhập tin nhắn… (Ctrl + Enter để gửi)"></textarea>
+      <input type="text" name="website" class="hd-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button type="submit" class="btn btn-primary" id="htGuiTiep">Gửi</button>
+    </form>
+    <div class="hd-msg" id="htMsgChat" role="status"></div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/ho_tro.js') }}" defer></script>
+{% endblock %}

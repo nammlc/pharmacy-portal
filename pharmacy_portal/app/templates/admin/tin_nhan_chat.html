@@ -1,0 +1,59 @@
+{% extends "admin/base.html" %}
+{% block title %}Chat với {{ khach.ten }}{% endblock %}
+{% block page_eyebrow %}Phản hồi{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head">
+  <div>
+    <h1>{{ khach.ten }} {% if khach.bi_chan %}<span class="yk-badge yk-badge-tu_choi">Đã chặn</span>{% endif %}</h1>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">
+      <a href="tel:{{ khach.so_dien_thoai }}">📞 {{ khach.so_dien_thoai }}</a> · tham gia {{ (khach.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}
+    </p>
+  </div>
+  <a href="{{ url_for('admin_tin_nhan.danh_sach') }}" class="btn btn-outline">← Danh sách</a>
+</div>
+
+<div class="ht-card ht-chat adm-chat" id="admChat" data-khach="{{ khach.id }}" data-csrf="{{ csrf_token() }}"
+     data-gui-url="{{ url_for('admin_tin_nhan.gui', khach_id=khach.id) }}"
+     data-tin-url="{{ url_for('admin_tin_nhan.tin_moi', khach_id=khach.id) }}">
+  <div class="ht-msgs" id="admMsgs" aria-live="polite">
+    {% for t in tin_nhan %}
+    <div class="ht-msg ht-{{ 'khach' if t.tu == 'khach' else 'admin' }} {{ 'ht-adm-khach' if t.tu == 'khach' else 'ht-adm-admin' }}" data-id="{{ t.id }}">
+      {% if t.ngu_canh %}<div class="ht-msg-ctx">📎 {{ loai_tin.get(t.loai, '') }}{% if t.ngu_canh_url %} · <a href="{{ t.ngu_canh_url }}" target="_blank" rel="noopener">{{ t.ngu_canh }} ↗</a>{% else %} · {{ t.ngu_canh }}{% endif %}</div>{% endif %}
+      <div class="ht-bubble">{{ t.noi_dung }}</div>
+      <div class="ht-meta">{{ t.ten if t.tu == 'admin' else khach.ten }} · {{ t.gio }}</div>
+    </div>
+    {% else %}
+    <p class="hd-empty" id="admTrong">Chưa có tin nhắn.</p>
+    {% endfor %}
+  </div>
+  <form class="ht-send" id="admGui" novalidate>
+    <textarea name="noi_dung" rows="2" maxlength="2000" placeholder="Trả lời khách… (Ctrl + Enter để gửi)"></textarea>
+    <button type="submit" class="btn btn-primary" id="admGuiNut">Gửi</button>
+  </form>
+  <div class="hd-msg" id="admMsg" role="status"></div>
+</div>
+
+<div class="adm-chat-tools">
+  <details class="yk-reply-form">
+    <summary>Đặt lại mã bí mật của khách</summary>
+    <form method="post" action="{{ url_for('admin_tin_nhan.dat_lai_ma', khach_id=khach.id) }}" class="inline-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <p class="hd-note">Chỉ đặt lại sau khi đã xác minh khách qua điện thoại. Mọi thiết bị cũ của khách sẽ bị đăng xuất; hãy báo mã mới cho khách.</p>
+      <input type="text" name="ma_moi" inputmode="numeric" pattern="\d{6}" maxlength="6" placeholder="Mã mới 6 số" required>
+      <button type="submit" class="btn btn-primary btn-sm">Đặt lại</button>
+    </form>
+  </details>
+  <form method="post" action="{{ url_for('admin_tin_nhan.chan', khach_id=khach.id) }}" class="inline-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if khach.bi_chan %}<input type="hidden" name="bo_chan" value="1"><button class="btn btn-outline btn-sm">Bỏ chặn khách</button>
+    {% else %}<button class="btn btn-outline btn-sm" onclick="return confirm('Chặn khách này? Họ sẽ không nhắn được nữa.')">Chặn khách</button>{% endif %}
+  </form>
+  <form method="post" action="{{ url_for('admin_tin_nhan.xoa', khach_id=khach.id) }}" class="inline-form"
+        onsubmit="return confirm('Xoá hẳn cuộc trò chuyện và tài khoản của khách này? Không thể khôi phục.')">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-outline btn-sm yk-del">Xoá cuộc trò chuyện</button>
+  </form>
+</div>
+<script src="{{ url_for('static', filename='js/admin_chat.js') }}" defer></script>
+{% endblock %}

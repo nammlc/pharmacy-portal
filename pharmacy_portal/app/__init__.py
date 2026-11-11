@@ -163,6 +163,19 @@ def create_app(config_class=Config):
     from app.routes.admin_otp import bp as admin_otp_bp
     app.register_blueprint(admin_otp_bp)
 
+    # --- Hỏi đáp công khai, chat riêng với khách, thông báo cho admin ---
+    from app.routes.hoi_dap import bp as hoi_dap_bp
+    app.register_blueprint(hoi_dap_bp)
+    from app.routes.ho_tro import bp as ho_tro_bp
+    app.register_blueprint(ho_tro_bp)
+    from app.routes.admin_y_kien import bp as admin_y_kien_bp
+    app.register_blueprint(admin_y_kien_bp)
+    from app.routes.admin_tin_nhan import bp as admin_tin_nhan_bp
+    app.register_blueprint(admin_tin_nhan_bp)
+    from app.routes.thong_bao import bp as thong_bao_bp, bp_admin as thong_bao_admin_bp
+    app.register_blueprint(thong_bao_bp)
+    app.register_blueprint(thong_bao_admin_bp)
+
     # --- Đếm người đang online: tín hiệu "còn ở đây" từ trình duyệt (không cần CSRF, chỉ ghi thời điểm) ---
     from app.routes.online import bp as online_bp
     app.register_blueprint(online_bp)
@@ -179,8 +192,9 @@ def create_app(config_class=Config):
     with app.app_context():
         # Tự tạo các bảng mới (nhat_ky, cài đặt, đếm lần nhập sai) nếu chưa có - không đụng bảng cũ
         try:
-            from app.models.models import NhatKy, CaiDatHeThong, GateLanThu, DangOnline
-            for _bang in (NhatKy, CaiDatHeThong, GateLanThu, DangOnline):
+            from app.models.models import (NhatKy, CaiDatHeThong, GateLanThu, DangOnline,
+                                           YKien, KhachHang, TinNhanRieng, ThongBao, ChatLanThu)
+            for _bang in (NhatKy, CaiDatHeThong, GateLanThu, DangOnline, KhachHang, YKien, TinNhanRieng, ThongBao, ChatLanThu):
                 _bang.__table__.create(bind=db.engine, checkfirst=True)
         except Exception as e:
             app.logger.warning(f"Không tạo được bảng mới (chạy them_bang_nhat_ky.sql / them_bang_cong_bao_mat.sql thủ công): {e}")

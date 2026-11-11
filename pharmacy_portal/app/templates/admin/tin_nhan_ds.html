@@ -1,0 +1,57 @@
+{% extends "admin/base.html" %}
+{% block title %}Tin nhắn riêng{% endblock %}
+{% block page_eyebrow %}Phản hồi{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Tin nhắn riêng</h1>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">Cuộc trò chuyện riêng với khách (mỗi số điện thoại một tài khoản). {{ tong }} khách.</p>
+  </div>
+</div>
+
+<form method="get" class="adm-search-row">
+  <input type="text" name="q" value="{{ q }}" placeholder="Tìm tên hoặc số điện thoại…">
+  <label class="yk-check-all"><input type="checkbox" name="cho_tra_loi" value="1" {% if chi_cho_tra_loi %}checked{% endif %}> Chỉ khách đang chờ trả lời</label>
+  <button type="submit" class="btn btn-outline btn-sm">Lọc</button>
+  {% if q or chi_cho_tra_loi %}<a href="{{ url_for('admin_tin_nhan.danh_sach') }}" class="btn btn-outline btn-sm">✕ Xoá lọc</a>{% endif %}
+</form>
+
+{% if dong %}
+<div class="adm-table-wrap">
+  <table class="adm-table">
+    <thead><tr><th>Khách</th><th>Tin gần nhất</th><th style="width:150px;">Lúc</th><th style="width:130px;"></th></tr></thead>
+    <tbody>
+    {% for k, tn in dong %}
+      <tr>
+        <td>
+          <strong>{{ k.ten }}</strong>{% if k.bi_chan %} <span class="yk-badge yk-badge-tu_choi">Đã chặn</span>{% endif %}
+          <div class="yk-phone-sub">📞 {{ k.so_dien_thoai }}</div>
+        </td>
+        <td class="tn-preview">
+          {% if tn %}<span class="tn-who">{{ 'Khách' if tn.tu == 'khach' else 'Bạn / Khoa Dược' }}:</span> {{ tn.noi_dung[:140] }}{% if tn.noi_dung|length > 140 %}…{% endif %}
+          {% else %}<em style="color:var(--text-muted)">Chưa có tin nhắn</em>{% endif %}
+        </td>
+        <td>{% if tn %}{{ (tn.ngay_tao | gio_vn).strftime('%d/%m/%Y %H:%M') }}{% endif %}</td>
+        <td style="text-align:right;">
+          {% if chua_doc.get(k.id) %}<span class="nav-badge" style="position:static;margin-right:6px;">{{ chua_doc[k.id] }} mới</span>{% endif %}
+          {% if tn and tn.tu == 'khach' %}<span class="yk-badge yk-badge-cho_duyet">Chờ trả lời</span>{% endif %}
+          <a href="{{ url_for('admin_tin_nhan.xem', khach_id=k.id) }}" class="btn btn-outline btn-sm">Mở</a>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% set tong_trang = (tong // moi_trang) + (1 if tong % moi_trang else 0) %}
+{% if tong_trang > 1 %}
+<nav class="yk-pager" aria-label="Phân trang">
+  {% if trang > 1 %}<a href="{{ url_for('admin_tin_nhan.danh_sach', q=q, cho_tra_loi=1 if chi_cho_tra_loi else None, trang=trang - 1) }}">‹ Trước</a>{% endif %}
+  <span>Trang {{ trang }} / {{ tong_trang }}</span>
+  {% if trang < tong_trang %}<a href="{{ url_for('admin_tin_nhan.danh_sach', q=q, cho_tra_loi=1 if chi_cho_tra_loi else None, trang=trang + 1) }}">Sau ›</a>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+<div class="adm-empty">Chưa có cuộc trò chuyện nào.</div>
+{% endif %}
+{% endblock %}

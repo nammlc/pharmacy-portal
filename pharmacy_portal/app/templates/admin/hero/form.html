@@ -5,6 +5,7 @@
 <div class="admin-page-head">
   <div>
     <h1>Ảnh nền trang chủ</h1>
+    <p>Thay mảng xanh ở đầu trang chủ bằng ảnh toàn cảnh bệnh viện. Khung xem trước bên dưới đổi ngay khi bạn kéo thanh trượt hoặc chọn ảnh.</p>
   </div>
   <a href="{{ url_for('main.trang_chu') }}" target="_blank" class="btn btn-outline">Xem trang chủ ↗</a>
 </div>
@@ -23,6 +24,8 @@
       <div class="hp-search">🔍 Nhập tên thuốc hoặc hoạt chất…</div>
     </div>
   </div>
+  <div class="hp-ghi-chu">Khung xem trước dùng tỉ lệ màn hình máy tính. Trên điện thoại ảnh sẽ được cắt hẹp hơn, hãy xem lại bằng điện thoại sau khi lưu.</div>
+
   <div class="hp-luoi">
     <div class="admin-form-card" style="max-width:100%;">
       <div class="hp-section-title" style="margin-top:0;">Ảnh</div>
@@ -30,9 +33,10 @@
         <label>Chọn ảnh toàn cảnh bệnh viện</label>
         <input type="file" name="file_anh" id="hpFile" accept="image/png,image/jpeg,image/webp"
                data-nen-toi-da="2400" data-nen-chat-luong="0.86">
+        <div class="vct-file-hint">JPG/PNG/WEBP. Nên dùng ảnh ngang, rộng từ 1600px trở lên, chụp ban ngày, bầu trời không cháy sáng. Ảnh quá lớn sẽ được trình duyệt tự nén trước khi gửi.</div>
         <div class="anh-paste-zone" tabindex="0" data-target-input="file_anh">
           <span class="anh-paste-zone-icon">&#128203;</span>
-          Click <kbd>Ctrl</kbd>+<kbd>V</kbd> để dán ảnh 
+          Bấm vào đây rồi <kbd>Ctrl</kbd>+<kbd>V</kbd> để dán ảnh đã copy
         </div>
       </div>
       {% if cd.anh %}
@@ -41,7 +45,7 @@
       </div>
       {% endif %}
       <div class="form-row">
-        <label>Mô tả ảnh </label>
+        <label>Mô tả ảnh (hiển thị cho người dùng đọc màn hình và Google Hình ảnh)</label>
         <input type="text" name="alt" maxlength="150" value="{{ cd.alt }}" placeholder="{{ H.ALT_MAC_DINH }}">
       </div>
     </div>
@@ -55,12 +59,13 @@
         <div class="hp-doc-duoc" id="hpDocDuoc"></div>
       </div>
       <div class="form-row">
-        <label>Vị trí ưu tiên của ảnh khi hiển thị</label>
+        <label>Phần ảnh được giữ lại khi khung bị cắt bớt</label>
         <div class="hp-radio-nhom">
           {% for ma, (nhan, _css) in H.VI_TRI.items() %}
           <label class="hp-radio"><input type="radio" name="vi_tri" value="{{ ma }}" {{ 'checked' if cd.vi_tri == ma }}> {{ nhan }}</label>
           {% endfor %}
         </div>
+        <div class="vct-file-hint">Ảnh toàn cảnh rộng hơn khung trang chủ nên sẽ bị cắt trên/dưới. Chọn phần có toà nhà chính.</div>
       </div>
     </div>
   </div>
@@ -77,7 +82,7 @@
   background:#0b1f3a; font-size:clamp(9px,1.25vw,13px); display:flex; align-items:center; justify-content:center; text-align:center; }
 .hp-preview.hp-khong-anh { background:linear-gradient(165deg,var(--ink-900) 0%,var(--navy-600) 62%,var(--navy-500) 100%); }
 .hp-preview.hp-khong-anh #hpImg, .hp-preview.hp-khong-anh .hp-phu { display:none; }
-.hp-preview img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
+.hp-preview img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .hp-phu { position:absolute; inset:0; background:linear-gradient(180deg,rgba(11,31,58,var(--a1,.6)) 0%,rgba(11,31,58,var(--a2,.66)) 55%,rgba(11,31,58,var(--a3,.78)) 100%); }
 .hp-noidung { position:relative; z-index:1; max-width:62%; padding:1em; text-shadow:0 2px 14px rgba(5,15,30,.45); }
 .hp-badge { font-size:1em; margin-bottom:.8em; }
@@ -94,15 +99,7 @@
 .hp-radio-nhom { display:flex; gap:10px; flex-wrap:wrap; }
 .hp-radio { display:inline-flex; align-items:center; gap:6px; font-weight:500; cursor:pointer; padding:8px 12px; border:1px solid var(--line-200); border-radius:var(--radius-sm); }
 .hp-xoa { font-weight:500; color:var(--level-cctd); cursor:pointer; display:inline-flex; gap:8px; align-items:center; }
-@media (max-width: 800px) {
-  .hp-luoi { grid-template-columns:1fr; }
-  .hp-noidung { max-width:92%; }
-}
-/* Xem trước mobile: cùng nguyên tắc với trang chủ, giữ trọn ảnh ngang. */
-@media (max-width: 700px) {
-  .hp-preview { background-color:#0b1f3a; }
-  .hp-preview img { object-fit:contain; object-position:center; }
-}
+@media (max-width: 800px) { .hp-luoi { grid-template-columns:1fr; } .hp-noidung { max-width:92%; } }
 </style>
 
 <script>

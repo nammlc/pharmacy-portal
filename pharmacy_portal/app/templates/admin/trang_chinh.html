@@ -48,6 +48,16 @@
     <div class="stat-value">{{ so_luong.get('benh_nhan', 0) }}</div>
     <div class="stat-label">Bài viết bệnh nhân</div>
   </a>
+  <a href="{{ url_for('admin_y_kien.danh_sach') }}" class="stat-card">
+    <div class="stat-icon" style="background:#fef3c7;color:#b45309;">💬</div>
+    <div class="stat-value">{{ dem_y_kien_cho_duyet }}</div>
+    <div class="stat-label">Ý kiến chờ duyệt</div>
+  </a>
+  <a href="{{ url_for('admin_tin_nhan.danh_sach', cho_tra_loi=1) }}" class="stat-card">
+    <div class="stat-icon" style="background:#e0f2fe;color:#0369a1;">✉️</div>
+    <div class="stat-value">{{ dem_tin_nhan_chua_doc }}</div>
+    <div class="stat-label">Tin nhắn chưa đọc</div>
+  </a>
 </div>
 
 <!-- Cập nhật gần đây -->

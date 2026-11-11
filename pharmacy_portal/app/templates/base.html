@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
 <meta name="description" content="{% block meta_mo_ta %}Tra cứu thông tin thuốc tại Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan: danh mục thuốc, tương tác thuốc, thuốc tiêm truyền, tương hợp – tương kỵ và hướng dẫn sử dụng thuốc.{% endblock %}">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="{% block meta_robots %}index, follow{% endblock %}">
 <link rel="canonical" href="{{ ((config.CANONICAL_HOST and ('https://' ~ config.CANONICAL_HOST)) or request.host_url.rstrip('/')) ~ request.path }}">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="vi_VN">
@@ -65,6 +65,7 @@
         <a href="{{ url_for('ttt.index') }}" class="{{ 'active' if request.blueprint == 'ttt' }}">⚠️ Tương tác thuốc</a>
         <a href="{{ url_for('ttth.index') }}" class="{{ 'active' if request.blueprint == 'ttth' }}">📋 Thông tin thuốc</a>
         <a href="{{ url_for('ttbn.index') }}" class="{{ 'active' if request.blueprint == 'ttbn' }}">🧑‍⚕️ Thông tin bệnh nhân</a>
+        <a href="{{ url_for('ho_tro.trang') }}" class="{{ 'active' if request.blueprint == 'ho_tro' }}">💬 Hỗ trợ &amp; góp ý</a>
         <a href="{{ url_for('main.ve_chung_toi') }}" class="{{ 'active' if request.endpoint == 'main.ve_chung_toi' }}">ℹ️ Về chúng tôi</a>
       </nav>
     </div>

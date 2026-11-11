@@ -51,6 +51,11 @@
     <a href="{{ url_for('admin_dmbv.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_dmbv' }}">🗂️ Danh mục bài viết</a>
     <a href="{{ url_for('admin_ttbn.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_ttbn' }}">🧑‍⚕️ Bài viết bệnh nhân</a>
 
+    <div class="section-label">Phản hồi</div>
+    <a href="{{ url_for('admin_y_kien.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_y_kien' }}">💬 Hỏi đáp &amp; bình luận{% if dem_y_kien_cho_duyet %}<span class="nav-badge" title="Chờ duyệt">{{ dem_y_kien_cho_duyet }}</span>{% endif %}</a>
+    <a href="{{ url_for('admin_tin_nhan.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_tin_nhan' }}">✉️ Tin nhắn riêng{% if dem_tin_nhan_chua_doc %}<span class="nav-badge" title="Khách đang chờ trả lời">{{ dem_tin_nhan_chua_doc }}</span>{% endif %}</a>
+    <a href="{{ url_for('admin_thong_bao.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_thong_bao' }}">🔔 Thông báo{% if dem_thong_bao %}<span class="nav-badge" data-tb-nav>{{ dem_thong_bao }}</span>{% endif %}</a>
+
     <div class="section-label">Khác</div>
     <a href="{{ url_for('admin_hero.chinh_sua') }}" class="{{ 'active' if request.blueprint == 'admin_hero' }}">🖼️ Ảnh trang chủ</a>
     <a href="{{ url_for('admin_vct.chinh_sua') }}" class="{{ 'active' if request.blueprint == 'admin_vct' }}">✏️ Về chúng tôi</a>
@@ -69,6 +74,8 @@
         </button>
         <span class="admin-topbar-title">{% block page_eyebrow %}Quản trị{% endblock %}</span>
       </div>
+
+      {% include "admin/_chuong_thong_bao.html" %}
 
       <div class="admin-user-menu" id="adminUserMenu">
         <button type="button" class="user-chip-btn" id="adminUserBtn" aria-haspopup="true" aria-expanded="false">
@@ -149,6 +156,10 @@
 <script src="{{ url_for('static', filename='js/admin_searchable_select.js') }}"></script>
 <script src="{{ url_for('static', filename='js/nen_anh.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dan_anh_clipboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/thong_bao.js') }}" defer
+        data-url="{{ url_for('tb_api.tom_tat') }}" data-doc-tat-ca="{{ url_for('tb_api.doc_tat_ca') }}"
+        data-trang-tb="{{ url_for('admin_thong_bao.danh_sach') }}" data-mo-url="{{ url_for('admin_thong_bao.mo', tb_id=0) }}"
+        data-login-url="{{ url_for('admin_auth.dang_nhap') }}"></script>
 <script src="{{ url_for('static', filename='js/online.js') }}" defer
         data-khu="admin"
         data-ping-url="{{ url_for('online.ping') }}"

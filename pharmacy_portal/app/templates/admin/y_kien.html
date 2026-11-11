@@ -1,0 +1,113 @@
+{% extends "admin/base.html" %}
+{% block title %}Hỏi đáp &amp; bình luận{% endblock %}
+{% block page_eyebrow %}Phản hồi{% endblock %}
+
+{% macro trang_link(p) %}{{ url_for('admin_y_kien.danh_sach', trang_thai=trang_thai, loai=loai, q=q, trang=p) }}{% endmacro %}
+
+{% block admin_content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Hỏi đáp &amp; bình luận</h1>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">Ý kiến công khai dưới thuốc và bài viết. Chỉ hiện ra trang công khai sau khi được duyệt.</p>
+  </div>
+</div>
+
+<div class="yk-tabs">
+  {% for k, v in nhan_trang_thai.items() %}
+    <a href="{{ url_for('admin_y_kien.danh_sach', trang_thai=k, loai=loai, q=q) }}" class="yk-tab {{ 'active' if trang_thai == k }}">{{ v }} <span>{{ dem.get(k, 0) }}</span></a>
+  {% endfor %}
+  <a href="{{ url_for('admin_y_kien.danh_sach', trang_thai='tat_ca', loai=loai, q=q) }}" class="yk-tab {{ 'active' if trang_thai == 'tat_ca' }}">Tất cả <span>{{ dem.values() | sum }}</span></a>
+</div>
+
+<form method="get" class="adm-search-row">
+  <input type="hidden" name="trang_thai" value="{{ trang_thai }}">
+  <input type="text" name="q" value="{{ q }}" placeholder="Tìm tên, SĐT, nội dung, tên thuốc…">
+  <select name="loai" class="adm-select">
+    <option value="">Tất cả nơi góp ý</option>
+    {% for k, v in nhan_loai.items() %}<option value="{{ k }}" {% if loai == k %}selected{% endif %}>{{ v }}</option>{% endfor %}
+  </select>
+  <button type="submit" class="btn btn-outline btn-sm">Lọc</button>
+  {% if q or loai %}<a href="{{ url_for('admin_y_kien.danh_sach', trang_thai=trang_thai) }}" class="btn btn-outline btn-sm">✕ Xoá lọc</a>{% endif %}
+</form>
+
+{% if muc %}
+<form id="bulkForm" method="post" action="{{ url_for('admin_y_kien.hang_loat') }}" class="yk-bulk">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="quay_lai" value="{{ request.full_path.rstrip('?') }}">
+  <label class="yk-check-all"><input type="checkbox" id="ykChonHet"> Chọn tất cả</label>
+  <select name="hanh_dong" class="adm-select">
+    <option value="">— Thao tác hàng loạt —</option>
+    <option value="duyet">Duyệt</option><option value="tu_choi">Từ chối</option>
+    <option value="spam">Đánh dấu spam</option><option value="xoa">Xoá</option>
+  </select>
+  <button type="submit" class="btn btn-outline btn-sm" onclick="return confirm('Áp dụng cho các ý kiến đã chọn?')">Áp dụng</button>
+</form>
+
+<div class="yk-list">
+  {% for y in muc %}
+  <article class="yk-card yk-{{ y.trang_thai }}" id="yk-{{ y.id }}">
+    <div class="yk-card-head">
+      <input type="checkbox" name="ids" value="{{ y.id }}" form="bulkForm" aria-label="Chọn ý kiến {{ y.id }}">
+      <div class="yk-who">
+        <strong>{{ y.ten }}</strong>
+        <a href="tel:{{ y.so_dien_thoai }}" class="yk-phone">📞 {{ y.so_dien_thoai }}</a>
+        <span class="yk-time">{{ (y.ngay_tao | gio_vn).strftime('%d/%m/%Y %H:%M') }}</span>
+      </div>
+      <span class="yk-badge yk-badge-{{ y.trang_thai }}">{{ nhan_trang_thai[y.trang_thai] }}</span>
+    </div>
+    <div class="yk-target">
+      {{ nhan_loai.get(y.doi_tuong_loai, y.doi_tuong_loai) }}:
+      {% if lien_ket.get(y.id) %}<a href="{{ lien_ket[y.id] }}" target="_blank" rel="noopener">{{ y.doi_tuong_ten }} ↗</a>{% else %}{{ y.doi_tuong_ten }}{% endif %}
+    </div>
+    <p class="yk-body">{{ y.noi_dung }}</p>
+
+    {% if y.tra_loi %}
+    <div class="yk-reply"><strong>Khoa Dược đã trả lời:</strong><p>{{ y.tra_loi }}</p></div>
+    {% endif %}
+
+    <div class="yk-actions">
+      {% for hd, ten, cls in (('duyet','✓ Duyệt','btn-primary'),('tu_choi','Từ chối','btn-outline'),('spam','Spam','btn-outline')) %}
+        {% if not (hd == 'duyet' and y.trang_thai == 'da_duyet') and not (hd == 'tu_choi' and y.trang_thai == 'tu_choi') and not (hd == 'spam' and y.trang_thai == 'spam') %}
+        <form method="post" action="{{ url_for('admin_y_kien.thao_tac', yk_id=y.id, hanh_dong=hd) }}" class="inline-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="quay_lai" value="{{ request.full_path.rstrip('?') }}">
+          <button type="submit" class="btn {{ cls }} btn-sm">{{ ten }}</button>
+        </form>
+        {% endif %}
+      {% endfor %}
+      <form method="post" action="{{ url_for('admin_y_kien.thao_tac', yk_id=y.id, hanh_dong='xoa') }}" class="inline-form"
+            onsubmit="return confirm('Xoá hẳn ý kiến này?')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="quay_lai" value="{{ request.full_path.rstrip('?') }}">
+        <button type="submit" class="btn btn-outline btn-sm yk-del">Xoá</button>
+      </form>
+    </div>
+
+    <details class="yk-reply-form">
+      <summary>{{ 'Sửa câu trả lời công khai' if y.tra_loi else 'Trả lời công khai (đồng thời duyệt ý kiến)' }}</summary>
+      <form method="post" action="{{ url_for('admin_y_kien.tra_loi', yk_id=y.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="quay_lai" value="{{ request.full_path.rstrip('?') }}">
+        <textarea name="tra_loi" rows="3" maxlength="2000" required placeholder="Nội dung trả lời hiển thị công khai dưới ý kiến…">{{ y.tra_loi or '' }}</textarea>
+        <button type="submit" class="btn btn-primary btn-sm">Đăng trả lời</button>
+      </form>
+    </details>
+  </article>
+  {% endfor %}
+</div>
+
+{% set tong_trang = (tong // moi_trang) + (1 if tong % moi_trang else 0) %}
+{% if tong_trang > 1 %}
+<nav class="yk-pager" aria-label="Phân trang">
+  {% if trang > 1 %}<a href="{{ trang_link(trang - 1) }}">‹ Trước</a>{% endif %}
+  <span>Trang {{ trang }} / {{ tong_trang }} · {{ tong }} ý kiến</span>
+  {% if trang < tong_trang %}<a href="{{ trang_link(trang + 1) }}">Sau ›</a>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+<div class="adm-empty">Không có ý kiến nào {% if trang_thai == 'cho_duyet' %}đang chờ duyệt{% else %}khớp bộ lọc{% endif %}. 🎉</div>
+{% endif %}
+<script>
+  var all = document.getElementById('ykChonHet');
+  if (all) all.addEventListener('change', function () {
+    document.querySelectorAll('input[name=ids]').forEach(function (c) { c.checked = all.checked; });
+  });
+</script>
+{% endblock %}
