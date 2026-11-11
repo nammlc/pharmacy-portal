@@ -15,7 +15,7 @@
      data-da-dang-nhap="{{ '1' if khach else '0' }}" data-loai="{{ loai }}"
      data-ngu-canh="{{ ngu_canh }}" data-ngu-canh-url="{{ ngu_canh_url }}">
 
-  {# ───── Chưa đăng nhập: SĐT + mã bí mật + (tên) + tin nhắn ───── #}
+  {# ───── Chưa có cuộc trò chuyện trên thiết bị này: họ tên + SĐT + tin nhắn (không mã bí mật) ───── #}
   <form class="ht-card ht-form" id="htDangNhap" novalidate {% if khach %}hidden{% endif %}>
     {% if ngu_canh %}<div class="ht-context">📎 {{ ngu_canh }}</div>{% endif %}
     <div class="hd-row">
@@ -23,13 +23,9 @@
         <input type="tel" name="sdt" inputmode="tel" maxlength="15" required autocomplete="tel" placeholder="09xx xxx xxx">
       </label>
       <label>Họ tên <span class="hd-req">*</span>
-        <input type="text" name="ten" maxlength="60" autocomplete="name" placeholder="Nguyễn Văn A">
+        <input type="text" name="ten" maxlength="60" required autocomplete="name" placeholder="Nguyễn Văn A">
       </label>
     </div>
-    <label>Mã bí mật 6 số <span class="hd-req">*</span>
-      <input type="password" name="ma" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" placeholder="••••••">
-      <small class="ht-hint"><b>Lần đầu:</b> bạn tự đặt một mã 6 số, nhớ mã này để xem lại cuộc trò chuyện. <b>Lần sau:</b> nhập lại đúng mã đã đặt. Không dùng mã ngân hàng của bạn. Quên mã, hãy liên hệ Khoa Dược để được đặt lại.</small>
-    </label>
     <label>Tin nhắn <span class="hd-req">*</span>
       <select name="loai" class="ht-select">
         {% for k, v in loai_tin.items() %}<option value="{{ k }}" {% if k == loai %}selected{% endif %}>{{ v }}</option>{% endfor %}
@@ -38,14 +34,14 @@
     </label>
     <input type="text" name="website" class="hd-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
     <p class="hd-note">Vui lòng không gửi số căn cước hay thông tin thẻ ngân hàng. Trường hợp cấp cứu hãy gọi <b>115</b> hoặc đến cơ sở y tế gần nhất.
-      Chúng tôi lưu cuộc trò chuyện theo số điện thoại của bạn để lần sau bạn xem lại được.</p>
+      Số điện thoại chỉ để Khoa Dược liên hệ khi cần. Cuộc trò chuyện được lưu trên trình duyệt này để chỉ bạn xem lại được; nếu xoá dữ liệu trình duyệt hoặc đổi thiết bị, bạn sẽ bắt đầu một cuộc trò chuyện mới.</p>
     <div class="hd-actions">
       <button type="submit" class="btn btn-primary" id="htGuiMoi">Gửi tin nhắn</button>
       <span class="hd-msg" id="htMsgDangNhap" role="status"></span>
     </div>
   </form>
 
-  {# ───── Đã đăng nhập: cuộc trò chuyện ───── #}
+  {# ───── Đã có cuộc trò chuyện trên thiết bị này ───── #}
   <div class="ht-card ht-chat" id="htChat" {% if not khach %}hidden{% endif %}>
     <div class="ht-chat-head">
       <div><strong id="htTen">{{ khach.ten if khach }}</strong><small> · cuộc trò chuyện riêng với Khoa Dược</small></div>

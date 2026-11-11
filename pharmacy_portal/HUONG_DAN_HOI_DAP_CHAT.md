@@ -4,15 +4,15 @@
 | Chức năng | Ở đâu | Ghi chú |
 |---|---|---|
 | **Hỏi đáp / bình luận công khai** | Cuối trang chi tiết: Danh mục thuốc, Nhà thuốc BV, Thuốc tra cứu, Bài viết, Bài viết bệnh nhân | Cần **tên + SĐT**. Ý kiến ở trạng thái *chờ duyệt*, admin duyệt mới hiện. Chỉ hiện tên, **không bao giờ hiện SĐT**. Admin có thể trả lời công khai. |
-| **Chat riêng tư** | Menu "💬 Hỗ trợ & góp ý" (`/ho-tro`) | Mỗi **số điện thoại = 1 tài khoản**, tự tạo ở tin nhắn đầu, giữ lại cuộc trò chuyện. Bảo vệ bằng **mã bí mật 6 số** khách tự đặt. |
+| **Chat riêng tư** | Menu "💬 Hỗ trợ & góp ý" (`/ho-tro`) | Khách chỉ nhập **họ tên + SĐT + tin nhắn** (không có mã bí mật). Cuộc trò chuyện **gắn với thiết bị/trình duyệt** tạo ra nó (cookie đã ký, nhớ 30 ngày); SĐT chỉ để Khoa Dược liên hệ. |
 | **Báo lỗi thông tin** | Thanh vàng ở đầu trang Tương tác thuốc, Thuốc tiêm truyền, Tương hợp – Tương kỵ | Mở chat riêng, đính kèm sẵn trang bị báo lỗi. |
 | **Chuông thông báo** | Thanh trên trang quản trị | Số chưa đọc + danh sách, tự cập nhật ~15 giây; trang "Thông báo" xem tất cả. Mỗi ý kiến mới = 1 thông báo; nhiều tin của cùng 1 khách gộp thành "×N". |
-| **Quản trị** | Menu "Phản hồi": Hỏi đáp & bình luận · Tin nhắn riêng · Thông báo | Duyệt / từ chối / spam / xoá / trả lời / thao tác hàng loạt; chat với khách; chặn khách; đặt lại mã bí mật. Mọi thao tác ghi vào Nhật ký truy cập. |
+| **Quản trị** | Menu "Phản hồi": Hỏi đáp & bình luận · Tin nhắn riêng · Thông báo | Duyệt / từ chối / spam / xoá / trả lời / thao tác hàng loạt; chat với khách; chặn khách. Mọi thao tác ghi vào Nhật ký truy cập. |
 
-## Vì sao có "mã bí mật 6 số"
-SĐT không được xác minh bằng SMS, nên nếu chỉ dùng SĐT thì **ai biết số cũng đọc được cuộc trò chuyện** (có thể chứa thông tin sức khoẻ). Mã bí mật (lưu dạng băm) chặn việc đó:
-nhập sai 5 lần khoá 15 phút · 10 lần khoá 1 giờ · 15 lần trở lên khoá 24 giờ · tối đa 10 lần sai / 15 phút trên mỗi thiết bị · thiết bị đã vào được nhớ 30 ngày bằng cookie đã ký.
-Khách **quên mã** → gọi điện cho Khoa Dược → admin mở cuộc trò chuyện của khách → *Đặt lại mã bí mật* (mọi thiết bị cũ bị đăng xuất).
+## Vì sao không còn "mã bí mật 6 số" mà cuộc trò chuyện lại gắn với thiết bị
+SĐT không được xác minh bằng SMS, nên nếu dùng SĐT để vào xem thì **ai biết số cũng đọc được cuộc trò chuyện** (có thể chứa thông tin sức khoẻ). Vì vậy SĐT chỉ là thông tin liên hệ; quyền xem thuộc về trình duyệt đã tạo cuộc trò chuyện (cookie đã ký, không đoán / sửa được).
+Hệ quả: **đổi thiết bị hoặc xoá dữ liệu trình duyệt thì khách bắt đầu một cuộc trò chuyện mới** (Khoa Dược vẫn thấy tất cả, theo từng cuộc). Cùng 1 SĐT có thể có nhiều cuộc. Mỗi thiết bị mở tối đa 5 cuộc mới / 24 giờ; SĐT đã bị admin chặn thì không mở được cuộc mới.
+**Khi nâng cấp từ bản cũ:** chạy `bo_ma_bi_mat.sql` một lần để bỏ ràng buộc UNIQUE trên số điện thoại. Khách cũ còn cookie hợp lệ vẫn dùng tiếp được; ai không còn cookie sẽ bắt đầu cuộc trò chuyện mới.
 
 ## Chống spam
 Giới hạn 3 ý kiến / 10 phút / thiết bị và 10 ý kiến / 24 giờ / SĐT · ô bẫy bot (honeypot) · thời gian điền tối thiểu 3 giây · chặn gửi trùng nội dung · chỉ nhận chữ thuần, chặn link · bỏ ký tự điều khiển / ký tự đảo chiều · bot (Googlebot...) bị từ chối. Trang `/ho-tro` và `/api/` không được lập chỉ mục.

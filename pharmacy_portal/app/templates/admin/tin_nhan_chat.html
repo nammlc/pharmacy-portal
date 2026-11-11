@@ -35,15 +35,6 @@
 </div>
 
 <div class="adm-chat-tools">
-  <details class="yk-reply-form">
-    <summary>Đặt lại mã bí mật của khách</summary>
-    <form method="post" action="{{ url_for('admin_tin_nhan.dat_lai_ma', khach_id=khach.id) }}" class="inline-form">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <p class="hd-note">Chỉ đặt lại sau khi đã xác minh khách qua điện thoại. Mọi thiết bị cũ của khách sẽ bị đăng xuất; hãy báo mã mới cho khách.</p>
-      <input type="text" name="ma_moi" inputmode="numeric" pattern="\d{6}" maxlength="6" placeholder="Mã mới 6 số" required>
-      <button type="submit" class="btn btn-primary btn-sm">Đặt lại</button>
-    </form>
-  </details>
   <form method="post" action="{{ url_for('admin_tin_nhan.chan', khach_id=khach.id) }}" class="inline-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     {% if khach.bi_chan %}<input type="hidden" name="bo_chan" value="1"><button class="btn btn-outline btn-sm">Bỏ chặn khách</button>

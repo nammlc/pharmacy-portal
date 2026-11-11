@@ -1,4 +1,4 @@
-"""Admin: xem và trả lời chat riêng của khách; chặn / đặt lại mã bí mật / xoá cuộc trò chuyện."""
+"""Admin: xem và trả lời chat riêng của khách; chặn / xoá cuộc trò chuyện."""
 from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import func
@@ -119,18 +119,6 @@ def chan(khach_id):
     db.session.commit()
     _ghi("chan" if khach.bi_chan else "bo_chan", khach)
     flash("Đã chặn khách này." if khach.bi_chan else "Đã bỏ chặn.", "success")
-    return redirect(url_for("admin_tin_nhan.xem", khach_id=khach.id))
-
-
-@bp.post("/<int:khach_id>/dat-lai-ma")
-def dat_lai_ma(khach_id):
-    khach = _khach_hoac_404(khach_id)
-    loi = CR.dat_lai_ma(khach, request.form.get("ma_moi", "").strip())
-    if loi:
-        flash(loi, "error")
-    else:
-        _ghi("dat_lai_ma", khach)
-        flash("Đã đặt lại mã bí mật. Hãy báo mã mới cho khách qua điện thoại; mọi thiết bị cũ của khách đã bị đăng xuất.", "success")
     return redirect(url_for("admin_tin_nhan.xem", khach_id=khach.id))
 
 

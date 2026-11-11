@@ -417,17 +417,18 @@ class YKien(db.Model):
 
 
 class KhachHang(db.Model):
-    """Tài khoản chat riêng của khách: mỗi SỐ ĐIỆN THOẠI 1 tài khoản, tự tạo ở lần nhắn đầu tiên.
-    Bảo vệ bằng MÃ BÍ MẬT 6 SỐ do khách tự đặt (lưu dạng băm) vì SĐT không được xác minh qua SMS."""
+    """Một cuộc trò chuyện riêng của khách, tự tạo ở lần nhắn đầu tiên và gắn với THIẾT BỊ (cookie đã ký), không có mã bí mật.
+    SĐT chỉ là thông tin liên hệ (không xác minh qua SMS, không dùng để vào xem cuộc trò chuyện) nên KHÔNG unique:
+    cùng 1 SĐT có thể có nhiều cuộc trò chuyện (mỗi thiết bị một cuộc)."""
     __tablename__ = "khach_hang"
 
     id = db.Column(db.Integer, primary_key=True)
-    so_dien_thoai = db.Column(db.String(15), unique=True, nullable=False, index=True)
+    so_dien_thoai = db.Column(db.String(15), nullable=False, index=True)
     ten = db.Column(db.String(100), nullable=False)
-    pin_hash = db.Column(db.String(255), nullable=False)
-    phien_ver = db.Column(db.Integer, nullable=False, default=1)      # tăng lên khi đặt lại mã → mọi thiết bị cũ bị đăng xuất
-    so_lan_sai = db.Column(db.Integer, nullable=False, default=0)
-    khoa_den = db.Column(db.DateTime)                                  # đang bị khoá thử mã tới lúc này
+    pin_hash = db.Column(db.String(255), nullable=False, default="")   # CỘT CŨ, không còn dùng (giữ để khỏi phải đổi DB)
+    phien_ver = db.Column(db.Integer, nullable=False, default=1)      # tăng lên khi admin chặn → mọi thiết bị của khách bị đăng xuất
+    so_lan_sai = db.Column(db.Integer, nullable=False, default=0)     # CỘT CŨ, không còn dùng
+    khoa_den = db.Column(db.DateTime)                                  # CỘT CŨ, không còn dùng
     bi_chan = db.Column(db.Boolean, nullable=False, default=False)
     ngay_tao = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     lan_cuoi = db.Column(db.DateTime, default=datetime.utcnow)
@@ -467,7 +468,7 @@ class ThongBao(db.Model):
 
 
 class ChatLanThu(db.Model):
-    """Đếm số lần nhập sai mã / tạo tài khoản theo THIẾT BỊ (mã băm) để chặn dò mã bí mật."""
+    """Đếm số lần tạo cuộc trò chuyện mới theo THIẾT BỊ (mã băm) để chống spam."""
     __tablename__ = "chat_lan_thu"
 
     id = db.Column(db.Integer, primary_key=True)

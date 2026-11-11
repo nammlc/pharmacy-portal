@@ -1,20 +1,19 @@
 """
-Chat riêng giữa khách và Khoa Dược. Mỗi SỐ ĐIỆN THOẠI = 1 tài khoản khách, tự tạo ở lần nhắn đầu tiên, giữ lại cuộc trò chuyện.
+Chat riêng giữa khách và Khoa Dược. KHÔNG có mã bí mật: khách chỉ nhập họ tên + SĐT + tin nhắn.
 
-Vì SĐT KHÔNG được xác minh (không có SMS), ai biết số cũng có thể thử vào xem cuộc trò chuyện (có thể chứa thông tin sức khoẻ).
-Nên mỗi tài khoản có MÃ BÍ MẬT 6 SỐ do khách tự đặt ở lần đầu:
-  - lưu dạng BĂM (không lưu mã thô); nhập sai 5 lần khoá 15 phút, 10 lần khoá 1 giờ, 15 lần trở lên khoá 24 giờ
-  - giới hạn số lần thử theo thiết bị; thiết bị đã đăng nhập được nhớ 30 ngày bằng cookie ĐÃ KÝ (không đoán / sửa được)
-  - admin đặt lại mã → mọi thiết bị cũ bị đăng xuất (phien_ver tăng)
+SĐT KHÔNG được xác minh (không có SMS), nên SĐT chỉ là thông tin LIÊN HỆ cho Khoa Dược, KHÔNG dùng để vào xem cuộc trò chuyện
+(nếu dùng thì ai biết số cũng đọc được, mà nội dung có thể chứa thông tin sức khoẻ). Thay vào đó:
+  - mỗi cuộc trò chuyện (1 dòng KhachHang) gắn với THIẾT BỊ / trình duyệt tạo ra nó, qua cookie ĐÃ KÝ nhớ 30 ngày (không đoán / sửa được)
+  - cùng 1 SĐT có thể có nhiều cuộc trò chuyện (mỗi thiết bị một cuộc); người khác nhập SĐT của bạn chỉ mở được cuộc trò chuyện MỚI, trống
+  - giới hạn số cuộc trò chuyện mới theo thiết bị; SĐT đã bị admin chặn thì không mở cuộc mới được
+  - admin chặn → mọi thiết bị của khách đó bị vô hiệu (phien_ver tăng)
 """
-import math
 import random
-import re
 from datetime import datetime, timedelta
 
 from flask import current_app, g, request, url_for
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
-from werkzeug.security import check_password_hash, generate_password_hash
+from sqlalchemy.exc import IntegrityError
 
 from app import db
 from app.models.models import ChatLanThu, KhachHang, TinNhanRieng
@@ -25,11 +24,9 @@ from app.utils.phan_hoi import (TOI_DA_TIN_NHAN, chuan_hoa_sdt, duong_dan_noi_bo
 COOKIE = "pp_chat"
 THOI_HAN_COOKIE = 30 * 24 * 3600
 LOAI_TIN = {"ho_tro": "Hỗ trợ", "gop_y": "Góp ý", "bao_loi": "Báo lỗi thông tin"}
-LOI_CHUNG = "Số điện thoại hoặc mã bí mật chưa đúng."
 TIN_MOI_10_PHUT = 8
 TIN_MOI_24_GIO = 60
-LAN_SAI_TOI_DA_THIET_BI = 10          # trong 15 phút
-TAO_MOI_TOI_DA_THIET_BI = 5           # trong 24 giờ
+TAO_MOI_TOI_DA_THIET_BI = 5           # số cuộc trò chuyện mới tối đa / thiết bị / 24 giờ
 
 
 # ───────────────────────────── phiên đăng nhập của khách (cookie ký) ─────────────────────────────
@@ -67,7 +64,7 @@ def khach_hien_tai():
     return khach
 
 
-# ───────────────────────────── đăng ký / đăng nhập bằng SĐT + mã bí mật ─────────────────────────────
+# ───────────────────────────── bắt đầu cuộc trò chuyện mới (không mã bí mật) ─────────────────────────────
 def _so_lan(khoa, loai, phut):
     return ChatLanThu.query.filter(ChatLanThu.khoa == khoa, ChatLanThu.loai == loai,
                                    ChatLanThu.thoi_gian >= datetime.utcnow() - timedelta(minutes=phut)).count()
@@ -79,65 +76,29 @@ def _ghi_lan(khoa, loai):
         ChatLanThu.query.filter(ChatLanThu.thoi_gian < datetime.utcnow() - timedelta(days=2)).delete(synchronize_session=False)
 
 
-def xac_thuc(sdt_tho, ten_tho, ma):
-    """Đăng nhập (SĐT đã có) hoặc TẠO MỚI (SĐT chưa có) bằng SĐT + mã bí mật 6 số.
-    Trả về (khach, la_tai_khoan_moi, loi). Hàm tự commit."""
+def bat_dau(sdt_tho, ten_tho):
+    """Mở 1 cuộc trò chuyện MỚI gắn với thiết bị này (không cần mã bí mật). Trả về (khach, loi). Hàm tự commit."""
     sdt = chuan_hoa_sdt(sdt_tho)
     if not sdt:
-        return None, False, "Số điện thoại chưa đúng. Nhập 10 số, bắt đầu bằng số 0."
-    if not re.fullmatch(r"\d{6}", ma or ""):
-        return None, False, "Mã bí mật gồm đúng 6 chữ số."
+        return None, "Số điện thoại chưa đúng. Nhập 10 số, bắt đầu bằng số 0."
+    ten, loi = kiem_tra_ten(ten_tho)
+    if loi:
+        return None, loi
+    if KhachHang.query.filter_by(so_dien_thoai=sdt, bi_chan=True).first() is not None:
+        return None, "Không thể mở cuộc trò chuyện với số điện thoại này."
     khoa = khoa_khach()
-    if _so_lan(khoa, "sai_ma", 15) >= LAN_SAI_TOI_DA_THIET_BI:
-        return None, False, "Bạn đã thử quá nhiều lần. Vui lòng quay lại sau ít phút."
-
-    bay_gio = datetime.utcnow()
-    khach = KhachHang.query.filter_by(so_dien_thoai=sdt).first()
-
-    if khach is None:                                                     # ── tạo tài khoản mới
-        ten, loi = kiem_tra_ten(ten_tho)
-        if loi:
-            return None, False, loi
-        if _so_lan(khoa, "tao_moi", 24 * 60) >= TAO_MOI_TOI_DA_THIET_BI:
-            return None, False, "Thiết bị này đã tạo quá nhiều tài khoản hôm nay."
-        khach = KhachHang(so_dien_thoai=sdt, ten=ten, pin_hash=generate_password_hash(ma))
-        db.session.add(khach)
-        _ghi_lan(khoa, "tao_moi")
+    if _so_lan(khoa, "tao_moi", 24 * 60) >= TAO_MOI_TOI_DA_THIET_BI:
+        return None, "Thiết bị này đã mở quá nhiều cuộc trò chuyện hôm nay."
+    khach = KhachHang(so_dien_thoai=sdt, ten=ten, pin_hash="")          # pin_hash: cột cũ, không còn dùng (giữ để khỏi phải đổi DB)
+    db.session.add(khach)
+    _ghi_lan(khoa, "tao_moi")
+    try:
         db.session.commit()
-        return khach, True, None
-
-    if khach.bi_chan:
-        return None, False, LOI_CHUNG
-    if khach.khoa_den and khach.khoa_den > bay_gio:
-        phut = max(1, math.ceil((khach.khoa_den - bay_gio).total_seconds() / 60))
-        return None, False, f"Tài khoản tạm khoá do nhập sai mã nhiều lần. Thử lại sau {phut} phút."
-
-    if check_password_hash(khach.pin_hash, ma):                          # ── đăng nhập đúng
-        khach.so_lan_sai, khach.khoa_den, khach.lan_cuoi = 0, None, bay_gio
-        db.session.commit()
-        return khach, False, None
-
-    khach.so_lan_sai = (khach.so_lan_sai or 0) + 1                       # ── sai mã
-    if khach.so_lan_sai >= 15:
-        khach.khoa_den = bay_gio + timedelta(hours=24)
-    elif khach.so_lan_sai >= 10:
-        khach.khoa_den = bay_gio + timedelta(hours=1)
-    elif khach.so_lan_sai >= 5:
-        khach.khoa_den = bay_gio + timedelta(minutes=15)
-    _ghi_lan(khoa, "sai_ma")
-    db.session.commit()
-    return None, False, LOI_CHUNG
-
-
-def dat_lai_ma(khach, ma_moi):
-    """Admin đặt lại mã bí mật cho khách (sau khi xác minh qua điện thoại). Mọi thiết bị cũ bị đăng xuất."""
-    if not re.fullmatch(r"\d{6}", ma_moi or ""):
-        return "Mã bí mật gồm đúng 6 chữ số."
-    khach.pin_hash = generate_password_hash(ma_moi)
-    khach.phien_ver = (khach.phien_ver or 1) + 1
-    khach.so_lan_sai, khach.khoa_den = 0, None
-    db.session.commit()
-    return None
+    except IntegrityError:                                               # DB cũ còn ràng buộc UNIQUE trên số điện thoại → cần chạy bo_ma_bi_mat.sql
+        db.session.rollback()
+        current_app.logger.error("khach_hang.so_dien_thoai còn UNIQUE: hãy chạy bo_ma_bi_mat.sql")
+        return None, "Hệ thống đang được cập nhật, vui lòng thử lại sau hoặc liên hệ Khoa Dược."
+    return khach, None
 
 
 # ───────────────────────────── tin nhắn ─────────────────────────────
