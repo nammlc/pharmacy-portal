@@ -4059,3 +4059,29 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
   .hero-badge { font-size: 11px; padding: 5px 12px; margin-bottom: 14px; }
   .hero h1 { margin-bottom: 22px; }
 }
+
+/* ============================================================
+   MÁY TÍNH (≥ 901px): HERO TRANG CHỦ - khối chữ và ô tìm kiếm to, rộng, thoáng
+   Trước đây chữ/ô tìm kiếm giữ cỡ của điện thoại nên "lọt thỏm" giữa banner rộng. Giờ: hero cao hơn, tiêu đề lớn, ô tìm kiếm
+   rộng ~760px, thêm quầng tối nhẹ phía sau khối chữ để đọc rõ trên ảnh nền rực. Điện thoại KHÔNG đổi.
+   ============================================================ */
+@media (min-width: 901px) {
+  .hero--anh { min-height: clamp(560px, 42vw, 680px); padding-top: 88px; padding-bottom: 130px; }
+  .hero--anh .hero-phu {
+    background:
+      radial-gradient(ellipse 52% 62% at 50% 48%, rgba(6, 18, 36, 0.62) 0%, rgba(6, 18, 36, 0.32) 55%, rgba(6, 18, 36, 0) 100%),
+      linear-gradient(180deg,
+        rgba(11, 31, 58, var(--hero-a1, 0.60)) 0%,
+        rgba(11, 31, 58, var(--hero-a2, 0.66)) 55%,
+        rgba(11, 31, 58, var(--hero-a3, 0.78)) 100%);
+  }
+  .hero-inner { max-width: 1000px; }
+  .hero-badge { font-size: 14px; padding: 9px 22px; gap: 10px; margin-bottom: 28px; letter-spacing: 0.06em; }
+  .hero-badge-dot { width: 9px; height: 9px; }
+  .hero h1 { gap: 6px; margin-bottom: 44px; }
+  .hero-h1-top { font-size: clamp(26px, 2.4vw, 36px); letter-spacing: 0.04em; }
+  .hero-h1-main { font-size: clamp(76px, 7.4vw, 112px); line-height: 1.05; letter-spacing: -0.02em; }
+  .hero-search { max-width: 780px; padding: 9px 9px 9px 32px; border-width: 3px; }
+  .hero-search input { font-size: 19px; padding-left: 40px; background-size: 24px; }
+  .hero-search button { padding: 18px 40px; font-size: 17px; }
+}
