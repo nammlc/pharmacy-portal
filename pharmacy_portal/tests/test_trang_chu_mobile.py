@@ -1,4 +1,5 @@
-"""Trang chủ điện thoại: các ô chức năng dạng thẻ sản phẩm 2 cột kiểu Shopee (chỉ ≤ 700px, máy tính không đổi)."""
+"""Điện thoại (≤ 700px, máy tính không đổi): trang chủ dạng thẻ sản phẩm 2 cột kiểu Shopee; Danh mục thuốc / Nhóm thuốc cũng là lưới 2 cột;
+tất cả cùng MỘT bảng màu xanh thương hiệu (không còn màu riêng / màu xoay vòng cho từng thẻ)."""
 import os
 import re
 import unittest
@@ -10,10 +11,23 @@ from tests.test_phan_hoi import Co                                      # noqa: 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+def _css():
+    with open(os.path.join(ROOT, "app/static/css/style.css"), encoding="utf-8") as f:
+        return f.read()
+
+
 def _khoi_mobile():
-    css = open(os.path.join(ROOT, "app/static/css/style.css"), encoding="utf-8").read()
+    css = _css()
     a = css.index("TRANG CHỦ ĐIỆN THOẠI")
     return css[a:]
+
+
+def _khoi_luoi_nhom_thuoc():
+    """Khối CSS điện thoại của Danh mục thuốc / Nhóm thuốc (nằm cuối file, sau khối trang chủ)."""
+    css = _css()
+    a = css.index("ĐIỆN THOẠI (≤ 700px): DANH MỤC THUỐC / NHÓM THUỐC")
+    k = css[a:]
+    return k[k.index("@media (max-width: 700px)"):]
 
 
 class TrangChuMobile(Co):
@@ -44,10 +58,48 @@ class TrangChuMobile(Co):
                 self.assertEqual(v.strip(), "none", m.group(0))             # chỉ được phép vô hiệu hoá transform, không được tạo mới
             self.assertNotIn("filter:", body); self.assertNotIn("z-index", body); self.assertNotIn("opacity:", body)
 
-    def test_each_card_has_its_own_colours(self):
+    def test_all_cards_share_one_harmonised_palette(self):
         trong = _khoi_mobile()
-        for k in ("dmt", "ntbv", "tt", "thtk", "ttt", "ttth", "ttbn", "bv"):
-            self.assertRegex(trong, r"\.category-card\.cat-%s\s*\{ --cat-bg1:" % k)
+        # không còn màu riêng cho từng thẻ (trước đây 8 thẻ = 8 màu: xanh / lục / chàm / tím / cam / ngọc / hồng / vàng)
+        self.assertNotRegex(trong, r"\.category-card\.cat-\w+\s*\{ --cat-bg1:")
+        # cả 8 thẻ dùng chung một bộ màu: nền ô "ảnh" xanh nhạt + chữ/nhãn xanh navy thương hiệu
+        self.assertRegex(trong, r"\.category-card \{[^}]*--cat-bg1: var\(--m-tile-1\);\s*--cat-bg2: var\(--m-tile-2\);\s*--cat-ink: var\(--navy-600\)")
+        # nền khu vực thẻ cùng màu nền các trang khác (không phải xám trung tính #f3f4f6)
+        self.assertRegex(trong, r"\.category-grid-outer \{ background: var\(--paper-0\)")
+
+
+class NhomThuocMobile(unittest.TestCase):
+    """Danh mục thuốc (danh sách nhóm) và Nhóm thuốc (danh sách thuốc) trên điện thoại: lưới 2 cột, một bảng màu."""
+
+    def test_group_and_drug_grids_are_two_columns_on_phones_only(self):
+        trong = _khoi_luoi_nhom_thuoc()
+        self.assertRegex(trong, r"\.nhom-grid, \.drug-grid \{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)")  # minmax(0,…) để tên dài không làm tràn cột
+        # máy tính giữ nguyên lưới tự co giãn
+        css = _css()
+        self.assertRegex(css, r"\.nhom-grid \{\s*display: grid;\s*grid-template-columns: repeat\(auto-fill, minmax\(250px, 1fr\)\)")
+        self.assertRegex(css, r"\.drug-grid \{\s*display: grid;\s*grid-template-columns: repeat\(auto-fill, minmax\(240px, 1fr\)\)")
+
+    def test_group_cards_use_one_accent_not_rotating_colours(self):
+        trong = _khoi_luoi_nhom_thuoc()
+        # .nhom-grid .nhom-card (2 class) thắng .nhom-card-accent-0..3 (1 class: xanh / vàng / cam…) → mọi nhóm cùng một màu
+        self.assertRegex(trong, r"\.nhom-grid \.nhom-card \{ --accent-color: var\(--navy-600\); --accent-bg: var\(--sage-100\);")
+
+    def test_drug_cards_are_product_tiles_with_ratio_image_on_top(self):
+        trong = _khoi_luoi_nhom_thuoc()
+        self.assertRegex(trong, r"\.drug-grid \.drug-card \{ flex-direction: column;")
+        self.assertIn("aspect-ratio: 4 / 5", trong)                          # cùng tỉ lệ 4:5 của ảnh thuốc đang dùng (80×100)
+        self.assertIn("-webkit-line-clamp: 2", trong)                        # tên thuốc / hoạt chất tối đa 2 dòng
+        # ô chữ cái khi chưa có ảnh: ghi đè màu inline (xanh dương / xanh lá) ở trang tìm kiếm tổng hợp
+        self.assertRegex(trong, r"\.drug-card-thumb-fallback \{[^}]*color: var\(--navy-600\) !important;[^}]*background: radial-gradient\([^}]*!important")
+
+    def test_no_sticky_hover_motion_on_touch(self):
+        trong = _khoi_luoi_nhom_thuoc()
+        for sel in (".nhom-card:hover", ".drug-card:hover"):
+            self.assertRegex(trong, re.escape(sel) + r" \{ transform: none;")
+
+    def test_footer_strip_follows_the_blue_palette_on_phones(self):
+        trong = _khoi_luoi_nhom_thuoc()
+        self.assertRegex(trong, r"\.site-footer::before \{ background: linear-gradient\(90deg, var\(--navy-600\), var\(--sky-400\)\)")
 
 
 if __name__ == "__main__":
