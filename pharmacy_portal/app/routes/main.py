@@ -68,10 +68,13 @@ VCT_MAC_DINH = {
 
 @bp.route("/")
 def vao_trang():
-    # Vừa truy cập vào web ("/") thì đẩy thẳng vào trang Bài viết/Thông báo,
+    # Vừa truy cập vào web ("/") thì hiện ngay trang Bài viết/Thông báo,
     # để thấy ngay tin tức/thông báo mới nhất. Trang chủ (thống kê) cũ vẫn
     # giữ nguyên, xem tại /trang-chu (nav "Trang chủ" trỏ vào đây).
-    return redirect(url_for("bv.index"))
+    # SEO: KHÔNG redirect nữa (trước đây là 302 sang /bai-viet/ nên Google báo "Page with redirect"
+    # và không lập chỉ mục địa chỉ gốc). Hiện thẳng nội dung ngay tại "/", canonical vẫn là "/".
+    from app.routes.bai_viet import index as bai_viet_index
+    return bai_viet_index()
 
 
 @bp.route("/trang-chu")
