@@ -4085,3 +4085,6 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
   .hero-search input { font-size: 16px; padding-left: 32px; background-size: 20px; }
   .hero-search button { padding: 13px 28px; font-size: 15px; }
 }
+
+/* Chữ chỉ dành cho công cụ tìm kiếm / trình đọc màn hình (không hiển thị trên giao diện) */
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }

@@ -21,7 +21,11 @@
     <h1>
       <span class="hero-h1-top">Tra cứu dược</span>
       <span class="hero-h1-main">Tâm Đức</span>
+      {# SEO: giữ nguyên chữ mà Google đã lập chỉ mục (tên khoa, bệnh viện, nội dung tra cứu). Ẩn khỏi mắt người xem nhưng vẫn
+         có trong HTML và đọc được bằng trình đọc màn hình. Đừng xoá khối này kẻo mất gợi ý khi tìm "dược BV Tâm Đức Cầu Quan". #}
+      <span class="sr-only"> – Cổng tra cứu thuốc Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan, thông tin thuốc nhanh chóng</span>
     </h1>
+    <p class="sr-only">Tra cứu dược Tâm Đức của Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan: danh mục thuốc, tương tác thuốc, thuốc tiêm truyền, tương hợp – tương kỵ và hướng dẫn sử dụng thuốc được cập nhật và kiểm duyệt bởi Dược sĩ lâm sàng.</p>
     <form class="hero-search" autocomplete="off" action="{{ url_for('main.tim_kiem') }}" method="get">
       <input type="text" name="q" placeholder="Tên thuốc hoặc hoạt chất..." data-goi-y="all">
       <button type="submit">🔍 Tra cứu</button>
