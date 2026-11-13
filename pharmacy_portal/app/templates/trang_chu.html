@@ -137,28 +137,44 @@
 
 <section class="home-info" aria-labelledby="home-info-title">
   <div class="home-wrap">
-    <h2 id="home-info-title">Tra cứu dược Tâm Đức Cầu Quan – cổng thông tin thuốc của Khoa Dược</h2>
-    <p>Đây là website <strong>tra cứu dược</strong> của <strong>Khoa Dược, Bệnh viện Đa khoa Tâm Đức Cầu Quan</strong>. Cổng giúp nhân viên y tế và người bệnh tra cứu nhanh thông tin thuốc đang sử dụng tại bệnh viện, do Khoa Dược cập nhật và kiểm duyệt.</p>
 
-    <h3>Bạn có thể tra cứu gì tại Khoa Dược BV Tâm Đức Cầu Quan?</h3>
-    <ul class="home-info-list">
-      <li><a href="{{ url_for('dmt.index') }}">Danh mục thuốc</a> – tra theo nhóm dược lý, kèm chỉ định, chống chỉ định và liều dùng.</li>
-      <li><a href="{{ url_for('ntbv.index') }}">Nhà thuốc bệnh viện</a> – thuốc bán tại Nhà thuốc Bệnh viện Đa khoa Tâm Đức Cầu Quan, tra theo nhóm và hoạt chất.</li>
-      <li><a href="{{ url_for('tttt.index') }}">Thuốc tiêm truyền</a> – dung môi pha loãng, tốc độ truyền, độ ổn định và thời hạn sau pha.</li>
-      <li><a href="{{ url_for('thtk.index') }}">Tương hợp – tương kỵ</a> – kiểm tra khả năng pha chung hai thuốc truyền tĩnh mạch.</li>
-      <li><a href="{{ url_for('ttt.index') }}">Tương tác thuốc</a> – mức độ, cơ chế và hướng xử trí khi dùng đồng thời hai thuốc.</li>
-      <li><a href="{{ url_for('ttth.index') }}">Thông tin thuốc</a> và <a href="{{ url_for('ttbn.index') }}">hướng dẫn dùng thuốc cho người bệnh</a> bằng ngôn ngữ đơn giản, dễ hiểu.</li>
-    </ul>
+    <div class="home-info-top">
+      <div class="home-intro">
+        <span class="home-eyebrow">Giới thiệu</span>
+        <h2 id="home-info-title">Tra cứu dược Tâm Đức Cầu Quan – cổng thông tin thuốc của Khoa Dược</h2>
+        <p>Đây là website <strong>tra cứu dược</strong> của <strong>Khoa Dược, Bệnh viện Đa khoa Tâm Đức Cầu Quan</strong>. Cổng giúp nhân viên y tế và người bệnh tra cứu nhanh thông tin thuốc đang sử dụng tại bệnh viện, do Khoa Dược cập nhật và kiểm duyệt.</p>
+        <div class="home-note"><span aria-hidden="true">ⓘ</span><span>Nội dung chỉ mang tính tham khảo, luôn đối chiếu dược thư và quy trình chuyên môn hiện hành.</span></div>
+      </div>
 
-    <h3>Câu hỏi thường gặp</h3>
+      <div class="home-find">
+        <h3>Bạn có thể tra cứu gì tại Khoa Dược BV Tâm Đức Cầu Quan?</h3>
+        <ul class="home-find-list">
+          <li><span class="home-ico" aria-hidden="true">💊</span><div><a href="{{ url_for('dmt.index') }}">Danh mục thuốc</a><p>Tra theo nhóm dược lý, kèm chỉ định, chống chỉ định và liều dùng.</p></div></li>
+          <li><span class="home-ico" aria-hidden="true">🏥</span><div><a href="{{ url_for('ntbv.index') }}">Nhà thuốc bệnh viện</a><p>Thuốc bán tại Nhà thuốc Bệnh viện Đa khoa Tâm Đức Cầu Quan, tra theo nhóm và hoạt chất.</p></div></li>
+          <li><span class="home-ico" aria-hidden="true">💉</span><div><a href="{{ url_for('tttt.index') }}">Thuốc tiêm truyền</a><p>Dung môi pha loãng, tốc độ truyền, độ ổn định và thời hạn sau pha.</p></div></li>
+          <li><span class="home-ico" aria-hidden="true">🧪</span><div><a href="{{ url_for('thtk.index') }}">Tương hợp – tương kỵ</a><p>Kiểm tra khả năng pha chung hai thuốc truyền tĩnh mạch.</p></div></li>
+          <li><span class="home-ico" aria-hidden="true">⚠️</span><div><a href="{{ url_for('ttt.index') }}">Tương tác thuốc</a><p>Mức độ, cơ chế và hướng xử trí khi dùng đồng thời hai thuốc.</p></div></li>
+          <li><span class="home-ico" aria-hidden="true">📋</span><div><a href="{{ url_for('ttth.index') }}">Thông tin thuốc</a> · <a href="{{ url_for('ttbn.index') }}">Hướng dẫn cho người bệnh</a><p>Hướng dẫn dùng thuốc bằng ngôn ngữ đơn giản, dễ hiểu.</p></div></li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 class="home-faq-title">Câu hỏi thường gặp</h3>
     <dl class="home-faq">
-      <dt>Tra cứu dược Tâm Đức Cầu Quan là gì?</dt>
-      <dd>Là trang tra cứu thông tin thuốc do Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan xây dựng, tập hợp danh mục thuốc, tương tác thuốc, thuốc tiêm truyền và tương hợp – tương kỵ.</dd>
-      <dt>Thông tin trên website có thay thế chỉ định của bác sĩ không?</dt>
-      <dd>Không. Nội dung chỉ mang tính tham khảo, cần đối chiếu dược thư và quy trình chuyên môn hiện hành. Người bệnh dùng thuốc theo chỉ định của bác sĩ, dược sĩ.</dd>
-      <dt>Liên hệ Khoa Dược BV Tâm Đức Cầu Quan bằng cách nào?</dt>
-      <dd>Xem thông tin liên hệ tại trang <a href="{{ url_for('main.ve_chung_toi') }}">Về chúng tôi</a>, hoặc gửi góp ý ở mục <a href="{{ url_for('ho_tro.trang') }}">Hỗ trợ &amp; góp ý</a>.</dd>
+      <div class="home-faq-item">
+        <dt><span class="home-q" aria-hidden="true">1</span>Tra cứu dược Tâm Đức Cầu Quan là gì?</dt>
+        <dd>Là trang tra cứu thông tin thuốc do Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan xây dựng, tập hợp danh mục thuốc, tương tác thuốc, thuốc tiêm truyền và tương hợp – tương kỵ.</dd>
+      </div>
+      <div class="home-faq-item">
+        <dt><span class="home-q" aria-hidden="true">2</span>Thông tin trên website có thay thế chỉ định của bác sĩ không?</dt>
+        <dd>Không. Nội dung chỉ mang tính tham khảo, cần đối chiếu dược thư và quy trình chuyên môn hiện hành. Người bệnh dùng thuốc theo chỉ định của bác sĩ, dược sĩ.</dd>
+      </div>
+      <div class="home-faq-item">
+        <dt><span class="home-q" aria-hidden="true">3</span>Liên hệ Khoa Dược BV Tâm Đức Cầu Quan bằng cách nào?</dt>
+        <dd>Xem thông tin liên hệ tại trang <a href="{{ url_for('main.ve_chung_toi') }}">Về chúng tôi</a>, hoặc gửi góp ý ở mục <a href="{{ url_for('ho_tro.trang') }}">Hỗ trợ &amp; góp ý</a>.</dd>
+      </div>
     </dl>
+
   </div>
 </section>
 {% endblock %}

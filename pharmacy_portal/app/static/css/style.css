@@ -4094,12 +4094,12 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
    ============================================================ */
 .home-news, .home-info { background: var(--paper-0); }
 .home-wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
-.home-news { margin-top: -36px; padding-bottom: 36px; }
-.home-info { padding: 8px 0 72px; }
+.home-news { margin-top: -36px; padding-bottom: 40px; }
+.home-info { padding: 0 0 72px; }
+
+/* --- Bài viết mới --- */
 .home-news-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-.home-news h2, .home-info h2 { font-family: var(--font-display); color: var(--ink-900); font-size: 22px; margin: 0; letter-spacing: -0.01em; }
-.home-info h2 { margin-bottom: 12px; }
-.home-info h3 { font-family: var(--font-display); color: var(--ink-700); font-size: 16px; margin: 26px 0 10px; }
+.home-news h2 { font-family: var(--font-display); color: var(--ink-900); font-size: 22px; margin: 0; letter-spacing: -0.01em; }
 .home-news-all { color: var(--navy-600); font-weight: 600; font-size: 14px; text-decoration: none; white-space: nowrap; }
 .home-news-all:hover { text-decoration: underline; }
 .home-news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
@@ -4108,15 +4108,56 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
 .home-news-item h3 { margin: 0; font-family: var(--font-display); font-size: 15px; line-height: 1.4; color: var(--ink-900); }
 .home-news-item p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--text-muted); }
 .home-news-item time { margin-top: auto; font-size: 12px; color: var(--text-muted); }
-.home-info p { color: #33475f; line-height: 1.75; margin: 0 0 8px; max-width: 880px; }
-.home-info-list { margin: 0; padding-left: 20px; color: #33475f; line-height: 1.75; max-width: 880px; }
-.home-info-list a, .home-faq a { color: var(--navy-600); font-weight: 600; }
-.home-faq { margin: 0; max-width: 880px; }
-.home-faq dt { font-weight: 600; color: var(--ink-900); margin-top: 14px; }
-.home-faq dd { margin: 4px 0 0; color: #33475f; line-height: 1.7; }
+
+/* --- Giới thiệu: 2 khối cạnh nhau --- */
+.home-info-top { display: grid; grid-template-columns: 1fr 1.08fr; gap: 18px; align-items: stretch; }
+.home-intro { display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; border-radius: var(--radius-lg); padding: 30px 32px; color: #fff;
+              background: linear-gradient(135deg, var(--ink-900) 0%, var(--navy-600) 100%); box-shadow: var(--shadow-md); }
+.home-intro::after { content: ""; position: absolute; right: -70px; bottom: -70px; width: 220px; height: 220px; border-radius: 50%;
+                     background: radial-gradient(circle, rgba(74,159,224,.35), rgba(74,159,224,0) 70%); pointer-events: none; }
+.home-eyebrow { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+                padding: 4px 10px; border-radius: var(--radius-full); background: rgba(255,255,255,.14); color: #cfe5fa; }
+.home-intro h2 { font-family: var(--font-display); font-size: 24px; line-height: 1.3; margin: 14px 0 12px; color: #fff; letter-spacing: -0.01em; }
+.home-intro p { margin: 0 0 18px; line-height: 1.7; color: #dbe9f8; font-size: 15px; }
+.home-intro strong { color: #fff; }
+.home-note { position: relative; z-index: 1; display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px;
+             background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); font-size: 13px; line-height: 1.55; color: #e8f1fb; }
+.home-note > span:first-child { font-size: 16px; line-height: 1.2; }
+
+.home-find { background: var(--paper-50); border: 1px solid var(--line-200); border-radius: var(--radius-lg); padding: 24px 26px; box-shadow: var(--m-card-shadow); }
+.home-find h3 { font-family: var(--font-display); font-size: 16px; color: var(--ink-900); margin: 0 0 6px; line-height: 1.4; }
+.home-find-list { list-style: none; margin: 0; padding: 0; }
+.home-find-list li { display: flex; gap: 14px; align-items: flex-start; padding: 13px 0; border-bottom: 1px solid var(--line-100); }
+.home-find-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+.home-ico { flex: none; width: 38px; height: 38px; display: grid; place-items: center; font-size: 18px; border-radius: 11px;
+            background: var(--sage-100); }
+.home-find-list a { color: var(--navy-600); font-weight: 700; text-decoration: none; }
+.home-find-list a:hover { text-decoration: underline; }
+.home-find-list p { margin: 2px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--text-muted); }
+
+/* --- Hỏi đáp: 3 thẻ --- */
+.home-faq-title { font-family: var(--font-display); font-size: 18px; color: var(--ink-900); margin: 34px 0 14px; }
+.home-faq { margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.home-faq-item { background: var(--paper-50); border: 1px solid var(--line-200); border-top: 3px solid var(--navy-500);
+                 border-radius: var(--radius-md); padding: 18px 20px; box-shadow: var(--m-card-shadow); }
+.home-faq-item dt { display: flex; gap: 10px; align-items: flex-start; font-weight: 700; color: var(--ink-900); line-height: 1.4; font-size: 15px; }
+.home-q { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700;
+          background: var(--navy-600); color: #fff; margin-top: 1px; }
+.home-faq-item dd { margin: 10px 0 0; color: #3a4f68; line-height: 1.65; font-size: 14px; }
+.home-faq-item a { color: var(--navy-600); font-weight: 600; }
+
+@media (max-width: 980px) {
+  .home-info-top { grid-template-columns: 1fr; }
+  .home-intro { justify-content: flex-start; }
+  .home-faq { grid-template-columns: 1fr; }
+}
 @media (max-width: 700px) {
   .home-wrap { padding: 0 14px; }
   .home-news { margin-top: 0; padding-bottom: 24px; }
   .home-info { padding-bottom: 48px; }
-  .home-news h2, .home-info h2 { font-size: 18px; }
+  .home-news h2 { font-size: 18px; }
+  .home-intro { padding: 22px 20px; border-radius: 18px; }
+  .home-intro h2 { font-size: 20px; }
+  .home-find { padding: 18px 16px; border-radius: 18px; }
+  .home-faq-title { margin-top: 26px; font-size: 17px; }
 }
