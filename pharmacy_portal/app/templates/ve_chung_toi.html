@@ -15,7 +15,8 @@
       <div class="vct-eyebrow">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
       <h1>{{ d.vct_tieu_de or 'Về chúng tôi' }}</h1>
       {% if d.vct_mo_ta_ngan %}
-      <p>{{ d.vct_mo_ta_ngan }}</p>
+      <p class="vct-mota vct-mota--pc">{{ d.vct_mo_ta_ngan }}</p>
+      <p class="vct-mota vct-mota--mb">{{ d.vct_mo_ta_ngan|truncate(70, False, '…') }}</p>
       {% endif %}
     </div>
   </div>
@@ -178,6 +179,9 @@
   line-height: 1.6;
 }
 
+/* Mô tả: máy tính hiện bản đầy đủ, điện thoại hiện bản rút gọn (tự cắt ~70 ký tự ở ranh giới từ) */
+.vct-mota--mb { display: none; }
+
 /* Main section */
 .vct-main-section { padding: 56px 0 80px; }
 .vct-container {
@@ -331,7 +335,15 @@ a.vct-contact-row:hover { color: var(--navy-500); }
   .vct-hero { padding: 16px 12px 0; }
   .vct-hero-inner { border-radius: 14px; }
   .vct-hero-gradient { height: 220px; }
-  .vct-hero-textbox { left: 14px; right: 14px; bottom: 14px; padding: 16px 18px; max-width: none; }
+  /* Điện thoại: hộp mô tả thu nhỏ, đặt gọn ở GÓC DƯỚI TRÁI để không che ảnh (ẩn dòng nhãn, mô tả tối đa 2 dòng) */
+  .vct-hero-textbox { left: 10px; right: auto; bottom: 10px; width: max-content; max-width: min(78%, 290px); padding: 11px 15px; border-radius: 14px;
+                      background: rgba(255,255,255,0.72); box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
+  .vct-eyebrow { display: none; }
+  .vct-hero-textbox h1 { font-size: 19px; line-height: 1.2; margin: 0; }
+  .vct-hero-textbox .vct-mota--pc { display: none; }
+  .vct-hero-textbox .vct-mota--mb { display: -webkit-box; }
+  .vct-hero-textbox p { font-size: 13px; line-height: 1.45; margin: 5px 0 0; color: var(--ink-900);
+                        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .vct-container { gap: 36px; padding: 0 16px; }
   .vct-cards-row { grid-template-columns: 1fr; }
   .vct-main-section { padding: 36px 0 60px; }

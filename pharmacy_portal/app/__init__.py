@@ -31,6 +31,14 @@ def create_app(config_class=Config):
         @app.before_request
         def _chuyen_ve_ten_mien_chinh():
             host = request.host.split(":")[0].lower()
+            chinh = app.config["CANONICAL_HOST"]
+            # Gộp www / không www về MỘT địa chỉ duy nhất (301) để Google không lập chỉ mục trùng 2 phiên bản
+            # (Search Console đang thấy cả www.tracuuduoc-... lẫn tracuuduoc-...).
+            if host != chinh and (host == "www." + chinh or "www." + host == chinh):
+                return redirect(
+                    f"https://{chinh}{request.full_path.rstrip('?')}",
+                    code=301,
+                )
             if host.endswith(".onrender.com"):
                 return redirect(
                     f"https://{app.config['CANONICAL_HOST']}{request.full_path.rstrip('?')}",

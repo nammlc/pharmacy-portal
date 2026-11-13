@@ -32,6 +32,7 @@ def dang_ky_seo(app):
     @app.route("/sitemap.xml")
     def sitemap_xml():
         goc = _goc_trang()
+        # "/" là trang chủ thật (HTTP 200). /trang-chu chỉ là địa chỉ cũ, đã 301 về "/" nên không đưa vào sitemap.
         duong_dan = [
             "/",
             "/ve-chung-toi",

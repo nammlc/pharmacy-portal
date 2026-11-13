@@ -1,5 +1,8 @@
 {% extends "base.html" %}
-{% block title %}{{ danh_muc_hien_tai.ten if danh_muc_hien_tai else 'Bài viết - Thông báo' }}{% endblock %}
+{% set la_trang_goc = (request.path == '/' and not danh_muc_hien_tai) %}
+{% block title %}{% if la_trang_goc %}Tra cứu dược Tâm Đức — Khoa Dược{% else %}{{ danh_muc_hien_tai.ten if danh_muc_hien_tai else 'Bài viết - Thông báo' }}{% endif %}{% endblock %}
+{% block meta_mo_ta %}{% if la_trang_goc %}Tra cứu dược Tâm Đức: thông tin thuốc, tương tác thuốc, tương hợp – tương kỵ, tin tức và thông báo từ Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan.{% else %}Thông báo nội bộ, tin tức dược phẩm, bài báo khoa học và hướng dẫn chuyên môn từ Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan.{% endif %}{% endblock %}
+{% block og_tieu_de %}{% if la_trang_goc %}Tra cứu dược Tâm Đức — Khoa Dược BV Đa khoa Tâm Đức Cầu Quan{% else %}Bài viết - Thông báo – BV Đa khoa Tâm Đức Cầu Quan{% endif %}{% endblock %}
 
 {% block content %}
 <div class="page-header">

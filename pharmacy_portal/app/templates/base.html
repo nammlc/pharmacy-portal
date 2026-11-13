@@ -33,6 +33,17 @@
   }
 }
 </script>
+{% if request.endpoint == 'main.trang_chu' %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Tra cứu dược Tâm Đức",
+  "alternateName": ["Cổng Tra Cứu Dược", "Khoa Dược BVĐK Tâm Đức Cầu Quan"],
+  "url": "{{ ((config.CANONICAL_HOST and ('https://' ~ config.CANONICAL_HOST)) or request.host_url.rstrip('/')) ~ '/' }}"
+}
+</script>
+{% endif %}
 </head>
 <body>
 

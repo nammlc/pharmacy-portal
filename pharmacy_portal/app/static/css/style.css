@@ -3748,7 +3748,7 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
 .hero--anh .hero-badge { text-shadow: 0 2px 18px rgba(5, 15, 30, 0.45); }
 .hero--anh p { color: rgba(255, 255, 255, 0.92); text-shadow: 0 1px 12px rgba(5, 15, 30, 0.5); }
 @media (max-width: 700px) {
-  .hero--anh { min-height: 0; padding-top: 56px; padding-bottom: 92px; }
+  .hero--anh { min-height: 0; padding-top: 56px; padding-bottom: 44px; }   /* lưới thẻ nằm dưới hero, không đè lên nữa */
 }
 
 /* ============================================================
@@ -3926,11 +3926,13 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
    ============================================================ */
 .cat-tag { display: none; }
 @media (max-width: 700px) {
-  .category-grid-outer { background: var(--paper-0); padding: 0 14px 32px; }
-  .category-grid { max-width: none; margin: -34px auto 0; padding: 0; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; }
+  /* Lưới nằm HẲN bên dưới hero (không đè lên ảnh nền): 18px nền trang giữa đáy hero và hàng thẻ đầu */
+  .category-grid-outer { background: var(--paper-0); padding: 18px 14px 32px; }
+  .category-grid { max-width: none; margin: 0 auto; padding: 0; grid-template-columns: 1fr 1fr; gap: 10px; align-items: stretch; }
   .category-card { padding: 0; gap: 0; background: #fff; border: 1px solid var(--line-200); border-radius: 14px; box-shadow: var(--m-card-shadow);
                    overflow: hidden; text-decoration: none; -webkit-tap-highlight-color: transparent;
                    --cat-bg1: var(--m-tile-1); --cat-bg2: var(--m-tile-2); --cat-ink: var(--navy-600); }
+  .hero { padding-bottom: 44px; }   /* hero nền xanh (chưa đặt ảnh) cũng cùng khoảng cách đáy */
   .category-card::before { display: none; }
   .category-card:hover { transform: none; box-shadow: var(--m-card-shadow); }
   .category-card:active { background: #f7f9fc; }
@@ -3991,15 +3993,16 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
   .drug-card:hover { transform: none; box-shadow: var(--m-card-shadow); border-color: var(--line-200); }
   .drug-card:active { background: #f7f9fc; }
   .drug-card .drug-card-thumb,
-  .drug-card .drug-card-thumb-fallback { width: 100%; height: auto; aspect-ratio: 4 / 5; border: 0; border-radius: 0; border-bottom: 1px solid var(--line-100); }
-  .drug-card .drug-card-thumb { display: block; object-fit: cover; }
+  /* Thu nhỏ: khung ảnh ngang 4:3 (trước là 4:5 rất cao), ảnh hiển thị trọn vẹn (contain) trên nền sáng, không bị cắt */
+  .drug-card .drug-card-thumb-fallback { width: 100%; height: auto; aspect-ratio: 4 / 3; border: 0; border-radius: 0; border-bottom: 1px solid var(--line-100); }
+  .drug-card .drug-card-thumb { display: block; object-fit: contain; padding: 6px; background: #fff; max-width: none; }
   /* Ô chữ cái khi chưa có ảnh: cùng nền xanh nhạt như trang chủ (màu inline cũ ở trang tìm kiếm cần !important mới ghi đè được) */
-  .drug-card .drug-card-thumb-fallback { font-size: 44px; color: var(--navy-600) !important;
+  .drug-card .drug-card-thumb-fallback { font-size: 34px; color: var(--navy-600) !important;
                                          background: radial-gradient(circle at 50% 38%, var(--m-tile-1) 0%, var(--m-tile-2) 100%) !important; }
-  .drug-card-body { padding: 10px 12px 12px; }
-  .drug-card-body h3 { margin: 0 0 4px; font-size: 13.5px; line-height: 1.3; white-space: normal;
+  .drug-card-body { padding: 8px 10px 10px; }
+  .drug-card-body h3 { margin: 0 0 2px; font-size: 13px; line-height: 1.3; white-space: normal;
                        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-  .drug-card-body p { font-size: 12px; line-height: 1.35; white-space: normal;
+  .drug-card-body p { font-size: 11.5px; line-height: 1.3; white-space: normal;
                       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
   /* Dải màu trên chân trang: bỏ dải cam - đỏ (thang mức độ cảnh báo), dùng đúng tông xanh của trang */
@@ -4019,3 +4022,69 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
   .drug-hero-media-fallback { font-size: 96px; }
   .drug-hero-text { padding: 0 4px 4px; }
 }
+
+/* ============================================================
+   ĐIỆN THOẠI (≤ 480px): Ô TÌM KIẾM Ở TRANG CHỦ - chữ gợi ý không bị cắt cụt
+   Chữ nhỏ lại, nút "Tra cứu" gọn hơn để ô nhập có thêm chỗ; nếu vẫn dài thì hiện dấu "…" thay vì bị cắt lửng.
+   ============================================================ */
+@media (max-width: 480px) {
+  .hero-search { padding: 5px 5px 5px 14px; }
+  .hero-search input { min-width: 0; font-size: 13px; padding-left: 24px; background-size: 16px; text-overflow: ellipsis; }
+  .hero-search input::placeholder { font-size: 13px; text-overflow: ellipsis; }
+  .hero-search button { padding: 11px 14px; font-size: 13px; white-space: nowrap; flex-shrink: 0; }
+}
+
+/* ============================================================
+   TRANG CHỦ: KHỐI CHỮ GIỚI THIỆU TRONG HERO (huy hiệu + tiêu đề 3 tầng, bỏ đoạn mô tả dài)
+   Tầng 1 nhỏ - tầng 2 là tên thương hiệu nổi bật (chữ chuyển sắc trời) - tầng 3 là dòng phụ gọn.
+   ============================================================ */
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-bottom: 18px; padding: 6px 14px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.04em; line-height: 1.3;
+  color: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 999px;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.hero-badge-dot { width: 7px; height: 7px; flex: none; border-radius: 50%; background: var(--sky-400); box-shadow: 0 0 0 3px rgba(74,159,224,0.3); }
+.hero h1 { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 0 0 28px; }
+.hero-h1-top { font-size: clamp(18px, 2.6vw, 24px); font-weight: 600; letter-spacing: 0.02em; color: rgba(255,255,255,0.9); }
+.hero-h1-main { font-size: clamp(40px, 7vw, 60px); font-weight: 800; line-height: 1.1; letter-spacing: -0.01em;
+                background: linear-gradient(180deg, #ffffff 25%, #a9d4f7 100%); -webkit-background-clip: text; background-clip: text;
+                color: transparent; -webkit-text-fill-color: transparent;
+                text-shadow: none !important; filter: drop-shadow(0 2px 12px rgba(5,15,30,0.45)); }
+@media (max-width: 480px) {
+  .hero-badge { font-size: 11px; padding: 5px 12px; margin-bottom: 14px; }
+  .hero h1 { margin-bottom: 22px; }
+}
+
+/* ============================================================
+   MÁY TÍNH (≥ 901px): HERO TRANG CHỦ - khối chữ và ô tìm kiếm to, rộng, thoáng
+   Trước đây chữ/ô tìm kiếm giữ cỡ của điện thoại nên "lọt thỏm" giữa banner rộng. Giờ: hero cao hơn, tiêu đề lớn, ô tìm kiếm
+   rộng ~600px, thêm quầng tối nhẹ phía sau khối chữ để đọc rõ trên ảnh nền rực. Điện thoại KHÔNG đổi.
+   ============================================================ */
+@media (min-width: 901px) {
+  .hero--anh { min-height: clamp(480px, 34vw, 560px); padding-top: 72px; padding-bottom: 110px; }
+  .hero--anh .hero-phu {
+    background:
+      radial-gradient(ellipse 52% 62% at 50% 48%, rgba(6, 18, 36, 0.62) 0%, rgba(6, 18, 36, 0.32) 55%, rgba(6, 18, 36, 0) 100%),
+      linear-gradient(180deg,
+        rgba(11, 31, 58, var(--hero-a1, 0.60)) 0%,
+        rgba(11, 31, 58, var(--hero-a2, 0.66)) 55%,
+        rgba(11, 31, 58, var(--hero-a3, 0.78)) 100%);
+  }
+  .hero-inner { max-width: 860px; }
+  .hero-badge { font-size: 13px; padding: 7px 18px; gap: 9px; margin-bottom: 22px; letter-spacing: 0.06em; }
+  .hero-badge-dot { width: 9px; height: 9px; }
+  .hero h1 { gap: 6px; margin-bottom: 32px; }
+  .hero-h1-top { font-size: clamp(20px, 1.8vw, 26px); letter-spacing: 0.03em; }
+  .hero-h1-main { font-size: clamp(52px, 4.6vw, 68px); line-height: 1.05; letter-spacing: -0.02em; }
+  .hero-search { max-width: 600px; padding: 6px 6px 6px 26px; border-width: 2px; }
+  .hero-search input { font-size: 16px; padding-left: 32px; background-size: 20px; }
+  .hero-search button { padding: 13px 28px; font-size: 15px; }
+}
+
+/* Chữ chỉ dành cho công cụ tìm kiếm / trình đọc màn hình (không hiển thị trên giao diện) */
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }

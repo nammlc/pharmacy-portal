@@ -32,7 +32,7 @@ def _khoi_luoi_nhom_thuoc():
 
 class TrangChuMobile(Co):
     def test_eight_function_cards_each_with_image_tile_title_desc_action_and_tag(self):
-        h = self.client().get("/trang-chu").get_data(as_text=True)
+        h = self.client().get("/").get_data(as_text=True)
         cards = re.findall(r'<a class="category-card cat-\w+".*?</a>', h, re.S)
         self.assertEqual(len(cards), 8)
         for c in cards:
@@ -57,6 +57,13 @@ class TrangChuMobile(Co):
             for v in re.findall(r"transform:\s*([^;}]+)", body):
                 self.assertEqual(v.strip(), "none", m.group(0))             # chỉ được phép vô hiệu hoá transform, không được tạo mới
             self.assertNotIn("filter:", body); self.assertNotIn("z-index", body); self.assertNotIn("opacity:", body)
+
+    def test_grid_sits_below_hero_without_overlapping_background_image(self):
+        trong = _khoi_mobile()
+        self.assertNotRegex(trong, r"\.category-grid \{[^}]*margin: -")                                 # không còn margin âm kéo lưới lên đè hero
+        self.assertRegex(trong, r"\.category-grid-outer \{[^}]*padding: 18px 14px 32px")                # chừa khoảng trống giữa đáy hero và thẻ đầu
+        css = _css()
+        self.assertNotRegex(css, r"\.hero--anh \{ min-height: 0; padding-top: 56px; padding-bottom: 92px")  # hết chừa đáy 92px cho phần đè
 
     def test_all_cards_share_one_harmonised_palette(self):
         trong = _khoi_mobile()
