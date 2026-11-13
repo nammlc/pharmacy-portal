@@ -4160,4 +4160,20 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
   .home-intro h2 { font-size: 20px; }
   .home-find { padding: 18px 16px; border-radius: 18px; }
   .home-faq-title { margin-top: 26px; font-size: 17px; }
+
+  /* Điện thoại: bài viết mới = lưới 2 cột (2x2) thay vì xếp dọc */
+  .home-news-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .home-news-item { padding: 12px 12px 10px; border-radius: 14px; gap: 6px; }
+  .home-news-item h3 { font-size: 13px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .home-news-item p { font-size: 12px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .home-news-item time { font-size: 11px; }
+
+  /* Điện thoại: "Bạn có thể tra cứu gì" = lưới 2 cột các ô có icon */
+  .home-find-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .home-find-list li,
+  .home-find-list li:last-child { flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--line-200); border-radius: 14px; background: var(--paper-0); }
+  .home-ico { width: 34px; height: 34px; font-size: 17px; }
+  .home-find-list a { font-size: 13.5px; line-height: 1.35; display: block; }
+  .home-dot { display: none; }
+  .home-find-list p { font-size: 12px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 }
