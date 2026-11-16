@@ -806,10 +806,9 @@ a { color: inherit; text-decoration: none; }
    DRUG DETAIL PAGE (trang chi tiết 1 thuốc) - bố cục hiện đại
    ============================================================ */
 /* Bố cục 3-6-3: nội dung chi tiết thuốc nằm giữa, chiếm 6/12 cột (50%) */
-.drug-page { width: 100%; margin: 0 auto; padding: 36px 20px 56px; box-sizing: border-box; }
+/* Trang chi tiết thuốc: cùng khung rộng + lề với logo/menu ở header (.header-inner: max 1180px, lề 24px) */
+.drug-page { width: 100%; max-width: 1180px; margin: 0 auto; padding: 36px 24px 56px; box-sizing: border-box; }
 @media (max-width: 640px) { .drug-page { padding: 28px 16px 44px; } }
-@media (min-width: 1200px) { .drug-page { width: 50%; } }
-@media (min-width: 800px) and (max-width: 1199px) { .drug-page { width: 75%; } }
 
 .drug-hero {
   display: flex;
@@ -3617,10 +3616,11 @@ pre, code { white-space: pre-wrap; word-break: break-word; }
   overflow-wrap: anywhere;
   min-width: 0;
 }
-.drug-page, .drug-grid-sections, .drug-section, .drug-section > *, .drug-hero, .drug-hero-text {
+.drug-grid-sections, .drug-section, .drug-section > *, .drug-hero, .drug-hero-text {
   min-width: 0;
   max-width: 100%;
 }
+.drug-page { min-width: 0; }   /* max-width của .drug-page do rule riêng ở trên quyết định (khớp khung header) */
 @media (max-width: 640px) {
   .drug-hero { flex-direction: column; align-items: flex-start; }
   .drug-hero-media { width: 96px; height: 96px; }
