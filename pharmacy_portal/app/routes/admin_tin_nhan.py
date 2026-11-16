@@ -7,6 +7,7 @@ from app import db
 from app.models.models import KhachHang, NguoiDung, TinNhanRieng
 from app.utils import chat_rieng as CR
 from app.utils import thong_bao as TB
+from app.utils import kenh_ngoai as KN
 from app.utils.nhat_ky import ghi
 from app.utils.phan_hoi import che_sdt
 from app.utils.thoi_gian import gio_vn
@@ -36,7 +37,11 @@ def _ten_admin(admin_id, cache={}):
 @bp.get("/")
 def danh_sach():
     q = request.args.get("q", "").strip()[:60]
-    chi_cho_tra_loi = request.args.get("cho_tra_loi") == "1"
+    tt = request.args.get("tt", "")                                  # "" tất cả | "cho" chờ trả lời | "da" đã trả lời
+    if request.args.get("cho_tra_loi") == "1":                       # đường dẫn cũ (thẻ ở trang Tổng quan)
+        tt = "cho"
+    if tt not in ("cho", "da"):
+        tt = ""
     try:
         trang = max(1, int(request.args.get("trang", 1)))
     except ValueError:
@@ -50,8 +55,10 @@ def danh_sach():
     if q:
         like = f"%{q}%"
         truy_van = truy_van.filter(db.or_(KhachHang.ten.ilike(like), KhachHang.so_dien_thoai.ilike(like)))
-    if chi_cho_tra_loi:
+    if tt == "cho":
         truy_van = truy_van.filter(tn_cuoi.tu == "khach")
+    elif tt == "da":
+        truy_van = truy_van.filter(tn_cuoi.tu == "admin")
     tong = truy_van.count()
     dong = (truy_van.order_by(tn_cuoi.ngay_tao.desc().nullslast(), KhachHang.id.desc()) if db.engine.dialect.name == "postgresql"
             else truy_van.order_by(KhachHang.lan_cuoi.desc(), KhachHang.id.desc()))
@@ -60,8 +67,16 @@ def danh_sach():
     chua_doc = dict(db.session.query(TinNhanRieng.khach_id, func.count(TinNhanRieng.id))
                     .filter(TinNhanRieng.khach_id.in_(ids), TinNhanRieng.tu == "khach", TinNhanRieng.da_doc_admin.is_(False))
                     .group_by(TinNhanRieng.khach_id).all()) if ids else {}
+    # đếm theo trạng thái trả lời (theo tin cuối của mỗi cuộc trò chuyện) + tên admin đã trả lời gần nhất
+    dem = {}
+    for k_tt, tu in (("cho", "khach"), ("da", "admin")):
+        dem[k_tt] = (db.session.query(func.count(KhachHang.id)).select_from(KhachHang)
+                     .join(cuoi, cuoi.c.khach_id == KhachHang.id).join(tn_cuoi, tn_cuoi.id == cuoi.c.mid)
+                     .filter(tn_cuoi.tu == tu).scalar() or 0)
+    ten_admin = {a.id: (a.ho_ten or a.ten_dang_nhap) for a in NguoiDung.query.filter(
+        NguoiDung.id.in_({t.admin_id for _, t in dong if t is not None and t.admin_id})).all()} if dong else {}
     return render_template("admin/tin_nhan_ds.html", dong=dong, chua_doc=chua_doc, tong=tong, trang=trang, moi_trang=MOI_TRANG,
-                           q=q, chi_cho_tra_loi=chi_cho_tra_loi, che_sdt=che_sdt)
+                           q=q, tt=tt, dem=dem, ten_admin=ten_admin, gio_vn=gio_vn, che_sdt=che_sdt)
 
 
 def _khach_hoac_404(khach_id):
@@ -104,10 +119,15 @@ def tin_moi(khach_id):
 def gui(khach_id):
     khach = _khach_hoac_404(khach_id)
     d = request.get_json(silent=True) or request.form
+    truoc = TinNhanRieng.query.filter_by(khach_id=khach.id).order_by(TinNhanRieng.id.desc()).first()
+    dang_cho = truoc is not None and truoc.tu == "khach"             # khách đang chờ → lần trả lời này là "đã trả lời"
     tn, loi = CR.admin_tra_loi(khach, current_user, d.get("noi_dung"))
     if loi:
         return jsonify({"ok": False, "loi": loi}), 400
     _ghi("tra_loi", khach, tn.noi_dung[:200])
+    if dang_cho:                                                      # báo cho các admin còn lại, KHÔNG kèm nội dung (tin riêng)
+        KN.bao_da_tra_loi(f"Tin nhắn riêng từ {khach.ten}", current_user.ho_ten or current_user.ten_dang_nhap,
+                          f"/admin/tin-nhan/{khach.id}", email_nguoi_tra_loi=current_user.email, rieng_tu=True)
     return jsonify({"ok": True, "tin": _dict_tin([tn])})
 
 

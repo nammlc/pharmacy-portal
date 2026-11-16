@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import func
 
 from app import db
-from app.models.models import NguoiDung, ThongBao
+from app.models.models import KhachHang, NguoiDung, ThongBao, TinNhanRieng, YKien
 
 TOI_DA_HIEN = 8
 
@@ -56,7 +56,43 @@ def dong_bo_da_doc_theo_khoa(khoa_gop):
         ThongBao.query.filter_by(khoa_gop=khoa_gop, da_doc=False).update({"da_doc": True}, synchronize_session=False)
 
 
-def thanh_dict(tb, gio_vn):
+def _ten_nguoi(admin_id, cache):
+    if admin_id not in cache:
+        a = db.session.get(NguoiDung, admin_id) if admin_id else None
+        cache[admin_id] = ((a.ho_ten or a.ten_dang_nhap) if a else "") or ""
+    return cache[admin_id]
+
+
+def trang_thai_tra_loi(muc, gio_vn):
+    """Cho danh sách thông báo: cái nào ĐÃ ĐƯỢC TRẢ LỜI (và bởi ai, lúc nào). Suy ra trực tiếp từ nguồn nên luôn đúng:
+      - ý kiến công khai (khoa_gop 'yk:<id>')  : có câu trả lời công khai
+      - chat riêng      (khoa_gop 'chat:<id>') : tin cuối cùng của cuộc trò chuyện là của Khoa Dược
+    Trả về {thong_bao_id: {"da": bool, "boi": str, "luc": 'HH:MM dd/mm'}} (chỉ có các thông báo thuộc 2 loại trên)."""
+    kq, cache = {}, {}
+    yk_ids = {t.id: int(t.khoa_gop[3:]) for t in muc if (t.khoa_gop or "").startswith("yk:") and t.khoa_gop[3:].isdigit()}
+    chat_ids = {t.id: int(t.khoa_gop[5:]) for t in muc if (t.khoa_gop or "").startswith("chat:") and t.khoa_gop[5:].isdigit()}
+    yks = {y.id: y for y in YKien.query.filter(YKien.id.in_(set(yk_ids.values()))).all()} if yk_ids else {}
+    for tid, yid in yk_ids.items():
+        y = yks.get(yid)
+        if y is None:
+            continue
+        da = bool((y.tra_loi or "").strip())
+        t = gio_vn(y.ngay_tra_loi) if da and y.ngay_tra_loi else None
+        kq[tid] = {"da": da, "boi": _ten_nguoi(y.nguoi_tra_loi_id, cache) if da else "", "luc": t.strftime("%H:%M %d/%m") if t else ""}
+    for tid, kid in chat_ids.items():
+        cuoi = TinNhanRieng.query.filter_by(khach_id=kid).order_by(TinNhanRieng.id.desc()).first()
+        if cuoi is None:
+            continue
+        da = cuoi.tu == "admin"
+        t = gio_vn(cuoi.ngay_tao) if da else None
+        kq[tid] = {"da": da, "boi": _ten_nguoi(cuoi.admin_id, cache) if da else "", "luc": t.strftime("%H:%M %d/%m") if t else ""}
+    return kq
+
+
+def thanh_dict(tb, gio_vn, tra_loi=None):
     t = gio_vn(tb.ngay_tao)
-    return {"id": tb.id, "loai": tb.loai, "tieu_de": tb.tieu_de, "noi_dung": tb.noi_dung or "", "so_luong": tb.so_luong or 1,
-            "da_doc": bool(tb.da_doc), "gio": t.strftime("%H:%M %d/%m") if t else "", "url": tb.url or ""}
+    d = {"id": tb.id, "loai": tb.loai, "tieu_de": tb.tieu_de, "noi_dung": tb.noi_dung or "", "so_luong": tb.so_luong or 1,
+         "da_doc": bool(tb.da_doc), "gio": t.strftime("%H:%M %d/%m") if t else "", "url": tb.url or ""}
+    if tra_loi is not None:
+        d["tra_loi"] = tra_loi                              # {"da": bool, "boi": "...", "luc": "..."}
+    return d

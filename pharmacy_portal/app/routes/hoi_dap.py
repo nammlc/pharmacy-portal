@@ -5,6 +5,7 @@ from app import db
 from app.models.models import YKien
 from app.utils import phan_hoi as PH
 from app.utils import thong_bao as TB
+from app.utils import kenh_ngoai as KN
 from app.utils.online import khoa_khach, la_bot
 from app.utils.thoi_gian import gio_vn
 
@@ -90,4 +91,6 @@ def gui():
                      f"{ten}: {nd}".replace("\n", " "),
                      f"/admin/y-kien/?trang_thai=cho_duyet#yk-{yk.id}", khoa_gop=f"yk:{yk.id}")
     db.session.commit()
+    KN.bao_admin_moi("y_kien_moi", f"Ý kiến mới chờ duyệt: {yk.doi_tuong_ten}", f"{ten}: {nd}",
+                     f"/admin/y-kien/?trang_thai=cho_duyet#yk-{yk.id}")             # Telegram / email (không có SĐT)
     return _json({"ok": True, "thong_bao": "Cảm ơn bạn. Ý kiến sẽ hiển thị sau khi được Khoa Dược duyệt."})

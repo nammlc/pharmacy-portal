@@ -10,11 +10,17 @@
   </div>
 </div>
 
+<div class="yk-tabs">
+  <a href="{{ url_for('admin_tin_nhan.danh_sach', q=q) }}" class="yk-tab {{ 'active' if not tt }}">Tất cả <span>{{ tong if not tt else dem.cho + dem.da }}</span></a>
+  <a href="{{ url_for('admin_tin_nhan.danh_sach', q=q, tt='cho') }}" class="yk-tab {{ 'active' if tt == 'cho' }}">⏳ Chờ trả lời <span>{{ dem.cho }}</span></a>
+  <a href="{{ url_for('admin_tin_nhan.danh_sach', q=q, tt='da') }}" class="yk-tab {{ 'active' if tt == 'da' }}">✔ Đã trả lời <span>{{ dem.da }}</span></a>
+</div>
+
 <form method="get" class="adm-search-row">
+  <input type="hidden" name="tt" value="{{ tt }}">
   <input type="text" name="q" value="{{ q }}" placeholder="Tìm tên hoặc số điện thoại…">
-  <label class="yk-check-all"><input type="checkbox" name="cho_tra_loi" value="1" {% if chi_cho_tra_loi %}checked{% endif %}> Chỉ khách đang chờ trả lời</label>
-  <button type="submit" class="btn btn-outline btn-sm">Lọc</button>
-  {% if q or chi_cho_tra_loi %}<a href="{{ url_for('admin_tin_nhan.danh_sach') }}" class="btn btn-outline btn-sm">✕ Xoá lọc</a>{% endif %}
+  <button type="submit" class="btn btn-outline btn-sm">Tìm</button>
+  {% if q %}<a href="{{ url_for('admin_tin_nhan.danh_sach', tt=tt) }}" class="btn btn-outline btn-sm">✕ Xoá tìm</a>{% endif %}
 </form>
 
 {% if dong %}
@@ -35,7 +41,8 @@
         <td>{% if tn %}{{ (tn.ngay_tao | gio_vn).strftime('%d/%m/%Y %H:%M') }}{% endif %}</td>
         <td style="text-align:right;">
           {% if chua_doc.get(k.id) %}<span class="nav-badge" style="position:static;margin-right:6px;">{{ chua_doc[k.id] }} mới</span>{% endif %}
-          {% if tn and tn.tu == 'khach' %}<span class="yk-badge yk-badge-cho_duyet">Chờ trả lời</span>{% endif %}
+          {% if tn and tn.tu == 'khach' %}<span class="tl-badge tl-chua">⏳ Chờ trả lời</span>
+          {% elif tn %}<span class="tl-badge tl-da" title="Tin cuối là của Khoa Dược">✔ Đã trả lời{% if ten_admin.get(tn.admin_id) %} bởi {{ ten_admin[tn.admin_id] }}{% endif %}</span>{% endif %}
           <a href="{{ url_for('admin_tin_nhan.xem', khach_id=k.id) }}" class="btn btn-outline btn-sm">Mở</a>
         </td>
       </tr>
@@ -46,9 +53,9 @@
 {% set tong_trang = (tong // moi_trang) + (1 if tong % moi_trang else 0) %}
 {% if tong_trang > 1 %}
 <nav class="yk-pager" aria-label="Phân trang">
-  {% if trang > 1 %}<a href="{{ url_for('admin_tin_nhan.danh_sach', q=q, cho_tra_loi=1 if chi_cho_tra_loi else None, trang=trang - 1) }}">‹ Trước</a>{% endif %}
+  {% if trang > 1 %}<a href="{{ url_for('admin_tin_nhan.danh_sach', q=q, tt=tt, trang=trang - 1) }}">‹ Trước</a>{% endif %}
   <span>Trang {{ trang }} / {{ tong_trang }}</span>
-  {% if trang < tong_trang %}<a href="{{ url_for('admin_tin_nhan.danh_sach', q=q, cho_tra_loi=1 if chi_cho_tra_loi else None, trang=trang + 1) }}">Sau ›</a>{% endif %}
+  {% if trang < tong_trang %}<a href="{{ url_for('admin_tin_nhan.danh_sach', q=q, tt=tt, trang=trang + 1) }}">Sau ›</a>{% endif %}
 </nav>
 {% endif %}
 {% else %}

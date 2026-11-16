@@ -28,6 +28,11 @@
       var tt = el("strong", "", t.tieu_de);
       if (t.so_luong > 1) tt.appendChild(el("span", "tb-count", " ×" + t.so_luong));
       txt.appendChild(tt); txt.appendChild(el("small", "", t.noi_dung));
+      if (t.tra_loi) {                                              // đã có người trả lời chưa
+        txt.appendChild(t.tra_loi.da
+          ? el("span", "tl-badge tl-da", "✔ Đã trả lời" + (t.tra_loi.boi ? " bởi " + t.tra_loi.boi : "") + (t.tra_loi.luc ? " · " + t.tra_loi.luc : ""))
+          : el("span", "tl-badge tl-chua", "⏳ Chưa trả lời"));
+      }
       a.appendChild(txt); a.appendChild(el("span", "tb-time", t.gio));
       li.appendChild(a); list.appendChild(li);
     });
@@ -41,7 +46,7 @@
       .then(function (d) {
         if (!d || !d.ok) return;
         capNhatSo(d.chua_doc);
-        if (!panel.hidden || d.chua_doc !== truoc) ve(d.muc);          // đang mở panel hoặc có thay đổi → vẽ lại
+        ve(d.muc);                                                      // luôn vẽ lại: trạng thái "đã trả lời" có thể đổi dù số chưa đọc không đổi
         if (truoc !== -1 && d.chua_doc > truoc) { btn.classList.add("tb-ring"); setTimeout(function () { btn.classList.remove("tb-ring"); }, 1500); }
         truoc = d.chua_doc;
       })

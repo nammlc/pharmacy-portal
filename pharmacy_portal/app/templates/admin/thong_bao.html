@@ -14,6 +14,38 @@
   </form>
 </div>
 
+<section class="kn-card">
+  <h2>📡 Báo ra ngoài khi không mở trang quản trị</h2>
+  <p class="kn-sub">Chuông chỉ chạy khi có admin đang đăng nhập. Hai kênh dưới đây đẩy thông báo ra điện thoại để không bỏ sót ý kiến.</p>
+  <ul class="kn-list">
+    <li>
+      <span class="kn-dot {{ 'on' if kenh.telegram else 'off' }}"></span>
+      <div><strong>Telegram</strong> — {% if kenh.telegram %}đã cấu hình ({{ kenh.so_nhom_telegram }} nơi nhận), báo tức thì.{% else %}chưa bật. Cần đặt <code>TELEGRAM_BOT_TOKEN</code> và <code>TELEGRAM_CHAT_ID</code> trong biến môi trường.{% endif %}</div>
+    </li>
+    <li>
+      <span class="kn-dot {{ 'on' if kenh.email_bat and kenh.admin_co_email else 'off' }}"></span>
+      <div><strong>Email</strong> —
+        {% if not kenh.email_bat %}đang tắt (<code>THONG_BAO_EMAIL=0</code>).
+        {% elif not kenh.admin_co_email %}chưa có admin nào đăng ký email (vào menu tài khoản → Cập nhật email).
+        {% else %}mỗi ý kiến / tin nhắn mới gửi tới <b>tất cả {{ kenh.admin_co_email }}/{{ kenh.admin_tong }} admin đã đăng ký email</b>; khi có người trả lời, các admin còn lại nhận email "đã trả lời" (tối đa {{ kenh.email_toi_da_gio }} thư / giờ / người).{% endif %}</div>
+    </li>
+  </ul>
+  <ul class="kn-admins">
+    {% for a in kenh.admin_chi_tiet %}
+    <li class="{{ 'ok' if a.co_email else 'no' }}">
+      <span>{{ a.ten }}</span>
+      {% if a.co_email %}<small>✔ {{ a.email }}</small>
+      {% else %}<small>✖ chưa đăng ký email{% if current_user.is_authenticated and (current_user.ho_ten or current_user.ten_dang_nhap) == a.ten %} — <a href="{{ url_for('admin_auth.cap_nhat_email') }}">đăng ký ngay</a>{% endif %}</small>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  <form method="post" action="{{ url_for('admin_thong_bao.gui_thu') }}" class="inline-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-outline btn-sm">Gửi thử cho tôi</button>
+  </form>
+  <p class="kn-sub" style="margin-top:8px">Riêng tư: tin nhắn riêng của khách <b>không</b> gửi nội dung ra ngoài (chỉ báo "có tin mới từ …"); số điện thoại không bao giờ gửi ra ngoài.</p>
+</section>
+
 <div class="yk-tabs">
   <a href="{{ url_for('admin_thong_bao.danh_sach') }}" class="yk-tab {{ 'active' if not chi_chua_doc }}">Tất cả</a>
   <a href="{{ url_for('admin_thong_bao.danh_sach', chua_doc=1) }}" class="yk-tab {{ 'active' if chi_chua_doc }}">Chưa đọc <span>{{ chua_doc }}</span></a>
@@ -28,6 +60,9 @@
       <span class="tb-txt">
         <strong>{{ t.tieu_de }}{% if t.so_luong and t.so_luong > 1 %} <span class="tb-count">×{{ t.so_luong }}</span>{% endif %}</strong>
         <small>{{ t.noi_dung }}</small>
+        {% set tl = tra_loi.get(t.id) %}
+        {% if tl %}{% if tl.da %}<span class="tl-badge tl-da">✔ Đã trả lời{% if tl.boi %} bởi {{ tl.boi }}{% endif %}{% if tl.luc %} · {{ tl.luc }}{% endif %}</span>
+        {% else %}<span class="tl-badge tl-chua">⏳ Chưa trả lời</span>{% endif %}{% endif %}
       </span>
       <span class="tb-time">{{ (t.ngay_tao | gio_vn).strftime('%H:%M %d/%m/%Y') }}</span>
     </a>

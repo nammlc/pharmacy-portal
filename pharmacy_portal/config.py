@@ -104,6 +104,19 @@ class Config:
     # Nếu đặt: ai vào bằng địa chỉ *.onrender.com cũ sẽ được chuyển hướng (301) sang tên miền này.
     # Để trống = tắt chuyển hướng.
     CANONICAL_HOST = os.environ.get("CANONICAL_HOST", "").strip().lower()
+    # --- Báo cho admin NGOÀI hệ thống khi có ý kiến / tin nhắn mới (không cần mở trang quản trị) ---
+    # TELEGRAM_BOT_TOKEN : token bot tạo ở @BotFather.  TELEGRAM_CHAT_ID : id nhóm/người nhận (nhiều nơi: cách nhau bằng dấu phẩy).
+    # THONG_BAO_EMAIL    : 1 = gửi email cho TẤT CẢ admin đã đăng ký email (qua cách gửi mail đã cấu hình ở trên); 0 = tắt.
+    #                      Mỗi ý kiến / tin nhắn mới = 1 email tới từng admin; khi có người trả lời, các admin còn lại nhận email "đã trả lời".
+    # THONG_BAO_EMAIL_TOI_DA_GIO: chặn an toàn — mỗi admin tối đa N email / giờ (mặc định 20); vượt mức thì gom vào email kế tiếp,
+    #                      tránh ngập hộp thư và quá hạn mức gửi mail trong ngày (Gmail / Apps Script).
+    # NHAC_CHUA_TRA_LOI_GIO: lệnh "flask nhac-chua-tra-loi" nhắc các ý kiến / tin nhắn chưa ai trả lời quá N giờ (mặc định 4).
+    TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+    TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+    THONG_BAO_EMAIL = os.environ.get("THONG_BAO_EMAIL", "1").strip() != "0"
+    THONG_BAO_EMAIL_TOI_DA_GIO = max(1, int(os.environ.get("THONG_BAO_EMAIL_TOI_DA_GIO", "20")))
+    NHAC_CHUA_TRA_LOI_GIO = max(1, int(os.environ.get("NHAC_CHUA_TRA_LOI_GIO", "4")))
+
     # Link đặt lại mật khẩu có hiệu lực bao nhiêu giây (mặc định 30 phút)
     RESET_TOKEN_MAX_AGE = int(os.environ.get("RESET_TOKEN_MAX_AGE", "1800"))
 

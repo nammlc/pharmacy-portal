@@ -2,7 +2,7 @@
 {% block title %}Hỏi đáp &amp; bình luận{% endblock %}
 {% block page_eyebrow %}Phản hồi{% endblock %}
 
-{% macro trang_link(p) %}{{ url_for('admin_y_kien.danh_sach', trang_thai=trang_thai, loai=loai, q=q, trang=p) }}{% endmacro %}
+{% macro trang_link(p) %}{{ url_for('admin_y_kien.danh_sach', trang_thai=trang_thai, loai=loai, q=q, tra_loi=tra_loi_tt, trang=p) }}{% endmacro %}
 
 {% block admin_content %}
 <div class="admin-page-head">
@@ -19,8 +19,16 @@
   <a href="{{ url_for('admin_y_kien.danh_sach', trang_thai='tat_ca', loai=loai, q=q) }}" class="yk-tab {{ 'active' if trang_thai == 'tat_ca' }}">Tất cả <span>{{ dem.values() | sum }}</span></a>
 </div>
 
+<div class="yk-tabs yk-tabs-sub" aria-label="Lọc theo trả lời">
+  <span class="yk-tabs-label">Trả lời:</span>
+  <a href="{{ url_for('admin_y_kien.danh_sach', trang_thai=trang_thai, loai=loai, q=q) }}" class="yk-tab {{ 'active' if not tra_loi_tt }}">Tất cả</a>
+  <a href="{{ url_for('admin_y_kien.danh_sach', trang_thai=trang_thai, loai=loai, q=q, tra_loi='chua') }}" class="yk-tab {{ 'active' if tra_loi_tt == 'chua' }}">⏳ Chưa trả lời <span>{{ dem_tl.chua }}</span></a>
+  <a href="{{ url_for('admin_y_kien.danh_sach', trang_thai=trang_thai, loai=loai, q=q, tra_loi='da') }}" class="yk-tab {{ 'active' if tra_loi_tt == 'da' }}">✔ Đã trả lời <span>{{ dem_tl.da }}</span></a>
+</div>
+
 <form method="get" class="adm-search-row">
   <input type="hidden" name="trang_thai" value="{{ trang_thai }}">
+  <input type="hidden" name="tra_loi" value="{{ tra_loi_tt }}">
   <input type="text" name="q" value="{{ q }}" placeholder="Tìm tên, SĐT, nội dung, tên thuốc…">
   <select name="loai" class="adm-select">
     <option value="">Tất cả nơi góp ý</option>
@@ -53,6 +61,11 @@
         <a href="tel:{{ y.so_dien_thoai }}" class="yk-phone">📞 {{ y.so_dien_thoai }}</a>
         <span class="yk-time">{{ (y.ngay_tao | gio_vn).strftime('%d/%m/%Y %H:%M') }}</span>
       </div>
+      {% if y.tra_loi %}
+        <span class="tl-badge tl-da" title="Đã trả lời">✔ Đã trả lời{% if nguoi_tl.get(y.nguoi_tra_loi_id) %} bởi {{ nguoi_tl[y.nguoi_tra_loi_id] }}{% endif %}{% if y.ngay_tra_loi %} · {{ (y.ngay_tra_loi | gio_vn).strftime('%H:%M %d/%m') }}{% endif %}</span>
+      {% elif y.trang_thai in ('cho_duyet', 'da_duyet') %}
+        <span class="tl-badge tl-chua" title="Chưa ai trả lời">⏳ Chưa trả lời</span>
+      {% endif %}
       <span class="yk-badge yk-badge-{{ y.trang_thai }}">{{ nhan_trang_thai[y.trang_thai] }}</span>
     </div>
     <div class="yk-target">

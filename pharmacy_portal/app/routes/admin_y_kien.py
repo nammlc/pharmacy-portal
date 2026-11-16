@@ -6,9 +6,11 @@ from flask_login import current_user, login_required
 from sqlalchemy import func
 
 from app import db
-from app.models.models import YKien
+from app.models.models import NguoiDung, YKien
+from app.utils.thoi_gian import gio_vn
 from app.utils import phan_hoi as PH
 from app.utils import thong_bao as TB
+from app.utils import kenh_ngoai as KN
 from app.utils.nhat_ky import ghi
 
 bp = Blueprint("admin_y_kien", __name__, url_prefix="/admin/y-kien")
@@ -54,6 +56,7 @@ def danh_sach():
     trang_thai = request.args.get("trang_thai", "cho_duyet")
     loai = request.args.get("loai", "")
     q = request.args.get("q", "").strip()[:80]
+    tra_loi_tt = request.args.get("tra_loi", "")                 # "" tất cả | "chua" chưa trả lời | "da" đã trả lời
     try:
         trang = max(1, int(request.args.get("trang", 1)))
     except ValueError:
@@ -66,6 +69,13 @@ def danh_sach():
         trang_thai = "tat_ca"
     if loai in PH.DOI_TUONG:
         truy_van = truy_van.filter(YKien.doi_tuong_loai == loai)
+    co_tra_loi = db.and_(YKien.tra_loi.isnot(None), YKien.tra_loi != "")
+    if tra_loi_tt == "chua":
+        truy_van = truy_van.filter(db.not_(co_tra_loi))
+    elif tra_loi_tt == "da":
+        truy_van = truy_van.filter(co_tra_loi)
+    else:
+        tra_loi_tt = ""
     if q:
         like = f"%{q}%"
         truy_van = truy_van.filter(db.or_(YKien.ten.ilike(like), YKien.so_dien_thoai.ilike(like),
@@ -73,6 +83,11 @@ def danh_sach():
     tong = truy_van.count()
     muc = truy_van.order_by(YKien.ngay_tao.desc(), YKien.id.desc()).offset((trang - 1) * MOI_TRANG).limit(MOI_TRANG).all()
     dem = dict(db.session.query(YKien.trang_thai, func.count(YKien.id)).group_by(YKien.trang_thai).all())
+    # đếm theo trạng thái trả lời (không tính ý kiến đã từ chối / spam: không cần trả lời)
+    can_tl = YKien.query.filter(YKien.trang_thai.in_(("cho_duyet", "da_duyet")))
+    dem_tl = {"chua": can_tl.filter(db.not_(co_tra_loi)).count(), "da": can_tl.filter(co_tra_loi).count()}
+    nguoi_tl = {a.id: (a.ho_ten or a.ten_dang_nhap) for a in NguoiDung.query.filter(
+        NguoiDung.id.in_({y.nguoi_tra_loi_id for y in muc if y.nguoi_tra_loi_id})).all()} if muc else {}
     lien_ket = {}                                           # đường dẫn tới trang công khai của thuốc / bài viết bị góp ý
     for y in muc:
         obj = PH.lay_doi_tuong(y.doi_tuong_loai, y.doi_tuong_id)
@@ -80,6 +95,7 @@ def danh_sach():
             lien_ket[y.id] = PH.url_doi_tuong(y.doi_tuong_loai, obj)
     return render_template("admin/y_kien.html", muc=muc, tong=tong, trang=trang, moi_trang=MOI_TRANG, lien_ket=lien_ket,
                            trang_thai=trang_thai, loai=loai, q=q, dem=dem, nhan_trang_thai=PH.TRANG_THAI,
+                           tra_loi_tt=tra_loi_tt, dem_tl=dem_tl, nguoi_tl=nguoi_tl, gio_vn=gio_vn,
                            nhan_loai={k: v[2] for k, v in PH.DOI_TUONG.items()})
 
 
@@ -104,12 +120,17 @@ def tra_loi(yk_id):
     if loi:
         flash(loi, "error")
         return redirect(request.form.get("quay_lai") or url_for("admin_y_kien.danh_sach"))
+    lan_dau = not (yk.tra_loi or "").strip()                 # lần đầu trả lời (sửa lại câu trả lời thì không báo thêm)
     yk.tra_loi, yk.nguoi_tra_loi_id, yk.ngay_tra_loi = nd, current_user.id, datetime.utcnow()
+    TB.dong_bo_da_doc_theo_khoa(f"yk:{yk.id}")               # đã có người trả lời → thông báo của mọi admin thành đã đọc
     logs = [_nhat_ky(yk, "tra_loi")]
     if yk.trang_thai != "da_duyet":
         logs.append(_ap_dung(yk, "duyet"))
     db.session.commit()
     _ghi_sau(logs)
+    if lan_dau:                                              # báo cho các admin còn lại (Telegram + email) để không trả lời trùng
+        KN.bao_da_tra_loi(f"{yk.doi_tuong_ten}: {yk.ten}", current_user.ho_ten or current_user.ten_dang_nhap,
+                          f"/admin/y-kien/?trang_thai=da_duyet#yk-{yk.id}", email_nguoi_tra_loi=current_user.email)
     flash("Đã đăng câu trả lời.", "success")
     return redirect(request.form.get("quay_lai") or url_for("admin_y_kien.danh_sach"))
 
