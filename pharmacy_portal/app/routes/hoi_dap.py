@@ -42,7 +42,7 @@ def danh_sach():
         "muc": [{"id": y.id, "ten": y.ten, "noi_dung": y.noi_dung,              # KHÔNG trả SĐT
                  "ngay": gio_vn(y.ngay_tao).strftime("%d/%m/%Y"),
                  "tra_loi": y.tra_loi or "",
-                 "ngay_tra_loi": gio_vn(y.ngay_tra_loi).strftime("%d/%m/%Y") if y.ngay_tra_loi else ""} for y in muc],
+                 "ngay_tra_loi": gio_vn(y.ngay_tra_loi).strftime("%H:%M %d/%m/%Y") if y.ngay_tra_loi else ""} for y in muc],
     })
 
 
