@@ -443,7 +443,7 @@ def dang_ky(app):
 
     @app.before_request
     def _gan_cookie_an_danh():
-        if request.endpoint == "static":
+        if request.endpoint in ("static", "anh.phuc_vu"):
             return
         dong_y = request.cookies.get(COOKIE_DONG_Y)
         vid = request.cookies.get(COOKIE_TEN, "")
@@ -463,7 +463,7 @@ def dang_ky(app):
     @app.after_request
     def _ghi_nhat_ky(response):
         try:
-            if request.endpoint in (None, "static") or not hasattr(g, "vid"):
+            if request.endpoint in (None, "static", "anh.phuc_vu") or not hasattr(g, "vid"):
                 return response
             if not _RE_BOT.search(request.headers.get("User-Agent") or ""):
                 if (request.blueprint or "").startswith("admin_"):

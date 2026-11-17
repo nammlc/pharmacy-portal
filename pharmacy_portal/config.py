@@ -75,6 +75,11 @@ class Config:
 
     # --- Cloudinary (lưu ảnh thuốc / nhóm thuốc) ---
     # Đăng ký miễn phí tại https://cloudinary.com, lấy 3 giá trị này trong Dashboard
+    # Nơi lưu ảnh upload MỚI: "cloudinary" (mặc định, như cũ) hoặc "local" (lưu trên máy chủ, trong UPLOAD_DIR).
+    # Ảnh đã có dạng /uploads/... luôn được phục vụ bất kể giá trị này. UPLOAD_DIR nên nằm NGOÀI thư mục code và được sao lưu.
+    ANH_LUU_TRU = os.environ.get("ANH_LUU_TRU", "cloudinary").strip().lower()
+    UPLOAD_DIR = os.environ.get("UPLOAD_DIR", os.path.join(basedir, "uploads"))
+
     CLOUDINARY_CLOUD_NAME = os.environ.get("CLOUDINARY_CLOUD_NAME", "")
     CLOUDINARY_API_KEY = os.environ.get("CLOUDINARY_API_KEY", "")
     CLOUDINARY_API_SECRET = os.environ.get("CLOUDINARY_API_SECRET", "")
