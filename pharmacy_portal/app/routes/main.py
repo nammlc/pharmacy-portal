@@ -66,19 +66,16 @@ VCT_MAC_DINH = {
 }
 
 
-@bp.route("/")
-def vao_trang():
-    # Vừa truy cập vào web ("/") thì hiện ngay trang Bài viết/Thông báo,
-    # để thấy ngay tin tức/thông báo mới nhất. Trang chủ (thống kê) cũ vẫn
-    # giữ nguyên, xem tại /trang-chu (nav "Trang chủ" trỏ vào đây).
-    # SEO: KHÔNG redirect nữa (trước đây là 302 sang /bai-viet/ nên Google báo "Page with redirect"
-    # và không lập chỉ mục địa chỉ gốc). Hiện thẳng nội dung ngay tại "/", canonical vẫn là "/".
-    from app.routes.bai_viet import index as bai_viet_index
-    return bai_viet_index()
-
-
 @bp.route("/trang-chu")
+def trang_chu_cu():
+    # Địa chỉ cũ /trang-chu: chuyển vĩnh viễn (301) về "/" để Google chỉ có MỘT trang chủ duy nhất.
+    return redirect(url_for("main.trang_chu"), code=301)
+
+
+@bp.route("/")
 def trang_chu():
+    # "/" là TRANG CHỦ thật (HTTP 200, không redirect, không hiện nội dung của trang khác).
+    # Bài viết/thông báo mới nhất vẫn hiện ngay trên trang chủ (biến bai_viet_moi bên dưới).
     # Lấy stat từ DB — dùng lại UNION ALL giống dashboard
     try:
         rows = db.session.execute(text("""

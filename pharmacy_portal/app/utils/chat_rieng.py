@@ -16,6 +16,7 @@ from sqlalchemy.exc import IntegrityError
 from app import db
 from app.models.models import ChatLanThu, KhachHang, TinNhanRieng
 from app.utils import thong_bao as TB
+from app.utils import kenh_ngoai as KN
 from app.utils.online import khoa_khach
 from app.utils.phan_hoi import (TOI_DA_TIN_NHAN, chuan_hoa_sdt, duong_dan_noi_bo, kiem_tra_noi_dung, kiem_tra_ten, lam_sach)
 
@@ -136,6 +137,8 @@ def gui_tin_nhan(khach, noi_dung_tho, loai="ho_tro", ngu_canh=None, ngu_canh_url
     TB.tao_cho_admin("tin_nhan_moi", tieu_de, nd.replace("\n", " "),
                      url_for("admin_tin_nhan.xem", khach_id=khach.id), khoa_gop=f"chat:{khach.id}")
     db.session.commit()
+    # Báo ra ngoài nhưng KHÔNG gửi nội dung (tin riêng có thể chứa thông tin sức khoẻ): chỉ "có tin mới từ <tên>"
+    KN.bao_admin_moi("tin_nhan_moi", tieu_de, "", url_for("admin_tin_nhan.xem", khach_id=khach.id), khoa_gop=f"chat:{khach.id}")
     return tn, None
 
 

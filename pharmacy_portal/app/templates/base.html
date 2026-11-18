@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{% block title %}Cổng Tra Cứu Dược{% endblock %} — BV Đa khoa Tâm Đức Cầu Quan</title>
+<title>{% block full_title %}{% block title %}Cổng Tra Cứu Dược{% endblock %} — BV Đa khoa Tâm Đức Cầu Quan{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -29,10 +29,22 @@
   "department": {
     "@type": "Pharmacy",
     "name": "Khoa Dược – Cổng Tra Cứu Dược",
+    "alternateName": ["Khoa Dược BVĐK Tâm Đức Cầu Quan", "Dược BVĐK Tâm Đức Cầu Quan"],
     "url": "{{ ((config.CANONICAL_HOST and ('https://' ~ config.CANONICAL_HOST)) or request.host_url.rstrip('/')) }}"
   }
 }
 </script>
+{% if request.endpoint == 'main.trang_chu' %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Tra cứu dược Tâm Đức Cầu Quan",
+  "alternateName": ["Tra cứu dược Tâm Đức", "Cổng Tra Cứu Dược", "Khoa Dược BVĐK Tâm Đức Cầu Quan", "Dược BVĐK Tâm Đức Cầu Quan"],
+  "url": "{{ ((config.CANONICAL_HOST and ('https://' ~ config.CANONICAL_HOST)) or request.host_url.rstrip('/')) ~ '/' }}"
+}
+</script>
+{% endif %}
 </head>
 <body>
 
@@ -57,7 +69,7 @@
 
       <nav class="main-nav" id="mainNav">
         <a href="{{ url_for('main.trang_chu') }}" class="{{ 'active' if request.endpoint == 'main.trang_chu' }}">🏠 Trang chủ</a>
-        <a href="{{ url_for('bv.index') }}" class="{{ 'active' if request.blueprint == 'bv' or request.endpoint == 'main.vao_trang' }}">📰 Bài viết - Thông báo</a>
+        <a href="{{ url_for('bv.index') }}" class="{{ 'active' if request.blueprint == 'bv' }}">📰 Bài viết - Thông báo</a>
         <a href="{{ url_for('dmt.index') }}" class="{{ 'active' if request.blueprint == 'dmt' }}">💊 Danh mục thuốc</a>
         <a href="{{ url_for('ntbv.index') }}" class="{{ 'active' if request.blueprint == 'ntbv' }}">🏥 Nhà thuốc BV</a>
         <a href="{{ url_for('tttt.index') }}" class="{{ 'active' if request.blueprint == 'tttt' }}">💉 Thuốc tiêm truyền</a>

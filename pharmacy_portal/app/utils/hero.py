@@ -33,8 +33,8 @@ CHIEU_RONG_PC = (640, 960, 1440, 1920, 2400)
 CHIEU_RONG_MOBILE = (480, 720, 960, 1200, 1600)
 MOBILE_MAX_WIDTH = 700                  # PHẢI khớp @media (max-width: 700px) của .hero--anh trong style.css
 
-# Chỉ nhận https, không có dấu nháy/ngoặc/khoảng trắng -> không thể "thoát" khỏi thuộc tính HTML/CSS.
-_RE_URL_AN_TOAN = re.compile(r"^https://[\w.~:/?#@!$&*+,;=%\-]+$")
+# Chỉ nhận https (hoặc ảnh lưu trên chính máy chủ: /uploads/...), không có dấu nháy/ngoặc/khoảng trắng -> không thể "thoát" khỏi thuộc tính HTML/CSS.
+_RE_URL_AN_TOAN = re.compile(r"^(?:https://|/uploads/)[\w.~:/?#@!$&*+,;=%\-]+$")
 
 
 def url_an_toan(url):
@@ -74,7 +74,7 @@ def doc_cai_dat():
 
 def _srcset(url, chieu_rong):
     s = ", ".join(f"{anh_theo_chieu_rong(url, w)} {w}w" for w in chieu_rong)
-    return s if s.count("/f_auto,") else ""   # không phải ảnh Cloudinary -> không có bản thu nhỏ
+    return s if (s.count("/f_auto,") or s.count("?w=")) else ""   # ảnh nơi khác -> không có bản thu nhỏ
 
 
 def lay_hero():

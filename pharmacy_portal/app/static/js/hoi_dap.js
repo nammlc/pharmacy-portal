@@ -55,16 +55,7 @@
   more.addEventListener("click", function () { tai(false); });
   tai(true);                                              // tải sớm để nút "Lịch sử hỏi đáp" hiện được số ý kiến
 
-  // 2 ngăn độc lập (có thể mở cùng lúc): bấm nút nào thì xổ / thu gọn ngăn đó
-  [["hdTabList", "hdPanelList"], ["hdTabAsk", "hdPanelAsk"]].forEach(function (c) {
-    var nut = document.getElementById(c[0]), ngan = document.getElementById(c[1]);
-    nut.addEventListener("click", function () {
-      var mo = ngan.hidden;
-      ngan.hidden = !mo;
-      nut.setAttribute("aria-expanded", mo ? "true" : "false");
-      if (mo && c[1] === "hdPanelAsk") { moFormLuc = Date.now(); form.elements.ten.focus({ preventScroll: true }); }
-    });
-  });
+  // Hai ngăn luôn hiển thị; moFormLuc (mốc bắt đầu điền form) đã được gán lúc tải trang.
 
   function bao(text, loi) { msg.textContent = text; msg.className = "hd-msg " + (loi ? "hd-msg-loi" : "hd-msg-ok"); }
 

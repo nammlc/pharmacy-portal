@@ -50,7 +50,7 @@
         <label>Chọn ảnh ngang</label>
         <input type="file" name="file_anh" id="hpFilePc" accept="image/png,image/jpeg,image/webp"
                data-nen-toi-da="2400" data-nen-chat-luong="0.86">
-        <div class="vct-file-hint">Nên dùng ảnh <strong>ngang, tỉ lệ khoảng 3:1</strong> (ví dụ 1920×640). JPG/PNG/WEBP; ảnh quá lớn được trình duyệt tự nén trước khi gửi.</div>
+        <div class="vct-file-hint">Nên dùng ảnh <strong>ngang, tỉ lệ khoảng 2,8:1</strong> (ví dụ 1920×680). Khung hero trên máy tính cao ~480–560px nên tỉ lệ khung đổi từ ~2:1 đến ~3,4:1 tuỳ độ rộng màn hình; tỉ lệ 2,8:1 ít bị méo nhất. Nên để phần chính của ảnh ở giữa. JPG/PNG/WEBP; ảnh quá lớn được trình duyệt tự nén trước khi gửi.</div>
         <div class="anh-paste-zone" tabindex="0" data-target-input="file_anh">
           <span class="anh-paste-zone-icon">&#128203;</span>
           Bấm vào đây rồi <kbd>Ctrl</kbd>+<kbd>V</kbd> để dán ảnh đã copy
@@ -66,10 +66,10 @@
     <div class="admin-form-card" style="max-width:100%;">
       <div class="hp-section-title" style="margin-top:0;">📱 Ảnh cho điện thoại</div>
       <div class="form-row">
-        <label>Chọn ảnh dọc</label>
+        <label>Chọn ảnh vuông</label>
         <input type="file" name="file_anh_mobile" id="hpFileMb" accept="image/png,image/jpeg,image/webp"
                data-nen-toi-da="1600" data-nen-chat-luong="0.86">
-        <div class="vct-file-hint">Nên dùng ảnh <strong>dọc, tỉ lệ khoảng 3:4</strong> (ví dụ 900×1200). JPG/PNG/WEBP; ảnh quá lớn được trình duyệt tự nén trước khi gửi.</div>
+        <div class="vct-file-hint">Nên dùng ảnh <strong>vuông, tỉ lệ khoảng 1:1</strong> (ví dụ 1200×1200). Khung hero trên điện thoại rộng ~390px, cao ~380px (gần vuông). Nên để phần chính của ảnh ở giữa. JPG/PNG/WEBP; ảnh quá lớn được trình duyệt tự nén trước khi gửi.</div>
         <div class="anh-paste-zone" tabindex="0" data-target-input="file_anh_mobile">
           <span class="anh-paste-zone-icon">&#128203;</span>
           Bấm vào đây rồi <kbd>Ctrl</kbd>+<kbd>V</kbd> để dán ảnh đã copy
@@ -110,9 +110,9 @@
 .hp-section-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); margin:0 0 10px 2px; }
 .hp-xem-luoi { display:grid; grid-template-columns:1fr 250px; gap:18px; align-items:start; }
 .hp-nhan-khung { font-size:12.5px; font-weight:700; color:var(--text-muted); margin:0 0 6px 2px; }
-.hp-preview { position:relative; width:100%; aspect-ratio: 16 / 6; border-radius:var(--radius-md); overflow:hidden; color:#fff;
+.hp-preview { position:relative; width:100%; aspect-ratio: 14 / 5; border-radius:var(--radius-md); overflow:hidden; color:#fff;
   background:#0b1f3a; font-size:clamp(8px,1.1vw,12px); display:flex; align-items:center; justify-content:center; text-align:center; }
-.hp-preview.hp-mobile { aspect-ratio: 390 / 560; font-size:7.5px; }
+.hp-preview.hp-mobile { aspect-ratio: 390 / 382; font-size:7.5px; }
 .hp-preview.hp-khong-anh { background:linear-gradient(165deg,var(--ink-900) 0%,var(--navy-600) 62%,var(--navy-500) 100%); }
 .hp-preview.hp-khong-anh img, .hp-preview.hp-khong-anh .hp-phu { display:none; }
 /* Xem trước ảnh KÉO GIÃN vừa khung (fill), giống trang chủ thật: không cắt */

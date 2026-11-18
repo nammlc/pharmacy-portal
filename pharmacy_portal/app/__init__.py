@@ -89,6 +89,9 @@ def create_app(config_class=Config):
     from app.routes.main import bp as main_bp
     app.register_blueprint(main_bp)
 
+    from app.routes.anh import bp as anh_bp          # /uploads/... (ảnh lưu trên máy chủ)
+    app.register_blueprint(anh_bp)
+
     from app.routes.tra_cuu_thuoc_tiem_truyen import bp as tttt_bp
     app.register_blueprint(tttt_bp)
 

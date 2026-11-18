@@ -32,10 +32,9 @@ def dang_ky_seo(app):
     @app.route("/sitemap.xml")
     def sitemap_xml():
         goc = _goc_trang()
-        # "/" tự chuyển hướng sang /bai-viet/ nên KHÔNG đưa vào sitemap (Google báo "Page with redirect");
-        # trang chủ thật nằm ở /trang-chu.
+        # "/" là trang chủ thật (HTTP 200). /trang-chu chỉ là địa chỉ cũ, đã 301 về "/" nên không đưa vào sitemap.
         duong_dan = [
-            "/trang-chu",
+            "/",
             "/ve-chung-toi",
             "/bai-viet/",
             "/danh-muc-thuoc/",

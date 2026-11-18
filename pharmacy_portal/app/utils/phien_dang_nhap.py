@@ -28,7 +28,7 @@ def danh_dau_hoat_dong():
 def dang_ky(app):
     @app.before_request
     def _het_phien_khi_khong_hoat_dong():
-        if request.endpoint == "static" or "_user_id" not in session:
+        if request.endpoint in ("static", "anh.phuc_vu") or "_user_id" not in session:
             return None
 
         gioi_han = app.config["ADMIN_IDLE_TIMEOUT_MINUTES"] * 60

@@ -32,7 +32,7 @@ def _khoi_luoi_nhom_thuoc():
 
 class TrangChuMobile(Co):
     def test_eight_function_cards_each_with_image_tile_title_desc_action_and_tag(self):
-        h = self.client().get("/trang-chu").get_data(as_text=True)
+        h = self.client().get("/").get_data(as_text=True)
         cards = re.findall(r'<a class="category-card cat-\w+".*?</a>', h, re.S)
         self.assertEqual(len(cards), 8)
         for c in cards:

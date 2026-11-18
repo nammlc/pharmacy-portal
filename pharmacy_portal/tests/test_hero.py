@@ -25,7 +25,7 @@ class Hero(Co):
             db.session.commit()
 
     def trang_chu(self):
-        r = self.client().get("/trang-chu")
+        r = self.client().get("/")
         self.assertEqual(r.status_code, 200)
         return r.get_data(as_text=True)
 

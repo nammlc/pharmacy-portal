@@ -304,7 +304,7 @@ def dang_ky(app):
     from flask import redirect, request, url_for
     from flask_login import current_user
 
-    cho_phep = ("static", "admin_otp.thiet_lap", "admin_auth.dang_xuat", "admin_auth.keep_alive")
+    cho_phep = ("static", "anh.phuc_vu", "admin_otp.thiet_lap", "admin_auth.dang_xuat", "admin_auth.keep_alive")
 
     @app.before_request
     def _ep_thiet_lap_otp():

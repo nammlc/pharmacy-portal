@@ -1,17 +1,35 @@
 """
-Tiện ích upload ảnh lên Cloudinary.
-Logic: luôn xoá ảnh cũ TRƯỚC khi upload ảnh mới để tránh CDN cache giữ ảnh cũ.
+Tiện ích upload ảnh: Cloudinary (mặc định) HOẶC lưu ngay trên máy chủ.
+
+Chọn bằng cấu hình ANH_LUU_TRU = "cloudinary" | "local" (xem config.py). Ở chế độ "local", ảnh được lưu trong
+UPLOAD_DIR và trong database chỉ có đường dẫn /uploads/... (xem app/utils/luu_tru_anh.py). Mọi hàm bên dưới giữ NGUYÊN TÊN
+và chữ ký cũ nên các route admin không phải sửa. Xoá ảnh / tạo bản thu nhỏ tự nhận biết URL Cloudinary hay /uploads/...
+Logic Cloudinary: luôn xoá ảnh cũ TRƯỚC khi upload ảnh mới để tránh CDN cache giữ ảnh cũ.
 """
-import cloudinary
-import cloudinary.uploader
+try:                                   # thư viện cloudinary là TUỲ CHỌN khi đã chuyển hẳn sang lưu trên máy chủ
+    import cloudinary
+    import cloudinary.uploader
+except ImportError:                    # pragma: no cover
+    cloudinary = None
 from flask import current_app
 import re
 import uuid
 
+from app.utils import luu_tru_anh as LT
+
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif"}
 
 
+def _che_do_local() -> bool:
+    try:
+        return str(current_app.config.get("ANH_LUU_TRU", "cloudinary")).strip().lower() == "local"
+    except RuntimeError:               # ngoài app context
+        return False
+
+
 def _ket_noi_cloudinary():
+    if cloudinary is None:
+        raise RuntimeError("Chưa cài thư viện cloudinary (pip install cloudinary) mà ANH_LUU_TRU đang là 'cloudinary'.")
     cloudinary.config(
         cloud_name=current_app.config["CLOUDINARY_CLOUD_NAME"],
         api_key=current_app.config["CLOUDINARY_API_KEY"],
@@ -46,6 +64,8 @@ def anh_thu_nho(url_anh: str, canh: int = 112) -> str:
     biến đổi thì giữ nguyên. Rỗng → rỗng."""
     if not url_anh:
         return ""
+    if LT.la_url_local(url_anh):                      # ảnh trên máy chủ: xin bản vuông thu nhỏ đã lưu đệm
+        return url_anh if "?" in url_anh else f"{url_anh}?w={int(canh)}&c=1"
     if "res.cloudinary.com" not in url_anh or "/upload/" not in url_anh:
         return url_anh
     dau, duoi = url_anh.split("/upload/", 1)
@@ -58,6 +78,8 @@ def anh_theo_chieu_rong(url_anh: str, rong: int) -> str:
     """URL ảnh Cloudinary thu về chiều rộng `rong` px (tự chọn WebP/AVIF + chất lượng tối ưu).
     Dùng cho ảnh nền lớn (hero) để điện thoại không phải tải ảnh 2400px. Ảnh không phải Cloudinary,
     hoặc đã có sẵn biến đổi → giữ nguyên."""
+    if LT.la_url_local(url_anh):                      # ảnh trên máy chủ: xin bản rộng `rong` px đã lưu đệm
+        return url_anh if "?" in url_anh else f"{url_anh}?w={int(rong)}"
     if not url_anh or "res.cloudinary.com" not in url_anh or "/upload/" not in url_anh:
         return url_anh or ""
     dau, duoi = url_anh.split("/upload/", 1)
@@ -67,9 +89,11 @@ def anh_theo_chieu_rong(url_anh: str, rong: int) -> str:
 
 
 def xoa_anh_cloudinary(url_anh: str) -> bool:
-    """Xoá ảnh khỏi Cloudinary dựa vào URL. Trả về True nếu thành công."""
+    """Xoá ảnh (Cloudinary hoặc /uploads/... trên máy chủ) dựa vào URL. Trả về True nếu thành công."""
     if not url_anh:
         return False
+    if LT.la_url_local(url_anh):
+        return LT.xoa(url_anh)
     try:
         _ket_noi_cloudinary()
         public_id = _lay_public_id_tu_url(url_anh)
@@ -97,6 +121,9 @@ def _upload_len_cloudinary(file_object, folder: str, url_cu: str | None = None,
     # Xoá ảnh cũ trước (nếu có)
     if url_cu:
         xoa_anh_cloudinary(url_cu)
+
+    if _che_do_local():
+        return LT.luu_anh(file_object, folder, width=width, height=height, crop=crop)
 
     _ket_noi_cloudinary()
     # Dùng UUID để đảm bảo URL mới luôn khác URL cũ → không bị cache
@@ -185,8 +212,11 @@ def upload_tep_dinh_kem_bai_viet(file_object, url_cu: str | None = None):
     if url_cu:
         xoa_tep_dinh_kem_cloudinary(url_cu)
 
-    _ket_noi_cloudinary()
     duoi = ten_goc.rsplit(".", 1)[1].lower()
+    if _che_do_local():
+        return LT.luu_tep(file_object, "pharmacy/bai_viet_dinh_kem", duoi), ten_goc
+
+    _ket_noi_cloudinary()
     public_id = f"bai_viet_dinh_kem_{uuid.uuid4().hex[:12]}.{duoi}"
     ket_qua = cloudinary.uploader.upload(
         file_object,
@@ -203,6 +233,8 @@ def xoa_tep_dinh_kem_cloudinary(url_tep: str) -> bool:
     Khác ảnh: với 'raw', public_id giữ nguyên phần đuôi file."""
     if not url_tep:
         return False
+    if LT.la_url_local(url_tep):
+        return LT.xoa(url_tep)
     try:
         _ket_noi_cloudinary()
         phan = url_tep.rsplit("/upload/", 1)
