@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Tra cứu tương hợp - tương kỵ{% endblock %}
 {% block meta_mo_ta %}Tra cứu tương hợp – tương kỵ tại BV Đa khoa Tâm Đức Cầu Quan: kiểm tra khả năng pha chung và phối hợp giữa hai thuốc truyền tĩnh mạch.{% endblock %}
 
@@ -12,8 +13,8 @@
 
 <div class="search-panel">
   <form class="search-form" method="get">
-    <input type="text" name="thuoc_a" value="{{ thuoc_a }}" placeholder="Thuốc thứ nhất...">
-    <input type="text" name="thuoc_b" value="{{ thuoc_b }}" placeholder="Thuốc thứ hai...">
+    <input type="text" name="thuoc_a" value="{{ thuoc_a }}" placeholder="Thuốc thứ nhất">
+    <input type="text" name="thuoc_b" value="{{ thuoc_b }}" placeholder="Thuốc thứ hai">
     <button type="submit">Kiểm tra</button>
   </form>
 </div>
@@ -42,12 +43,12 @@
   </table>
   {% elif thuoc_a and thuoc_b %}
   <div class="empty-state">
-    <div class="empty-state-icon">&#128269;</div>
+    <div class="empty-state-icon">{{ ic('search', 22) }}</div>
     Chưa có dữ liệu tương hợp - tương kỵ cho cặp thuốc này.
   </div>
   {% else %}
   <div class="empty-state">
-    <div class="empty-state-icon">&#129514;</div>
+    <div class="empty-state-icon">{{ ic('flask', 22) }}</div>
     Nhập tên 2 thuốc cần kiểm tra để bắt đầu.
   </div>
   {% endif %}

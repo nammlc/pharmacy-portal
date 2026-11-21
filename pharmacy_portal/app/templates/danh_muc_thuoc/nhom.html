@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}{{ nhom.ten_nhom }}{% endblock %}
 
 {% block content %}
@@ -30,7 +31,7 @@
   {% include "_phan_trang.html" with context %}
   {% else %}
   <div class="empty-state">
-    <div class="empty-state-icon">&#128138;</div>
+    <div class="empty-state-icon">{{ ic('pill', 22) }}</div>
     Chưa có thuốc nào trong nhóm này.
   </div>
   {% endif %}

@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}{{ tieu_de }}{% endblock %}
 
 {% block admin_content %}
@@ -58,7 +59,7 @@
       {% endfor %}
 
       <div class="anh-paste-zone" tabindex="0" data-target-input="file_anh">
-        <span class="anh-paste-zone-icon">&#128203;</span>
+        <span class="anh-paste-zone-icon">{{ ic('file', 22) }}</span>
         Bấm vào đây rồi <kbd>Ctrl</kbd>+<kbd>V</kbd> để dán ảnh đã copy
       </div>
 

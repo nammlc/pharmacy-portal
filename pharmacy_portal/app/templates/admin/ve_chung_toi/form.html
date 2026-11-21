@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Về chúng tôi{% endblock %}
 
 {% block admin_content %}
@@ -25,7 +26,7 @@
       </div>
       <div class="form-row">
         <label>Mô tả ngắn (hiển thị dưới tiêu đề)</label>
-        <textarea name="vct_mo_ta_ngan" rows="2" placeholder="Mô tả ngắn...">{{ du_lieu.vct_mo_ta_ngan }}</textarea>
+        <textarea name="vct_mo_ta_ngan" rows="2" placeholder="Mô tả ngắn">{{ du_lieu.vct_mo_ta_ngan }}</textarea>
       </div>
     </div>
   </div>
@@ -36,16 +37,16 @@
     <div class="admin-form-card" style="max-width:100%;">
       <div class="form-row">
         <label>Giới thiệu chung</label>
-        <textarea name="vct_gioi_thieu" rows="4" placeholder="Giới thiệu về khoa/đơn vị...">{{ du_lieu.vct_gioi_thieu }}</textarea>
+        <textarea name="vct_gioi_thieu" rows="4" placeholder="Giới thiệu về khoa/đơn vị">{{ du_lieu.vct_gioi_thieu }}</textarea>
       </div>
       <div class="vct-two-col">
         <div class="form-row">
           <label>Sứ mệnh</label>
-          <textarea name="vct_su_menh" rows="3" placeholder="Sứ mệnh...">{{ du_lieu.vct_su_menh }}</textarea>
+          <textarea name="vct_su_menh" rows="3" placeholder="Sứ mệnh">{{ du_lieu.vct_su_menh }}</textarea>
         </div>
         <div class="form-row">
           <label>Tầm nhìn</label>
-          <textarea name="vct_tam_nhin" rows="3" placeholder="Tầm nhìn...">{{ du_lieu.vct_tam_nhin }}</textarea>
+          <textarea name="vct_tam_nhin" rows="3" placeholder="Tầm nhìn">{{ du_lieu.vct_tam_nhin }}</textarea>
         </div>
       </div>
     </div>
@@ -73,7 +74,7 @@
                  onchange="previewAnh(this,'pre1')">
           <div class="vct-file-hint">PNG, JPG, WEBP — tối đa 5 MB. Khuyến nghị: 1200×800px</div>
           <div class="anh-paste-zone" tabindex="0" data-target-input="file_anh_1">
-            <span class="anh-paste-zone-icon">&#128203;</span>
+            <span class="anh-paste-zone-icon">{{ ic('file', 22) }}</span>
             Bấm vào đây rồi <kbd>Ctrl</kbd>+<kbd>V</kbd> để dán ảnh đã copy
           </div>
           <div class="preview-img-box">
@@ -98,7 +99,7 @@
                  onchange="previewAnh(this,'pre2')">
           <div class="vct-file-hint">PNG, JPG, WEBP — tối đa 5 MB.</div>
           <div class="anh-paste-zone" tabindex="0" data-target-input="file_anh_2">
-            <span class="anh-paste-zone-icon">&#128203;</span>
+            <span class="anh-paste-zone-icon">{{ ic('file', 22) }}</span>
             Bấm vào đây rồi <kbd>Ctrl</kbd>+<kbd>V</kbd> để dán ảnh đã copy
           </div>
           <div class="preview-img-box">
@@ -135,7 +136,7 @@
       </div>
       <div class="form-row">
         <label>Địa chỉ</label>
-        <input type="text" name="vct_dia_chi" value="{{ du_lieu.vct_dia_chi }}" placeholder="Số XX, đường..., tỉnh...">
+        <input type="text" name="vct_dia_chi" value="{{ du_lieu.vct_dia_chi }}" placeholder="Số XX, đường..., tỉnh">
       </div>
     </div>
   </div>

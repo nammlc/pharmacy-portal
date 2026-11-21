@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Tra cứu tương tác thuốc{% endblock %}
 {% block meta_mo_ta %}Tra cứu tương tác thuốc tại Khoa Dược BV Đa khoa Tâm Đức Cầu Quan: mức độ, cơ chế và hướng xử trí khi dùng đồng thời hai thuốc.{% endblock %}
 
@@ -12,7 +13,7 @@
 
 <div class="search-panel">
   <form class="search-form" method="get">
-    <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên thuốc...">
+    <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên thuốc">
     <button type="submit">Tra cứu</button>
   </form>
 </div>
@@ -34,7 +35,7 @@
       <tr>
         <td data-nhan="Thuốc A">{{ item.thuoc_a.ten_thuoc }}</td>
         <td data-nhan="Thuốc B">{{ item.thuoc_b.ten_thuoc }}</td>
-        <td data-nhan="Mức độ"><span class="badge-level badge-{{ item.muc_do }}">{{ item.muc_do.replace('_', ' ') }}</span></td>
+        <td data-nhan="Mức độ"><span class="badge-level badge-{{ item.muc_do }}">{{ {'nhe':'Nhẹ','trung_binh':'Trung bình','nang':'Nặng','chong_chi_dinh':'Chống chỉ định'}.get(item.muc_do, item.muc_do) }}</span></td>
         <td data-nhan="Hậu quả" class="rich-content">{{ (item.hau_qua_lam_sang | safe) if item.hau_qua_lam_sang else '—' }}</td>
         <td data-nhan="Xử trí" class="rich-content">{{ (item.xu_tri | safe) if item.xu_tri else '—' }}</td>
       </tr>
@@ -43,12 +44,12 @@
   </table>
   {% elif tu_khoa %}
   <div class="empty-state">
-    <div class="empty-state-icon">&#128269;</div>
+    <div class="empty-state-icon">{{ ic('search', 22) }}</div>
     Không tìm thấy tương tác nào liên quan đến "{{ tu_khoa }}".
   </div>
   {% else %}
   <div class="empty-state">
-    <div class="empty-state-icon">&#9888;&#65039;</div>
+    <div class="empty-state-icon">{{ ic('alert', 22) }}</div>
     Nhập tên thuốc để xem các tương tác liên quan.
   </div>
   {% endif %}

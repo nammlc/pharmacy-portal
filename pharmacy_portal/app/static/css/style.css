@@ -4494,3 +4494,218 @@ body { font-variant-numeric: tabular-nums; }
   .rank-bar { grid-column: 1 / -1; grid-row: 2; }
   .rank-num { grid-column: 2; grid-row: 1; }
 }
+
+
+/* ============================================================
+   UNSLOP · vòng 3 — mobile lưới 2 cột (kiểu ảnh mẫu), trang danh mục thuốc, danh sách thuốc, bài viết
+   ============================================================ */
+
+/* ---- Khung trang con dùng chung ---- */
+.page-header { padding: 40px 24px 8px; }
+.page-header .eyebrow { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--text-muted); }
+.page-header .eyebrow a:hover { color: var(--navy-600); }
+.page-header h1 { margin: 6px 0 8px; font-size: clamp(26px, 3.4vw, 34px); font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
+.page-header p { font-size: 15px; line-height: 1.6; color: var(--text-2); }
+.search-form { flex-wrap: nowrap; gap: 6px; padding: 6px; border-radius: 12px; box-shadow: none; }
+.search-form input[type="text"] { border: 0; background-color: transparent; min-width: 0; }
+.search-form input[type="text"]:focus { border: 0; box-shadow: none; }
+.search-form:focus-within { border-color: var(--navy-500); box-shadow: 0 0 0 3px rgba(26, 77, 143, 0.12); }
+.search-form button { padding: 10px 18px; border-radius: var(--radius-sm); font-weight: 500; }
+.empty-state { background: none; border: 1px solid var(--line-200); border-radius: var(--radius-md); padding: 56px 20px; }
+.empty-state-icon { width: 44px; height: 44px; margin: 0 auto 16px; border: 0; border-radius: var(--radius-sm); background: var(--sage-100); color: var(--navy-600); font-size: inherit; }
+.page-btn, .page-num { border-radius: var(--radius-sm); font-weight: 500; }
+.page-num.is-current { background: var(--ink-900); border-color: var(--ink-900); color: #fff; }
+
+/* ---- Danh mục thuốc: thẻ nhóm thuốc (hết màu cầu vồng, một accent navy) ---- */
+.nhom-grid { gap: 12px; }
+.nhom-grid .nhom-card { --accent-color: var(--navy-600); --accent-bg: var(--sage-100); padding: 20px; gap: 20px; border-radius: var(--radius-md); box-shadow: none; transition: border-color .15s var(--ease); }
+.nhom-grid .nhom-card:hover { border-color: var(--navy-500); box-shadow: none; }
+.nhom-card-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--sage-100); color: var(--navy-600); font-size: inherit; }
+.nhom-card h3 { font-size: 16px; font-weight: 600; line-height: 1.35; }
+.nhom-card-count { padding: 0; border-radius: 0; background: none; font-size: 13px; font-weight: 400; color: var(--text-muted); }
+.nhom-card-arrow { background: none; color: var(--line-200); transition: color .15s var(--ease), transform .15s var(--ease); }
+.nhom-card:hover .nhom-card-arrow { background: none; color: var(--navy-600); transform: translate(2px, -2px); }
+
+/* ---- Danh sách thuốc: hàng ngang trên PC, thẻ ảnh trên mobile ---- */
+.drug-grid { gap: 12px; }
+.drug-card { gap: 14px; padding: 12px; border-radius: var(--radius-md); box-shadow: none; transition: border-color .15s var(--ease); }
+.drug-card:hover { border-color: var(--navy-500); box-shadow: none; }
+.drug-card-thumb, .drug-card-thumb-fallback { width: 72px; height: 72px; border-radius: var(--radius-sm); }
+.drug-card-thumb { object-fit: contain; background: #fff; border: 1px solid var(--line-100); }
+.drug-card-thumb-fallback { background: var(--sage-100); color: var(--navy-600); }
+.drug-card-body h3 { font-size: 15px; font-weight: 600; }
+.drug-card-body p { font-size: 13px; color: var(--text-muted); }
+
+/* ---- Chi tiết thuốc: bỏ vạch màu bên trái ---- */
+.drug-section { border-left: 1px solid var(--line-200); box-shadow: none; }
+.drug-section-wide { border-left-color: var(--line-200); }
+.drug-section-title { letter-spacing: 0; }
+.drug-related { border-radius: var(--radius-md); }
+.drug-related-list a { border-radius: var(--radius-sm); font-weight: 500; text-decoration: none; transition: background-color .15s var(--ease); }
+.drug-related-list a:hover { text-decoration: none; background: #dbe7f5; }
+
+/* ---- Bài viết: nhãn danh mục chỉ còn chấm màu, thẻ phẳng ---- */
+.bv-filter-chip { padding: 6px 14px; border-width: 1px; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 500; color: var(--text-2); }
+.bv-filter-chip:hover { border-color: var(--navy-500); color: var(--navy-600); }
+.bv-filter-chip.is-active { background: var(--ink-900); border-color: var(--ink-900); color: #fff; }
+.bv-card { border-radius: var(--radius-md); box-shadow: none; transition: border-color .15s var(--ease); }
+.bv-card:hover { box-shadow: none; border-color: var(--navy-500); }
+.bv-card-thumb { height: auto; aspect-ratio: 16 / 10; }
+.bv-card-thumb-fallback { display: grid; place-items: center; color: var(--navy-600); opacity: .5; font-size: inherit; }
+.bv-card-pin { display: inline-flex; align-items: center; gap: 4px; font-weight: 500; }
+.bv-card-tag, .bv-phu-eyebrow { display: inline-flex; align-items: center; gap: 6px; padding: 0; border-radius: 0; background: none; letter-spacing: 0; font-size: 12.5px; font-weight: 500; color: var(--text-2); }
+.bv-card-tag::before, .bv-phu-eyebrow::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--chip-color, var(--navy-600)); }
+.bv-card-body h3 { font-size: 16px; }
+.bv-card-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.bv-slide-tag { background: rgba(11, 31, 58, .72) !important; border-radius: 6px; font-weight: 500; }
+.bv-slide-meta span { display: inline-flex; align-items: center; gap: 6px; }
+.bv-phu-heading { color: var(--ink-900); letter-spacing: 0; border-bottom: 1px solid var(--line-200); }
+.bv-phu-item::before { display: none; }
+.bv-phu-item:hover { padding-left: 0; background: none; }
+.bv-lienquan-card:hover .bv-lienquan-title { color: var(--navy-600); }
+
+/* ---- Chi tiết bài viết ---- */
+.bv-meta { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13.5px; color: var(--text-muted); }
+.bv-meta span { display: inline-flex; align-items: center; gap: 6px; }
+.bv-detail-anh { display: block; width: 100%; max-width: 760px; height: auto; margin-bottom: 20px; border: 1px solid var(--line-200); border-radius: var(--radius-md); }
+.bv-article-body { max-width: 760px; padding: 28px; background: var(--paper-50); border: 1px solid var(--line-200); border-radius: var(--radius-md); }
+.bv-attach { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 10px 16px; border-radius: var(--radius-sm); background: var(--sage-100); color: var(--navy-600); font-size: 13.5px; font-weight: 500; }
+.bv-related { max-width: 760px; margin-top: 40px; }
+.bv-related h3 { margin: 0 0 8px; font-size: 16px; }
+.bv-related ul { margin: 0; padding: 0; list-style: none; }
+.bv-related a { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line-100); font-size: 14.5px; font-weight: 500; color: var(--ink-900); transition: color .15s var(--ease); }
+.bv-related a .ic { color: var(--text-muted); }
+.bv-related a:hover { color: var(--navy-600); }
+
+/* ============================================================
+   MOBILE — lưới 2 cột như ảnh mẫu (ảnh/biểu tượng ở trên, tên, mô tả, thông tin phụ)
+   ============================================================ */
+@media (max-width: 700px) {
+  /* trang chủ: 8 chức năng = 4 hàng x 2 cột */
+  .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .category-card, .category-card.cat-thtk, .category-card.cat-ttt { display: flex; flex-direction: column; align-items: stretch; grid-column: auto; gap: 4px; padding: 14px; }
+  .category-card::after { display: none; }
+  .category-card > *, .category-card > .cat-icon-wrap { grid-column: auto; }
+  .cat-icon-wrap { grid-row: auto; width: 36px; height: 36px; margin: 0 0 8px; }
+  .category-card h3 { font-size: 14.5px; line-height: 1.3; }
+  .category-card p { margin: 2px 0 0; font-size: 12px; line-height: 1.4; -webkit-line-clamp: 3; }
+  .cat-arrow { display: block; margin-top: auto; padding-top: 10px; font-size: 12px; }
+  .cat-levels { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; margin-top: 10px; }
+  .cat-levels span { gap: 0; font-size: 0; }
+  .cat-levels i { order: 0; width: 100%; height: 5px; }
+
+  /* danh mục thuốc / nhà thuốc: thẻ nhóm 2 cột gọn */
+  .nhom-grid, .drug-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .nhom-grid .nhom-card { padding: 14px; gap: 14px; border-radius: var(--radius-md); box-shadow: none; }
+  .nhom-card-icon { width: 36px; height: 36px; }
+  .nhom-card h3 { font-size: 14px; -webkit-line-clamp: 3; }
+  .nhom-card-count { font-size: 12px; }
+
+  /* danh sách thuốc: ảnh vuông ở trên, tên + hoạt chất bên dưới */
+  .drug-grid .drug-card { flex-direction: column; align-items: stretch; gap: 0; padding: 0; border-radius: var(--radius-md); box-shadow: none; }
+  .drug-card .drug-card-thumb, .drug-card .drug-card-thumb-fallback { width: 100%; height: auto; aspect-ratio: 1 / 1; border: 0; border-bottom: 1px solid var(--line-100); border-radius: 0; }
+  .drug-card .drug-card-thumb { padding: 8px; }
+  .drug-card .drug-card-thumb-fallback { font-size: 36px; }
+  .drug-card-body { padding: 10px 12px 12px; }
+  .drug-card-body h3 { font-size: 13.5px; font-weight: 600; line-height: 1.3; }
+  .drug-card-body p { margin-top: 2px; font-size: 12px; line-height: 1.35; }
+
+  /* bài viết: 2 cột, ảnh trên, nhãn + tiêu đề + ngày */
+  .bv-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .bv-card-body { gap: 4px; padding: 10px 12px 12px; }
+  .bv-card-body h3 { font-size: 13.5px; line-height: 1.3; }
+  .bv-card-body p { display: none; }
+  .bv-card-tag { font-size: 11.5px; }
+  .bv-card-meta { padding-top: 4px; font-size: 11.5px; }
+  .bv-filter-bar { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .bv-filter-chip { flex: none; }
+  .bv-article-body { padding: 18px 16px; }
+  .page-header { padding: 28px 16px 4px; }
+  .search-panel, .results-panel, .bv-filter-bar { padding-left: 16px; padding-right: 16px; }
+}
+@media (max-width: 700px) { .cat-arrow { padding: 10px 0 0; } }
+
+
+/* ============================================================
+   UNSLOP · vòng 4 — điểm nhấn có chủ đích
+   · số liệu hero (dữ liệu thật) · chữ cái đầu + số lớn ở thẻ nhóm thuốc · ô biểu tượng đổi màu khi chạm/hover
+   · dải tiêu đề trang con · chấm mức độ trong bảng tương tác · thanh tab dưới cùng trên điện thoại
+   · khối "Cần xử lý" tối màu ở dashboard
+   ============================================================ */
+body { overflow-x: clip; }
+
+/* ---- Hero: hàng số liệu ---- */
+.hero-stats { display: flex; flex-wrap: wrap; margin-top: 36px; }
+.hero-stat { padding: 0 32px; border-left: 1px solid rgba(255, 255, 255, .22); }
+.hero-stat:first-child { padding-left: 0; border-left: 0; }
+.hero-stat-num { font-family: var(--font-display); font-size: 34px; font-weight: 600; line-height: 1; letter-spacing: -0.01em; color: #fff; font-variant-numeric: tabular-nums; }
+.hero-stat-lbl { margin-top: 8px; font-size: 13px; color: rgba(255, 255, 255, .7); }
+@media (max-width: 700px) { .hero-stats { margin-top: 24px; } .hero-stat { padding: 0 20px; } .hero-stat-num { font-size: 26px; } }
+
+/* ---- Ô biểu tượng: đổi sang navy khi hover, nhún nhẹ khi chạm (chỉ trên cảm ứng) ---- */
+.cat-icon-wrap, .nhom-card-icon { transition: background-color .15s var(--ease), color .15s var(--ease); }
+.category-card:hover .cat-icon-wrap, .nhom-card:hover .nhom-card-icon { background: var(--navy-600); color: #fff; }
+.category-card.cat-ttt:hover .cat-icon-wrap { background: rgba(255, 255, 255, .22); }
+@media (hover: none) {
+  .category-card:active, .nhom-card:active, .drug-card:active, .bv-card:active { transform: scale(.98); transition: transform .1s var(--ease); }
+}
+
+/* ---- Thẻ nhóm thuốc: chữ cái đầu (như mục lục dược thư) + số thuốc cỡ lớn ---- */
+.nhom-card-icon { font-family: var(--font-display); font-size: 18px; font-weight: 600; line-height: 1; }
+.nhom-card-count { display: flex; align-items: baseline; gap: 6px; font-size: 13px; }
+.nhom-card-count b { font-family: var(--font-display); font-size: 26px; font-weight: 600; line-height: 1; color: var(--ink-900); font-variant-numeric: tabular-nums; }
+@media (max-width: 700px) { .nhom-card-icon { font-size: 16px; } .nhom-card-count b { font-size: 22px; } }
+
+/* ---- Trang con: dải tiêu đề trắng tách khỏi vùng nội dung ---- */
+.page-header { position: relative; z-index: 0; padding-bottom: 28px; }
+.page-header::before { content: ""; position: absolute; z-index: -1; top: 0; bottom: 0; left: 50%; width: 100vw; margin-left: -50vw; background: #fff; border-bottom: 1px solid var(--line-200); }
+@media (max-width: 700px) { .page-header { padding: 28px 16px 20px; } }
+
+/* ---- Bảng tương tác: mức độ là chấm + chữ (màu chỉ ở đây mang nghĩa) ---- */
+.badge-level { gap: 8px; padding: 0; border-radius: 0; background: none; font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--ink-900); white-space: nowrap; }
+.badge-level::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--lv, var(--text-muted)); }
+.badge-nhe { --lv: var(--level-nhe); }
+.badge-trung_binh, .badge-trungbinh { --lv: var(--level-trungbinh); }
+.badge-nang { --lv: var(--level-nang); }
+.badge-chong_chi_dinh { --lv: var(--level-cctd); }
+.result-table tbody tr { transition: background-color .15s var(--ease); }
+@media (min-width: 701px) { .result-table tbody tr:hover { background: #f7f9fc; } }
+
+/* ---- Thanh tab dưới cùng (điện thoại) ---- */
+.tabbar { display: none; }
+@media (max-width: 700px) {
+  body { padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px)); }
+  .tabbar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; height: calc(56px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); background: #fff; border-top: 1px solid var(--line-200); }
+  .tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 500; color: var(--text-muted); -webkit-tap-highlight-color: transparent; }
+  .tabbar a.is-active { color: var(--navy-600); font-weight: 600; }
+  .tabbar a.is-active .ic { stroke-width: 2.2; }
+  .pp-cookie { bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ---- Dashboard: "Cần xử lý" là khối tối duy nhất ---- */
+.dash-queue { gap: 0; margin-bottom: 32px; background: var(--ink-900); border-radius: var(--radius-lg); overflow: hidden; }
+.dash-queue .queue-card { background: transparent; border: 0; border-radius: 0; padding: 24px 28px; color: #fff; }
+.dash-queue .queue-card + .queue-card { border-left: 1px solid rgba(255, 255, 255, .12); }
+.dash-queue .queue-card:hover { background: rgba(255, 255, 255, .05); }
+.dash-queue .queue-label { color: rgba(255, 255, 255, .7); }
+.dash-queue .queue-num { color: rgba(255, 255, 255, .4); }
+.dash-queue .queue-card.has-items .queue-num { color: #fff; }
+.dash-queue .queue-go { color: rgba(255, 255, 255, .5); }
+@media (max-width: 800px) { .dash-queue .queue-card + .queue-card { border-left: 0; border-top: 1px solid rgba(255, 255, 255, .12); } .dash-queue .queue-card { padding: 18px 20px; } }
+
+/* ---- Bỏ vạch màu bên trái ở thẻ ý kiến, trả lời, trang giới thiệu ---- */
+.yk-card { border-left: 1px solid var(--line-200); border-radius: var(--radius-md); }
+.hd-reply { background: var(--paper-0); border: 1px solid var(--line-200); border-radius: var(--radius-md); }
+.vct-hero-gradient { background: var(--ink-900); }
+
+/* bỏ vòng tròn trang trí ở góc thẻ */
+.nhom-card::after, .drug-card::after, .category-card::before { display: none; }
+@media (max-width: 700px) { .category-card::after { display: none; } }
+.nhom-card::before { display: none; }
+
+/* ---- Thanh "Báo lỗi thông tin": cùng lề với nội dung, không còn dải vàng cảnh báo ---- */
+.bao-loi-bar { max-width: 1180px; margin: 20px auto 0; padding: 12px 24px; box-sizing: border-box; background: none; border: 0; border-radius: 0; font-size: 13.5px; color: var(--text-muted); gap: 8px 16px; }
+.btn-bao-loi { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid var(--line-200); border-radius: var(--radius-sm); background: #fff; font-size: 13px; font-weight: 500; color: var(--ink-900); text-decoration: none; transition: border-color .15s var(--ease), color .15s var(--ease); }
+.btn-bao-loi:hover { border-color: var(--navy-500); color: var(--navy-600); }
+.btn-bao-loi .ic { color: var(--text-muted); }
+@media (max-width: 700px) { .bao-loi-bar { padding: 12px 16px; } }

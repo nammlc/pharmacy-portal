@@ -44,13 +44,13 @@
          không hiển thị ở đây nữa. Xoá khối comment này để hiện lại. #}
       {% if stat.get('thuoc') %}
       <div class="hero-stat">
-        <div class="hero-stat-num">{{ stat.thuoc }}</div>
+        <div class="hero-stat-num">{{ ('{:,}'.format(stat.thuoc|int))|replace(',', '.') }}</div>
         <div class="hero-stat-lbl">Thuốc tra cứu</div>
       </div>
       {% endif %}
       {% if stat.get('thtk') %}
       <div class="hero-stat">
-        <div class="hero-stat-num">{{ stat.thtk }}</div>
+        <div class="hero-stat-num">{{ ('{:,}'.format(stat.thtk|int))|replace(',', '.') }}</div>
         <div class="hero-stat-lbl">Cặp tương hợp/kỵ</div>
       </div>
       {% endif %}

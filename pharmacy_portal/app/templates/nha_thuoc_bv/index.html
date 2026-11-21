@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Nhà thuốc BV{% endblock %}
 {% block meta_mo_ta %}Danh mục thuốc tại Nhà thuốc Bệnh viện Đa khoa Tâm Đức Cầu Quan: tra cứu theo nhóm thuốc và hoạt chất.{% endblock %}
 
@@ -11,7 +12,7 @@
 
 <div class="search-panel">
   <form class="search-form" autocomplete="off" method="get">
-    <input type="text" name="q" placeholder="Tên biệt dược hoặc hoạt chất..." data-goi-y="ntbv">
+    <input type="text" name="q" placeholder="Tên biệt dược hoặc hoạt chất" data-goi-y="ntbv">
     <button type="submit" class="btn btn-primary">Tìm</button>
   </form>
 </div>
@@ -20,11 +21,11 @@
   {% if phan_trang_nhom.items %}
   <div class="nhom-grid">
     {% for nhom in phan_trang_nhom.items %}
-    <a class="nhom-card nhom-card-accent-{{ loop.index0 % 4 }}" href="{{ url_for('ntbv.xem_nhom', nhom_id=nhom.id) }}">
-      <div class="nhom-card-icon">&#127973;</div>
+    <a class="nhom-card" href="{{ url_for('ntbv.xem_nhom', nhom_id=nhom.id) }}">
+      <div class="nhom-card-icon" aria-hidden="true">{{ nhom.ten_nhom[:1]|upper }}</div>
       <h3>{{ nhom.ten_nhom }}</h3>
       <div class="nhom-card-footer">
-        <span class="nhom-card-count">{{ counts.get(nhom.id, 0) }} thuốc</span>
+        <span class="nhom-card-count"><b>{{ counts.get(nhom.id, 0) }}</b> thuốc</span>
         <span class="nhom-card-arrow">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5.5M12 4V10.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
@@ -38,7 +39,7 @@
   {% include "_phan_trang.html" with context %}
   {% else %}
   <div class="empty-state">
-    <div class="empty-state-icon">&#127973;</div>
+    <div class="empty-state-icon">{{ ic('building', 22) }}</div>
     Chưa có dữ liệu Nhà thuốc BV.
   </div>
   {% endif %}

@@ -114,6 +114,15 @@
   </div>
 </footer>
 
+<nav class="tabbar" aria-label="Điều hướng nhanh">
+  {% set ep = request.endpoint or '' %}
+  <a href="{{ url_for('main.trang_chu') }}" class="{{ 'is-active' if ep == 'main.trang_chu' }}">{{ ic('home', 22) }}<span>Trang chủ</span></a>
+  <a href="{{ url_for('dmt.index') }}" class="{{ 'is-active' if ep.startswith('dmt.') or ep.startswith('ntbv.') }}">{{ ic('pill', 22) }}<span>Thuốc</span></a>
+  <a href="{{ url_for('ttt.index') }}" class="{{ 'is-active' if ep.startswith('ttt.') or ep.startswith('thtk.') }}">{{ ic('alert', 22) }}<span>Tương tác</span></a>
+  <a href="{{ url_for('bv.index') }}" class="{{ 'is-active' if ep.startswith('bv.') }}">{{ ic('newspaper', 22) }}<span>Bài viết</span></a>
+  <a href="{{ url_for('ho_tro.trang') }}" class="{{ 'is-active' if ep.startswith('ho_tro.') }}">{{ ic('message', 22) }}<span>Hỗ trợ</span></a>
+</nav>
+
 <div class="pp-cookie" id="ppCookie" role="dialog" aria-live="polite" aria-label="Thông báo cookie" {% if not chua_chon_cookie %}hidden{% endif %}>
   <p>Chúng tôi dùng cookie để nhớ thiết bị của bạn, giúp thống kê lượt tra cứu chính xác hơn và cá nhân hóa trải nghiệm.</p>
   <div class="pp-cookie-btns">
