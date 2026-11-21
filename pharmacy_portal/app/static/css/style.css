@@ -4858,7 +4858,8 @@ h1, h2, h3, .brand-text strong.brand-primary, .nav-toggle { font-family: var(--f
   .hero-tile:hover { background: #e9f1fb; border-color: #c5d8ee; }
   .hero-tile:hover > .ic:last-child { opacity: 1; }
   /* Lớp phủ nhẹ hơn: ảnh nền sáng rõ hơn, chữ trắng bên trái vẫn đủ tương phản */
-  .hero--anh .hero-phu, .hero .hero-phu { background: linear-gradient(90deg, rgba(11,31,58,.80) 0%, rgba(11,31,58,.52) 52%, rgba(11,31,58,.14) 100%); }
+  /* Độ phủ máy tính do admin chỉnh (Ảnh trang chủ → Độ phủ máy tính): --hero-pl/pm/pr = trái/giữa/phải */
+  .hero--anh .hero-phu, .hero .hero-phu { background: linear-gradient(90deg, rgba(11,31,58,var(--hero-pl,.80)) 0%, rgba(11,31,58,var(--hero-pm,.52)) 52%, rgba(11,31,58,var(--hero-pr,.14)) 100%); }
   .hero .hero-grid { align-items: center; }
 }
 
@@ -5010,7 +5011,8 @@ h1, h2, h3, .brand-text strong.brand-primary, .nav-toggle { font-family: var(--f
 @media (max-width: 700px) {
   .hero--anh { padding-top: 84px; padding-bottom: 36px; }
   .hero--anh .hero-phu, .hero .hero-phu {
-    background: linear-gradient(180deg, rgba(11,31,58,.93) 0%, rgba(11,31,58,.86) 40%, rgba(11,31,58,.66) 100%);
+    /* Độ phủ điện thoại do admin chỉnh riêng (Ảnh trang chủ → Độ phủ điện thoại): --hero-m1/m2/m3 = trên/giữa/dưới */
+    background: linear-gradient(180deg, rgba(11,31,58,var(--hero-m1,.54)) 0%, rgba(11,31,58,var(--hero-m2,.60)) 55%, rgba(11,31,58,var(--hero-m3,.72)) 100%);
   }
   .hero-h1-top { color: #dbeafb; font-size: 13px; letter-spacing: .1em; }
   .hero-h1-top::before { background: #dbeafb; }

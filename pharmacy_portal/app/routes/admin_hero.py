@@ -46,6 +46,8 @@ def chinh_sua():
         loi_mb = _xu_ly_mot_anh("file_anh_mobile", "xoa_anh_mobile", H.K_ANH_MOBILE, upload_anh_hero_mobile, "điện thoại")
 
         CaiDat.dat(H.K_DO_PHU, str(H.kep_do_phu(request.form.get("do_phu"))))
+        if "do_phu_mobile" in request.form:                     # form cũ không gửi trường này -> giữ nguyên giá trị đã lưu
+            CaiDat.dat(H.K_DO_PHU_MOBILE, str(H.kep_do_phu(request.form.get("do_phu_mobile"))))
         CaiDat.dat(H.K_ALT, (request.form.get("alt") or "").strip()[:150])
         db.session.commit()
         if loi_pc or loi_mb:

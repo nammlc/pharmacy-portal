@@ -7,7 +7,8 @@ không làm trang to nhỏ khác đi; admin tự chọn ảnh có tỉ lệ hợ
 Cài đặt (bảng cai_dat, khoá -> giá trị):
   hero_hinh_anh        : URL ảnh Cloudinary cho MÁY TÍNH (rỗng = không có)
   hero_hinh_anh_mobile : URL ảnh Cloudinary cho ĐIỆN THOẠI (rỗng = không có)
-  hero_do_phu          : độ phủ lớp xanh navy lên ảnh, 55..95 (%)  - càng cao chữ càng dễ đọc, ảnh càng mờ
+  hero_do_phu          : độ phủ lớp xanh navy lên ảnh MÁY TÍNH, 30..95 (%)  - càng cao chữ càng dễ đọc, ảnh càng mờ
+  hero_do_phu_mobile   : độ phủ lớp xanh navy lên ảnh ĐIỆN THOẠI, 30..95 (%) - chỉnh riêng vì khung điện thoại nhỏ, chữ chiếm nhiều diện tích hơn
   hero_alt             : mô tả ảnh (cho người khiếm thị và Google Images)
 Thiếu 1 trong 2 ảnh thì dùng ảnh còn lại cho cả hai loại màn hình; thiếu cả hai thì trang chủ giữ nền xanh gradient mặc định.
 (Khoá cũ hero_vi_tri không còn dùng vì không còn cắt ảnh; nếu còn trong DB thì bỏ qua.)
@@ -23,11 +24,13 @@ from app.utils.upload_anh import anh_theo_chieu_rong
 
 K_ANH = "hero_hinh_anh"                 # ảnh máy tính (giữ khoá cũ để không mất ảnh đã tải)
 K_ANH_MOBILE = "hero_hinh_anh_mobile"   # ảnh điện thoại
-K_DO_PHU = "hero_do_phu"
+K_DO_PHU = "hero_do_phu"                # độ phủ máy tính (giữ khoá cũ)
+K_DO_PHU_MOBILE = "hero_do_phu_mobile"  # độ phủ điện thoại
 K_ALT = "hero_alt"
-CAC_KHOA = (K_ANH, K_ANH_MOBILE, K_DO_PHU, K_ALT)
+CAC_KHOA = (K_ANH, K_ANH_MOBILE, K_DO_PHU, K_DO_PHU_MOBILE, K_ALT)
 
-DO_PHU_MIN, DO_PHU_MAX, DO_PHU_MAC_DINH = 55, 95, 66
+DO_PHU_MIN, DO_PHU_MAX, DO_PHU_MAC_DINH = 30, 95, 66
+DO_PHU_MOBILE_MAC_DINH = 60
 ALT_MAC_DINH = "Toàn cảnh Bệnh viện Đa khoa Tâm Đức Cầu Quan"
 CHIEU_RONG_PC = (640, 960, 1440, 1920, 2400)
 CHIEU_RONG_MOBILE = (480, 720, 960, 1200, 1600)
@@ -50,11 +53,18 @@ def kep_do_phu(gia_tri):
     return max(DO_PHU_MIN, min(DO_PHU_MAX, so))
 
 
+def tinh_pc(do_phu):
+    """MÁY TÍNH: lớp phủ chạy NGANG (đậm bên trái nơi đặt chữ, nhạt dần sang phải nơi có hình ảnh): (trái, giữa, phải).
+    Trung bình của trái và giữa đúng bằng giá trị người dùng chọn. PHẢI khớp tinhPc() trong admin/hero/form.html."""
+    p = kep_do_phu(do_phu) / 100
+    return round(min(p + 0.14, 0.96), 2), round(max(p - 0.14, 0.0), 2), round(max(p - 0.52, 0.0), 2)
+
+
 def tinh_alpha(do_phu):
     """(trên, giữa, dưới): lớp phủ đậm dần từ trên xuống. 'Giữa' = đúng giá trị người dùng chọn,
     là chỗ đặt chữ. Công thức này PHẢI khớp với tinhAlpha() trong admin/hero/form.html (xem trước)."""
     giua = kep_do_phu(do_phu) / 100
-    return round(max(giua - 0.06, 0.45), 2), round(giua, 2), round(min(giua + 0.12, 0.96), 2)
+    return round(max(giua - 0.06, min(giua, 0.45)), 2), round(giua, 2), round(min(giua + 0.12, 0.96), 2)
 
 
 def doc_cai_dat():
@@ -68,6 +78,7 @@ def doc_cai_dat():
         "anh_mobile": mb,
         "anh_mobile_xem_truoc": anh_theo_chieu_rong(mb, 960) if mb else "",
         "do_phu": kep_do_phu(hang.get(K_DO_PHU) or DO_PHU_MAC_DINH),
+        "do_phu_mobile": kep_do_phu(hang.get(K_DO_PHU_MOBILE) or DO_PHU_MOBILE_MAC_DINH),
         "alt": hang.get(K_ALT) or "",
     }
 
@@ -84,6 +95,8 @@ def lay_hero():
     if not pc and not mb:
         return None
     a1, a2, a3 = tinh_alpha(cd["do_phu"])
+    m1, m2, m3 = tinh_alpha(cd["do_phu_mobile"])
+    pl, pm, pr = tinh_pc(cd["do_phu"])
     anh_chinh = pc or mb                                   # thiếu ảnh máy tính -> dùng ảnh điện thoại cho tất cả
     hero = {
         "src": anh_theo_chieu_rong(anh_chinh, 1920),
@@ -91,7 +104,9 @@ def lay_hero():
         "mobile_src": "", "mobile_srcset": "",
         "mobile_max": MOBILE_MAX_WIDTH,
         "alt": cd["alt"] or ALT_MAC_DINH,
-        "a1": a1, "a2": a2, "a3": a3,
+        "a1": a1, "a2": a2, "a3": a3,                     # (giữ cho tablet 701-900px)
+        "m1": m1, "m2": m2, "m3": m3,                     # điện thoại
+        "pl": pl, "pm": pm, "pr": pr,                     # máy tính
     }
     if pc and mb:                                          # có cả 2 ảnh -> điện thoại dùng ảnh riêng
         hero["mobile_src"] = anh_theo_chieu_rong(mb, 1200)

@@ -89,12 +89,18 @@
     <div class="vct-file-hint" style="margin:0 0 14px;">Ảnh được kéo giãn cho vừa khít khung, không cắt: ảnh sai tỉ lệ sẽ bị méo, ảnh nhỏ sẽ bị mờ. Hãy chọn ảnh có tỉ lệ gần với gợi ý ở trên để đẹp nhất.</div>
     <div class="hp-luoi" style="margin-bottom:0;">
       <div class="form-row">
-        <label>Độ phủ màu xanh: <strong id="hpDoPhuNhan">{{ cd.do_phu }}%</strong></label>
+        <label>Độ phủ màu xanh · Máy tính: <strong id="hpDoPhuNhan">{{ cd.do_phu }}%</strong></label>
         <input type="range" name="do_phu" id="hpDoPhu" min="{{ H.DO_PHU_MIN }}" max="{{ H.DO_PHU_MAX }}" step="1" value="{{ cd.do_phu }}">
         <div class="hp-thang"><span>Thấy rõ ảnh</span><span>Chữ nổi bật</span></div>
         <div class="hp-doc-duoc" id="hpDocDuoc"></div>
       </div>
       <div class="form-row">
+        <label>Độ phủ màu xanh · Điện thoại: <strong id="hpDoPhuMbNhan">{{ cd.do_phu_mobile }}%</strong></label>
+        <input type="range" name="do_phu_mobile" id="hpDoPhuMb" min="{{ H.DO_PHU_MIN }}" max="{{ H.DO_PHU_MAX }}" step="1" value="{{ cd.do_phu_mobile }}">
+        <div class="hp-thang"><span>Thấy rõ ảnh</span><span>Chữ nổi bật</span></div>
+        <div class="hp-doc-duoc" id="hpDocDuocMb"></div>
+      </div>
+      <div class="form-row" style="grid-column:1 / -1;">
         <label>Mô tả ảnh (hiển thị cho người dùng đọc màn hình và Google Hình ảnh)</label>
         <input type="text" name="alt" maxlength="150" value="{{ cd.alt }}" placeholder="{{ H.ALT_MAC_DINH }}">
       </div>
@@ -119,6 +125,7 @@
 /* Xem trước ảnh KÉO GIÃN vừa khung (fill), giống trang chủ thật: không cắt */
 .hp-preview img { position:absolute; inset:0; width:100%; height:100%; object-fit:fill; }
 .hp-phu { position:absolute; inset:0; background:linear-gradient(180deg,rgba(11,31,58,var(--a1,.6)) 0%,rgba(11,31,58,var(--a2,.66)) 55%,rgba(11,31,58,var(--a3,.78)) 100%); }
+.hp-preview:not(.hp-mobile) .hp-phu { background:linear-gradient(90deg,rgba(11,31,58,var(--pl,.8)) 0%,rgba(11,31,58,var(--pm,.52)) 52%,rgba(11,31,58,var(--pr,.14)) 100%); }
 .hp-noidung { position:relative; z-index:1; max-width:62%; padding:1em; text-shadow:0 2px 14px rgba(5,15,30,.45); }
 .hp-mobile .hp-noidung { max-width:92%; }
 .hp-badge { font-size:1em; margin-bottom:.8em; }
@@ -131,7 +138,7 @@
 .hp-thang { display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted); margin-top:2px; }
 .hp-doc-duoc { font-size:12.5px; margin-top:8px; font-weight:600; }
 .hp-doc-duoc.tot { color:#1a7f4b; } .hp-doc-duoc.kha { color:#b27400; } .hp-doc-duoc.thap { color:var(--level-cctd); }
-#hpDoPhu { width:100%; accent-color:var(--navy-600); }
+#hpDoPhu, #hpDoPhuMb { width:100%; accent-color:var(--navy-600); }
 .hp-xoa { font-weight:500; color:var(--level-cctd); cursor:pointer; display:inline-flex; gap:8px; align-items:center; }
 @media (max-width: 800px) { .hp-luoi, .hp-xem-luoi { grid-template-columns:1fr; } .hp-noidung { max-width:92%; } .hp-preview.hp-mobile { max-width:260px; } }
 </style>
@@ -142,6 +149,7 @@
   var xemPc = document.getElementById('hpPreviewPc'), imgPc = document.getElementById('hpImgPc');
   var xemMb = document.getElementById('hpPreviewMb'), imgMb = document.getElementById('hpImgMb');
   var thanh = document.getElementById('hpDoPhu'), nhan = document.getElementById('hpDoPhuNhan'), docDuoc = document.getElementById('hpDocDuoc');
+  var thanhMb = document.getElementById('hpDoPhuMb'), nhanMb = document.getElementById('hpDoPhuMbNhan'), docDuocMb = document.getElementById('hpDocDuocMb');
   var filePc = document.getElementById('hpFilePc'), fileMb = document.getElementById('hpFileMb');
   var xoaPc = document.getElementById('hpXoaPc'), xoaMb = document.getElementById('hpXoaMb');
   var DA_LUU_PC = {{ cd.anh_xem_truoc | tojson }}, DA_LUU_MB = {{ cd.anh_mobile_xem_truoc | tojson }};
@@ -151,7 +159,7 @@
   function tinhAlpha(p) {
     p = Math.min(MAX, Math.max(MIN, parseInt(p, 10) || MIN));
     var giua = p / 100, lam = function (x) { return Math.round(x * 100) / 100; };
-    return [lam(Math.max(giua - 0.06, 0.45)), lam(giua), lam(Math.min(giua + 0.12, 0.96))];
+    return [lam(Math.max(giua - 0.06, Math.min(giua, 0.45))), lam(giua), lam(Math.min(giua + 0.12, 0.96))];
   }
   // Độ tương phản của chữ trắng trên lớp phủ navy #0b1f3a khi ảnh phía sau là trời/tường rất sáng (228,236,246).
   function tuongPhan(a) {
@@ -159,14 +167,27 @@
     var ink = [11, 31, 58], nen = [228, 236, 246];
     return 1.05 / (lum(ink.map(function (v, i) { return v * a + nen[i] * (1 - a); })) + 0.05);
   }
-  function capNhatPhu() {
-    var a = tinhAlpha(thanh.value);
-    [xemPc, xemMb].forEach(function (x) { x.style.setProperty('--a1', a[0]); x.style.setProperty('--a2', a[1]); x.style.setProperty('--a3', a[2]); });
-    nhan.textContent = thanh.value + '%';
-    var tp = tuongPhan(a[1]);
+  // MÁY TÍNH: phủ chạy ngang (trái / giữa / phải). PHẢI khớp tinh_pc() trong app/utils/hero.py.
+  function tinhPc(p) {
+    p = Math.min(MAX, Math.max(MIN, parseInt(p, 10) || MIN)) / 100;
+    var lam = function (x) { return Math.round(x * 100) / 100; };
+    return [lam(Math.min(p + 0.14, 0.96)), lam(Math.max(p - 0.14, 0)), lam(Math.max(p - 0.52, 0))];
+  }
+  function docDuocCho(el, p) {
+    var tp = tuongPhan(Math.min(MAX, Math.max(MIN, parseInt(p, 10) || MIN)) / 100);
     var loai = tp >= 4.5 ? ['tot', 'Chữ rất dễ đọc'] : tp >= 3.6 ? ['kha', 'Chữ đọc được; nếu ảnh nền rất sáng nên tăng độ phủ'] : ['thap', 'Chữ khó đọc trên ảnh sáng, nên tăng độ phủ'];
-    docDuoc.className = 'hp-doc-duoc ' + loai[0];
-    docDuoc.textContent = loai[1] + ' (độ tương phản ' + tp.toFixed(1) + ':1 trên nền ảnh sáng)';
+    el.className = 'hp-doc-duoc ' + loai[0];
+    el.textContent = loai[1] + ' (độ tương phản ' + tp.toFixed(1) + ':1 trên nền ảnh sáng)';
+  }
+  function capNhatPhu() {
+    var pc = tinhPc(thanh.value);
+    xemPc.style.setProperty('--pl', pc[0]); xemPc.style.setProperty('--pm', pc[1]); xemPc.style.setProperty('--pr', pc[2]);
+    nhan.textContent = thanh.value + '%';
+    docDuocCho(docDuoc, thanh.value);
+    var a = tinhAlpha(thanhMb.value);
+    xemMb.style.setProperty('--a1', a[0]); xemMb.style.setProperty('--a2', a[1]); xemMb.style.setProperty('--a3', a[2]);
+    nhanMb.textContent = thanhMb.value + '%';
+    docDuocCho(docDuocMb, thanhMb.value);
   }
   function datAnh(khung, img, url) {
     if (url) { img.src = url; khung.classList.remove('hp-khong-anh'); }
@@ -191,6 +212,7 @@
   theoDoi(filePc, xoaPc, function (u) { if (tamPc) URL.revokeObjectURL(tamPc); tamPc = u; });
   theoDoi(fileMb, xoaMb, function (u) { if (tamMb) URL.revokeObjectURL(tamMb); tamMb = u; });
   thanh.addEventListener('input', capNhatPhu);
+  thanhMb.addEventListener('input', capNhatPhu);
   capNhatPhu(); capNhatAnh();
 })();
 </script>

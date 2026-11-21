@@ -5,7 +5,7 @@
 {% block og_mo_ta %}Tra cứu thông tin thuốc, thuốc tiêm truyền, tương tác thuốc và tương hợp – tương kỵ tại Khoa Dược BVĐK Tâm Đức Cầu Quan.{% endblock %}
 
 {% block content %}{% from "_icons.html" import ic %}
-<section class="hero{% if hero %} hero--anh{% endif %}"{% if hero %} style="--hero-a1:{{ hero.a1 }};--hero-a2:{{ hero.a2 }};--hero-a3:{{ hero.a3 }}"{% endif %}>
+<section class="hero{% if hero %} hero--anh{% endif %}"{% if hero %} style="--hero-a1:{{ hero.a1 }};--hero-a2:{{ hero.a2 }};--hero-a3:{{ hero.a3 }};--hero-m1:{{ hero.m1 }};--hero-m2:{{ hero.m2 }};--hero-m3:{{ hero.m3 }};--hero-pl:{{ hero.pl }};--hero-pm:{{ hero.pm }};--hero-pr:{{ hero.pr }}"{% endif %}>
   {% if hero %}
   <div class="hero-media" aria-hidden="false">
     {# 2 ảnh: điện thoại (≤ hero.mobile_max px) dùng ảnh riêng, còn lại dùng ảnh máy tính. Ảnh luôn kéo giãn vừa khung, không cắt. #}
