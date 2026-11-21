@@ -15,7 +15,7 @@
 
 <div class="search-panel">
   <form class="search-form" autocomplete="off" method="get" action="{{ url_for('main.tim_kiem') }}">
-    <input type="text" name="q" placeholder="Tra thêm 1 thuốc khác">
+    <input aria-label="Tra thêm 1 thuốc khác" enterkeyhint="search" type="text" name="q" placeholder="Tra thêm 1 thuốc khác">
     <button type="submit">Tìm</button>
   </form>
 </div>
@@ -40,7 +40,7 @@
       {% for it in kq.danh_sach_ket_qua %}
       <a class="drug-card" href="{{ url_for(it.endpoint, thuoc_id=it.thuoc.id) }}">
         {% if it.thuoc.hinh_anh %}
-        <img class="drug-card-thumb" src="{{ it.thuoc.hinh_anh }}" alt="{{ it.thuoc.ten_biet_duoc }}">
+        <img class="drug-card-thumb" src="{{ it.thuoc.hinh_anh }}" alt="{{ it.thuoc.ten_biet_duoc }}" loading="lazy" decoding="async">
         {% else %}
         <div class="drug-card-thumb-fallback" style="background:#eff6ff;color:#2563eb;">{{ it.thuoc.ten_biet_duoc[:1]|upper }}</div>
         {% endif %}

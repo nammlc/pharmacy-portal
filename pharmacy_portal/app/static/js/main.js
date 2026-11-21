@@ -362,3 +362,34 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 });
+
+
+/* ============================================================
+   PHẢN HỒI KHI GỬI FORM TÌM KIẾM (khu công khai)
+   Nút hiện trạng thái "đang tra cứu" + chống bấm lặp; tự gỡ khi quay lại bằng nút Back (bfcache).
+   ============================================================ */
+(function () {
+  function gan(form) {
+    var nut = form.querySelector('button[type="submit"], button:not([type])');
+    if (!nut) return;
+    form.addEventListener("submit", function (e) {
+      if (e.defaultPrevented) return;
+      if (form.dataset.dangGui === "1") { e.preventDefault(); return; }
+      form.dataset.dangGui = "1";
+      form.setAttribute("aria-busy", "true");
+      nut.classList.add("is-loading");
+    });
+  }
+  function reset() {
+    document.querySelectorAll("form[data-dang-gui]").forEach(function (f) {
+      delete f.dataset.dangGui;
+      f.removeAttribute("aria-busy");
+      var n = f.querySelector(".is-loading");
+      if (n) n.classList.remove("is-loading");
+    });
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".hero-search, .search-form").forEach(gan);
+  });
+  window.addEventListener("pageshow", reset);
+})();

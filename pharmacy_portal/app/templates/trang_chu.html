@@ -26,7 +26,7 @@
     </h1>
     <p class="sr-only">Tra cứu dược Tâm Đức của Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan: danh mục thuốc, tương tác thuốc, thuốc tiêm truyền, tương hợp – tương kỵ và hướng dẫn sử dụng thuốc được cập nhật và kiểm duyệt bởi Dược sĩ lâm sàng.</p>
     <form class="hero-search" autocomplete="off" action="{{ url_for('main.tim_kiem') }}" method="get">
-      <input type="text" name="q" placeholder="Tên thuốc hoặc hoạt chất" data-goi-y="all">
+      <input aria-label="Tên thuốc hoặc hoạt chất" enterkeyhint="search" type="text" name="q" placeholder="Tên thuốc hoặc hoạt chất" data-goi-y="all">
       <button type="submit">Tra cứu</button>
     </form>
     <nav class="hero-chips" aria-label="Tra nhanh">
