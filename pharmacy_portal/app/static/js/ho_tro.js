@@ -20,7 +20,7 @@
   function veTin(t) {
     var b = el("div", "ht-msg ht-" + t.tu); b.dataset.id = t.id;
     if (t.ngu_canh) {
-      var c = el("div", "ht-msg-ctx"); c.appendChild(document.createTextNode("📎 "));
+      var c = el("div", "ht-msg-ctx"); 
       if (t.ngu_canh_url && t.ngu_canh_url.charAt(0) === "/") { var a = el("a", "", t.ngu_canh); a.href = t.ngu_canh_url; c.appendChild(a); }
       else c.appendChild(document.createTextNode(t.ngu_canh));
       b.appendChild(c);

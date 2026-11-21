@@ -19,31 +19,46 @@
     </div>
     <h1 class="drug-hero-title">{{ thuoc.ten_biet_duoc }}</h1>
     {% if thuoc.ten_hoat_chat_hien_thi %}<p class="drug-hero-sub">{{ thuoc.ten_hoat_chat_hien_thi }}</p>{% endif %}
+    <nav class="drug-jump" aria-label="Chuyển nhanh tới mục">
+      <a href="#chi-dinh">Chỉ định</a>
+      <a href="#lieu-dung">Cách dùng, liều dùng</a>
+      <a href="#chong-chi-dinh" class="is-danger">Chống chỉ định</a>
+    </nav>
   </div>
 </div>
 
+<div class="drug-layout">
+<nav class="drug-toc" aria-label="Mục lục trang">
+  <div class="drug-toc-title">Nội dung</div>
+  <a href="#thanh-phan">Thành phần</a>
+  <a href="#chi-dinh">Chỉ định</a>
+  <a href="#lieu-dung">Cách dùng, liều dùng</a>
+  <a href="#chong-chi-dinh">Chống chỉ định</a>
+  {% if thuoc.link_chi_tiet %}<a href="#nguon">Nguồn tham khảo</a>{% endif %}
+</nav>
 <div class="drug-grid-sections">
-  {% call section('Thành phần', 'flask') %}
+  {% call section('Thành phần', 'flask', sid='thanh-phan') %}
     <div class="drug-section-body">{% if thuoc.thanh_phan %}{{ thuoc.thanh_phan | safe }}{% else %}<p class="drug-section-empty">Chưa cập nhật.</p>{% endif %}</div>
   {% endcall %}
 
-  {% call section('Chỉ định', 'target') %}
+  {% call section('Chỉ định', 'target', sid='chi-dinh') %}
     <div class="drug-section-body">{% if thuoc.chi_dinh %}{{ thuoc.chi_dinh | safe }}{% else %}<p class="drug-section-empty">Chưa cập nhật.</p>{% endif %}</div>
   {% endcall %}
 
-  {% call section('Cách dùng, liều dùng', 'clock') %}
+  {% call section('Cách dùng, liều dùng', 'clock', sid='lieu-dung') %}
     <div class="drug-section-body">{% if thuoc.cach_dung_lieu_dung %}{{ thuoc.cach_dung_lieu_dung | safe }}{% else %}<p class="drug-section-empty">Chưa cập nhật.</p>{% endif %}</div>
   {% endcall %}
 
-  {% call section('Chống chỉ định', 'ban') %}
+  {% call section('Chống chỉ định', 'ban', sid='chong-chi-dinh', tone='danger') %}
     <div class="drug-section-body">{% if thuoc.chong_chi_dinh %}{{ thuoc.chong_chi_dinh | safe }}{% else %}<p class="drug-section-empty">Chưa cập nhật.</p>{% endif %}</div>
   {% endcall %}
 
   {% if thuoc.link_chi_tiet %}
-  {% call section('Nguồn tham khảo', 'link', wide=true) %}
+  {% call section('Nguồn tham khảo', 'link', wide=true, sid='nguon') %}
     <a class="drug-source-link" href="{{ thuoc.link_chi_tiet | chuan_hoa_url }}" target="_blank" rel="noopener">{{ thuoc.link_chi_tiet }}</a>
   {% endcall %}
   {% endif %}
+</div>
 </div>
 
 {% if cung_hoat_chat %}

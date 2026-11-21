@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Thông báo{% endblock %}
 {% block page_eyebrow %}Phản hồi{% endblock %}
 
@@ -15,7 +16,7 @@
 </div>
 
 <section class="kn-card">
-  <h2>📡 Báo ra ngoài khi không mở trang quản trị</h2>
+  <h2>Báo ra ngoài khi không mở trang quản trị</h2>
   <p class="kn-sub">Chuông chỉ chạy khi có admin đang đăng nhập. Hai kênh dưới đây đẩy thông báo ra điện thoại để không bỏ sót ý kiến.</p>
   <ul class="kn-list">
     <li>
@@ -34,8 +35,8 @@
     {% for a in kenh.admin_chi_tiet %}
     <li class="{{ 'ok' if a.co_email else 'no' }}">
       <span>{{ a.ten }}</span>
-      {% if a.co_email %}<small>✔ {{ a.email }}</small>
-      {% else %}<small>✖ chưa đăng ký email{% if current_user.is_authenticated and (current_user.ho_ten or current_user.ten_dang_nhap) == a.ten %} — <a href="{{ url_for('admin_auth.cap_nhat_email') }}">đăng ký ngay</a>{% endif %}</small>{% endif %}
+      {% if a.co_email %}<small>{{ a.email }}</small>
+      {% else %}<small>chưa đăng ký email{% if current_user.is_authenticated and (current_user.ho_ten or current_user.ten_dang_nhap) == a.ten %} — <a href="{{ url_for('admin_auth.cap_nhat_email') }}">đăng ký ngay</a>{% endif %}</small>{% endif %}
     </li>
     {% endfor %}
   </ul>
@@ -56,12 +57,12 @@
   {% for t in muc %}
   <li class="{{ '' if t.da_doc else 'tb-unread' }}">
     <a href="{{ url_for('admin_thong_bao.mo', tb_id=t.id) }}">
-      <span class="tb-ico">{{ '💬' if t.loai == 'y_kien_moi' else '✉️' }}</span>
+      <span class="tb-ico">{{ ic('message',16) if t.loai == 'y_kien_moi' else ic('mail',16) }}</span>
       <span class="tb-txt">
         <strong>{{ t.tieu_de }}{% if t.so_luong and t.so_luong > 1 %} <span class="tb-count">×{{ t.so_luong }}</span>{% endif %}</strong>
         <small>{{ t.noi_dung }}</small>
         {% set tl = tra_loi.get(t.id) %}
-        {% if tl %}{% if tl.da %}<span class="tl-badge tl-da">✔ Đã trả lời{% if tl.boi %} bởi {{ tl.boi }}{% endif %}{% if tl.luc %} · {{ tl.luc }}{% endif %}</span>
+        {% if tl %}{% if tl.da %}<span class="tl-badge tl-da">Đã trả lời{% if tl.boi %} bởi {{ tl.boi }}{% endif %}{% if tl.luc %} · {{ tl.luc }}{% endif %}</span>
         {% else %}<span class="tl-badge tl-chua">⏳ Chưa trả lời</span>{% endif %}{% endif %}
       </span>
       <span class="tb-time">{{ (t.ngay_tao | gio_vn).strftime('%H:%M %d/%m/%Y') }}</span>

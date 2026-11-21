@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}{{ tieu_de }}{% endblock %}
 
 {% block admin_content %}
@@ -86,7 +87,7 @@
 
       {% if bai_viet and bai_viet.file_dinh_kem %}
       <div style="margin-bottom:10px; font-size:13.5px;">
-        📎 <a href="{{ bai_viet.file_dinh_kem }}" target="_blank">{{ bai_viet.ten_file or 'Tệp hiện tại' }}</a>
+        {{ ic('paperclip', 16) }} <a href="{{ bai_viet.file_dinh_kem }}" target="_blank">{{ bai_viet.ten_file or 'Tệp hiện tại' }}</a>
         <label style="display:inline-flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer; margin-left:14px;">
           <input type="checkbox" name="xoa_tep" value="1">
           <span style="color:#e53e3e;">Xoá tệp hiện tại</span>

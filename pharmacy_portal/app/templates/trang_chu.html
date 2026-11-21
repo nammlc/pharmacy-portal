@@ -4,7 +4,7 @@
 {% block og_tieu_de %}Tra cứu dược BVĐK Tâm Đức Cầu Quan — Khoa Dược Bệnh viện Đa khoa{% endblock %}
 {% block og_mo_ta %}Tra cứu thông tin thuốc, thuốc tiêm truyền, tương tác thuốc và tương hợp – tương kỵ tại Khoa Dược BVĐK Tâm Đức Cầu Quan.{% endblock %}
 
-{% block content %}
+{% block content %}{% from "_icons.html" import ic %}
 <section class="hero{% if hero %} hero--anh{% endif %}"{% if hero %} style="--hero-a1:{{ hero.a1 }};--hero-a2:{{ hero.a2 }};--hero-a3:{{ hero.a3 }}"{% endif %}>
   {% if hero %}
   <div class="hero-media" aria-hidden="false">
@@ -16,7 +16,8 @@
     <div class="hero-phu" aria-hidden="true"></div>
   </div>
   {% endif %}
-  <div class="hero-inner">
+  <div class="hero-inner hero-grid">
+  <div class="hero-main">
     <h1>
       <span class="hero-h1-top">Tra cứu dược</span>
       <span class="hero-h1-main">BVĐK Tâm Đức Cầu Quan</span>
@@ -26,9 +27,16 @@
     </h1>
     <p class="sr-only">Tra cứu dược Tâm Đức của Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan: danh mục thuốc, tương tác thuốc, thuốc tiêm truyền, tương hợp – tương kỵ và hướng dẫn sử dụng thuốc được cập nhật và kiểm duyệt bởi Dược sĩ lâm sàng.</p>
     <form class="hero-search" autocomplete="off" action="{{ url_for('main.tim_kiem') }}" method="get">
-      <input type="text" name="q" placeholder="Tên thuốc hoặc hoạt chất..." data-goi-y="all">
-      <button type="submit">🔍 Tra cứu</button>
+      <input aria-label="Tên thuốc hoặc hoạt chất" enterkeyhint="search" type="text" name="q" placeholder="Tên thuốc hoặc hoạt chất" data-goi-y="all">
+      <button type="submit">Tra cứu</button>
     </form>
+    <nav class="hero-chips" aria-label="Tra nhanh">
+      <span>Tra nhanh</span>
+      <a href="{{ url_for('dmt.index') }}">Danh mục thuốc</a>
+      <a href="{{ url_for('tttt.index') }}">Thuốc tiêm truyền</a>
+      <a href="{{ url_for('thtk.index') }}">Tương hợp - Tương kỵ</a>
+      <a href="{{ url_for('ttt.index') }}">Tương tác thuốc</a>
+    </nav>
 
     {% if stat %}
     <div class="hero-stats">
@@ -37,18 +45,26 @@
          không hiển thị ở đây nữa. Xoá khối comment này để hiện lại. #}
       {% if stat.get('thuoc') %}
       <div class="hero-stat">
-        <div class="hero-stat-num">{{ stat.thuoc }}</div>
+        <div class="hero-stat-num">{{ ('{:,}'.format(stat.thuoc|int))|replace(',', '.') }}</div>
         <div class="hero-stat-lbl">Thuốc tra cứu</div>
       </div>
       {% endif %}
       {% if stat.get('thtk') %}
       <div class="hero-stat">
-        <div class="hero-stat-num">{{ stat.thtk }}</div>
+        <div class="hero-stat-num">{{ ('{:,}'.format(stat.thtk|int))|replace(',', '.') }}</div>
         <div class="hero-stat-lbl">Cặp tương hợp/kỵ</div>
       </div>
       {% endif %}
     </div>
     {% endif %}
+  </div>
+  <aside class="hero-panel" aria-label="Lối tắt tra cứu">
+    <div class="hero-panel-title">Tra cứu nhanh</div>
+    <a class="hero-tile" href="{{ url_for('dmt.index') }}">{{ ic('pill', 22) }}<span><b>Danh mục thuốc</b><small>Theo nhóm dược lý</small></span>{{ ic('arrow', 16) }}</a>
+    <a class="hero-tile" href="{{ url_for('tttt.index') }}">{{ ic('syringe', 22) }}<span><b>Thuốc tiêm truyền</b><small>Dung môi, tốc độ truyền</small></span>{{ ic('arrow', 16) }}</a>
+    <a class="hero-tile" href="{{ url_for('thtk.index') }}">{{ ic('flask', 22) }}<span><b>Tương hợp – Tương kỵ</b><small>Pha chung hai thuốc</small></span>{{ ic('arrow', 16) }}</a>
+    <a class="hero-tile hero-tile--warn" href="{{ url_for('ttt.index') }}">{{ ic('alert', 22) }}<span><b>Tương tác thuốc</b><small>Mức độ và hướng xử trí</small></span>{{ ic('arrow', 16) }}</a>
+  </aside>
   </div>
 </section>
 {# Điện thoại (≤ 700px): các ô chức năng hiển thị dạng thẻ sản phẩm 2 cột (xem CSS "Trang chủ điện thoại"); máy tính giữ nguyên #}
@@ -56,56 +72,58 @@
   <div class="category-grid">
 
     <a class="category-card cat-dmt" href="{{ url_for('dmt.index') }}">
-      <div class="cat-icon-wrap">💊<span class="cat-tag">Danh mục</span></div>
+      <div class="cat-icon-wrap">{{ ic('pill', 20) }}<span class="cat-tag">Danh mục</span></div>
       <h3>Danh mục thuốc</h3>
       <p>Tra cứu theo nhóm dược lý, đầy đủ thông tin chỉ định và liều dùng.</p>
+      {% if stat and stat.get('dmt') %}<div class="cat-stat"><b>{{ ('{:,}'.format(stat.dmt|int))|replace(',', '.') }}</b><span>thuốc trong danh mục</span></div>{% endif %}
       <div class="cat-arrow">Xem danh mục →</div>
     </a>
 
     <a class="category-card cat-ntbv" href="{{ url_for('ntbv.index') }}">
-      <div class="cat-icon-wrap">🏥<span class="cat-tag">Nhà thuốc</span></div>
+      <div class="cat-icon-wrap">{{ ic('building', 20) }}<span class="cat-tag">Nhà thuốc</span></div>
       <h3>Nhà thuốc BV</h3>
       <p>Danh mục thuốc bán tại Nhà thuốc Bệnh viện, tra theo nhóm và hoạt chất.</p>
       <div class="cat-arrow">Xem danh mục →</div>
     </a>
 
     <a class="category-card cat-tt" href="{{ url_for('tttt.index') }}">
-      <div class="cat-icon-wrap">💉<span class="cat-tag">Tiêm truyền</span></div>
+      <div class="cat-icon-wrap">{{ ic('syringe', 20) }}<span class="cat-tag">Tiêm truyền</span></div>
       <h3>Thuốc tiêm truyền</h3>
       <p>Dung môi pha loãng, tốc độ truyền, độ ổn định và thời hạn sau pha.</p>
       <div class="cat-arrow">Tra cứu →</div>
     </a>
 
     <a class="category-card cat-thtk" href="{{ url_for('thtk.index') }}">
-      <div class="cat-icon-wrap">🧪<span class="cat-tag">Pha chung</span></div>
+      <div class="cat-icon-wrap">{{ ic('flask', 20) }}<span class="cat-tag">Pha chung</span></div>
       <h3>Tương hợp - Tương kỵ</h3>
       <p>Kiểm tra khả năng pha chung và phối hợp giữa hai thuốc truyền tĩnh mạch.</p>
       <div class="cat-arrow">Kiểm tra →</div>
     </a>
 
     <a class="category-card cat-ttt" href="{{ url_for('ttt.index') }}">
-      <div class="cat-icon-wrap">⚠️<span class="cat-tag">Tương tác</span></div>
+      <div class="cat-icon-wrap">{{ ic('alert', 20) }}<span class="cat-tag">Tương tác</span></div>
       <h3>Tương tác thuốc</h3>
       <p>Mức độ, cơ chế tương tác và hướng xử trí khi dùng đồng thời hai thuốc.</p>
+      <div class="cat-levels" aria-label="Các mức độ tương tác"><span><i style="--lv:var(--level-nhe)"></i>Nhẹ</span><span><i style="--lv:var(--level-trungbinh)"></i>Trung bình</span><span><i style="--lv:var(--level-nang)"></i>Nặng</span><span><i style="--lv:var(--level-cctd)"></i>Chống chỉ định</span></div>
       <div class="cat-arrow">Kiểm tra →</div>
     </a>
 
     <a class="category-card cat-ttth" href="{{ url_for('ttth.index') }}">
-      <div class="cat-icon-wrap">📋<span class="cat-tag">Thông tin</span></div>
+      <div class="cat-icon-wrap">{{ ic('file', 20) }}<span class="cat-tag">Thông tin</span></div>
       <h3>Thông tin thuốc</h3>
       <p>Chỉ định, chống chỉ định, liều dùng theo đối tượng và tác dụng phụ.</p>
       <div class="cat-arrow">Tra cứu →</div>
     </a>
 
     <a class="category-card cat-ttbn" href="{{ url_for('ttbn.index') }}">
-      <div class="cat-icon-wrap">🧑‍⚕️<span class="cat-tag">Người bệnh</span></div>
+      <div class="cat-icon-wrap">{{ ic('user', 20) }}<span class="cat-tag">Người bệnh</span></div>
       <h3>Thông tin bệnh nhân</h3>
       <p>Hướng dẫn dùng thuốc tại nhà, ngôn ngữ đơn giản dễ hiểu cho người bệnh.</p>
       <div class="cat-arrow">Xem hướng dẫn →</div>
     </a>
 
     <a class="category-card cat-bv" href="{{ url_for('bv.index') }}">
-      <div class="cat-icon-wrap">📰<span class="cat-tag">Tin mới</span></div>
+      <div class="cat-icon-wrap">{{ ic('newspaper', 20) }}<span class="cat-tag">Tin mới</span></div>
       <h3>Bài viết - Thông báo</h3>
       <p>Tin tức, thông báo nội bộ và bài viết chuyên môn mới nhất từ Khoa Dược.</p>
       <div class="cat-arrow">Xem bài viết →</div>
@@ -142,18 +160,18 @@
         <span class="home-eyebrow">Giới thiệu</span>
         <h2 id="home-info-title">Tra cứu dược Tâm Đức Cầu Quan – cổng thông tin thuốc của Khoa Dược</h2>
         <p>Đây là website <strong>tra cứu dược</strong> của <strong>Khoa Dược, Bệnh viện Đa khoa (BVĐK) Tâm Đức Cầu Quan</strong>. Cổng giúp nhân viên y tế và người bệnh tra cứu nhanh thông tin thuốc đang sử dụng tại bệnh viện, do Khoa Dược cập nhật và kiểm duyệt.</p>
-        <div class="home-note"><span aria-hidden="true">ⓘ</span><span>Nội dung chỉ mang tính tham khảo, luôn đối chiếu dược thư và quy trình chuyên môn hiện hành.</span></div>
+        <div class="home-note"><span aria-hidden="true">{{ ic('info', 16) }}</span><span>Nội dung chỉ mang tính tham khảo, luôn đối chiếu dược thư và quy trình chuyên môn hiện hành.</span></div>
       </div>
 
       <div class="home-find">
         <h3>Bạn có thể tra cứu gì tại Khoa Dược BVĐK Tâm Đức Cầu Quan?</h3>
         <ul class="home-find-list">
-          <li><span class="home-ico" aria-hidden="true">💊</span><div><a href="{{ url_for('dmt.index') }}">Danh mục thuốc</a><p>Tra theo nhóm dược lý, kèm chỉ định, chống chỉ định và liều dùng.</p></div></li>
-          <li><span class="home-ico" aria-hidden="true">🏥</span><div><a href="{{ url_for('ntbv.index') }}">Nhà thuốc bệnh viện</a><p>Thuốc bán tại Nhà thuốc Bệnh viện Đa khoa Tâm Đức Cầu Quan, tra theo nhóm và hoạt chất.</p></div></li>
-          <li><span class="home-ico" aria-hidden="true">💉</span><div><a href="{{ url_for('tttt.index') }}">Thuốc tiêm truyền</a><p>Dung môi pha loãng, tốc độ truyền, độ ổn định và thời hạn sau pha.</p></div></li>
-          <li><span class="home-ico" aria-hidden="true">🧪</span><div><a href="{{ url_for('thtk.index') }}">Tương hợp – tương kỵ</a><p>Kiểm tra khả năng pha chung hai thuốc truyền tĩnh mạch.</p></div></li>
-          <li><span class="home-ico" aria-hidden="true">⚠️</span><div><a href="{{ url_for('ttt.index') }}">Tương tác thuốc</a><p>Mức độ, cơ chế và hướng xử trí khi dùng đồng thời hai thuốc.</p></div></li>
-          <li><span class="home-ico" aria-hidden="true">📋</span><div><a href="{{ url_for('ttth.index') }}">Thông tin thuốc</a><span class="home-dot"> · </span><a href="{{ url_for('ttbn.index') }}">Hướng dẫn cho người bệnh</a><p>Hướng dẫn dùng thuốc bằng ngôn ngữ đơn giản, dễ hiểu.</p></div></li>
+          <li><span class="home-ico" aria-hidden="true">{{ ic('pill', 18) }}</span><div><a href="{{ url_for('dmt.index') }}">Danh mục thuốc</a><p>Tra theo nhóm dược lý, kèm chỉ định, chống chỉ định và liều dùng.</p></div></li>
+          <li><span class="home-ico" aria-hidden="true">{{ ic('building', 18) }}</span><div><a href="{{ url_for('ntbv.index') }}">Nhà thuốc bệnh viện</a><p>Thuốc bán tại Nhà thuốc Bệnh viện Đa khoa Tâm Đức Cầu Quan, tra theo nhóm và hoạt chất.</p></div></li>
+          <li><span class="home-ico" aria-hidden="true">{{ ic('syringe', 18) }}</span><div><a href="{{ url_for('tttt.index') }}">Thuốc tiêm truyền</a><p>Dung môi pha loãng, tốc độ truyền, độ ổn định và thời hạn sau pha.</p></div></li>
+          <li><span class="home-ico" aria-hidden="true">{{ ic('flask', 18) }}</span><div><a href="{{ url_for('thtk.index') }}">Tương hợp – tương kỵ</a><p>Kiểm tra khả năng pha chung hai thuốc truyền tĩnh mạch.</p></div></li>
+          <li><span class="home-ico" aria-hidden="true">{{ ic('alert', 18) }}</span><div><a href="{{ url_for('ttt.index') }}">Tương tác thuốc</a><p>Mức độ, cơ chế và hướng xử trí khi dùng đồng thời hai thuốc.</p></div></li>
+          <li><span class="home-ico" aria-hidden="true">{{ ic('file', 18) }}</span><div><a href="{{ url_for('ttth.index') }}">Thông tin thuốc</a><span class="home-dot"> · </span><a href="{{ url_for('ttbn.index') }}">Hướng dẫn cho người bệnh</a><p>Hướng dẫn dùng thuốc bằng ngôn ngữ đơn giản, dễ hiểu.</p></div></li>
         </ul>
       </div>
     </div>

@@ -1,18 +1,19 @@
 {% extends "base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Tra cứu thông tin thuốc{% endblock %}
 {% block meta_mo_ta %}Tra cứu thông tin thuốc tại Khoa Dược BV Đa khoa Tâm Đức Cầu Quan: chỉ định, chống chỉ định, liều dùng theo đối tượng và tác dụng phụ.{% endblock %}
 
 {% block content %}
 <div class="page-header">
-  <div class="eyebrow">📋 Tra cứu</div>
+  <div class="eyebrow">Tra cứu</div>
   <h1>Thông tin thuốc</h1>
   <p>Danh mục thuốc, chỉ định, chống chỉ định, liều dùng và tác dụng phụ.</p>
 </div>
 
 <div class="search-panel">
   <form class="search-form" method="get">
-    <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên thuốc hoặc hoạt chất...">
-    <button type="submit">🔍 Tra cứu</button>
+    <input aria-label="Tên thuốc hoặc hoạt chất" enterkeyhint="search" type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên thuốc hoặc hoạt chất">
+    <button type="submit">Tra cứu</button>
   </form>
 </div>
 
@@ -45,12 +46,12 @@
   {% include "_phan_trang.html" with context %}
   {% elif tu_khoa %}
   <div class="empty-state">
-    <div class="empty-state-icon">&#128269;</div>
+    <div class="empty-state-icon">{{ ic('search', 22) }}</div>
     Không tìm thấy thuốc phù hợp với "{{ tu_khoa }}".
   </div>
   {% else %}
   <div class="empty-state">
-    <div class="empty-state-icon">&#128138;</div>
+    <div class="empty-state-icon">{{ ic('pill', 22) }}</div>
     Chưa có dữ liệu thuốc.
   </div>
   {% endif %}

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}{{ nhom.ten_nhom }}{% endblock %}
 
 {% block content %}
@@ -14,7 +15,7 @@
     {% for thuoc in phan_trang.items %}
     <a class="drug-card" href="{{ url_for('ntbv.xem_thuoc', thuoc_id=thuoc.id) }}">
       {% if thuoc.hinh_anh %}
-      <img class="drug-card-thumb" src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}">
+      <img class="drug-card-thumb" src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}" loading="lazy" decoding="async">
       {% else %}
       <div class="drug-card-thumb-fallback">{{ thuoc.ten_biet_duoc[:1]|upper }}</div>
       {% endif %}
@@ -30,7 +31,7 @@
   {% include "_phan_trang.html" with context %}
   {% else %}
   <div class="empty-state">
-    <div class="empty-state-icon">&#128138;</div>
+    <div class="empty-state-icon">{{ ic('pill', 22) }}</div>
     Chưa có thuốc nào trong nhóm này.
   </div>
   {% endif %}

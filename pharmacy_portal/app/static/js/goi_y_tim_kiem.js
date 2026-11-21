@@ -68,13 +68,30 @@
     var hop = document.createElement("div");
     hop.className = "goi-y-dropdown";
     hop.hidden = true;
+    var uid = "gy-" + Math.random().toString(36).slice(2, 8);
+    hop.id = uid + "-ds";
+    hop.setAttribute("role", "listbox");
+    hop.setAttribute("aria-label", "Gợi ý tìm kiếm");
     wrap.appendChild(hop);
+    input.setAttribute("role", "combobox");
+    input.setAttribute("aria-autocomplete", "list");
+    input.setAttribute("aria-expanded", "false");
+    input.setAttribute("aria-controls", hop.id);
+
+    // Vùng đọc (ẩn) báo số gợi ý cho trình đọc màn hình
+    var trang_thai = document.createElement("div");
+    trang_thai.className = "sr-only";
+    trang_thai.setAttribute("role", "status");
+    trang_thai.setAttribute("aria-live", "polite");
+    wrap.appendChild(trang_thai);
 
     var danh_sach = [];
     var dang_chon = -1;
     var bo_dem = 0;
 
     function dong() {
+      input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
       hop.hidden = true;
       hop.innerHTML = "";
       danh_sach = [];
@@ -91,7 +108,7 @@
           ? '<img class="goi-y-anh" src="' + thoat_html(it.anh) + '" alt="" loading="lazy" decoding="async">'
           : '<span class="goi-y-anh goi-y-anh-trong">' + thoat_html(chu) + "</span>";
         return (
-          '<div class="goi-y-item" data-idx="' + i + '">' +
+          '<div class="goi-y-item" role="option" id="' + uid + '-' + i + '" aria-selected="false" data-idx="' + i + '">' +
             anh +
             '<div class="goi-y-noidung">' +
               '<div class="goi-y-ten-dong">' +
@@ -112,11 +129,18 @@
         });
       });
       hop.hidden = false;
+      input.setAttribute("aria-expanded", "true");
+      trang_thai.textContent = danh_sach.length + " gợi ý, dùng phím mũi tên lên xuống để chọn";
     }
 
     function to_dam_dang_chon() {
       var muc = hop.querySelectorAll(".goi-y-item");
-      muc.forEach(function (el, i) { el.classList.toggle("active", i === dang_chon); });
+      muc.forEach(function (el, i) {
+        el.classList.toggle("active", i === dang_chon);
+        el.setAttribute("aria-selected", i === dang_chon ? "true" : "false");
+      });
+      if (dang_chon >= 0 && muc[dang_chon]) input.setAttribute("aria-activedescendant", muc[dang_chon].id);
+      else input.removeAttribute("aria-activedescendant");
       if (dang_chon >= 0 && muc[dang_chon]) muc[dang_chon].scrollIntoView({ block: "nearest" });
     }
 

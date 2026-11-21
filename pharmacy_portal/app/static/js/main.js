@@ -343,7 +343,7 @@ document.addEventListener("DOMContentLoaded", function () {
     preview.setAttribute("role", "button");
     preview.setAttribute("aria-label", "Chỉnh sửa " + nhan);
     preview.innerHTML =
-      '<span class="rich-preview-badge">✎ Bấm để chỉnh sửa</span>' +
+      '<span class="rich-preview-badge">Bấm để chỉnh sửa</span>' +
       '<div class="rich-preview-noidung rich-content"></div>' +
       '<span class="rich-preview-placeholder"></span>';
     preview.querySelector(".rich-preview-placeholder").textContent =
@@ -362,3 +362,52 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 });
+
+
+/* ============================================================
+   PHẢN HỒI KHI GỬI FORM TÌM KIẾM (khu công khai)
+   Nút hiện trạng thái "đang tra cứu" + chống bấm lặp; tự gỡ khi quay lại bằng nút Back (bfcache).
+   ============================================================ */
+(function () {
+  function gan(form) {
+    var nut = form.querySelector('button[type="submit"], button:not([type])');
+    if (!nut) return;
+    form.addEventListener("submit", function (e) {
+      if (e.defaultPrevented) return;
+      if (form.dataset.dangGui === "1") { e.preventDefault(); return; }
+      form.dataset.dangGui = "1";
+      form.setAttribute("aria-busy", "true");
+      nut.classList.add("is-loading");
+    });
+  }
+  function reset() {
+    document.querySelectorAll("form[data-dang-gui]").forEach(function (f) {
+      delete f.dataset.dangGui;
+      f.removeAttribute("aria-busy");
+      var n = f.querySelector(".is-loading");
+      if (n) n.classList.remove("is-loading");
+    });
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".hero-search, .search-form").forEach(gan);
+  });
+  window.addEventListener("pageshow", reset);
+})();
+
+/* Mục lục trang chi tiết thuốc: tô sáng mục đang đọc */
+(function () {
+  document.addEventListener("DOMContentLoaded", function () {
+    var links = document.querySelectorAll(".drug-toc a[href^='#']");
+    if (!links.length || !("IntersectionObserver" in window)) return;
+    var map = {};
+    links.forEach(function (a) { var s = document.getElementById(a.getAttribute("href").slice(1)); if (s) map[s.id] = a; });
+    var obs = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        links.forEach(function (a) { a.classList.remove("is-active"); a.removeAttribute("aria-current"); });
+        var a = map[e.target.id]; if (a) { a.classList.add("is-active"); a.setAttribute("aria-current", "location"); }
+      });
+    }, { rootMargin: "-20% 0px -65% 0px" });
+    Object.keys(map).forEach(function (id) { obs.observe(document.getElementById(id)); });
+  });
+})();

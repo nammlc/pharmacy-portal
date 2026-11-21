@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Hỗ trợ &amp; góp ý{% endblock %}
 {% block meta_robots %}noindex, nofollow{% endblock %}
 
 {% block content %}
 <div class="page-header">
-  <div class="eyebrow">💬 Hỗ trợ</div>
+  <div class="eyebrow">Hỗ trợ</div>
   <h1>Hỗ trợ &amp; góp ý riêng tư</h1>
   <p>Nhắn riêng cho Khoa Dược để được hỗ trợ, góp ý hoặc báo lỗi thông tin. Cuộc trò chuyện chỉ bạn và Khoa Dược xem được.</p>
 </div>
@@ -17,7 +18,7 @@
 
   {# ───── Chưa vào: SĐT (+ họ tên nếu là số mới) + tin nhắn. Không mã bí mật ───── #}
   <form class="ht-card ht-form" id="htDangNhap" novalidate {% if khach %}hidden{% endif %}>
-    {% if ngu_canh %}<div class="ht-context">📎 {{ ngu_canh }}</div>{% endif %}
+    {% if ngu_canh %}<div class="ht-context">{{ ic('paperclip', 16) }} {{ ngu_canh }}</div>{% endif %}
     <div class="hd-row">
       <label>Số điện thoại <span class="hd-req">*</span>
         <input type="tel" name="sdt" inputmode="tel" maxlength="15" required autocomplete="tel" placeholder="09xx xxx xxx">
@@ -49,7 +50,7 @@
     <div class="ht-msgs" id="htMsgs" aria-live="polite">
       {% for t in tin_nhan %}
       <div class="ht-msg ht-{{ t.tu }}" data-id="{{ t.id }}">
-        {% if t.ngu_canh %}<div class="ht-msg-ctx">📎 {% if t.ngu_canh_url %}<a href="{{ t.ngu_canh_url }}">{{ t.ngu_canh }}</a>{% else %}{{ t.ngu_canh }}{% endif %}</div>{% endif %}
+        {% if t.ngu_canh %}<div class="ht-msg-ctx">{{ ic('paperclip', 16) }} {% if t.ngu_canh_url %}<a href="{{ t.ngu_canh_url }}">{{ t.ngu_canh }}</a>{% else %}{{ t.ngu_canh }}{% endif %}</div>{% endif %}
         <div class="ht-bubble">{{ t.noi_dung }}</div>
         <div class="ht-meta">{% if t.tu == 'admin' %}{{ t.ten }} · {% endif %}{{ t.gio }}</div>
       </div>
@@ -58,7 +59,7 @@
       {% endfor %}
     </div>
     <form class="ht-send" id="htGui" novalidate>
-      {% if ngu_canh %}<div class="ht-context">📎 {{ ngu_canh }}</div>{% endif %}
+      {% if ngu_canh %}<div class="ht-context">{{ ic('paperclip', 16) }} {{ ngu_canh }}</div>{% endif %}
       <textarea name="noi_dung" rows="2" maxlength="2000" placeholder="Nhập tin nhắn… (Ctrl + Enter để gửi)"></textarea>
       <input type="text" name="website" class="hd-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       <button type="submit" class="btn btn-primary" id="htGuiTiep">Gửi</button>

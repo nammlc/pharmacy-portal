@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Kết quả tìm kiếm — "{{ tu_khoa }}"{% endblock %}
 
 {% block content %}
 {% set tong_ket_qua = phan_trang_dmt.total + phan_trang_ntbv.total %}
 
 <div class="page-header">
-  <div class="eyebrow">🔍 Tìm kiếm</div>
+  <div class="eyebrow">Tìm kiếm</div>
   <h1>Kết quả cho "{{ tu_khoa }}"</h1>
   <p>
     {% if tong_ket_qua %}
@@ -18,15 +19,15 @@
 
 <div class="search-panel">
   <form class="search-form" autocomplete="off" method="get" action="{{ url_for('main.tim_kiem') }}">
-    <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên biệt dược hoặc hoạt chất...">
-    <button type="submit">🔍 Tìm</button>
+    <input aria-label="Tên biệt dược hoặc hoạt chất" enterkeyhint="search" type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên biệt dược hoặc hoạt chất">
+    <button type="submit">Tìm</button>
   </form>
 </div>
 
 {% if not tong_ket_qua %}
 <div class="results-panel">
   <div class="empty-state">
-    <p style="font-size:32px;margin-bottom:12px;">🔍</p>
+    <p style="font-size:32px;margin-bottom:12px;">{{ ic('search', 22) }}</p>
     <p>Không tìm thấy thuốc phù hợp với <strong>"{{ tu_khoa }}"</strong>.</p>
     <p style="font-size:13px;margin-top:8px;">Thử gõ tên khác, tên hoạt chất, hoặc tên viết tắt.</p>
   </div>
@@ -40,7 +41,7 @@
     <div class="tktg-section-head">
       <div class="tktg-section-title">
         <span class="tktg-dot" style="background:var(--cat-dmt)"></span>
-        💊 Danh mục thuốc
+        {{ ic('pill', 16) }} Danh mục thuốc
         <span class="tktg-count">{{ phan_trang_dmt.total }} kết quả</span>
       </div>
       {% if phan_trang_dmt.total > phan_trang_dmt.items|length %}
@@ -57,7 +58,7 @@
       {% for thuoc in phan_trang_dmt.items %}
       <a class="drug-card" href="{{ url_for('dmt.xem_thuoc', thuoc_id=thuoc.id) }}">
         {% if thuoc.hinh_anh %}
-        <img class="drug-card-thumb" src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}">
+        <img class="drug-card-thumb" src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}" loading="lazy" decoding="async">
         {% else %}
         <div class="drug-card-thumb-fallback" style="background:#eff6ff;color:#2563eb;">{{ thuoc.ten_biet_duoc[:1]|upper }}</div>
         {% endif %}
@@ -78,7 +79,7 @@
     <div class="tktg-section-head">
       <div class="tktg-section-title">
         <span class="tktg-dot" style="background:var(--cat-ntbv)"></span>
-        🏥 Nhà thuốc BV
+        {{ ic('building', 16) }} Nhà thuốc BV
         <span class="tktg-count">{{ phan_trang_ntbv.total }} kết quả</span>
       </div>
       {% if phan_trang_ntbv.total > phan_trang_ntbv.items|length %}
@@ -95,7 +96,7 @@
       {% for thuoc in phan_trang_ntbv.items %}
       <a class="drug-card" href="{{ url_for('ntbv.xem_thuoc', thuoc_id=thuoc.id) }}">
         {% if thuoc.hinh_anh %}
-        <img class="drug-card-thumb" src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}">
+        <img class="drug-card-thumb" src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}" loading="lazy" decoding="async">
         {% else %}
         <div class="drug-card-thumb-fallback" style="background:#ecfdf5;color:#059669;">{{ thuoc.ten_biet_duoc[:1]|upper }}</div>
         {% endif %}

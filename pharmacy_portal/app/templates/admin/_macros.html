@@ -37,7 +37,7 @@
   </div>
 
   {% if field.choices %}
-  <div class="hc-multi" data-hc-multi data-field-name="{{ field.name }}" data-placeholder="Gõ để tìm hoạt chất...">
+  <div class="hc-multi" data-hc-multi data-field-name="{{ field.name }}" data-placeholder="Gõ để tìm hoạt chất">
     <select class="hc-source-options" hidden>
       {% for value, label, checked, render_kw in field.iter_choices() %}
       <option value="{{ value }}" data-checked="{{ '1' if checked else '0' }}">{{ label }}</option>

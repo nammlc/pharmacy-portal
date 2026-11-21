@@ -1,12 +1,13 @@
-<!DOCTYPE html>
+{% from "_icons.html" import ic %}<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1f3a">
 <title>{% block full_title %}{% block title %}Cổng Tra Cứu Dược{% endblock %} — BV Đa khoa Tâm Đức Cầu Quan{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
 <meta name="description" content="{% block meta_mo_ta %}Tra cứu thông tin thuốc tại Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan: danh mục thuốc, tương tác thuốc, thuốc tiêm truyền, tương hợp – tương kỵ và hướng dẫn sử dụng thuốc.{% endblock %}">
@@ -47,19 +48,20 @@
 {% endif %}
 </head>
 <body>
+<a class="skip-link" href="#main">Bỏ qua menu, tới nội dung chính</a>
 
 <header class="site-header">
   <div class="header-inner">
     <a href="{{ url_for('main.trang_chu') }}" class="brand">
       <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo bệnh viện" class="brand-logo">
       <span class="brand-text">
-        <strong class="brand-primary">KHOA DƯỢC</strong>
+        <strong class="brand-primary">Khoa Dược</strong>
         <small>BVĐK Tâm Đức Cầu Quan</small>
       </span>
     </a>
 
     <div class="nav-dropdown" id="navDropdown">
-      <button class="nav-toggle" id="navToggle" aria-haspopup="true" aria-expanded="false">
+      <button class="nav-toggle" id="navToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="mainNav" aria-label="Menu điều hướng">
         <span class="nav-toggle-icon"><span></span><span></span><span></span></span>
         <span class="nav-toggle-label">Menu</span>
         <svg class="nav-toggle-caret" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -67,24 +69,24 @@
         </svg>
       </button>
 
-      <nav class="main-nav" id="mainNav">
-        <a href="{{ url_for('main.trang_chu') }}" class="{{ 'active' if request.endpoint == 'main.trang_chu' }}">🏠 Trang chủ</a>
-        <a href="{{ url_for('bv.index') }}" class="{{ 'active' if request.blueprint == 'bv' }}">📰 Bài viết - Thông báo</a>
-        <a href="{{ url_for('dmt.index') }}" class="{{ 'active' if request.blueprint == 'dmt' }}">💊 Danh mục thuốc</a>
-        <a href="{{ url_for('ntbv.index') }}" class="{{ 'active' if request.blueprint == 'ntbv' }}">🏥 Nhà thuốc BV</a>
-        <a href="{{ url_for('tttt.index') }}" class="{{ 'active' if request.blueprint == 'tttt' }}">💉 Thuốc tiêm truyền</a>
-        <a href="{{ url_for('thtk.index') }}" class="{{ 'active' if request.blueprint == 'thtk' }}">🧪 Tương hợp - Tương kỵ</a>
-        <a href="{{ url_for('ttt.index') }}" class="{{ 'active' if request.blueprint == 'ttt' }}">⚠️ Tương tác thuốc</a>
-        <a href="{{ url_for('ttth.index') }}" class="{{ 'active' if request.blueprint == 'ttth' }}">📋 Thông tin thuốc</a>
-        <a href="{{ url_for('ttbn.index') }}" class="{{ 'active' if request.blueprint == 'ttbn' }}">🧑‍⚕️ Thông tin bệnh nhân</a>
-        <a href="{{ url_for('ho_tro.trang') }}" class="{{ 'active' if request.blueprint == 'ho_tro' }}">💬 Hỗ trợ &amp; góp ý</a>
-        <a href="{{ url_for('main.ve_chung_toi') }}" class="{{ 'active' if request.endpoint == 'main.ve_chung_toi' }}">ℹ️ Về chúng tôi</a>
+      <nav class="main-nav" id="mainNav" aria-label="Điều hướng chính">
+        <a href="{{ url_for('main.trang_chu') }}" class="{{ 'active' if request.endpoint == 'main.trang_chu' }}" {% if request.endpoint == 'main.trang_chu' %}aria-current="page"{% endif %}>{{ ic('home', 18) }}Trang chủ</a>
+        <a href="{{ url_for('bv.index') }}" class="{{ 'active' if request.blueprint == 'bv' }}" {% if request.blueprint == 'bv' %}aria-current="page"{% endif %}>{{ ic('newspaper', 18) }}Bài viết - Thông báo</a>
+        <a href="{{ url_for('dmt.index') }}" class="{{ 'active' if request.blueprint == 'dmt' }}" {% if request.blueprint == 'dmt' %}aria-current="page"{% endif %}>{{ ic('pill', 18) }}Danh mục thuốc</a>
+        <a href="{{ url_for('ntbv.index') }}" class="{{ 'active' if request.blueprint == 'ntbv' }}" {% if request.blueprint == 'ntbv' %}aria-current="page"{% endif %}>{{ ic('building', 18) }}Nhà thuốc BV</a>
+        <a href="{{ url_for('tttt.index') }}" class="{{ 'active' if request.blueprint == 'tttt' }}" {% if request.blueprint == 'tttt' %}aria-current="page"{% endif %}>{{ ic('syringe', 18) }}Thuốc tiêm truyền</a>
+        <a href="{{ url_for('thtk.index') }}" class="{{ 'active' if request.blueprint == 'thtk' }}" {% if request.blueprint == 'thtk' %}aria-current="page"{% endif %}>{{ ic('flask', 18) }}Tương hợp - Tương kỵ</a>
+        <a href="{{ url_for('ttt.index') }}" class="{{ 'active' if request.blueprint == 'ttt' }}" {% if request.blueprint == 'ttt' %}aria-current="page"{% endif %}>{{ ic('alert', 18) }}Tương tác thuốc</a>
+        <a href="{{ url_for('ttth.index') }}" class="{{ 'active' if request.blueprint == 'ttth' }}" {% if request.blueprint == 'ttth' %}aria-current="page"{% endif %}>{{ ic('file', 18) }}Thông tin thuốc</a>
+        <a href="{{ url_for('ttbn.index') }}" class="{{ 'active' if request.blueprint == 'ttbn' }}" {% if request.blueprint == 'ttbn' %}aria-current="page"{% endif %}>{{ ic('user', 18) }}Thông tin bệnh nhân</a>
+        <a href="{{ url_for('ho_tro.trang') }}" class="{{ 'active' if request.blueprint == 'ho_tro' }}" {% if request.blueprint == 'ho_tro' %}aria-current="page"{% endif %}>{{ ic('message', 18) }}Hỗ trợ &amp; góp ý</a>
+        <a href="{{ url_for('main.ve_chung_toi') }}" class="{{ 'active' if request.endpoint == 'main.ve_chung_toi' }}" {% if request.endpoint == 'main.ve_chung_toi' %}aria-current="page"{% endif %}>{{ ic('info', 18) }}Về chúng tôi</a>
       </nav>
     </div>
   </div>
 </header>
 
-<main class="site-main">
+<main class="site-main" id="main" tabindex="-1">
   {% block content %}{% endblock %}
 </main>
 
@@ -114,8 +116,17 @@
   </div>
 </footer>
 
+<nav class="tabbar" aria-label="Điều hướng nhanh">
+  {% set ep = request.endpoint or '' %}
+  <a href="{{ url_for('main.trang_chu') }}" class="{{ 'is-active' if ep == 'main.trang_chu' }}" {% if ep == 'main.trang_chu' %}aria-current="page"{% endif %}>{{ ic('home', 22) }}<span>Trang chủ</span></a>
+  <a href="{{ url_for('dmt.index') }}" class="{{ 'is-active' if ep.startswith('dmt.') or ep.startswith('ntbv.') }}" {% if ep.startswith('dmt.') or ep.startswith('ntbv.') %}aria-current="page"{% endif %}>{{ ic('pill', 22) }}<span>Thuốc</span></a>
+  <a href="{{ url_for('ttt.index') }}" class="{{ 'is-active' if ep.startswith('ttt.') or ep.startswith('thtk.') }}" {% if ep.startswith('ttt.') or ep.startswith('thtk.') %}aria-current="page"{% endif %}>{{ ic('alert', 22) }}<span>Tương tác</span></a>
+  <a href="{{ url_for('bv.index') }}" class="{{ 'is-active' if ep.startswith('bv.') }}" {% if ep.startswith('bv.') %}aria-current="page"{% endif %}>{{ ic('newspaper', 22) }}<span>Bài viết</span></a>
+  <a href="{{ url_for('ho_tro.trang') }}" class="{{ 'is-active' if ep.startswith('ho_tro.') }}" {% if ep.startswith('ho_tro.') %}aria-current="page"{% endif %}>{{ ic('message', 22) }}<span>Hỗ trợ</span></a>
+</nav>
+
 <div class="pp-cookie" id="ppCookie" role="dialog" aria-live="polite" aria-label="Thông báo cookie" {% if not chua_chon_cookie %}hidden{% endif %}>
-  <p>🍪 Chúng tôi dùng cookie để nhớ thiết bị của bạn, giúp thống kê lượt tra cứu chính xác hơn và cá nhân hóa trải nghiệm.</p>
+  <p>Chúng tôi dùng cookie để nhớ thiết bị của bạn, giúp thống kê lượt tra cứu chính xác hơn và cá nhân hóa trải nghiệm.</p>
   <div class="pp-cookie-btns">
     <button type="button" class="pp-cookie-btn pp-cookie-no" id="ppCookieNo">Từ chối</button>
     <button type="button" class="pp-cookie-btn pp-cookie-yes" id="ppCookieYes">Đồng ý</button>

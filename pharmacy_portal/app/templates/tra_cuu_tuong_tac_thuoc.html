@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Tra cứu tương tác thuốc{% endblock %}
 {% block meta_mo_ta %}Tra cứu tương tác thuốc tại Khoa Dược BV Đa khoa Tâm Đức Cầu Quan: mức độ, cơ chế và hướng xử trí khi dùng đồng thời hai thuốc.{% endblock %}
 
 {% block content %}
 <div class="page-header">
-  <div class="eyebrow">⚠️ Tra cứu</div>
+  <div class="eyebrow">Tra cứu</div>
   <h1>Tương tác thuốc</h1>
   <p>Mức độ, cơ chế và hướng xử trí khi hai thuốc dùng đồng thời.</p>
 </div>
@@ -12,43 +13,54 @@
 
 <div class="search-panel">
   <form class="search-form" method="get">
-    <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên thuốc...">
-    <button type="submit">🔍 Tra cứu</button>
+    <input aria-label="Tên thuốc" enterkeyhint="search" type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên thuốc">
+    <button type="submit">Tra cứu</button>
   </form>
 </div>
 
 <div class="results-panel">
   {% if ket_qua %}
-  <table class="result-table">
+  {% set ds = ket_qua|list %}
+  {% set thu_tu = ['chong_chi_dinh', 'nang', 'trung_binh', 'nhe'] %}
+  {% set nhan = {'nhe':'Nhẹ','trung_binh':'Trung bình','nang':'Nặng','chong_chi_dinh':'Chống chỉ định'} %}
+  {% set bac = {'nhe':1,'trung_binh':2,'nang':3,'chong_chi_dinh':4} %}
+  {# Tóm tắt theo mức độ: nặng nhất đứng đầu; mỗi mức có thang 4 vạch + chữ (không chỉ dựa vào màu) #}
+  <div class="ttt-summary" role="group" aria-label="Tóm tắt kết quả theo mức độ">
+    <strong class="ttt-total">{{ ds|length }} tương tác</strong>
+    {% for m in thu_tu %}{% set n = ds|selectattr('muc_do', 'equalto', m)|list|length %}{% if n %}
+    <span class="ttt-chip lvl-{{ m }}"><span class="lv-meter lv-n{{ bac[m] }}" aria-hidden="true"><i></i><i></i><i></i><i></i></span>{{ n }} {{ nhan[m] }}</span>
+    {% endif %}{% endfor %}
+  </div>
+  <table class="result-table ttt-table">
     <thead>
       <tr>
-        <th>Thuốc A</th>
-        <th>Thuốc B</th>
-        <th>Mức độ</th>
-        <th>Hậu quả lâm sàng</th>
-        <th>Xử trí</th>
+        <th scope="col">Cặp thuốc</th>
+        <th scope="col">Mức độ</th>
+        <th scope="col">Hậu quả lâm sàng</th>
+        <th scope="col">Xử trí</th>
       </tr>
     </thead>
     <tbody>
-      {% for item in ket_qua %}
-      <tr>
-        <td data-nhan="Thuốc A">{{ item.thuoc_a.ten_thuoc }}</td>
-        <td data-nhan="Thuốc B">{{ item.thuoc_b.ten_thuoc }}</td>
-        <td data-nhan="Mức độ"><span class="badge-level badge-{{ item.muc_do }}">{{ item.muc_do.replace('_', ' ') }}</span></td>
-        <td data-nhan="Hậu quả" class="rich-content">{{ (item.hau_qua_lam_sang | safe) if item.hau_qua_lam_sang else '—' }}</td>
+      {% for m in thu_tu + ['__khac'] %}
+      {% for item in ds if (item.muc_do == m) or (m == '__khac' and item.muc_do not in thu_tu) %}
+      <tr class="ttt-row lvl-{{ item.muc_do }}">
+        <td data-nhan="Cặp thuốc" class="ttt-pair"><strong>{{ item.thuoc_a.ten_thuoc }}</strong><span class="ttt-plus" aria-label="kết hợp với">+</span><strong>{{ item.thuoc_b.ten_thuoc }}</strong></td>
+        <td data-nhan="Mức độ"><span class="ttt-badge"><span class="lv-meter lv-n{{ bac.get(item.muc_do, 1) }}" aria-hidden="true"><i></i><i></i><i></i><i></i></span>{{ nhan.get(item.muc_do, item.muc_do) }}</span></td>
+        <td data-nhan="Hậu quả lâm sàng" class="rich-content">{{ (item.hau_qua_lam_sang | safe) if item.hau_qua_lam_sang else '—' }}</td>
         <td data-nhan="Xử trí" class="rich-content">{{ (item.xu_tri | safe) if item.xu_tri else '—' }}</td>
       </tr>
+      {% endfor %}
       {% endfor %}
     </tbody>
   </table>
   {% elif tu_khoa %}
   <div class="empty-state">
-    <div class="empty-state-icon">&#128269;</div>
+    <div class="empty-state-icon">{{ ic('search', 22) }}</div>
     Không tìm thấy tương tác nào liên quan đến "{{ tu_khoa }}".
   </div>
   {% else %}
   <div class="empty-state">
-    <div class="empty-state-icon">&#9888;&#65039;</div>
+    <div class="empty-state-icon">{{ ic('alert', 22) }}</div>
     Nhập tên thuốc để xem các tương tác liên quan.
   </div>
   {% endif %}

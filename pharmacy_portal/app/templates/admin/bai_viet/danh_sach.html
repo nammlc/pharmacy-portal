@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% from "_icons.html" import ic %}
 {% from "admin/_phan_trang.html" import render as pt %}
 {% block title %}Bài viết - Thông báo{% endblock %}
 {% block admin_content %}
@@ -11,9 +12,9 @@
 </div>
 
 <form method="get" class="adm-search-row">
-  <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm theo tiêu đề...">
+  <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm theo tiêu đề">
   <button type="submit" class="btn btn-outline btn-sm">Tìm</button>
-  {% if tu_khoa %}<a href="{{ url_for('admin_bv.danh_sach') }}" class="btn btn-outline btn-sm">✕ Xoá</a>{% endif %}
+  {% if tu_khoa %}<a href="{{ url_for('admin_bv.danh_sach') }}" class="btn btn-outline btn-sm">Xoá</a>{% endif %}
 </form>
 
 {% if items %}
@@ -30,8 +31,8 @@
           <strong class="col-title-text" title="{{ item.tieu_de }}">{{ item.tieu_de }}</strong>
           {% if item.ghim or item.do_uu_tien %}
           <div class="col-title-badges">
-            {% if item.ghim %}<span class="adm-badge">📌 Ghim</span>{% endif %}
-            {% if item.do_uu_tien %}<span class="adm-badge" style="background:#fff3cd;color:#8a6300;">⭐ Ưu tiên {{ item.do_uu_tien }}</span>{% endif %}
+            {% if item.ghim %}<span class="adm-badge">{{ ic('pin', 16) }} Ghim</span>{% endif %}
+            {% if item.do_uu_tien %}<span class="adm-badge" style="background:#fff3cd;color:#8a6300;">Ưu tiên {{ item.do_uu_tien }}</span>{% endif %}
           </div>
           {% endif %}
         </td>

@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Chat với {{ khach.ten }}{% endblock %}
 {% block page_eyebrow %}Phản hồi{% endblock %}
 
@@ -7,7 +8,7 @@
   <div>
     <h1>{{ khach.ten }} {% if khach.bi_chan %}<span class="yk-badge yk-badge-tu_choi">Đã chặn</span>{% endif %}</h1>
     <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">
-      <a href="tel:{{ khach.so_dien_thoai }}">📞 {{ khach.so_dien_thoai }}</a> · tham gia {{ (khach.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}
+      <a href="tel:{{ khach.so_dien_thoai }}">{{ ic('phone', 16) }} {{ khach.so_dien_thoai }}</a> · tham gia {{ (khach.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}
     </p>
   </div>
   <a href="{{ url_for('admin_tin_nhan.danh_sach') }}" class="btn btn-outline">← Danh sách</a>
@@ -19,7 +20,7 @@
   <div class="ht-msgs" id="admMsgs" aria-live="polite">
     {% for t in tin_nhan %}
     <div class="ht-msg ht-{{ 'khach' if t.tu == 'khach' else 'admin' }} {{ 'ht-adm-khach' if t.tu == 'khach' else 'ht-adm-admin' }}" data-id="{{ t.id }}">
-      {% if t.ngu_canh %}<div class="ht-msg-ctx">📎 {{ loai_tin.get(t.loai, '') }}{% if t.ngu_canh_url %} · <a href="{{ t.ngu_canh_url }}" target="_blank" rel="noopener">{{ t.ngu_canh }} ↗</a>{% else %} · {{ t.ngu_canh }}{% endif %}</div>{% endif %}
+      {% if t.ngu_canh %}<div class="ht-msg-ctx">{{ ic('paperclip', 16) }} {{ loai_tin.get(t.loai, '') }}{% if t.ngu_canh_url %} · <a href="{{ t.ngu_canh_url }}" target="_blank" rel="noopener">{{ t.ngu_canh }} ↗</a>{% else %} · {{ t.ngu_canh }}{% endif %}</div>{% endif %}
       <div class="ht-bubble">{{ t.noi_dung }}</div>
       <div class="ht-meta">{{ t.ten if t.tu == 'admin' else khach.ten }} · {{ t.gio }}</div>
     </div>

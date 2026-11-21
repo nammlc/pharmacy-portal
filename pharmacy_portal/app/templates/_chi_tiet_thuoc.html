@@ -17,8 +17,8 @@
 {%- endif -%}
 {%- endmacro %}
 
-{% macro section(ten_muc, icon_ten, wide=false) -%}
-<section class="drug-section{% if wide %} drug-section-wide{% endif %}">
+{% macro section(ten_muc, icon_ten, wide=false, sid='', tone='') -%}
+<section class="drug-section{% if wide %} drug-section-wide{% endif %}{% if tone %} drug-section--{{ tone }}{% endif %}"{% if sid %} id="{{ sid }}"{% endif %}>
   <div class="drug-section-head">
     <span class="drug-section-icon">{{ icon(icon_ten) }}</span>
     <h2 class="drug-section-title">{{ ten_muc }}</h2>

@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Nhập hàng loạt{% endblock %}
 {% block admin_content %}
 <div class="admin-page-head">
@@ -12,14 +13,14 @@
 <div class="buoc1-grid">
 
   <a href="{{ url_for('admin_nhap_hang_loat.upload_dmt') }}" class="buoc1-card">
-    <div class="buoc1-icon">💊</div>
+    <div class="buoc1-icon">{{ ic('pill', 22) }}</div>
     <div class="buoc1-title">Danh mục thuốc</div>
     <div class="buoc1-desc">Nhập biệt dược kèm thành phần, chỉ định, cách dùng</div>
     <div class="buoc1-arrow">Chọn →</div>
   </a>
 
   <a href="{{ url_for('admin_nhap_hang_loat.upload_ntbv') }}" class="buoc1-card">
-    <div class="buoc1-icon">🏥</div>
+    <div class="buoc1-icon">{{ ic('building', 22) }}</div>
     <div class="buoc1-title">Nhà thuốc BV</div>
     <div class="buoc1-desc">Nhập danh mục thuốc bán tại nhà thuốc bệnh viện</div>
     <div class="buoc1-arrow">Chọn →</div>
