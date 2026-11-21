@@ -5000,3 +5000,26 @@ h1, h2, h3, .brand-text strong.brand-primary, .nav-toggle { font-family: var(--f
   .drug-toc a.is-active { color: var(--navy-600); font-weight: 600; border-left-color: var(--navy-600); }
 }
 .drug-related-title { font-family: var(--font-display); font-weight: 500; }
+
+/* ============================================================
+   UI/UX PRO MAX · vòng 7 — ĐIỆN THOẠI: banner dễ đọc
+   Ảnh banner bản điện thoại có sẵn dòng chữ "BVĐK Tâm Đức Cầu Quan – vì sức khỏe cộng đồng –" ở trên cùng, trùng với
+   chữ của trang → khó đọc. Giải pháp: lớp phủ navy đặc hơn ở nửa trên (làm mờ chữ trong ảnh), chữ trang bắt đầu thấp hơn,
+   nhãn nhỏ đổi sang trắng, chip có nền riêng. Số liệu "173 thuốc" ẩn ở thẻ nhỏ (thẻ điện thoại đã gọn).
+   ============================================================ */
+@media (max-width: 700px) {
+  .hero--anh { padding-top: 84px; padding-bottom: 36px; }
+  .hero--anh .hero-phu, .hero .hero-phu {
+    background: linear-gradient(180deg, rgba(11,31,58,.93) 0%, rgba(11,31,58,.86) 40%, rgba(11,31,58,.66) 100%);
+  }
+  .hero-h1-top { color: #dbeafb; font-size: 13px; letter-spacing: .1em; }
+  .hero-h1-top::before { background: #dbeafb; }
+  .hero-h1-main { font-size: clamp(30px, 8.6vw, 40px); }
+  .hero-chips span { font-size: 13px; color: rgba(255,255,255,.88); }
+  .hero-chips a { background: rgba(11,31,58,.55); border-color: rgba(255,255,255,.4); font-size: 14px; }
+  .cat-stat { display: none; }
+}
+
+/* Tiêu đề hero ngắt dòng cố định: "BVĐK Tâm Đức" / "Cầu Quan" (mỗi dòng không tự xuống dòng thêm) */
+.hero-h1-main { white-space: nowrap; }
+.hero-h1-main .hero-h1-line2 { display: block; }
