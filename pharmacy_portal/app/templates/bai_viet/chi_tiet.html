@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}{{ bai_viet.tieu_de }}{% endblock %}
 
 {% block content %}
@@ -12,9 +13,9 @@
   </div>
   <h1>{{ bai_viet.tieu_de }}</h1>
   <p style="display:flex; gap:16px; flex-wrap:wrap; font-size:13.5px;">
-    <span>🗓 {{ (bai_viet.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bai_viet.ngay_xuat_ban else (bai_viet.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}</span>
-    <span>👁 {{ bai_viet.luot_xem or 0 }} lượt xem</span>
-    {% if bai_viet.tac_gia %}<span>✍️ {{ bai_viet.tac_gia.ho_ten or bai_viet.tac_gia.ten_dang_nhap }}</span>{% endif %}
+    <span>{{ ic('calendar', 16) }} {{ (bai_viet.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bai_viet.ngay_xuat_ban else (bai_viet.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}</span>
+    <span>{{ ic('eye', 16) }} {{ bai_viet.luot_xem or 0 }} lượt xem</span>
+    {% if bai_viet.tac_gia %}<span>{{ ic('pencil', 16) }} {{ bai_viet.tac_gia.ho_ten or bai_viet.tac_gia.ten_dang_nhap }}</span>{% endif %}
   </p>
 </div>
 
@@ -31,7 +32,7 @@
   {% if bai_viet.file_dinh_kem %}
   <a href="{{ bai_viet.file_dinh_kem }}" target="_blank" rel="noopener"
      style="display:inline-flex; align-items:center; gap:8px; margin-top:18px; padding:10px 18px; border-radius:var(--radius-sm); background:var(--sage-100); color:var(--sage-500); font-weight:700; font-size:13.5px; max-width:760px;">
-    📎 Tải tệp đính kèm{{ ' — ' ~ bai_viet.ten_file if bai_viet.ten_file }}
+    {{ ic('paperclip', 16) }} Tải tệp đính kèm{{ ' — ' ~ bai_viet.ten_file if bai_viet.ten_file }}
   </a>
   {% endif %}
 

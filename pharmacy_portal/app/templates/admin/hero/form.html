@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Ảnh trang chủ{% endblock %}
 
 {% block admin_content %}
@@ -16,7 +17,7 @@
   <div class="hp-section-title">Xem trước</div>
   <div class="hp-xem-luoi">
     <div>
-      <div class="hp-nhan-khung">💻 Máy tính</div>
+      <div class="hp-nhan-khung">Máy tính</div>
       <div class="hp-preview hp-khong-anh" id="hpPreviewPc">
         <img id="hpImgPc" alt="">
         <div class="hp-phu"></div>
@@ -24,19 +25,19 @@
           <div class="hp-badge">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
           <div class="hp-h1">Tra cứu dược <span>Tâm Đức</span><br>thông tin thuốc nhanh chóng</div>
           <div class="hp-p">Danh mục thuốc, tương tác, tương hợp–kỵ và hướng dẫn sử dụng được cập nhật và kiểm duyệt bởi Dược sĩ lâm sàng.</div>
-          <div class="hp-search">🔍 Nhập tên thuốc hoặc hoạt chất…</div>
+          <div class="hp-search">{{ ic('search', 16) }} Nhập tên thuốc hoặc hoạt chất…</div>
         </div>
       </div>
     </div>
     <div>
-      <div class="hp-nhan-khung">📱 Điện thoại</div>
+      <div class="hp-nhan-khung">Điện thoại</div>
       <div class="hp-preview hp-mobile hp-khong-anh" id="hpPreviewMb">
         <img id="hpImgMb" alt="">
         <div class="hp-phu"></div>
         <div class="hp-noidung">
           <div class="hp-badge">Khoa Dược · BVĐK Tâm Đức Cầu Quan</div>
           <div class="hp-h1">Tra cứu dược <span>Tâm Đức</span><br>thông tin thuốc nhanh chóng</div>
-          <div class="hp-search">🔍 Nhập tên thuốc…</div>
+          <div class="hp-search">{{ ic('search', 16) }} Nhập tên thuốc…</div>
         </div>
       </div>
     </div>
@@ -45,7 +46,7 @@
 
   <div class="hp-luoi">
     <div class="admin-form-card" style="max-width:100%;">
-      <div class="hp-section-title" style="margin-top:0;">💻 Ảnh cho máy tính</div>
+      <div class="hp-section-title" style="margin-top:0;">Ảnh cho máy tính</div>
       <div class="form-row">
         <label>Chọn ảnh ngang</label>
         <input type="file" name="file_anh" id="hpFilePc" accept="image/png,image/jpeg,image/webp"
@@ -64,7 +65,7 @@
     </div>
 
     <div class="admin-form-card" style="max-width:100%;">
-      <div class="hp-section-title" style="margin-top:0;">📱 Ảnh cho điện thoại</div>
+      <div class="hp-section-title" style="margin-top:0;">Ảnh cho điện thoại</div>
       <div class="form-row">
         <label>Chọn ảnh vuông</label>
         <input type="file" name="file_anh_mobile" id="hpFileMb" accept="image/png,image/jpeg,image/webp"
@@ -101,7 +102,7 @@
   </div>
 
   <div style="margin-top:8px; display:flex; gap:10px;">
-    <button type="submit" class="btn btn-primary">💾 Lưu thay đổi</button>
+    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
     <a href="{{ url_for('main.trang_chu') }}" target="_blank" class="btn btn-outline">Xem kết quả ↗</a>
   </div>
 </form>

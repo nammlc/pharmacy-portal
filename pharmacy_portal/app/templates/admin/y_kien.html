@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Hỏi đáp &amp; bình luận{% endblock %}
 {% block page_eyebrow %}Phản hồi{% endblock %}
 
@@ -23,7 +24,7 @@
   <span class="yk-tabs-label">Trả lời:</span>
   <a href="{{ url_for('admin_y_kien.danh_sach', trang_thai=trang_thai, loai=loai, q=q) }}" class="yk-tab {{ 'active' if not tra_loi_tt }}">Tất cả</a>
   <a href="{{ url_for('admin_y_kien.danh_sach', trang_thai=trang_thai, loai=loai, q=q, tra_loi='chua') }}" class="yk-tab {{ 'active' if tra_loi_tt == 'chua' }}">⏳ Chưa trả lời <span>{{ dem_tl.chua }}</span></a>
-  <a href="{{ url_for('admin_y_kien.danh_sach', trang_thai=trang_thai, loai=loai, q=q, tra_loi='da') }}" class="yk-tab {{ 'active' if tra_loi_tt == 'da' }}">✔ Đã trả lời <span>{{ dem_tl.da }}</span></a>
+  <a href="{{ url_for('admin_y_kien.danh_sach', trang_thai=trang_thai, loai=loai, q=q, tra_loi='da') }}" class="yk-tab {{ 'active' if tra_loi_tt == 'da' }}">Đã trả lời <span>{{ dem_tl.da }}</span></a>
 </div>
 
 <form method="get" class="adm-search-row">
@@ -35,7 +36,7 @@
     {% for k, v in nhan_loai.items() %}<option value="{{ k }}" {% if loai == k %}selected{% endif %}>{{ v }}</option>{% endfor %}
   </select>
   <button type="submit" class="btn btn-outline btn-sm">Lọc</button>
-  {% if q or loai %}<a href="{{ url_for('admin_y_kien.danh_sach', trang_thai=trang_thai) }}" class="btn btn-outline btn-sm">✕ Xoá lọc</a>{% endif %}
+  {% if q or loai %}<a href="{{ url_for('admin_y_kien.danh_sach', trang_thai=trang_thai) }}" class="btn btn-outline btn-sm">Xoá lọc</a>{% endif %}
 </form>
 
 {% if muc %}
@@ -58,11 +59,11 @@
       <input type="checkbox" name="ids" value="{{ y.id }}" form="bulkForm" aria-label="Chọn ý kiến {{ y.id }}">
       <div class="yk-who">
         <strong>{{ y.ten }}</strong>
-        <a href="tel:{{ y.so_dien_thoai }}" class="yk-phone">📞 {{ y.so_dien_thoai }}</a>
+        <a href="tel:{{ y.so_dien_thoai }}" class="yk-phone">{{ ic('phone', 16) }} {{ y.so_dien_thoai }}</a>
         <span class="yk-time">{{ (y.ngay_tao | gio_vn).strftime('%d/%m/%Y %H:%M') }}</span>
       </div>
       {% if y.tra_loi %}
-        <span class="tl-badge tl-da" title="Đã trả lời">✔ Đã trả lời{% if nguoi_tl.get(y.nguoi_tra_loi_id) %} bởi {{ nguoi_tl[y.nguoi_tra_loi_id] }}{% endif %}{% if y.ngay_tra_loi %} · {{ (y.ngay_tra_loi | gio_vn).strftime('%H:%M %d/%m') }}{% endif %}</span>
+        <span class="tl-badge tl-da" title="Đã trả lời">Đã trả lời{% if nguoi_tl.get(y.nguoi_tra_loi_id) %} bởi {{ nguoi_tl[y.nguoi_tra_loi_id] }}{% endif %}{% if y.ngay_tra_loi %} · {{ (y.ngay_tra_loi | gio_vn).strftime('%H:%M %d/%m') }}{% endif %}</span>
       {% elif y.trang_thai in ('cho_duyet', 'da_duyet') %}
         <span class="tl-badge tl-chua" title="Chưa ai trả lời">⏳ Chưa trả lời</span>
       {% endif %}
@@ -115,7 +116,7 @@
 </nav>
 {% endif %}
 {% else %}
-<div class="adm-empty">Không có ý kiến nào {% if trang_thai == 'cho_duyet' %}đang chờ duyệt{% else %}khớp bộ lọc{% endif %}. 🎉</div>
+<div class="adm-empty">Không có ý kiến nào {% if trang_thai == 'cho_duyet' %}đang chờ duyệt{% else %}khớp bộ lọc{% endif %}.</div>
 {% endif %}
 <script>
   var all = document.getElementById('ykChonHet');

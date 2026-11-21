@@ -343,7 +343,7 @@ document.addEventListener("DOMContentLoaded", function () {
     preview.setAttribute("role", "button");
     preview.setAttribute("aria-label", "Chỉnh sửa " + nhan);
     preview.innerHTML =
-      '<span class="rich-preview-badge">✎ Bấm để chỉnh sửa</span>' +
+      '<span class="rich-preview-badge">Bấm để chỉnh sửa</span>' +
       '<div class="rich-preview-noidung rich-content"></div>' +
       '<span class="rich-preview-placeholder"></span>';
     preview.querySelector(".rich-preview-placeholder").textContent =

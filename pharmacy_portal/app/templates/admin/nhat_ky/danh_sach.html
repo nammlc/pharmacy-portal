@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Nhật ký truy cập{% endblock %}
 {% block admin_content %}
 <div class="admin-page-head">
@@ -11,7 +12,7 @@
 </div>
 
 {% if loi_ghi %}
-<div class="flash-msg flash-danger" style="margin-bottom:14px;">⚠️ Lần ghi nhật ký gần nhất bị lỗi: <code>{{ loi_ghi }}</code><br><small>Xem chi tiết trong log của server (console khi chạy local, tab Logs trên Render).</small></div>
+<div class="flash-msg flash-danger" style="margin-bottom:14px;">{{ ic('alert', 16) }} Lần ghi nhật ký gần nhất bị lỗi: <code>{{ loi_ghi }}</code><br><small>Xem chi tiết trong log của server (console khi chạy local, tab Logs trên Render).</small></div>
 {% endif %}
 
 <div class="nk-cards">
@@ -79,10 +80,10 @@
         <td>{{ r.ten_nguoi_dung or '—' }}</td>
         <td class="nk-content">
           {% if r.loai == 'tim_kiem' %}
-            <strong>🔎 {{ r.tu_khoa }}</strong>
+            <strong>{{ ic('search', 16) }} {{ r.tu_khoa }}</strong>
             <small>{{ r.doi_tuong }}{% if r.mo_ta %} · {{ r.mo_ta }}{% endif %}</small>
           {% elif r.loai == 'xem_thuoc' %}
-            <strong>💊 {{ r.doi_tuong_ten or 'Thuốc' }}</strong>
+            <strong>{{ ic('pill', 16) }} {{ r.doi_tuong_ten or 'Thuốc' }}</strong>
             <small>Xem chi tiết · {{ r.doi_tuong }}{% if r.doi_tuong_id %} (ID {{ r.doi_tuong_id }}){% endif %}</small>
           {% elif r.loai == 'truy_cap' %}
             <strong>{{ r.doi_tuong_ten or r.doi_tuong or 'Trang web' }}</strong>

@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Tin nhắn riêng{% endblock %}
 {% block page_eyebrow %}Phản hồi{% endblock %}
 
@@ -13,14 +14,14 @@
 <div class="yk-tabs">
   <a href="{{ url_for('admin_tin_nhan.danh_sach', q=q) }}" class="yk-tab {{ 'active' if not tt }}">Tất cả <span>{{ tong if not tt else dem.cho + dem.da }}</span></a>
   <a href="{{ url_for('admin_tin_nhan.danh_sach', q=q, tt='cho') }}" class="yk-tab {{ 'active' if tt == 'cho' }}">⏳ Chờ trả lời <span>{{ dem.cho }}</span></a>
-  <a href="{{ url_for('admin_tin_nhan.danh_sach', q=q, tt='da') }}" class="yk-tab {{ 'active' if tt == 'da' }}">✔ Đã trả lời <span>{{ dem.da }}</span></a>
+  <a href="{{ url_for('admin_tin_nhan.danh_sach', q=q, tt='da') }}" class="yk-tab {{ 'active' if tt == 'da' }}">Đã trả lời <span>{{ dem.da }}</span></a>
 </div>
 
 <form method="get" class="adm-search-row">
   <input type="hidden" name="tt" value="{{ tt }}">
   <input type="text" name="q" value="{{ q }}" placeholder="Tìm tên hoặc số điện thoại…">
   <button type="submit" class="btn btn-outline btn-sm">Tìm</button>
-  {% if q %}<a href="{{ url_for('admin_tin_nhan.danh_sach', tt=tt) }}" class="btn btn-outline btn-sm">✕ Xoá tìm</a>{% endif %}
+  {% if q %}<a href="{{ url_for('admin_tin_nhan.danh_sach', tt=tt) }}" class="btn btn-outline btn-sm">Xoá tìm</a>{% endif %}
 </form>
 
 {% if dong %}
@@ -32,7 +33,7 @@
       <tr>
         <td>
           <strong>{{ k.ten }}</strong>{% if k.bi_chan %} <span class="yk-badge yk-badge-tu_choi">Đã chặn</span>{% endif %}
-          <div class="yk-phone-sub">📞 {{ k.so_dien_thoai }}</div>
+          <div class="yk-phone-sub">{{ ic('phone', 16) }} {{ k.so_dien_thoai }}</div>
         </td>
         <td class="tn-preview">
           {% if tn %}<span class="tn-who">{{ 'Khách' if tn.tu == 'khach' else 'Bạn / Khoa Dược' }}:</span> {{ tn.noi_dung[:140] }}{% if tn.noi_dung|length > 140 %}…{% endif %}
@@ -42,7 +43,7 @@
         <td style="text-align:right;">
           {% if chua_doc.get(k.id) %}<span class="nav-badge" style="position:static;margin-right:6px;">{{ chua_doc[k.id] }} mới</span>{% endif %}
           {% if tn and tn.tu == 'khach' %}<span class="tl-badge tl-chua">⏳ Chờ trả lời</span>
-          {% elif tn %}<span class="tl-badge tl-da" title="Tin cuối là của Khoa Dược">✔ Đã trả lời{% if ten_admin.get(tn.admin_id) %} bởi {{ ten_admin[tn.admin_id] }}{% endif %}</span>{% endif %}
+          {% elif tn %}<span class="tl-badge tl-da" title="Tin cuối là của Khoa Dược">Đã trả lời{% if ten_admin.get(tn.admin_id) %} bởi {{ ten_admin[tn.admin_id] }}{% endif %}</span>{% endif %}
           <a href="{{ url_for('admin_tin_nhan.xem', khach_id=k.id) }}" class="btn btn-outline btn-sm">Mở</a>
         </td>
       </tr>

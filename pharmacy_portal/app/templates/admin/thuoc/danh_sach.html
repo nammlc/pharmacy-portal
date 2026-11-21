@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% from "_icons.html" import ic %}
 {% from "admin/_phan_trang.html" import render as pt %}
 {% block title %}Thuốc tra cứu{% endblock %}
 {% block admin_content %}
@@ -13,7 +14,7 @@
 <form method="get" class="adm-search-row">
   <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm theo tên thuốc...">
   <button type="submit" class="btn btn-outline btn-sm">Tìm</button>
-  {% if tu_khoa %}<a href="{{ url_for('admin_thuoc.danh_sach') }}" class="btn btn-outline btn-sm">✕ Xoá</a>{% endif %}
+  {% if tu_khoa %}<a href="{{ url_for('admin_thuoc.danh_sach') }}" class="btn btn-outline btn-sm">Xoá</a>{% endif %}
 </form>
 
 {% if danh_sach_thuoc %}
@@ -38,7 +39,7 @@
           {% if t.hinh_anh %}
           <img src="{{ t.hinh_anh }}" class="adm-thumb" alt="">
           {% else %}
-          <span class="adm-thumb-placeholder">🔬</span>
+          <span class="adm-thumb-placeholder">{{ ic('book', 22) }}</span>
           {% endif %}
         </td>
         <td class="col-title"><strong class="col-title-text" title="{{ t.ten_thuoc }}">{{ t.ten_thuoc }}</strong></td>

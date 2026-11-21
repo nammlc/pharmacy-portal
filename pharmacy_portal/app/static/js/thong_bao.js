@@ -23,14 +23,14 @@
     muc.forEach(function (t) {
       var li = el("li", t.da_doc ? "" : "tb-unread");
       var a = el("a"); a.href = moUrl(t.id);
-      a.appendChild(el("span", "tb-ico", t.loai === "y_kien_moi" ? "💬" : "✉️"));
+      var tbIco = el("span", "tb-ico"); tbIco.innerHTML = t.loai === "y_kien_moi" ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>'; a.appendChild(tbIco);
       var txt = el("span", "tb-txt");
       var tt = el("strong", "", t.tieu_de);
       if (t.so_luong > 1) tt.appendChild(el("span", "tb-count", " ×" + t.so_luong));
       txt.appendChild(tt); txt.appendChild(el("small", "", t.noi_dung));
       if (t.tra_loi) {                                              // đã có người trả lời chưa
         txt.appendChild(t.tra_loi.da
-          ? el("span", "tl-badge tl-da", "✔ Đã trả lời" + (t.tra_loi.boi ? " bởi " + t.tra_loi.boi : "") + (t.tra_loi.luc ? " · " + t.tra_loi.luc : ""))
+          ? el("span", "tl-badge tl-da", "Đã trả lời" + (t.tra_loi.boi ? " bởi " + t.tra_loi.boi : "") + (t.tra_loi.luc ? " · " + t.tra_loi.luc : ""))
           : el("span", "tl-badge tl-chua", "⏳ Chưa trả lời"));
       }
       a.appendChild(txt); a.appendChild(el("span", "tb-time", t.gio));

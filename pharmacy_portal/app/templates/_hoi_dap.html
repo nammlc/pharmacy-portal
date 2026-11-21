@@ -1,3 +1,4 @@
+{% from "_icons.html" import ic %}
 {# Khối HỎI ĐÁP công khai dưới 1 thuốc / bài viết. Ý kiến mới phải được Khoa Dược duyệt mới hiện.
    Dùng: {% set hd_loai = 'dmt' %}{% set hd_id = thuoc.id %}{% set hd_ten = thuoc.ten_biet_duoc %}{% include "_hoi_dap.html" %}
    hd_loai: dmt | ntbv | tt | bv | ttbn (xem utils/phan_hoi.py)
@@ -7,7 +8,7 @@
          data-api="{{ url_for('hoi_dap.danh_sach') }}" aria-label="Hỏi đáp và góp ý">
   <div class="hd-cols">
     <div class="hd-col">
-    <h2 class="hd-head" id="hdTabList"><span>💬 Lịch sử hỏi đáp <span class="hd-count" id="hdCount"></span></span></h2>
+    <h2 class="hd-head" id="hdTabList"><span>{{ ic('message', 16) }} Lịch sử hỏi đáp <span class="hd-count" id="hdCount"></span></span></h2>
     <div class="hd-panel hd-panel-list" id="hdPanelList">
       <div class="hd-scroll" tabindex="0" aria-label="Danh sách hỏi đáp, cuộn để xem thêm">
         <div class="hd-list" id="hdList" aria-live="polite"><p class="hd-empty">Đang tải ý kiến…</p></div>
@@ -17,7 +18,7 @@
 
     </div>
     <div class="hd-col">
-    <h2 class="hd-head" id="hdTabAsk"><span>✍️ Đặt câu hỏi</span></h2>
+    <h2 class="hd-head" id="hdTabAsk"><span>{{ ic('pencil', 16) }} Đặt câu hỏi</span></h2>
     <div class="hd-panel hd-panel-ask" id="hdPanelAsk">
       <div class="hd-scroll">
         <form class="hd-form" id="hdForm" novalidate>

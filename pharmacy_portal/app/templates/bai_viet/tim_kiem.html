@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% from "_icons.html" import ic %}
 {% block title %}Kết quả tìm kiếm - Bài viết{% endblock %}
 
 {% block content %}
 <div class="page-header">
-  <div class="eyebrow">📰 Tin tức &amp; thông báo</div>
+  <div class="eyebrow">Tin tức &amp; thông báo</div>
   <h1>Kết quả cho "{{ tu_khoa }}"</h1>
   {% if phan_trang.total %}<p>{{ phan_trang.total }} bài viết phù hợp.</p>{% endif %}
 </div>
@@ -22,7 +23,7 @@
 <div class="search-panel">
   <form class="search-form" method="get">
     <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm bài viết theo tiêu đề...">
-    <button type="submit">🔍 Tìm</button>
+    <button type="submit">Tìm</button>
   </form>
 </div>
 
@@ -32,8 +33,8 @@
     {% for bv in phan_trang.items %}
     <a class="bv-card" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
       <div class="bv-card-thumb" {% if bv.anh_dai_dien %}style="background-image:url('{{ bv.anh_dai_dien }}');"{% endif %}>
-        {% if not bv.anh_dai_dien %}<span class="bv-card-thumb-fallback">📰</span>{% endif %}
-        {% if bv.ghim %}<span class="bv-card-pin">📌 Ghim</span>{% endif %}
+        {% if not bv.anh_dai_dien %}<span class="bv-card-thumb-fallback">{{ ic('newspaper', 22) }}</span>{% endif %}
+        {% if bv.ghim %}<span class="bv-card-pin">{{ ic('pin', 16) }} Ghim</span>{% endif %}
       </div>
       <div class="bv-card-body">
         {% if bv.danh_muc %}
@@ -43,7 +44,7 @@
         {% if bv.mo_ta_ngan %}<p>{{ bv.mo_ta_ngan }}</p>{% endif %}
         <div class="bv-card-meta">
           <span>{{ (bv.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bv.ngay_xuat_ban else (bv.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}</span>
-          <span>👁 {{ bv.luot_xem or 0 }}</span>
+          <span>{{ ic('eye', 16) }} {{ bv.luot_xem or 0 }}</span>
         </div>
       </div>
     </a>
@@ -54,7 +55,7 @@
   {% include "_phan_trang.html" with context %}
   {% else %}
   <div class="empty-state">
-    <div class="empty-state-icon">🔍</div>
+    <div class="empty-state-icon">{{ ic('search', 22) }}</div>
     Không tìm thấy bài viết nào phù hợp với "{{ tu_khoa }}".
   </div>
   {% endif %}
