@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b1f3a">
+<meta name="theme-color" content="#f3f1ec">
 <title>{% block full_title %}{% block title %}Cổng Tra Cứu Dược{% endblock %} — BV Đa khoa Tâm Đức Cầu Quan{% endblock %}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="preload" href="{{ url_for('static', filename='fonts/newsreader-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ url_for('static', filename='fonts/hanken-grotesk-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/taste-fonts.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/taste.css') }}">
 <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
 <meta name="description" content="{% block meta_mo_ta %}Tra cứu thông tin thuốc tại Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan: danh mục thuốc, tương tác thuốc, thuốc tiêm truyền, tương hợp – tương kỵ và hướng dẫn sử dụng thuốc.{% endblock %}">
 <meta name="robots" content="{% block meta_robots %}index, follow{% endblock %}">
@@ -50,39 +51,49 @@
 <body>
 <a class="skip-link" href="#main">Bỏ qua menu, tới nội dung chính</a>
 
-<header class="site-header">
-  <div class="header-inner">
-    <a href="{{ url_for('main.trang_chu') }}" class="brand">
-      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo bệnh viện" class="brand-logo">
-      <span class="brand-text">
-        <strong class="brand-primary">Khoa Dược</strong>
-        <small>BVĐK Tâm Đức Cầu Quan</small>
-      </span>
+{% set ep = request.endpoint or '' %}{% set bp = request.blueprint or '' %}
+{% set tra_cuu = [
+  ('dmt.index', 'dmt', 'Danh mục thuốc', 'Theo nhóm dược lý'),
+  ('ntbv.index', 'ntbv', 'Nhà thuốc bệnh viện', 'Thuốc bán tại Nhà thuốc BV'),
+  ('tttt.index', 'tttt', 'Thuốc tiêm truyền', 'Dung môi, tốc độ truyền, độ ổn định'),
+  ('thtk.index', 'thtk', 'Tương hợp – tương kỵ', 'Pha chung hai thuốc truyền'),
+  ('ttt.index', 'ttt', 'Tương tác thuốc', 'Mức độ và hướng xử trí'),
+  ('ttth.index', 'ttth', 'Thông tin thuốc', 'Chỉ định, liều dùng, tác dụng phụ'),
+  ('ttbn.index', 'ttbn', 'Thông tin bệnh nhân', 'Hướng dẫn dùng thuốc tại nhà'),
+] %}
+{% set dang_tra_cuu = bp in ['dmt', 'ntbv', 'tttt', 'thtk', 'ttt', 'ttth', 'ttbn'] %}
+<header class="tk-nav">
+  <div class="tk-wrap tk-nav__in">
+    <a href="{{ url_for('main.trang_chu') }}" class="tk-brand" aria-label="Khoa Dược BVĐK Tâm Đức Cầu Quan, trang chủ">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="" width="40" height="40">
+      <span class="tk-brand__name">Khoa Dược<small>BVĐK Tâm Đức Cầu Quan</small></span>
     </a>
-
-    <div class="nav-dropdown" id="navDropdown">
-      <button class="nav-toggle" id="navToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="mainNav" aria-label="Menu điều hướng">
-        <span class="nav-toggle-icon"><span></span><span></span><span></span></span>
-        <span class="nav-toggle-label">Menu</span>
-        <svg class="nav-toggle-caret" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-
-      <nav class="main-nav" id="mainNav" aria-label="Điều hướng chính">
-        <a href="{{ url_for('main.trang_chu') }}" class="{{ 'active' if request.endpoint == 'main.trang_chu' }}" {% if request.endpoint == 'main.trang_chu' %}aria-current="page"{% endif %}>{{ ic('home', 18) }}Trang chủ</a>
-        <a href="{{ url_for('bv.index') }}" class="{{ 'active' if request.blueprint == 'bv' }}" {% if request.blueprint == 'bv' %}aria-current="page"{% endif %}>{{ ic('newspaper', 18) }}Bài viết - Thông báo</a>
-        <a href="{{ url_for('dmt.index') }}" class="{{ 'active' if request.blueprint == 'dmt' }}" {% if request.blueprint == 'dmt' %}aria-current="page"{% endif %}>{{ ic('pill', 18) }}Danh mục thuốc</a>
-        <a href="{{ url_for('ntbv.index') }}" class="{{ 'active' if request.blueprint == 'ntbv' }}" {% if request.blueprint == 'ntbv' %}aria-current="page"{% endif %}>{{ ic('building', 18) }}Nhà thuốc BV</a>
-        <a href="{{ url_for('tttt.index') }}" class="{{ 'active' if request.blueprint == 'tttt' }}" {% if request.blueprint == 'tttt' %}aria-current="page"{% endif %}>{{ ic('syringe', 18) }}Thuốc tiêm truyền</a>
-        <a href="{{ url_for('thtk.index') }}" class="{{ 'active' if request.blueprint == 'thtk' }}" {% if request.blueprint == 'thtk' %}aria-current="page"{% endif %}>{{ ic('flask', 18) }}Tương hợp - Tương kỵ</a>
-        <a href="{{ url_for('ttt.index') }}" class="{{ 'active' if request.blueprint == 'ttt' }}" {% if request.blueprint == 'ttt' %}aria-current="page"{% endif %}>{{ ic('alert', 18) }}Tương tác thuốc</a>
-        <a href="{{ url_for('ttth.index') }}" class="{{ 'active' if request.blueprint == 'ttth' }}" {% if request.blueprint == 'ttth' %}aria-current="page"{% endif %}>{{ ic('file', 18) }}Thông tin thuốc</a>
-        <a href="{{ url_for('ttbn.index') }}" class="{{ 'active' if request.blueprint == 'ttbn' }}" {% if request.blueprint == 'ttbn' %}aria-current="page"{% endif %}>{{ ic('user', 18) }}Thông tin bệnh nhân</a>
-        <a href="{{ url_for('ho_tro.trang') }}" class="{{ 'active' if request.blueprint == 'ho_tro' }}" {% if request.blueprint == 'ho_tro' %}aria-current="page"{% endif %}>{{ ic('message', 18) }}Hỗ trợ &amp; góp ý</a>
-        <a href="{{ url_for('main.ve_chung_toi') }}" class="{{ 'active' if request.endpoint == 'main.ve_chung_toi' }}" {% if request.endpoint == 'main.ve_chung_toi' %}aria-current="page"{% endif %}>{{ ic('info', 18) }}Về chúng tôi</a>
-      </nav>
-    </div>
+    <nav class="tk-nav__links" aria-label="Điều hướng chính">
+      <div class="tk-nav__item" data-panel data-open="false">
+        <button type="button" class="tk-nav__word" aria-expanded="false" aria-controls="tkPanel" {% if dang_tra_cuu %}data-here{% endif %}>Tra cứu</button>
+        <div class="tk-panel" id="tkPanel">
+          <div class="tk-wrap tk-panel__grid">
+            {% for ep_, bp_, ten, mo_ta in tra_cuu %}
+            <a href="{{ url_for(ep_) }}" {% if bp == bp_ %}aria-current="page"{% endif %}><b>{{ ten }}</b><span>{{ mo_ta }}</span></a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="tk-nav__item"><a class="tk-nav__word" href="{{ url_for('bv.index') }}" {% if bp == 'bv' %}aria-current="page"{% endif %}>Bài viết</a></div>
+      <div class="tk-nav__item"><a class="tk-nav__word" href="{{ url_for('ho_tro.trang') }}" {% if bp == 'ho_tro' %}aria-current="page"{% endif %}>Hỗ trợ</a></div>
+      <div class="tk-nav__item"><a class="tk-nav__word" href="{{ url_for('main.ve_chung_toi') }}" {% if ep == 'main.ve_chung_toi' %}aria-current="page"{% endif %}>Giới thiệu</a></div>
+    </nav>
+    <a class="tk-btn tk-btn--primary tk-nav__cta" href="{{ url_for('dmt.index') }}">Tìm thuốc</a>
+    <button type="button" class="tk-menu" id="tkMenu" aria-expanded="false" aria-controls="tkSheet">Menu</button>
+  </div>
+  <div class="tk-sheet" id="tkSheet" hidden>
+    <a href="{{ url_for('main.trang_chu') }}" {% if ep == 'main.trang_chu' %}aria-current="page"{% endif %}>Trang chủ</a>
+    {% for ep_, bp_, ten, mo_ta in tra_cuu %}
+    <a href="{{ url_for(ep_) }}" {% if bp == bp_ %}aria-current="page"{% endif %}>{{ ten }}</a>
+    {% endfor %}
+    <a href="{{ url_for('bv.index') }}" {% if bp == 'bv' %}aria-current="page"{% endif %}>Bài viết – Thông báo</a>
+    <a href="{{ url_for('ho_tro.trang') }}" {% if bp == 'ho_tro' %}aria-current="page"{% endif %}>Hỗ trợ và góp ý</a>
+    <a href="{{ url_for('main.ve_chung_toi') }}" {% if ep == 'main.ve_chung_toi' %}aria-current="page"{% endif %}>Về chúng tôi</a>
   </div>
 </header>
 
@@ -90,40 +101,43 @@
   {% block content %}{% endblock %}
 </main>
 
-<footer class="site-footer">
-  <div class="footer-inner">
-    <div class="footer-grid">
-      <div class="footer-col">
-        <h4 class="footer-title">Khoa Dược</h4>
-        <p class="footer-text">Bệnh viện Đa khoa Tâm Đức Cầu Quan. Dữ liệu chỉ dùng tham khảo trong nội bộ, luôn đối chiếu với dược thư và quy trình chuyên môn hiện hành.</p>
+<footer class="tk-foot">
+  <div class="tk-wrap">
+    <div class="tk-foot__close">
+      <h2 class="tk-h2">Tìm thuốc theo tên biệt dược hoặc hoạt chất.</h2>
+      <a class="tk-btn tk-btn--primary" href="{{ url_for('dmt.index') }}">Tìm thuốc <svg class="tk-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+    <div class="tk-foot__cols">
+      <div>
+        <div class="tk-foot__brand"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="" width="40" height="40">Khoa Dược</div>
+        <p>Bệnh viện Đa khoa Tâm Đức Cầu Quan. Dữ liệu chỉ dùng tham khảo trong nội bộ, luôn đối chiếu với dược thư và quy trình chuyên môn hiện hành.</p>
       </div>
-      <div class="footer-col">
-        <h4 class="footer-title">Liên hệ</h4>
-        <ul class="footer-list">
-          <li><span class="footer-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h6M12 6v6"/></svg></span><span>Khoa Dược · BVĐK Tâm Đức Cầu Quan</span></li>
-          <li><span class="footer-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>Trưởng khoa dược: <strong>DS CK.I Tống Văn Tuấn</strong></span></li>
-          <li><span class="footer-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span><a href="tel:0961256092">0961.256.092</a> &middot; Le Cong Nam</span></li>
+      <div>
+        <h4>Tra cứu</h4>
+        <ul>
+          {% for ep_, bp_, ten, mo_ta in tra_cuu %}<li><a href="{{ url_for(ep_) }}">{{ ten }}</a></li>{% endfor %}
         </ul>
       </div>
-      <div class="footer-col">
-        <h4 class="footer-title">Liên kết</h4>
-        <ul class="footer-list">
-          <li><span class="footer-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span><a href="https://benhviendakhoatamduccauquan.vn" rel="noopener" target="_blank">Trang chính thức của bệnh viện</a></li>
+      <div>
+        <h4>Khoa Dược</h4>
+        <ul>
+          <li><a href="{{ url_for('bv.index') }}">Bài viết – Thông báo</a></li>
+          <li><a href="{{ url_for('ho_tro.trang') }}">Hỗ trợ và góp ý</a></li>
+          <li><a href="{{ url_for('main.ve_chung_toi') }}">Về chúng tôi</a></li>
+          <li><a href="https://benhviendakhoatamduccauquan.vn" rel="noopener" target="_blank">Trang chính thức của bệnh viện</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Liên hệ</h4>
+        <ul>
+          <li>Trưởng khoa dược: DS CK.I Tống Văn Tuấn</li>
+          <li><a href="tel:0961256092">0961.256.092</a> · Le Cong Nam</li>
         </ul>
       </div>
     </div>
-    <div class="footer-bottom">© 2026 Khoa Dược · BVĐK Tâm Đức Cầu Quan · Independently developed by Le Cong Nam</div>
+    <div class="tk-foot__legal"><span>© 2026 Khoa Dược · BVĐK Tâm Đức Cầu Quan</span><span>Independently developed by Le Cong Nam</span></div>
   </div>
 </footer>
-
-<nav class="tabbar" aria-label="Điều hướng nhanh">
-  {% set ep = request.endpoint or '' %}
-  <a href="{{ url_for('main.trang_chu') }}" class="{{ 'is-active' if ep == 'main.trang_chu' }}" {% if ep == 'main.trang_chu' %}aria-current="page"{% endif %}>{{ ic('home', 22) }}<span>Trang chủ</span></a>
-  <a href="{{ url_for('dmt.index') }}" class="{{ 'is-active' if ep.startswith('dmt.') or ep.startswith('ntbv.') }}" {% if ep.startswith('dmt.') or ep.startswith('ntbv.') %}aria-current="page"{% endif %}>{{ ic('pill', 22) }}<span>Thuốc</span></a>
-  <a href="{{ url_for('ttt.index') }}" class="{{ 'is-active' if ep.startswith('ttt.') or ep.startswith('thtk.') }}" {% if ep.startswith('ttt.') or ep.startswith('thtk.') %}aria-current="page"{% endif %}>{{ ic('alert', 22) }}<span>Tương tác</span></a>
-  <a href="{{ url_for('bv.index') }}" class="{{ 'is-active' if ep.startswith('bv.') }}" {% if ep.startswith('bv.') %}aria-current="page"{% endif %}>{{ ic('newspaper', 22) }}<span>Bài viết</span></a>
-  <a href="{{ url_for('ho_tro.trang') }}" class="{{ 'is-active' if ep.startswith('ho_tro.') }}" {% if ep.startswith('ho_tro.') %}aria-current="page"{% endif %}>{{ ic('message', 22) }}<span>Hỗ trợ</span></a>
-</nav>
 
 <div class="pp-cookie" id="ppCookie" role="dialog" aria-live="polite" aria-label="Thông báo cookie" {% if not chua_chon_cookie %}hidden{% endif %}>
   <p>Chúng tôi dùng cookie để nhớ thiết bị của bạn, giúp thống kê lượt tra cứu chính xác hơn và cá nhân hóa trải nghiệm.</p>
@@ -134,6 +148,7 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/taste.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/lightbox.js') }}"></script>
 <script src="{{ url_for('static', filename='js/goi_y_tim_kiem.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dong_y_cookie.js') }}"></script>

@@ -1,0 +1,23 @@
+{# Mảnh giao diện dùng chung cho kiểu "taste" #}
+{% macro arrow() -%}<svg class="tk-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>{%- endmacro %}
+
+{% macro o_tim(value='', placeholder='Tên biệt dược hoặc hoạt chất', goi_y='dmt', nut='Tìm thuốc') -%}
+<form class="tk-search" autocomplete="off" method="get" role="search">
+  <svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+  <input type="text" name="q" value="{{ value }}" placeholder="{{ placeholder }}" aria-label="{{ placeholder }}" enterkeyhint="search"{% if goi_y %} data-goi-y="{{ goi_y }}"{% endif %}>
+  <button type="submit" class="tk-btn tk-btn--primary">{{ nut }}</button>
+</form>
+{%- endmacro %}
+
+{% macro the_thuoc(thuoc, href) -%}
+<a class="tk-card tk-drug" href="{{ href }}">
+  <div class="tk-frame">
+    {% if thuoc.hinh_anh %}<img src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}" loading="lazy" decoding="async">
+    {% else %}<div class="tk-drug__initial" aria-hidden="true">{{ thuoc.ten_biet_duoc[:1]|upper }}</div>{% endif %}
+  </div>
+  <div class="tk-drug__body">
+    <h3>{{ thuoc.ten_biet_duoc }}</h3>
+    <p>{{ thuoc.ten_hoat_chat_hien_thi or 'Chưa có hoạt chất' }}</p>
+  </div>
+</a>
+{%- endmacro %}

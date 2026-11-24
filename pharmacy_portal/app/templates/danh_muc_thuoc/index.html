@@ -1,47 +1,36 @@
 {% extends "base.html" %}
-{% from "_icons.html" import ic %}
+{% from "_tk.html" import o_tim, arrow %}
 {% block title %}Danh mục thuốc{% endblock %}
 {% block meta_mo_ta %}Danh mục thuốc của Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan: tra cứu theo nhóm dược lý, thành phần, chỉ định, chống chỉ định và liều dùng.{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <div class="eyebrow">Danh mục thuốc</div>
-  <h1>Danh mục thuốc theo nhóm dược lý</h1>
-  <p>Chọn một nhóm để xem danh sách thuốc, hoặc tìm nhanh theo tên biệt dược/hoạt chất.</p>
-</div>
-
-<div class="search-panel">
-  <form class="search-form" autocomplete="off" method="get">
-    <input aria-label="Tên biệt dược hoặc hoạt chất" enterkeyhint="search" type="text" name="q" placeholder="Tên biệt dược hoặc hoạt chất" data-goi-y="dmt">
-    <button type="submit" class="btn btn-primary">Tìm</button>
-  </form>
-</div>
-
-<div class="results-panel">
-  {% if phan_trang_nhom.items %}
-  <div class="nhom-grid">
-    {% for nhom in phan_trang_nhom.items %}
-    <a class="nhom-card" href="{{ url_for('dmt.xem_nhom', nhom_id=nhom.id) }}">
-      <div class="nhom-card-icon" aria-hidden="true">{{ nhom.ten_nhom[:1]|upper }}</div>
-      <h3>{{ nhom.ten_nhom }}</h3>
-      <div class="nhom-card-footer">
-        <span class="nhom-card-count"><b>{{ counts.get(nhom.id, 0) }}</b> thuốc</span>
-        <span class="nhom-card-arrow">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5.5M12 4V10.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </span>
-      </div>
-    </a>
-    {% endfor %}
+{% set tong_thuoc = counts.values()|sum %}
+<section class="tk-head">
+  <div class="tk-wrap">
+    <h1 class="tk-h1">Danh mục thuốc theo nhóm dược lý</h1>
+    <p class="tk-lead">{% if tong_thuoc %}{{ ('{:,}'.format(tong_thuoc))|replace(',', '.') }} thuốc trong {{ phan_trang_nhom.total }} nhóm. {% endif %}Chọn một nhóm, hoặc tìm theo tên biệt dược, hoạt chất.</p>
+    {{ o_tim() }}
   </div>
-  {% set phan_trang = phan_trang_nhom %}
-  {% set endpoint = 'dmt.index' %}
-  {% set args = {} %}
-  {% include "_phan_trang.html" with context %}
-  {% else %}
-  <div class="empty-state">
-    <div class="empty-state-icon">{{ ic('pill', 22) }}</div>
-    Chưa có dữ liệu danh mục thuốc.
+</section>
+
+<section class="tk-section" style="padding-top: var(--s-6)" aria-label="Các nhóm thuốc">
+  <div class="tk-wrap">
+    {% if phan_trang_nhom.items %}
+    <ul class="tk-rows">
+      {% for nhom in phan_trang_nhom.items %}
+      <li><a class="tk-row" href="{{ url_for('dmt.xem_nhom', nhom_id=nhom.id) }}">
+        <span class="tk-row__name">{{ nhom.ten_nhom }}</span>
+        <span class="tk-row__end"><span class="tk-row__meta">{{ counts.get(nhom.id, 0) }} thuốc</span>{{ arrow() }}</span>
+      </a></li>
+      {% endfor %}
+    </ul>
+    {% set phan_trang = phan_trang_nhom %}
+    {% set endpoint = 'dmt.index' %}
+    {% set args = {} %}
+    {% include "_phan_trang.html" with context %}
+    {% else %}
+    <div class="tk-empty"><b>Chưa có dữ liệu</b><p class="tk-muted">Danh mục thuốc chưa có nhóm nào. Khoa Dược đang cập nhật.</p></div>
+    {% endif %}
   </div>
-  {% endif %}
-</div>
+</section>
 {% endblock %}

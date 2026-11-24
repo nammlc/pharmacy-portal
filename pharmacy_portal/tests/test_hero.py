@@ -31,18 +31,19 @@ class Hero(Co):
 
     def test_no_image_keeps_default_blue_hero(self):
         h = self.trang_chu()
-        self.assertNotIn("hero--anh", h); self.assertNotIn("<picture>", h)
+        self.assertNotIn('class="hero-bg"', h); self.assertNotIn("<picture>", h)
+        self.assertIn("tk-quick", h)                                          # thay chỗ ảnh bằng 4 lối tắt, không để khung trống
 
     def test_only_pc_image_is_used_for_all_screens(self):
         self.dat(**{H.K_ANH: PC})
         h = self.trang_chu()
-        self.assertIn("hero--anh", h); self.assertIn("v111/pharmacy/hero/pc.jpg", h)
+        self.assertIn('class="hero-bg"', h); self.assertIn("v111/pharmacy/hero/pc.jpg", h)
         self.assertNotIn("<source", h)
 
     def test_only_mobile_image_is_used_for_all_screens(self):
         self.dat(**{H.K_ANH_MOBILE: MB})
         h = self.trang_chu()
-        self.assertIn("hero--anh", h); self.assertIn("v222/pharmacy/hero_mobile/mb.jpg", h)
+        self.assertIn('class="hero-bg"', h); self.assertIn("v222/pharmacy/hero_mobile/mb.jpg", h)
         self.assertNotIn("<source", h)
 
     def test_both_images_phone_gets_its_own_source(self):
@@ -104,7 +105,7 @@ class Hero(Co):
 class DoPhuRiengPcMobile(Co):
     """Độ phủ màu xanh chỉnh RIÊNG cho máy tính và điện thoại (trước đây dùng chung 1 giá trị, và máy tính bị CSS cố định bỏ qua)."""
 
-    def test_pc_and_mobile_overlay_are_saved_and_rendered_separately(self):
+    def test_pc_and_mobile_overlay_are_saved_separately_but_no_longer_painted_on_the_photo(self):
         def luu():
             from app import db
             CaiDat.dat(H.K_ANH, PC); CaiDat.dat(H.K_ANH_MOBILE, MB); db.session.commit()
@@ -114,12 +115,10 @@ class DoPhuRiengPcMobile(Co):
         self.assertIn(r.status_code, (302, 303))
         self.assertEqual(self.q(lambda: (CaiDat.lay(H.K_DO_PHU), CaiDat.lay(H.K_DO_PHU_MOBILE))), ("50", "35"))
         h = self.client().get("/").get_data(as_text=True)
-        for bien in ("--hero-pl:", "--hero-pm:", "--hero-pr:", "--hero-m1:", "--hero-m2:", "--hero-m3:"):
-            self.assertIn(bien, h)
-        self.assertIn("--hero-m2:0.35", h)                         # điện thoại = giá trị riêng
-        self.assertIn("--hero-pl:0.64", h)                         # máy tính = 50% + 0,14
+        # Giao diện mới: ảnh nguyên vẹn, KHÔNG có lớp phủ màu hay chữ đè lên ảnh
+        self.assertNotIn("hero-phu", h); self.assertNotIn("--hero-m2", h)
         f = a.get("/admin/anh-trang-chu/").get_data(as_text=True)
-        self.assertIn('name="do_phu_mobile"', f); self.assertIn('name="do_phu"', f)
+        self.assertIn('name="do_phu_mobile"', f); self.assertIn('name="do_phu"', f)    # còn trong form (ẩn) để không mất giá trị đã lưu
 
     def test_old_form_without_mobile_field_keeps_saved_mobile_value(self):
         a = self.admin()

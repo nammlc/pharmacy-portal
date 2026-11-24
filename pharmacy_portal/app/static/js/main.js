@@ -389,7 +389,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
   document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".hero-search, .search-form").forEach(gan);
+    document.querySelectorAll(".hero-search, .search-form, .tk-search").forEach(gan);
   });
   window.addEventListener("pageshow", reset);
 })();

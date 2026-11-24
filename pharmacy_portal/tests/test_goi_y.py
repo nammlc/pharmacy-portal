@@ -96,7 +96,7 @@ class GiaoDien(unittest.TestCase):
         self.assertIn("goi_y_tim_kiem.js", base)
         n = sum("data-goi-y" in open(f, encoding="utf-8").read()
                 for f in glob.glob(os.path.join(os.path.dirname(__file__), "..", "app", "templates", "**", "*.html"), recursive=True))
-        self.assertGreaterEqual(n, 5)
+        self.assertGreaterEqual(n, 4)               # trang chủ, macro ô tìm kiếm dùng chung (danh mục/kết quả), nhà thuốc BV, tra cứu khác
 
 
 if __name__ == "__main__":
