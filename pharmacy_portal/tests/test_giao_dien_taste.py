@@ -82,6 +82,55 @@ class TrangCongKhai(Co):
         self.assertIn('data-moment="word-highlight"', h); self.assertIn('href="tel:0961256092"', h)
 
 
+class PhanConLaiVaAdmin(Co):
+    def trang(self, url, admin=False):
+        r = (self.admin() if admin else self.client()).get(url)
+        self.assertEqual(r.status_code, 200, url)
+        return r.get_data(as_text=True)
+
+    def test_remaining_public_pages_use_the_new_head_and_search(self):
+        for url in ("/tra-cuu-thuoc-tiem-truyen/", "/tra-cuu-tuong-hop-tuong-ky/", "/tra-cuu-thong-tin-thuoc/", "/tra-cuu-tuong-tac-thuoc/",
+                    "/thong-tin-cho-benh-nhan/", "/ho-tro", "/bai-viet/", "/nha-thuoc-bv/"):
+            h = self.trang(url)
+            self.assertIn('class="tk-head"', h, url)
+            self.assertNotIn('class="page-header"', h, url)
+            self.assertIn("css/taste.css", h, url)
+
+    def test_pharmacy_shop_pages_mirror_the_catalogue(self):
+        h = self.trang("/nha-thuoc-bv/thuoc/%d" % self.ids["ntbv"])
+        self.assertIn('tk-detail"', h); self.assertIn("Nhà thuốc BV", h)
+        self.assertIn('id="hoat-chat"', h)
+
+    def test_articles_have_no_autoplay_slideshow_and_no_overlay_on_photos(self):
+        h = self.trang("/bai-viet/")
+        self.assertNotIn("bvSlideshow", h); self.assertNotIn("bv-slide-overlay", h)
+
+    def test_interaction_table_is_sorted_by_severity_and_keeps_text_labels(self):
+        def tao():
+            from app import db
+            from app.models.models import Thuoc, TuongTacThuoc
+            a, b, c = Thuoc(ten_thuoc="Warfarin"), Thuoc(ten_thuoc="Aspirin"), Thuoc(ten_thuoc="Ibuprofen")
+            db.session.add_all([a, b, c]); db.session.flush()
+            for y, m in ((b.id, "nhe"), (c.id, "chong_chi_dinh")):
+                db.session.add(TuongTacThuoc(thuoc_a_id=a.id, thuoc_b_id=y, muc_do=m, hau_qua_lam_sang="x", xu_tri="y"))
+            db.session.commit()
+        self.q(tao)
+        h = self.trang("/tra-cuu-tuong-tac-thuoc/?q=Warfarin")
+        self.assertLess(h.index("lvl-chong_chi_dinh"), h.index('class="ttt-row lvl-nhe"'))
+        self.assertIn("Chống chỉ định", h)
+
+    def test_admin_pages_load_the_same_design_system(self):
+        for url in ("/admin/", "/admin/danh-muc-thuoc/", "/admin/anh-trang-chu/", "/admin/bai-viet/them"):
+            h = self.trang(url, admin=True)
+            self.assertIn("css/admin-taste.css", h, url); self.assertIn("css/taste-fonts.css", h, url)
+            self.assertNotIn("fonts.googleapis.com", h, url)
+
+    def test_admin_css_has_no_blur_and_no_dark_navy_sidebar(self):
+        css = _doc("app/static/css/admin-taste.css")
+        self.assertIn(".admin-sidebar { width: 264px; background: var(--p-surface)", css)
+        self.assertNotIn("backdrop-filter: blur", css)
+
+
 class LuatThietKe(unittest.TestCase):
     def setUp(self):
         self.css = _doc("app/static/css/taste.css")
@@ -105,6 +154,13 @@ class LuatThietKe(unittest.TestCase):
         self.assertIn("vietnamese", f)
         for ten in re.findall(r"url\(\.\./fonts/([^)]+)\)", f):
             self.assertTrue(os.path.exists(os.path.join(ROOT, "app/static/fonts", ten)), ten)
+
+    def test_search_bar_dropdown_sits_above_following_blocks_and_input_has_no_inner_outline(self):
+        # Lỗi thật: hiệu ứng vào của hero tạo lớp xếp chồng cho từng khối nên chữ/ảnh bên dưới đè lên danh sách gợi ý;
+        # và quy tắc :focus-visible toàn cục vẽ thêm khung chữ nhật quanh ô nhập bên trong khung tìm kiếm.
+        self.assertRegex(self.css, r"\.tk-search \{ position: relative; z-index: 20; \}")
+        self.assertRegex(self.css, r"\.tk-search input:focus, \.tk-search input:focus-visible \{ outline: none !important")
+        self.assertRegex(self.css, r"\.tk-search\.goi-y-form \.goi-y-dropdown, \.tk-search \.goi-y-dropdown \{[^}]*background: #fff")
 
     def test_word_highlight_is_scroll_linked_only_inside_its_section_and_skips_reduced_motion(self):
         js = _doc("app/static/js/taste.js")

@@ -3,28 +3,18 @@
 {% block title %}{{ bai_viet.tieu_de }}{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <div class="eyebrow">
-    {% if bai_viet.danh_muc %}
-    <a href="{{ url_for('bv.index', danh_muc=bai_viet.danh_muc.slug) }}">{{ bai_viet.danh_muc.ten }}</a>
-    {% else %}
-    Bài viết - Thông báo
-    {% endif %}
-  </div>
-  <h1>{{ bai_viet.tieu_de }}</h1>
-  <p class="bv-meta">
-    <span>{{ ic('calendar', 16) }} {{ (bai_viet.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bai_viet.ngay_xuat_ban else (bai_viet.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}</span>
-    <span>{{ ic('eye', 16) }} {{ bai_viet.luot_xem or 0 }} lượt xem</span>
-    {% if bai_viet.tac_gia %}<span>{{ ic('pencil', 16) }} {{ bai_viet.tac_gia.ho_ten or bai_viet.tac_gia.ten_dang_nhap }}</span>{% endif %}
-  </p>
-</div>
+<section class="tk-head"><div class="tk-wrap">
+  <p class="tk-crumb">{% if bai_viet.danh_muc %}<a class="tk-link" href="{{ url_for('bv.index', danh_muc=bai_viet.danh_muc.slug) }}">{{ bai_viet.danh_muc.ten }}</a>{% else %}<a class="tk-link" href="{{ url_for('bv.index') }}">Bài viết - Thông báo</a>{% endif %}</p>
+  <h1 class="tk-h1">{{ bai_viet.tieu_de }}</h1>
+  <p class="tk-label" style="margin-top:16px">{{ (bai_viet.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bai_viet.ngay_xuat_ban else (bai_viet.ngay_tao | gio_vn).strftime('%d/%m/%Y') }} · {{ bai_viet.luot_xem or 0 }} lượt xem{% if bai_viet.tac_gia %} · {{ bai_viet.tac_gia.ho_ten or bai_viet.tac_gia.ten_dang_nhap }}{% endif %}</p>
+</div></section>
 
-<div class="results-panel">
+<div class="tk-wrap tk-results">
   {% if bai_viet.anh_dai_dien %}
-  <img src="{{ bai_viet.anh_dai_dien }}" alt="{{ bai_viet.tieu_de }}" class="bv-detail-anh">
+  <div class="tk-frame tk-article-pic"><img src="{{ bai_viet.anh_dai_dien }}" alt="{{ bai_viet.tieu_de }}" decoding="async"></div>
   {% endif %}
 
-  <div class="rich-content bv-article-body">
+  <div class="tk-rich bv-article-body">
     {{ bai_viet.noi_dung | safe if bai_viet.noi_dung else '' }}
   </div>
 
@@ -36,10 +26,10 @@
 
   {% if bai_lien_quan %}
   <div class="bv-related">
-    <h3>Bài viết liên quan</h3>
-    <ul>
+    <h2 class="tk-h3" style="margin:var(--s-8) 0 var(--s-4)">Bài viết liên quan</h2>
+    <ul class="tk-rows">
       {% for bv in bai_lien_quan %}
-      <li><a href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}"><span>{{ bv.tieu_de }}</span>{{ ic('chevron', 16) }}</a></li>
+      <li><a class="tk-row" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}"><span class="tk-row__name">{{ bv.tieu_de }}</span><span class="tk-row__end">{{ ic('chevron', 16) }}</span></a></li>
       {% endfor %}
     </ul>
   </div>

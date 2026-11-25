@@ -1,54 +1,54 @@
 {% extends "base.html" %}
-{% from "_chi_tiet_thuoc.html" import section %}
+{% from "_tk.html" import arrow %}
 {% block title %}{{ thuoc.ten_biet_duoc }}{% endblock %}
-{% block meta_mo_ta %}{{ thuoc.ten_biet_duoc }}: thành phần, chỉ định, chống chỉ định, cách dùng – liều dùng. Thông tin thuốc của Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan.{% endblock %}
+{% block meta_mo_ta %}{{ thuoc.ten_biet_duoc }}: nhóm thuốc và hoạt chất. Thông tin thuốc của Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan.{% endblock %}
+
+{% macro muc(id, tieu_de, ground='') -%}
+<section class="tk-fact{% if ground %} tk-section--{{ ground }}{% endif %}" id="{{ id }}" aria-labelledby="{{ id }}-h">
+  <div class="tk-wrap tk-fact__grid">
+    <h2 class="tk-h2" id="{{ id }}-h">{{ tieu_de }}</h2>
+    <div class="tk-fact__body tk-rich">{{ caller() }}</div>
+  </div>
+</section>
+{%- endmacro %}
 
 {% block content %}
-<div class="drug-page">
-<div class="drug-hero">
-  <div class="drug-hero-media">
-    {% if thuoc.hinh_anh %}
-    <img src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}">
-    {% else %}
-    <div class="drug-hero-media-fallback">{{ thuoc.ten_biet_duoc[:1]|upper }}</div>
+<article>
+<section class="tk-wrap tk-detail">
+  <div class="tk-detail__text">
+    <p class="tk-crumb"><a class="tk-link" href="{{ url_for('ntbv.index') }}">Nhà thuốc BV</a>{% if thuoc.nhom %}<span aria-hidden="true">/</span><a class="tk-link" href="{{ url_for('ntbv.xem_nhom', nhom_id=thuoc.nhom.id) }}">{{ thuoc.nhom.ten_nhom }}</a>{% endif %}</p>
+    <h1 class="tk-h1">{{ thuoc.ten_biet_duoc }}</h1>
+    {% if thuoc.ten_hoat_chat_hien_thi %}<p class="tk-detail__sub">{{ thuoc.ten_hoat_chat_hien_thi }}</p>{% endif %}
+    
+  </div>
+  <div class="tk-detail__pic">
+    <div class="tk-frame">
+      {% if thuoc.hinh_anh %}<img src="{{ thuoc.hinh_anh }}" alt="{{ thuoc.ten_biet_duoc }}" fetchpriority="high" decoding="async">
+      {% else %}<div class="tk-drug__initial" aria-hidden="true" style="font-size:120px">{{ thuoc.ten_biet_duoc[:1]|upper }}</div>{% endif %}
+    </div>
+  </div>
+</section>
+
+{% call muc('nhom-thuoc', 'Nhóm thuốc') %}<p>{{ thuoc.nhom.ten_nhom if thuoc.nhom else '—' }}</p>{% endcall %}
+{% call muc('hoat-chat', 'Hoạt chất', 'alt') %}<p>{{ thuoc.ten_hoat_chat_hien_thi or '—' }}</p>{% endcall %}
+
+{% if thuoc.link_tham_khao or cung_hoat_chat %}
+<section class="tk-fact" aria-label="Tham khảo thêm">
+  <div class="tk-wrap">
+    {% if thuoc.link_tham_khao %}
+    <p class="tk-label" style="margin:0 0 8px">Nguồn tham khảo</p>
+    <p style="margin:0 0 {{ 'var(--s-7)' if cung_hoat_chat else '0' }}"><a class="tk-link" href="{{ thuoc.link_tham_khao | chuan_hoa_url }}" target="_blank" rel="noopener" style="overflow-wrap:anywhere">{{ thuoc.link_tham_khao }}</a></p>
+    {% endif %}
+    {% if cung_hoat_chat %}
+    <h2 class="tk-h3" style="margin-bottom: var(--s-4)">Thuốc cùng hoạt chất</h2>
+    <ul class="tk-chips">
+      {% for t in cung_hoat_chat %}<li><a href="{{ url_for('ntbv.xem_thuoc', thuoc_id=t.id) }}">{{ t.ten_biet_duoc }}</a></li>{% endfor %}
+    </ul>
     {% endif %}
   </div>
-  <div class="drug-hero-text">
-    <div class="drug-hero-crumbs">
-      <a href="{{ url_for('ntbv.index') }}">Nhà thuốc BV</a>{% if thuoc.nhom %} / <a href="{{ url_for('ntbv.xem_nhom', nhom_id=thuoc.nhom.id) }}">{{ thuoc.nhom.ten_nhom }}</a>{% endif %}
-    </div>
-    <h1 class="drug-hero-title">{{ thuoc.ten_biet_duoc }}</h1>
-    {% if thuoc.ten_hoat_chat_hien_thi %}<p class="drug-hero-sub">{{ thuoc.ten_hoat_chat_hien_thi }}</p>{% endif %}
-  </div>
-</div>
-
-<div class="drug-grid-sections">
-  {% call section('Nhóm thuốc', 'group') %}
-    <div class="drug-section-body">{{ thuoc.nhom.ten_nhom if thuoc.nhom else '—' }}</div>
-  {% endcall %}
-
-  {% call section('Hoạt chất', 'molecule') %}
-    <div class="drug-section-body">{{ thuoc.ten_hoat_chat_hien_thi or '—' }}</div>
-  {% endcall %}
-
-  {% if thuoc.link_tham_khao %}
-  {% call section('Nguồn tham khảo', 'link', wide=true) %}
-    <a class="drug-source-link" href="{{ thuoc.link_tham_khao | chuan_hoa_url }}" target="_blank" rel="noopener">{{ thuoc.link_tham_khao }}</a>
-  {% endcall %}
-  {% endif %}
-</div>
-
-{% if cung_hoat_chat %}
-<section class="drug-related">
-  <h2 class="drug-related-title">Thuốc cùng hoạt chất</h2>
-  <ul class="drug-related-list">
-    {% for t in cung_hoat_chat %}
-    <li><a href="{{ url_for('ntbv.xem_thuoc', thuoc_id=t.id) }}">{{ t.ten_biet_duoc }}</a></li>
-    {% endfor %}
-  </ul>
 </section>
 {% endif %}
-</div>
+</article>
 
 {% set hd_loai = 'ntbv' %}{% set hd_id = thuoc.id %}{% set hd_ten = thuoc.ten_biet_duoc %}
 {% include "_hoi_dap.html" %}

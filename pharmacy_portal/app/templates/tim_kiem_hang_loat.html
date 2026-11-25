@@ -2,25 +2,24 @@
 {% block title %}Tra cứu đơn thuốc — {{ ket_qua_hang_loat|length }} thuốc{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <div class="eyebrow">Tra cứu đơn thuốc (quét mã QR)</div>
-  <h1>Kết quả tra cứu {{ ket_qua_hang_loat|length }} thuốc trong đơn</h1>
-  <p>
-    Tìm thấy thông tin cho <strong>{{ so_thuoc_tim_thay }}/{{ ket_qua_hang_loat|length }}</strong> thuốc.
+<section class="tk-head"><div class="tk-wrap">
+  <p class="tk-crumb">Tra cứu đơn thuốc (quét mã QR)</p>
+  <h1 class="tk-h1">Kết quả tra cứu {{ ket_qua_hang_loat|length }} thuốc trong đơn</h1>
+  <p class="tk-lead">Tìm thấy thông tin cho <strong>{{ so_thuoc_tim_thay }}/{{ ket_qua_hang_loat|length }}</strong> thuốc.
     {% if so_thuoc_tim_thay < ket_qua_hang_loat|length %}
       Thuốc chưa có trong hệ thống được đánh dấu bên dưới.
-    {% endif %}
-  </p>
-</div>
+    {% endif %}</p>
+</div></section>
 
-<div class="search-panel">
-  <form class="search-form" autocomplete="off" method="get" action="{{ url_for('main.tim_kiem') }}">
+<div class="tk-wrap tk-searchrow">
+  <form class="tk-search" role="search" autocomplete="off" method="get" action="{{ url_for('main.tim_kiem') }}">
+    <svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
     <input aria-label="Tra thêm 1 thuốc khác" enterkeyhint="search" type="text" name="q" placeholder="Tra thêm 1 thuốc khác">
-    <button type="submit">Tìm</button>
+    <button type="submit" class="tk-btn tk-btn--primary">Tìm</button>
   </form>
 </div>
 
-<div class="results-panel">
+<div class="tk-wrap tk-results">
   {% for kq in ket_qua_hang_loat %}
   <div class="tkhl-thuoc {% if not kq.tong %}tkhl-thuoc--rong{% endif %}">
     <div class="tkhl-thuoc-head">

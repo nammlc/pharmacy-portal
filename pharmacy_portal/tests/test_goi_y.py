@@ -96,7 +96,9 @@ class GiaoDien(unittest.TestCase):
         self.assertIn("goi_y_tim_kiem.js", base)
         n = sum("data-goi-y" in open(f, encoding="utf-8").read()
                 for f in glob.glob(os.path.join(os.path.dirname(__file__), "..", "app", "templates", "**", "*.html"), recursive=True))
-        self.assertGreaterEqual(n, 4)               # trang chủ, macro ô tìm kiếm dùng chung (danh mục/kết quả), nhà thuốc BV, tra cứu khác
+        self.assertGreaterEqual(n, 2)               # ô tìm kiếm trang chủ + macro o_tim dùng chung (danh mục thuốc, nhà thuốc BV, kết quả)
+        macro = open(os.path.join(os.path.dirname(__file__), "..", "app", "templates", "_tk.html"), encoding="utf-8").read()
+        self.assertIn('data-goi-y="{{ goi_y }}"', macro)          # macro mặc định có gợi ý; mỗi trang chọn nguồn (dmt / ntbv)
 
 
 if __name__ == "__main__":

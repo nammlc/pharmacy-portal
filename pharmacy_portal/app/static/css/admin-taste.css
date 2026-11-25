@@ -1,0 +1,107 @@
+/* ============================================================
+   ADMIN · cùng hệ thiết kế "taste" với trang công khai (bảng màu linen-harbour, Newsreader + Hanken Grotesk)
+   Là công cụ làm việc nên: nền be phẳng, đường kẻ mảnh, một màu nhấn, nút 44px, không kính mờ, không bóng nặng,
+   thanh bên sáng (nền tonal) thay cho khối xanh navy đặc. Tải SAU style.css và taste.css; chỉ ghi đè lớp .admin-* và thành phần admin.
+   ============================================================ */
+body { background: var(--p-bg); color: var(--p-ink); font: 400 16px/1.55 var(--font-text); }
+.admin-shell { background: var(--p-bg); }
+.admin-overlay { background: rgba(29, 37, 48, .4); backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+/* ---------- thanh bên ---------- */
+.admin-sidebar { width: 264px; background: var(--p-surface); color: var(--p-ink); padding: 20px 14px 28px; border-right: 1px solid var(--tk-line); gap: 2px; }
+.admin-sidebar .brand { color: var(--p-ink); border-bottom: 1px solid var(--tk-line-strong); margin-bottom: 14px; padding: 2px 8px 16px; }
+.admin-sidebar .brand .brand-primary { font: 500 18px/1.2 var(--font-display); letter-spacing: -0.01em; }
+.admin-sidebar .brand .brand-text small { color: var(--p-muted); font-size: 13px; }
+.admin-sidebar .sidebar-credit { color: var(--p-muted); font-size: 12.5px; font-style: normal; opacity: 1; }
+.admin-sidebar a { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: var(--r-sm); font: 500 15px/1.2 var(--font-text); color: var(--p-ink); box-shadow: none; transition: background-color var(--m-out) var(--ease); }
+.admin-sidebar a .ic { flex: none; opacity: .75; }
+.admin-sidebar a:hover { background: color-mix(in srgb, var(--p-surface) 80%, var(--p-ink)); color: var(--p-ink); }
+.admin-sidebar a.active { background: var(--p-ink); color: var(--p-bg); box-shadow: none; font-weight: 500; }
+.admin-sidebar a.active .ic { opacity: 1; }
+.admin-sidebar .section-label { font: 500 13px/1.4 var(--font-text); letter-spacing: .01em; color: var(--p-muted); padding: 20px 12px 6px; text-transform: none; }
+.nav-badge { background: var(--p-action); color: #fff; border-radius: 999px; font: 500 12px/1 var(--font-text); }
+
+/* ---------- thanh trên ---------- */
+.admin-topbar { height: 64px; background: var(--p-bg); backdrop-filter: none; -webkit-backdrop-filter: none; border-bottom: 1px solid var(--tk-line); }
+.admin-topbar-title { font: 500 14px/1.3 var(--font-text); color: var(--p-muted); text-transform: none; letter-spacing: .01em; }
+.admin-menu-btn { min-height: 44px; min-width: 44px; border-radius: var(--r-btn); background: var(--p-surface); border: 0; color: var(--p-ink); }
+.admin-body { max-width: 1180px; padding: var(--s-6) var(--s-6) var(--s-9); }
+
+/* ---------- đầu trang ---------- */
+.admin-page-head { margin-bottom: var(--s-6); }
+.admin-page-head h1 { font: 400 clamp(30px, 1.6vw + 20px, 40px)/1.1 var(--font-display); letter-spacing: -0.02em; color: var(--p-ink); margin: 0; }
+.admin-page-head p, .admin-page-head .sub { color: var(--p-muted); font-size: 16px; margin: 6px 0 0; }
+
+/* ---------- thẻ, khung biểu mẫu ---------- */
+.admin-form-card, .panel, .nk-card, .login-card { background: #fff; border: 1px solid var(--tk-line); border-radius: var(--r-md); box-shadow: none; }
+.admin-form-card { padding: var(--s-6); }
+.panel-title { font: 500 18px/1.3 var(--font-display); letter-spacing: -0.01em; color: var(--p-ink); }
+
+/* ---------- biểu mẫu ---------- */
+.form-row { margin-bottom: var(--s-5); }
+.form-row label, .form-label-row label, .pv-label, .gate-label { display: block; margin-bottom: 6px; font: 500 15px/1.4 var(--font-text); color: var(--p-ink); }
+.form-row input[type=text], .form-row input[type=email], .form-row input[type=password], .form-row input[type=url], .form-row input[type=number], .form-row input[type=tel], .form-row input[type=date], .form-row select, .form-row textarea, .adm-select, .gate-input {
+  width: 100%; min-height: 44px; padding: 10px 14px; background: #fff; border: 1px solid var(--tk-line-strong); border-radius: var(--r-sm); font: 400 16px/1.4 var(--font-text); color: var(--p-ink);
+}
+.form-row textarea { min-height: 120px; }
+.form-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-6); padding-top: var(--s-5); border-top: 1px solid var(--tk-line); }
+.field-errors { margin: 6px 0 0; padding: 0; list-style: none; color: var(--level-cctd); font-size: 14.5px; }
+.vct-file-hint, .hint { color: var(--p-muted); font-size: 14px; line-height: 1.5; }
+
+/* ---------- bảng ---------- */
+.adm-table-wrap { background: #fff; border: 1px solid var(--tk-line); border-radius: var(--r-md); box-shadow: none; overflow-x: auto; }
+.adm-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.adm-table thead th { padding: 12px 16px; background: var(--p-surface); border-bottom: 1px solid var(--tk-line-strong); text-align: left; font: 500 13px/1.4 var(--font-text); letter-spacing: .01em; color: var(--p-muted); text-transform: none; white-space: nowrap; }
+.adm-table td { padding: 14px 16px; border-bottom: 1px solid var(--tk-line); vertical-align: middle; background: transparent; }
+.adm-table tbody tr:last-child td { border-bottom: 0; }
+@media (hover: hover) { .adm-table tbody tr:hover td { background: color-mix(in srgb, var(--p-surface) 45%, transparent); } }
+.col-title-text { font-weight: 500; color: var(--p-ink); }
+.td-actions { white-space: nowrap; }
+.row-act { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; min-width: 36px; padding: 0 12px; border-radius: var(--r-sm); background: var(--p-surface); color: var(--p-ink); border: 0; font: 500 14px/1 var(--font-text); cursor: pointer; }
+.row-act.act-del { background: transparent; color: var(--level-cctd); }
+@media (hover: hover) { .row-act:hover { background: color-mix(in srgb, var(--p-surface) 80%, var(--p-ink)); } .row-act.act-del:hover { background: color-mix(in srgb, var(--level-cctd) 10%, var(--p-bg)); } }
+.adm-thumb { border-radius: var(--r-sm); background: #fff; border: 1px solid var(--tk-line); object-fit: contain; }
+.adm-thumb-placeholder { background: var(--p-surface); color: var(--p-muted); border-radius: var(--r-sm); }
+.adm-search-row { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-bottom: var(--s-5); }
+.admin-empty, .adm-empty { padding: var(--s-8) var(--s-5); text-align: center; color: var(--p-muted); background: transparent; border: 1px dashed var(--tk-line-strong); border-radius: var(--r-md); }
+
+/* ---------- nhãn trạng thái: nền nhạt, chữ ink, có chữ (không chỉ dựa vào màu) ---------- */
+.adm-badge, .tl-badge, .yk-badge { display: inline-flex; align-items: center; min-height: 26px; padding: 0 10px; border-radius: 999px; background: var(--p-surface); color: var(--p-ink); font: 500 13px/1 var(--font-text); border: 0; }
+
+/* ---------- phân trang admin ---------- */
+.adm-pt-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0 12px; border-radius: var(--r-btn); background: var(--p-surface); color: var(--p-ink); font: 500 15px/1 var(--font-text); border: 0; }
+.adm-pt-btn.is-current, .adm-pt-btn.active { background: var(--p-ink); color: var(--p-bg); }
+.adm-pt-dis { opacity: .45; }
+
+/* ---------- vùng dán ảnh / xem trước ---------- */
+.anh-paste-zone { border: 1px dashed var(--tk-line-strong); border-radius: var(--r-md); background: var(--p-bg); color: var(--p-muted); }
+.preview-img-box { border: 1px solid var(--tk-line); border-radius: var(--r-md); background: #fff; }
+
+/* ---------- tổng quan ---------- */
+.dash-label, .queue-label { font: 500 13px/1.4 var(--font-text); color: var(--p-muted); text-transform: none; letter-spacing: .01em; }
+.queue-num, .nk-num { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.02em; color: var(--p-ink); font-variant-numeric: tabular-nums; }
+.nk-lbl, .dash-muted { color: var(--p-muted); }
+.nk-card, .dash-queue { background: #fff; color: var(--p-ink); border: 1px solid var(--tk-line); border-radius: var(--r-md); box-shadow: none; }
+
+/* ---------- hộp thoại xoá: phẳng, không mờ nền ---------- */
+.xoa-modal-overlay { background: rgba(29, 37, 48, .45); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.xoa-modal-box { border-radius: var(--r-md); box-shadow: none; border: 1px solid var(--tk-line-strong); animation: none; }
+.xoa-modal-title { font: 500 20px/1.3 var(--font-display); letter-spacing: -0.01em; }
+
+/* ---------- thông báo nhanh (flash) ---------- */
+.flash-msg { padding: 12px 16px; border-radius: var(--r-sm); border: 1px solid var(--tk-line-strong); background: #fff; color: var(--p-ink); font-size: 15px; }
+.flash-error { border-color: var(--level-cctd); }
+.flash-success { border-color: var(--p-action); }
+
+/* ---------- đăng nhập và các trang một thẻ ---------- */
+.login-shell { background: var(--p-bg); min-height: 100vh; }
+.login-card { padding: var(--s-7) var(--s-6); max-width: 440px; }
+.login-card h1 { font: 400 32px/1.15 var(--font-display); letter-spacing: -0.02em; color: var(--p-ink); }
+.login-card .sub { color: var(--p-muted); font-size: 15px; }
+
+/* ---------- điện thoại ---------- */
+@media (max-width: 900px) {
+  .admin-sidebar { background: var(--p-surface); }
+  .admin-body { padding: var(--s-5) var(--s-4) var(--s-8); }
+}
+@media (prefers-reduced-motion: reduce) { .admin-sidebar a, .row-act { transition: none; } }

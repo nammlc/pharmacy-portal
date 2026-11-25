@@ -4,11 +4,11 @@
 {% block meta_robots %}noindex, nofollow{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <div class="eyebrow">Hỗ trợ</div>
-  <h1>Hỗ trợ &amp; góp ý riêng tư</h1>
-  <p>Nhắn riêng cho Khoa Dược để được hỗ trợ, góp ý hoặc báo lỗi thông tin. Cuộc trò chuyện chỉ bạn và Khoa Dược xem được.</p>
-</div>
+<section class="tk-head"><div class="tk-wrap">
+  <p class="tk-crumb">Hỗ trợ</p>
+  <h1 class="tk-h1">Hỗ trợ &amp; góp ý riêng tư</h1>
+  <p class="tk-lead">Nhắn riêng cho Khoa Dược để được hỗ trợ, góp ý hoặc báo lỗi thông tin. Cuộc trò chuyện chỉ bạn và Khoa Dược xem được.</p>
+</div></section>
 
 <div class="ht" id="htApp" data-csrf="{{ csrf_token() }}"
      data-dang-nhap-url="{{ url_for('ho_tro.dang_nhap') }}" data-gui-url="{{ url_for('ho_tro.gui') }}"
