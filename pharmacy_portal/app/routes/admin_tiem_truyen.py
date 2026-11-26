@@ -62,7 +62,7 @@ def xoa(item_id):
     item = ThuocTiemTruyen.query.get_or_404(item_id)
     db.session.delete(item)
     db.session.commit()
-    flash("Đã xoá.", "success")
+    flash("Đã xoá. Có thể khôi phục trong Thùng rác.", "success")
     return redirect(url_for("admin_tttt.danh_sach"))
 
 

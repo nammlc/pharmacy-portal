@@ -155,18 +155,10 @@ def sua(item_id):
 def xoa(item_id):
     bai_viet = BaiViet.query.get_or_404(item_id)
     ten = bai_viet.tieu_de
-    _xoa_tai_nguyen_bai_viet(bai_viet)
-    db.session.delete(bai_viet)
+    db.session.delete(bai_viet)   # ảnh/tệp giữ lại tới khi xoá vĩnh viễn khỏi Thùng rác
     db.session.commit()
-    flash(f'Đã xoá bài viết "{ten}".', "success")
+    flash(f'Đã xoá bài viết "{ten}". Có thể khôi phục trong Thùng rác.', "success")
     return redirect(url_for("admin_bv.danh_sach"))
-
-
-def _xoa_tai_nguyen_bai_viet(bai_viet):
-    if bai_viet.anh_dai_dien:
-        xoa_anh_cloudinary(bai_viet.anh_dai_dien)
-    if bai_viet.file_dinh_kem:
-        xoa_tep_dinh_kem_cloudinary(bai_viet.file_dinh_kem)
 
 
 @bp.route("/xoa-hang-loat", methods=["POST"])
@@ -175,7 +167,6 @@ def xoa_hang_loat():
     ids = lay_id_tu_form(request)
     so_da_xoa, bo_qua = xoa_theo_danh_sach_id(
         BaiViet, ids,
-        xoa_anh=_xoa_tai_nguyen_bai_viet,
         hien_thi=lambda b: b.tieu_de,
     )
     flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="bài viết")
@@ -187,7 +178,6 @@ def xoa_hang_loat():
 def xoa_tat_ca():
     so_da_xoa, bo_qua = xoa_toan_bo(
         BaiViet,
-        xoa_anh=_xoa_tai_nguyen_bai_viet,
         hien_thi=lambda b: b.tieu_de,
     )
     flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="bài viết")

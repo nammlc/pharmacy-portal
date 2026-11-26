@@ -59,6 +59,7 @@
     <div class="section-label">Khác</div>
     <a href="{{ url_for('admin_hero.chinh_sua') }}" class="{{ 'active' if request.blueprint == 'admin_hero' }}">{{ ic('image', 18) }}Ảnh trang chủ</a>
     <a href="{{ url_for('admin_vct.chinh_sua') }}" class="{{ 'active' if request.blueprint == 'admin_vct' }}">{{ ic('pencil', 18) }}Về chúng tôi</a>
+    <a href="{{ url_for('admin_thung_rac.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_thung_rac' }}">{{ ic('trash', 18) }}Thùng rác</a>
     {% if current_user.vai_tro == 'quan_tri' %}
     <a href="{{ url_for('admin_nhat_ky.danh_sach') }}" class="{{ 'active' if request.blueprint == 'admin_nhat_ky' }}">{{ ic('shield', 18) }}Nhật ký truy cập</a>
     {% endif %}
@@ -208,12 +209,21 @@
 <script>
 let _xoaForm = null;
 
-function moModal(form, ten) {
+function escHtml(t) {
+  return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// tuyChon.thungRac = true: mục sẽ vào Thùng rác (khôi phục được). Mặc định: xoá hẳn, không hoàn tác.
+function moModal(form, ten, tuyChon) {
   _xoaForm = form;
-  const msg = ten
-    ? `Bạn có chắc muốn xoá <strong>${ten}</strong>? Hành động này không thể hoàn tác.`
-    : 'Bạn có chắc muốn xoá mục này? Hành động này không thể hoàn tác.';
-  document.getElementById('xoaModalMsg').innerHTML = msg;
+  const vaoRac = !!(tuyChon && tuyChon.thungRac);
+  const ngay = {{ config.THUNG_RAC_GIU_NGAY }};
+  const t = ten ? `<strong>${escHtml(ten)}</strong>` : 'mục này';
+  document.getElementById('xoaModalTitle').textContent = (tuyChon && tuyChon.tieuDe) || (vaoRac ? 'Chuyển vào thùng rác' : 'Xác nhận xoá');
+  document.getElementById('xoaModalMsg').innerHTML = vaoRac
+    ? `Chuyển ${t} vào thùng rác? Bạn có thể khôi phục trong ${ngay} ngày, sau đó mục sẽ bị xoá vĩnh viễn.`
+    : `Bạn có chắc muốn xoá ${t}? Hành động này không thể hoàn tác.`;
+  document.getElementById('xoaModalConfirm').textContent = (tuyChon && tuyChon.nut) || (vaoRac ? 'Chuyển vào thùng rác' : 'Xoá');
   document.getElementById('xoaModal').style.display = 'flex';
   document.documentElement.style.overflow = 'hidden';      // khoá cuộn trên <html>: đặt trên <body> sẽ làm sidebar mất ghim
   document.getElementById('xoaModalConfirm').focus();

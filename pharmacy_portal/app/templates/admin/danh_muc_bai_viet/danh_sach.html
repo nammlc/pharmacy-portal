@@ -29,7 +29,7 @@
             <a href="{{ url_for('admin_dmbv.sua', dm_id=dm.id) }}">Sửa</a>
             <form method="POST" action="{{ url_for('admin_dmbv.xoa', dm_id=dm.id) }}" onsubmit="return false;" style="display:contents;">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <button type="button" class="act-del" onclick="moModal(this.closest('form'), '{{ dm.ten }}')">Xoá</button>
+              <button type="button" class="act-del" data-ten="{{ dm.ten }}" onclick="moModal(this.closest('form'), this.dataset.ten, {thungRac: true})">Xoá</button>
             </form>
           </div>
         </td>

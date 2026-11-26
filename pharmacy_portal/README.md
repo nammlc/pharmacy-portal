@@ -180,3 +180,12 @@ Mỗi tài khoản có secret OTP riêng (không dùng chung). Thay cho "cổng 
 - **Chạy sau proxy (Coolify/Traefik):** đặt `TRUSTED_PROXIES=1` (mặc định). Máy chủ cloud phải **đồng bộ giờ** (NTP/`chrony`) vì OTP phụ thuộc đồng hồ.
 - Mọi sự kiện (đăng nhập, OTP sai, bật/đổi OTP) được ghi trong **Nhật ký truy cập**.
 
+
+## Thùng rác (admin)
+
+Mọi thao tác xoá ở trang quản trị (xoá 1 mục, xoá đã chọn, xoá tất cả) đều đưa mục vào **Thùng rác** thay vì mất hẳn.
+Vào menu **Khác → Thùng rác** để khôi phục hoặc xoá vĩnh viễn. Mục được giữ tối đa **30 ngày** (biến môi trường
+`THUNG_RAC_GIU_NGAY`, chỉ giảm được, không vượt 30), quá hạn thì ẩn ngay và tự xoá vĩnh viễn (kèm ảnh/tệp đính kèm).
+Mã nguồn: `app/utils/thung_rac.py` (khai báo loại dữ liệu ở `REGISTRY`). Bảng `thung_rac` tự tạo khi khởi động
+(hoặc chạy `them_bang_thung_rac.sql`). Dọn thủ công/cron: `flask don-thung-rac`.
+Không đưa vào thùng rác: tài khoản chat khách và tin nhắn riêng (dữ liệu cá nhân).

@@ -95,18 +95,10 @@ def xoa(nhom_id):
         flash(f'Không thể xoá "{nhom.ten_nhom}" vì vẫn còn thuốc thuộc nhóm này.', "danger")
         return redirect(url_for("admin_nhom_thuoc.danh_sach"))
     ten = nhom.ten_nhom
-    # Xoá ảnh Cloudinary trước
-    if nhom.hinh_anh:
-        xoa_anh_cloudinary(nhom.hinh_anh)
-    db.session.delete(nhom)
+    db.session.delete(nhom)      # ảnh giữ lại tới khi xoá vĩnh viễn khỏi Thùng rác
     db.session.commit()
-    flash(f'Đã xoá nhóm thuốc "{ten}".', "success")
+    flash(f'Đã xoá nhóm thuốc "{ten}". Có thể khôi phục trong Thùng rác.', "success")
     return redirect(url_for("admin_nhom_thuoc.danh_sach"))
-
-
-def _xoa_anh_nhom(nhom):
-    if nhom.hinh_anh:
-        xoa_anh_cloudinary(nhom.hinh_anh)
 
 
 def _kiem_tra_nhom_con_thuoc(nhom):
@@ -121,7 +113,6 @@ def xoa_hang_loat():
     ids = lay_id_tu_form(request)
     so_da_xoa, bo_qua = xoa_theo_danh_sach_id(
         NhomThuoc, ids,
-        xoa_anh=_xoa_anh_nhom,
         kiem_tra_rang_buoc=_kiem_tra_nhom_con_thuoc,
         hien_thi=lambda n: n.ten_nhom,
     )
@@ -134,7 +125,6 @@ def xoa_hang_loat():
 def xoa_tat_ca():
     so_da_xoa, bo_qua = xoa_toan_bo(
         NhomThuoc,
-        xoa_anh=_xoa_anh_nhom,
         kiem_tra_rang_buoc=_kiem_tra_nhom_con_thuoc,
         hien_thi=lambda n: n.ten_nhom,
     )

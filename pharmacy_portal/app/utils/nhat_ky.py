@@ -51,7 +51,7 @@ NHAN_DOI_TUONG = {
     "admin_ttbn": "Bài viết bệnh nhân", "admin_vct": "Về chúng tôi",
     "admin_nhat_ky": "Nhật ký truy cập", "admin_auth": "Tài khoản",
     "admin_ma_bao_mat": "Mã bảo mật (cũ)", "admin_cong": "Cổng mã bảo mật (cũ)",
-    "admin_otp": "Xác thực 2 lớp",
+    "admin_otp": "Xác thực 2 lớp", "admin_thung_rac": "Thùng rác",
 }
 
 NHAN_TRANG_CONG_KHAI = {

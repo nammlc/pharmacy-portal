@@ -68,7 +68,8 @@ def xoa_toan_bo(Model, xoa_anh=None, kiem_tra_rang_buoc=None, hien_thi=None):
 def flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="bản ghi"):
     """Hiển thị flash message tổng kết sau khi xoá hàng loạt / xoá toàn bộ."""
     if so_da_xoa:
-        flash(f"Đã xoá {so_da_xoa} {danh_tu}.", "success")
+        from app.utils.thung_rac import so_ngay_giu
+        flash(f"Đã xoá {so_da_xoa} {danh_tu}. Có thể khôi phục trong Thùng rác (giữ {so_ngay_giu()} ngày).", "success")
     if bo_qua:
         ds = ", ".join(f'"{ten}" ({ly_do})' for ten, ly_do in bo_qua[:5])
         con_lai = f" và {len(bo_qua) - 5} mục khác" if len(bo_qua) > 5 else ""

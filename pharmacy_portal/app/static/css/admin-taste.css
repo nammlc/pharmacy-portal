@@ -105,3 +105,18 @@ body { background: var(--p-bg); color: var(--p-ink); font: 400 16px/1.55 var(--f
   .admin-body { padding: var(--s-5) var(--s-4) var(--s-8); }
 }
 @media (prefers-reduced-motion: reduce) { .admin-sidebar a, .row-act { transition: none; } }
+
+/* ---------- thùng rác ---------- */
+.tr-filter { align-items: center; }
+.tr-filter .adm-select { width: auto; min-width: 220px; }
+.tr-bulk { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--s-3); padding: 10px 14px; margin-bottom: var(--s-3); background: var(--p-surface); border: 1px solid var(--tk-line); border-radius: var(--r-md); }
+.tr-bulk[hidden] { display: none; }
+.tr-bulk-actions { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.tr-table .tr-check { width: 44px; text-align: center; padding-left: 8px; padding-right: 8px; }
+.tr-table input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--p-ink); cursor: pointer; }
+.tr-when { white-space: nowrap; color: var(--p-ink); }
+.tr-when small { display: block; color: var(--p-muted); font-size: 13px; }
+.tr-left.is-soon { background: transparent; box-shadow: inset 0 0 0 1px var(--level-cctd); color: var(--level-cctd); }
+.row-act .tr-restore { background: var(--p-ink); color: var(--p-bg); border-color: var(--p-ink); }
+@media (hover: hover) { .row-act .tr-restore:hover { background: color-mix(in srgb, var(--p-ink) 86%, var(--p-bg)); color: var(--p-bg); } }
+@media (max-width: 900px) { .tr-filter .adm-select, .tr-filter input { flex: 1 1 100%; max-width: none; } }

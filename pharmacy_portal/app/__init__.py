@@ -174,6 +174,9 @@ def create_app(config_class=Config):
     from app.routes.admin_otp import bp as admin_otp_bp
     app.register_blueprint(admin_otp_bp)
 
+    from app.routes.admin_thung_rac import bp as admin_thung_rac_bp
+    app.register_blueprint(admin_thung_rac_bp)
+
     # --- Hỏi đáp công khai, chat riêng với khách, thông báo cho admin ---
     from app.routes.hoi_dap import bp as hoi_dap_bp
     app.register_blueprint(hoi_dap_bp)
@@ -196,6 +199,10 @@ def create_app(config_class=Config):
     from app.utils import nhat_ky as _nhat_ky
     _nhat_ky.dang_ky(app)
 
+    # --- Thùng rác: hook chụp dữ liệu khi admin xoá + tự dọn mục quá hạn ---
+    from app.utils import thung_rac as _thung_rac
+    _thung_rac.dang_ky(app)
+
     # --- Xác thực 2 lớp OTP: ép thiết lập cho phiên cũ + tự thêm cột vào bảng nguoi_dung ---
     from app.utils import otp as _otp
     _otp.dang_ky(app)
@@ -204,8 +211,8 @@ def create_app(config_class=Config):
         # Tự tạo các bảng mới (nhat_ky, cài đặt, đếm lần nhập sai) nếu chưa có - không đụng bảng cũ
         try:
             from app.models.models import (NhatKy, CaiDatHeThong, GateLanThu, DangOnline,
-                                           YKien, KhachHang, TinNhanRieng, ThongBao, ChatLanThu)
-            for _bang in (NhatKy, CaiDatHeThong, GateLanThu, DangOnline, KhachHang, YKien, TinNhanRieng, ThongBao, ChatLanThu):
+                                           YKien, KhachHang, TinNhanRieng, ThongBao, ChatLanThu, ThungRac)
+            for _bang in (NhatKy, CaiDatHeThong, GateLanThu, DangOnline, KhachHang, YKien, TinNhanRieng, ThongBao, ChatLanThu, ThungRac):
                 _bang.__table__.create(bind=db.engine, checkfirst=True)
         except Exception as e:
             app.logger.warning(f"Không tạo được bảng mới (chạy them_bang_nhat_ky.sql / them_bang_cong_bao_mat.sql thủ công): {e}")

@@ -33,6 +33,8 @@ NHAN_LOAI = {
 NHAN_HANH_DONG = {
     "them": "Thêm", "sua": "Sửa", "xoa": "Xoá", "xoa_hang_loat": "Xoá hàng loạt",
     "xoa_tat_ca": "Xoá tất cả", "nhap": "Nhập hàng loạt",
+    "khoi_phuc": "Khôi phục", "khoi_phuc_nhieu": "Khôi phục nhiều mục",
+    "huy_vinh_vien": "Xoá vĩnh viễn", "huy_nhieu": "Xoá vĩnh viễn nhiều mục", "don_sach": "Dọn sạch thùng rác",
 }
 TRANG_MOI_TRANG = 15
 _RE_IP_DAY_DU = re.compile(r"^(\d{1,3}\.){3}\d{1,3}$")

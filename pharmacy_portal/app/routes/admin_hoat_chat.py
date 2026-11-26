@@ -62,7 +62,7 @@ def xoa(hc_id):
     ten = hc.ten_hoat_chat
     db.session.delete(hc)
     db.session.commit()
-    flash(f'Đã xoá hoạt chất "{ten}".', "success")
+    flash(f'Đã xoá hoạt chất "{ten}". Có thể khôi phục trong Thùng rác.', "success")
     return redirect(url_for("admin_hoat_chat.danh_sach"))
 
 

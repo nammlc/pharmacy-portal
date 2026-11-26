@@ -100,18 +100,11 @@ def sua(thuoc_id):
 def xoa(thuoc_id):
     thuoc = Thuoc.query.get_or_404(thuoc_id)
     ten = thuoc.ten_thuoc
-    # Xoá ảnh trên Cloudinary trước khi xoá record
-    if thuoc.hinh_anh:
-        xoa_anh_cloudinary(thuoc.hinh_anh)
+    # Ảnh được giữ lại cho tới khi mục bị xoá vĩnh viễn khỏi Thùng rác (app/utils/thung_rac.py)
     db.session.delete(thuoc)
     db.session.commit()
-    flash(f'Đã xoá "{ten}" và toàn bộ dữ liệu liên quan.', "success")
+    flash(f'Đã xoá "{ten}" . Có thể khôi phục trong Thùng rác.', "success")
     return redirect(url_for("admin_thuoc.danh_sach"))
-
-
-def _xoa_anh_thuoc(thuoc):
-    if thuoc.hinh_anh:
-        xoa_anh_cloudinary(thuoc.hinh_anh)
 
 
 @bp.route("/xoa-hang-loat", methods=["POST"])
@@ -120,7 +113,6 @@ def xoa_hang_loat():
     ids = lay_id_tu_form(request)
     so_da_xoa, bo_qua = xoa_theo_danh_sach_id(
         Thuoc, ids,
-        xoa_anh=_xoa_anh_thuoc,
         hien_thi=lambda t: t.ten_thuoc,
     )
     flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="thuốc")
@@ -132,7 +124,6 @@ def xoa_hang_loat():
 def xoa_tat_ca():
     so_da_xoa, bo_qua = xoa_toan_bo(
         Thuoc,
-        xoa_anh=_xoa_anh_thuoc,
         hien_thi=lambda t: t.ten_thuoc,
     )
     flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="thuốc")

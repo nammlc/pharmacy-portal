@@ -101,17 +101,10 @@ def sua(thuoc_id):
 def xoa(thuoc_id):
     thuoc = NhaThuocBV.query.get_or_404(thuoc_id)
     ten = thuoc.ten_biet_duoc
-    if thuoc.hinh_anh:
-        xoa_anh_cloudinary(thuoc.hinh_anh)
-    db.session.delete(thuoc)
+    db.session.delete(thuoc)     # ảnh giữ lại tới khi xoá vĩnh viễn khỏi Thùng rác
     db.session.commit()
-    flash(f'Đã xoá "{ten}" khỏi Nhà thuốc BV.', "success")
+    flash(f'Đã xoá "{ten}" khỏi Nhà thuốc BV. Có thể khôi phục trong Thùng rác.', "success")
     return redirect(url_for("admin_ntbv.danh_sach"))
-
-
-def _xoa_anh_thuoc(thuoc):
-    if thuoc.hinh_anh:
-        xoa_anh_cloudinary(thuoc.hinh_anh)
 
 
 @bp.route("/xoa-hang-loat", methods=["POST"])
@@ -120,7 +113,6 @@ def xoa_hang_loat():
     ids = lay_id_tu_form(request)
     so_da_xoa, bo_qua = xoa_theo_danh_sach_id(
         NhaThuocBV, ids,
-        xoa_anh=_xoa_anh_thuoc,
         hien_thi=lambda t: t.ten_biet_duoc,
     )
     flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="thuốc trong Nhà thuốc BV")
@@ -132,7 +124,6 @@ def xoa_hang_loat():
 def xoa_tat_ca():
     so_da_xoa, bo_qua = xoa_toan_bo(
         NhaThuocBV,
-        xoa_anh=_xoa_anh_thuoc,
         hien_thi=lambda t: t.ten_biet_duoc,
     )
     flash_ket_qua_xoa(flash, so_da_xoa, bo_qua, danh_tu="thuốc trong Nhà thuốc BV")

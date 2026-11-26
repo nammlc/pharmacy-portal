@@ -73,7 +73,7 @@ def xoa(dm_id):
     ten = dm.ten
     db.session.delete(dm)
     db.session.commit()
-    flash(f'Đã xoá danh mục "{ten}". Các bài viết thuộc danh mục này chuyển về "chưa phân loại".', "success")
+    flash(f'Đã xoá danh mục "{ten}". Các bài viết thuộc danh mục này chuyển về "chưa phân loại" (khôi phục danh mục sẽ gắn lại). Có thể khôi phục trong Thùng rác.', "success")
     return redirect(url_for("admin_dmbv.danh_sach"))
 
 

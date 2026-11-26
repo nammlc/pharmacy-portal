@@ -1,0 +1,148 @@
+{% extends "admin/base.html" %}
+{% from "_icons.html" import ic %}
+{% block title %}Thùng rác{% endblock %}
+{% block page_eyebrow %}Khác{% endblock %}
+{% block admin_content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Thùng rác</h1>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">Mục đã xoá được giữ {{ so_ngay }} ngày để khôi phục, sau đó tự xoá vĩnh viễn. {{ tong }} mục trong thùng rác.</p>
+  </div>
+  {% if tong %}
+  <form method="POST" action="{{ url_for('admin_thung_rac.don_sach') }}" onsubmit="return false;" style="display:contents;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="button" class="btn btn-danger" data-ten="toàn bộ {{ tong }} mục trong thùng rác"
+            onclick="moModal(this.closest('form'), this.dataset.ten, {tieuDe: 'Dọn sạch thùng rác', nut: 'Xoá vĩnh viễn tất cả'})">{{ ic('trash', 16) }}Dọn sạch thùng rác</button>
+  </form>
+  {% endif %}
+</div>
+
+<form method="get" class="adm-search-row tr-filter">
+  <select name="loai" class="adm-select" aria-label="Lọc theo loại" onchange="this.form.submit()">
+    <option value="">Tất cả loại ({{ tong }})</option>
+    {% for khoa, l in loai_tat_ca.items() if dem.get(khoa) or khoa == loai %}
+    <option value="{{ khoa }}" {{ 'selected' if khoa == loai }}>{{ l.nhan }} ({{ dem.get(khoa, 0) }})</option>
+    {% endfor %}
+  </select>
+  <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm theo tên" aria-label="Tìm theo tên">
+  <button type="submit" class="btn btn-outline btn-sm">Tìm</button>
+  {% if tu_khoa or loai %}<a href="{{ url_for('admin_thung_rac.danh_sach') }}" class="btn btn-outline btn-sm">Bỏ lọc</a>{% endif %}
+</form>
+
+{% if muc %}
+<form id="trBulk" method="POST" action="{{ url_for('admin_thung_rac.khoi_phuc_nhieu') }}" onsubmit="return false;" class="tr-bulk" hidden>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="loai" value="{{ loai }}">
+  <input type="hidden" name="q" value="{{ tu_khoa }}">
+  <span class="tr-bulk-count" aria-live="polite"><b id="trCount">0</b> mục đã chọn</span>
+  <span class="tr-bulk-actions">
+    <button type="button" class="btn btn-primary btn-sm" id="trBulkRestore" data-action="{{ url_for('admin_thung_rac.khoi_phuc_nhieu') }}">Khôi phục đã chọn</button>
+    <button type="button" class="btn btn-danger btn-sm" id="trBulkDelete" data-action="{{ url_for('admin_thung_rac.huy_nhieu') }}">Xoá vĩnh viễn</button>
+  </span>
+</form>
+
+<div class="adm-table-wrap">
+  <table class="adm-table tr-table">
+    <thead>
+      <tr>
+        <th class="tr-check"><input type="checkbox" id="trAll" aria-label="Chọn tất cả mục trên trang này"></th>
+        <th class="adm-col-thumb adm-col-thumb--vuong"></th>
+        <th>Tên</th>
+        <th>Loại</th>
+        <th>Đã xoá</th>
+        <th>Còn lại</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b, l, con_lai in muc %}
+      <tr>
+        <td class="tr-check"><input type="checkbox" class="tr-pick" name="ids" value="{{ b.id }}" form="trBulk" aria-label="Chọn {{ b.ten }}"></td>
+        <td>
+          {% if b.anh %}
+          <img src="{{ b.anh }}" class="adm-thumb adm-thumb--vuong" alt="" loading="lazy">
+          {% else %}
+          <span class="adm-thumb-placeholder adm-thumb--vuong">{{ ic('file', 22) }}</span>
+          {% endif %}
+        </td>
+        <td class="col-title"><strong class="col-title-text" title="{{ b.ten }}">{{ b.ten }}</strong></td>
+        <td><span class="adm-badge">{{ l.nhan if l else b.loai }}</span></td>
+        <td class="tr-when">
+          {{ (b.ngay_xoa | gio_vn).strftime('%d/%m/%Y %H:%M') }}
+          {% if b.ten_nguoi_xoa %}<small>bởi {{ b.ten_nguoi_xoa }}</small>{% endif %}
+        </td>
+        <td><span class="adm-badge tr-left{{ ' is-soon' if con_lai <= 3 }}">Còn {{ con_lai }} ngày</span></td>
+        <td class="td-actions">
+          <div class="row-act">
+            <form method="POST" action="{{ url_for('admin_thung_rac.khoi_phuc', rac_id=b.id) }}" style="display:contents;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="loai" value="{{ loai }}">
+              <input type="hidden" name="q" value="{{ tu_khoa }}">
+              <input type="hidden" name="ten" value="{{ b.ten }}">
+              <button type="submit" class="tr-restore">Khôi phục</button>
+            </form>
+            <form method="POST" action="{{ url_for('admin_thung_rac.huy_vinh_vien', rac_id=b.id) }}" onsubmit="return false;" style="display:contents;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="loai" value="{{ loai }}">
+              <input type="hidden" name="q" value="{{ tu_khoa }}">
+              <input type="hidden" name="ten" value="{{ b.ten }}">
+              <button type="button" class="act-del" data-ten="{{ b.ten }}"
+                      onclick="moModal(this.closest('form'), this.dataset.ten, {tieuDe: 'Xoá vĩnh viễn', nut: 'Xoá vĩnh viễn'})">Xoá vĩnh viễn</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if phan_trang.pages > 1 %}
+{% macro lien_ket(p) %}{{ url_for('admin_thung_rac.danh_sach', trang=p, loai=loai or none, q=tu_khoa or none) }}{% endmacro %}
+<nav class="adm-pt" aria-label="Phân trang">
+  <span class="adm-pt-info">{{ phan_trang.total }} mục · trang {{ phan_trang.page }}/{{ phan_trang.pages }}</span>
+  <div class="adm-pt-btns">
+    {% if phan_trang.has_prev %}<a href="{{ lien_ket(phan_trang.prev_num) }}" class="adm-pt-btn" aria-label="Trang trước">‹</a>{% else %}<span class="adm-pt-btn adm-pt-dis">‹</span>{% endif %}
+    {% for p in phan_trang.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=1) %}
+      {% if p %}
+        {% if p == phan_trang.page %}<span class="adm-pt-btn adm-pt-cur" aria-current="page">{{ p }}</span>
+        {% else %}<a href="{{ lien_ket(p) }}" class="adm-pt-btn">{{ p }}</a>{% endif %}
+      {% else %}<span class="adm-pt-ell">…</span>{% endif %}
+    {% endfor %}
+    {% if phan_trang.has_next %}<a href="{{ lien_ket(phan_trang.next_num) }}" class="adm-pt-btn" aria-label="Trang sau">›</a>{% else %}<span class="adm-pt-btn adm-pt-dis">›</span>{% endif %}
+  </div>
+</nav>
+{% endif %}
+
+<script>
+(function () {
+  var bar = document.getElementById('trBulk'), all = document.getElementById('trAll');
+  var picks = Array.prototype.slice.call(document.querySelectorAll('.tr-pick'));
+  var count = document.getElementById('trCount');
+  function sync() {
+    var n = picks.filter(function (c) { return c.checked; }).length;
+    count.textContent = n;
+    bar.hidden = n === 0;
+    all.checked = n > 0 && n === picks.length;
+    all.indeterminate = n > 0 && n < picks.length;
+  }
+  all.addEventListener('change', function () { picks.forEach(function (c) { c.checked = all.checked; }); sync(); });
+  picks.forEach(function (c) { c.addEventListener('change', sync); });
+  document.getElementById('trBulkRestore').addEventListener('click', function () {
+    bar.action = this.dataset.action; bar.onsubmit = null; bar.submit();
+  });
+  document.getElementById('trBulkDelete').addEventListener('click', function () {
+    bar.action = this.dataset.action;
+    var n = picks.filter(function (c) { return c.checked; }).length;
+    moModal(bar, n + ' mục đã chọn', {tieuDe: 'Xoá vĩnh viễn', nut: 'Xoá vĩnh viễn'});
+  });
+  sync();
+})();
+</script>
+{% else %}
+<div class="admin-empty">
+  {% if tu_khoa or loai %}Không có mục nào trong thùng rác khớp với bộ lọc.
+  {% else %}Thùng rác trống. Mục bạn xoá sẽ nằm ở đây {{ so_ngay }} ngày trước khi bị xoá vĩnh viễn.{% endif %}
+</div>
+{% endif %}
+{% endblock %}

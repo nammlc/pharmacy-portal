@@ -474,3 +474,21 @@ class ChatLanThu(db.Model):
     khoa = db.Column(db.String(64), nullable=False, index=True)
     loai = db.Column(db.String(12), nullable=False)                   # sai_ma | tao_moi
     thoi_gian = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+
+
+# ============================================================================================
+# THÙNG RÁC (admin): mỗi dòng = 1 bản ghi đã xoá, lưu dạng ảnh chụp JSON để khôi phục. Xem app/utils/thung_rac.py
+# ============================================================================================
+class ThungRac(db.Model):
+    __tablename__ = "thung_rac"
+
+    id = db.Column(db.Integer, primary_key=True)
+    loai = db.Column(db.String(30), nullable=False, index=True)       # khoá loại (thuoc, danh_muc_thuoc, bai_viet...)
+    doi_tuong_id = db.Column(db.Integer, nullable=False)              # id gốc của bản ghi
+    ten = db.Column(db.String(300), nullable=False)                   # tên hiển thị lúc xoá
+    anh = db.Column(db.String(500))                                   # ảnh đại diện (để hiện hình nhỏ), có thể trống
+    du_lieu = db.Column(db.Text, nullable=False)                      # JSON: cột + liên kết nhiều-nhiều + liên kết ngược
+    nguoi_xoa_id = db.Column(db.Integer)
+    ten_nguoi_xoa = db.Column(db.String(100))
+    ngay_xoa = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+    het_han = db.Column(db.DateTime, nullable=False, index=True)      # quá mốc này: ẩn và tự xoá vĩnh viễn

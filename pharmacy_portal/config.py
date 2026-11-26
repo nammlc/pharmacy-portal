@@ -145,6 +145,9 @@ class Config:
     # Trần tổng số dòng nhật ký (mặc định 100.000 dòng ≈ 50 MB, an toàn cho gói free 500 MB): vượt thì xoá bớt lượt xem cũ nhất.
     NHAT_KY_TOI_DA = int(os.environ.get("NHAT_KY_TOI_DA", "100000"))
 
+    # --- Thùng rác admin: mục đã xoá được giữ bao nhiêu ngày rồi tự xoá vĩnh viễn (tối đa 30, mặc định 30) ---
+    THUNG_RAC_GIU_NGAY = min(30, max(1, int(os.environ.get("THUNG_RAC_GIU_NGAY", "30"))))
+
     # --- Đếm người đang trực tuyến (ô thống kê góc dưới trang quản trị) ---
     # Ai có tín hiệu "còn ở đây" trong N giây gần nhất thì tính là đang online (trình duyệt báo mỗi ~45 giây).
     # Trình duyệt báo mỗi ~20 giây và báo "tôi rời trang" ngay khi đóng tab, nên cửa sổ 60 giây là đủ → số liệu gần thời gian thực.
