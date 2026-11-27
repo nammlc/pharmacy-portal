@@ -1,0 +1,163 @@
+/* ============================================================
+   MÀU SẮC CHUNG · đưa bảng màu "sinh động" của trang chủ sang các trang con (tải SAU taste.css, trước taste-sinh-dong.css)
+   - Cùng 8 màu của trang chủ: teal, blue, coral, amber, rose, green, cyan, ochre (không có màu tím).
+   - Mỗi mục tra cứu giữ ĐÚNG màu của thẻ tương ứng trên trang chủ: Danh mục thuốc = teal, Nhà thuốc BV = blue,
+     Thuốc tiêm truyền = coral, Tương hợp – tương kỵ = amber, Tương tác thuốc = rose, Thông tin thuốc = green,
+     Thông tin bệnh nhân = cyan, Bài viết = ochre. Trang khác (Hỗ trợ, Giới thiệu, tìm kiếm) dùng teal.
+   - Chỉ có màu và hover. KHÔNG có hiệu ứng hiện ra khi cuộn, không thanh tiến độ, không hình khối trôi theo cuộn:
+     các hình khối nền ở đầu trang đứng yên.
+   - Chỉ áp dụng khi <body class="pg cN"> (base.html gắn, trừ trang chủ), nên trang chủ không bị đổi.
+   ============================================================ */
+:root {
+  --c-teal: #1f8a83; --c-blue: #2c5877; --c-coral: #d9604a; --c-amber: #d98a1f;
+  --c-rose: #c24d68; --c-green: #4a9a58; --c-cyan: #2a8fb5; --c-ochre: #b8741f;
+  --cat-dmt: var(--c-teal); --cat-ntbv: var(--c-blue);
+}
+.c1 { --c: var(--c-teal); }  .c2 { --c: var(--c-blue); }  .c3 { --c: var(--c-coral); } .c4 { --c: var(--c-amber); }
+.c5 { --c: var(--c-rose); }  .c6 { --c: var(--c-green); } .c7 { --c: var(--c-cyan); }  .c8 { --c: var(--c-ochre); }
+
+/* --pc = màu của cả trang (không đổi dù phần tử con đặt lại --c); --pc2 = màu thứ hai cho nền trang trí */
+.pg { --pc: var(--c, var(--c-teal)); --pc2: var(--c-amber); }
+.pg.c4 { --pc2: var(--c-coral); }
+.pg .site-main { overflow-x: clip; }
+
+/* ---------- đầu trang: hai hình khối mờ đứng yên, giống nền hero trang chủ ---------- */
+.pg .tk-head { position: relative; isolation: isolate; }
+.pg .tk-head { z-index: 3; }
+.pg .tk-head::before, .pg .tk-head::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; filter: blur(70px); pointer-events: none; }
+.pg .tk-head::before { width: 420px; height: 420px; left: -120px; top: -140px; background: color-mix(in srgb, var(--pc) 55%, #fff); opacity: .30; }
+.pg .tk-head::after { width: 380px; height: 380px; right: -110px; top: -40px; background: color-mix(in srgb, var(--pc2) 50%, #fff); opacity: .24; }
+@media (max-width: 900px) {
+  .pg .tk-head::before, .pg .tk-head::after { filter: blur(50px); width: 300px; height: 300px; }
+}
+
+/* nhãn trang (crumb): viên thuốc màu */
+.pg .tk-crumb { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 12px; border-radius: 999px;
+  background: color-mix(in srgb, var(--pc) 12%, #fff); border: 1px solid color-mix(in srgb, var(--pc) 28%, transparent);
+  color: color-mix(in srgb, var(--pc) 62%, var(--p-ink)); }
+.pg .tk-crumb::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--pc); flex: none; }
+.pg .tk-crumb a { color: inherit; }
+.pg .tk-crumb a:hover { color: var(--p-ink); }
+
+/* ---------- đường điều hướng, ô tìm kiếm, nút phụ ---------- */
+.pg .tk-nav__word[aria-current="page"]::after, .pg .tk-nav__word[data-here]::after { background: var(--pc); height: 3px; bottom: 17px; border-radius: 2px; }
+.pg .tk-search { border-color: color-mix(in srgb, var(--pc) 38%, var(--tk-line-strong)); }
+.pg .tk-search:focus-within { border-color: var(--pc); box-shadow: 0 0 0 3px color-mix(in srgb, var(--pc) 22%, transparent); }
+.pg .tk-search .ic, .pg .tk-search > svg { color: var(--pc); }
+.pg .btn-outline, .pg .btn-secondary, .pg .tk-btn--secondary { background: color-mix(in srgb, var(--pc) 12%, #fff); color: color-mix(in srgb, var(--pc) 62%, var(--p-ink)); }
+@media (hover: hover) and (pointer: fine) {
+  .pg .btn-outline:hover, .pg .btn-secondary:hover, .pg .tk-btn--secondary:hover { background: color-mix(in srgb, var(--pc) 22%, #fff); }
+}
+
+/* ---------- danh sách nhóm / bài viết theo hàng: mỗi hàng một màu, quay vòng 8 màu như bento trang chủ ---------- */
+.pg .tk-rows > li { --c: var(--c-teal); }
+.pg .tk-rows > li:nth-child(8n+2) { --c: var(--c-blue); }  .pg .tk-rows > li:nth-child(8n+3) { --c: var(--c-coral); }
+.pg .tk-rows > li:nth-child(8n+4) { --c: var(--c-amber); } .pg .tk-rows > li:nth-child(8n+5) { --c: var(--c-rose); }
+.pg .tk-rows > li:nth-child(8n+6) { --c: var(--c-green); } .pg .tk-rows > li:nth-child(8n+7) { --c: var(--c-cyan); }
+.pg .tk-rows > li:nth-child(8n+8) { --c: var(--c-ochre); }
+.pg .tk-row { padding-inline: var(--s-4); border-radius: var(--r-md); transition: background-color 140ms var(--ease), box-shadow 140ms var(--ease); }
+.pg .tk-row__name { position: relative; padding-left: 26px; }
+.pg .tk-row__name::before { content: ""; position: absolute; left: 0; top: .55em; width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+.pg .tk-row__meta { padding: 4px 12px; border-radius: 999px; font-weight: 500; background: color-mix(in srgb, var(--c) 12%, #fff); color: color-mix(in srgb, var(--c) 62%, var(--p-ink)); }
+.pg .tk-row .tk-arrow { color: var(--c); }
+.pg .tk-row:hover .tk-row__name { text-decoration: none; }
+@media (hover: hover) and (pointer: fine) {
+  .pg .tk-row:hover { background: color-mix(in srgb, var(--c) 9%, #fff); box-shadow: inset 4px 0 0 var(--c); }
+}
+.pg .tk-row:focus-visible { outline: 2px solid var(--c); outline-offset: 2px; }
+
+/* ---------- thanh màu phía trên thẻ (nằm TRONG thẻ nên bo góc gọn, giống .sd-news ở trang chủ) ---------- */
+.pg .tk-drug, .pg .drug-card, .pg .bv-lienquan-grid > a, .pg .bv-lienquan-card, .pg .bv-card, .pg .tk-lead-story__card, .pg .ht-card { position: relative; overflow: hidden; }
+.pg .tk-drug::before, .pg .drug-card::before, .pg .bv-lienquan-grid > a::before, .pg .bv-lienquan-card::before, .pg .bv-card::before, .pg .tk-lead-story__card::before, .pg .ht-card::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--c); z-index: 3; pointer-events: none; }
+.pg .bv-lienquan-card::before, .pg .bv-lienquan-grid > a::before, .pg .bv-card::before, .pg .tk-lead-story__card::before, .pg .ht-card::before { height: 5px; }
+.pg .btn-bao-loi { background: color-mix(in srgb, var(--pc) 12%, #fff); color: color-mix(in srgb, var(--pc) 62%, var(--p-ink)); }
+
+/* ---------- thẻ thuốc: viền trên màu của trang, hover viền + bóng theo màu (như thẻ trang chủ) ---------- */
+.pg .tk-drug__body { border-top-color: color-mix(in srgb, var(--c) 22%, transparent); }
+.pg .tk-drug__initial, .pg .drug-card-thumb-fallback { background: color-mix(in srgb, var(--c) 12%, #fff) !important; color: color-mix(in srgb, var(--c) 62%, var(--p-ink)) !important; }
+@media (hover: hover) and (pointer: fine) {
+  .pg .tk-drug:hover, .pg .drug-card:hover { border-color: var(--c); box-shadow: 0 14px 30px color-mix(in srgb, var(--c) 22%, transparent); }
+}
+.pg .tk-drug:focus-visible, .pg .drug-card:focus-visible { outline: 2px solid var(--c); outline-offset: 3px; }
+
+/* kết quả tìm kiếm chung: khối 1 = Danh mục thuốc (teal), khối 2 = Nhà thuốc BV (blue) */
+.pg .tktg-section:nth-child(1) { --c: var(--c-teal); }
+.pg .tktg-section:nth-child(2) { --c: var(--c-blue); }
+.pg .tktg-count { padding: 2px 10px; border-radius: 999px; background: color-mix(in srgb, var(--c) 12%, #fff); color: color-mix(in srgb, var(--c) 62%, var(--p-ink)); font-weight: 500; }
+.pg .tktg-empty { color: var(--p-muted); }
+
+/* ---------- bài viết: thẻ có thanh màu phía trên (4 màu quay vòng như "Bài viết mới" ở trang chủ) ---------- */
+.pg .bv-lienquan-grid > :nth-child(4n+1) { --c: var(--c-teal); }  .pg .bv-lienquan-grid > :nth-child(4n+2) { --c: var(--c-blue); }
+.pg .bv-lienquan-grid > :nth-child(4n+3) { --c: var(--c-coral); } .pg .bv-lienquan-grid > :nth-child(4n+4) { --c: var(--c-amber); }
+@media (hover: hover) and (pointer: fine) {
+  .pg .bv-lienquan-grid > a:hover, .pg .bv-lienquan-card:hover, .pg .bv-card:hover { border-color: var(--c); box-shadow: 0 14px 30px color-mix(in srgb, var(--c) 22%, transparent); }
+}
+.pg .tk-lead-story__text .tk-label { align-self: flex-start; padding: 4px 12px; border-radius: 999px; background: color-mix(in srgb, var(--pc) 12%, #fff); color: color-mix(in srgb, var(--pc) 62%, var(--p-ink)); }
+.pg .bv-filter-chip { border-color: color-mix(in srgb, var(--pc) 30%, var(--tk-line-strong)); }
+@media (hover: hover) and (pointer: fine) { .pg .bv-filter-chip:not(.is-active):hover { background: color-mix(in srgb, var(--pc) 10%, #fff); } }
+.pg .bv-filter-chip.is-active { background: color-mix(in srgb, var(--pc) 65%, var(--p-ink)); border-color: color-mix(in srgb, var(--pc) 65%, var(--p-ink)); color: #fff; }
+
+/* ---------- phân trang, chip, nút nhảy mục ---------- */
+.pg .page-btn, .pg .page-num { background: color-mix(in srgb, var(--pc) 10%, #fff); }
+.pg .page-num.is-current { background: color-mix(in srgb, var(--pc) 65%, var(--p-ink)); color: #fff; }
+@media (hover: hover) { .pg a.page-btn:hover, .pg a.page-num:hover { background: color-mix(in srgb, var(--pc) 22%, #fff); } }
+.pg .tk-chips a { border-color: color-mix(in srgb, var(--pc) 35%, var(--tk-line-strong)); background: #fff; }
+@media (hover: hover) { .pg .tk-chips a:hover { background: color-mix(in srgb, var(--pc) 12%, #fff); border-color: var(--pc); } }
+.pg .tk-jump .tk-btn--secondary:nth-child(3) { background: color-mix(in srgb, var(--c-coral) 12%, #fff); color: color-mix(in srgb, var(--c-coral) 62%, var(--p-ink)); }
+@media (hover: hover) and (pointer: fine) { .pg .tk-jump .tk-btn--secondary:nth-child(3):hover { background: color-mix(in srgb, var(--c-coral) 22%, #fff); } }
+
+/* ---------- chi tiết thuốc: mỗi mục một thanh màu, mục "Chống chỉ định" nền tối có hai hình khối mờ như khối "Nguồn thông tin" ---------- */
+.pg .tk-detail__pic .tk-frame { border-color: color-mix(in srgb, var(--pc) 35%, transparent); background: #fff; }
+.pg .tk-detail__group { color: color-mix(in srgb, var(--pc) 62%, var(--p-ink)); font-weight: 500; }
+.pg .tk-section--alt { background: color-mix(in srgb, var(--pc) 7%, var(--p-bg)); }
+.pg .tk-fact__grid > h2::before { content: ""; display: block; width: 48px; height: 5px; margin-bottom: var(--s-4); border-radius: 3px; background: var(--c); }
+.pg #thanh-phan { --c: var(--c-teal); }  .pg #chi-dinh { --c: var(--c-blue); }
+.pg #lieu-dung { --c: var(--c-green); }  .pg #chong-chi-dinh { --c: var(--c-coral); }
+.pg .tk-fact.tk-section--dark { position: relative; overflow: hidden; isolation: isolate; }
+.pg .tk-fact.tk-section--dark::before, .pg .tk-fact.tk-section--dark::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; filter: blur(70px); pointer-events: none; }
+.pg .tk-fact.tk-section--dark::before { width: 420px; height: 420px; right: -100px; top: -140px; background: var(--c-teal); opacity: .26; }
+.pg .tk-fact.tk-section--dark::after { width: 340px; height: 340px; left: -120px; bottom: -150px; background: var(--c-amber); opacity: .18; }
+.pg .tk-fact.tk-section--dark .tk-rich strong { color: #86d8cd; }
+.pg .tk-rich th { color: color-mix(in srgb, var(--pc) 62%, var(--p-ink)); }
+@media (max-width: 900px) { .pg .tk-fact.tk-section--dark::before, .pg .tk-fact.tk-section--dark::after { filter: blur(50px); } }
+
+/* ---------- bảng tra cứu (tiêm truyền, tương hợp, thông tin thuốc, tương tác) ---------- */
+.pg .result-table thead th { color: color-mix(in srgb, var(--pc) 62%, var(--p-ink)); border-bottom: 2px solid var(--pc); }
+.pg .result-table.ttt-table thead th { background: color-mix(in srgb, var(--pc) 10%, #fff); }
+.pg .result-table td strong { color: color-mix(in srgb, var(--pc) 45%, var(--p-ink)); }
+@media (hover: hover) { .pg .result-table tbody tr:hover td { background: color-mix(in srgb, var(--pc) 6%, transparent); } }
+.pg .ttt-summary .ttt-total { color: color-mix(in srgb, var(--pc) 62%, var(--p-ink)); }
+
+/* ---------- Về chúng tôi ---------- */
+.pg .tk-two > div { padding-top: var(--s-5); border-top: 5px solid var(--c-teal); }
+.pg .tk-two > div:nth-child(2) { border-top-color: var(--c-amber); }
+.pg .tk-contact li { border-top-color: color-mix(in srgb, var(--pc) 30%, transparent); }
+.pg .tk-contact li:last-child { border-bottom-color: color-mix(in srgb, var(--pc) 30%, transparent); }
+.pg .tk-contact dt, .pg .tk-contact .k { color: color-mix(in srgb, var(--pc) 62%, var(--p-ink)); font-weight: 500; }
+
+/* ---------- Hỗ trợ và khung Hỏi đáp ---------- */
+.pg .ht-context { background: color-mix(in srgb, var(--pc) 10%, #fff); color: color-mix(in srgb, var(--pc) 62%, var(--p-ink)); }
+.pg .hd-head { background: color-mix(in srgb, var(--pc) 12%, #fff) !important; color: color-mix(in srgb, var(--pc) 62%, var(--p-ink)) !important; }
+.pg .hd-col + .hd-col .hd-head { background: color-mix(in srgb, var(--c-amber) 14%, #fff) !important; color: color-mix(in srgb, var(--c-amber) 55%, var(--p-ink)) !important; }
+.pg .hd-reply { border-left-color: var(--pc); }
+
+/* ---------- chân trang: đường kẻ gradient cùng màu với thanh tiến độ ở trang chủ ---------- */
+.pg .tk-foot { border-top: 4px solid transparent; border-image: linear-gradient(90deg, var(--c-teal), var(--c-blue) 40%, var(--c-amber) 75%, var(--c-coral)) 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pg .tk-row { transition: none; }
+}
+
+/* ---------- ô tìm kiếm trên điện thoại: nút gọn lại, chữ gợi ý không bị cắt cụt ---------- */
+.tk-search input::placeholder { text-overflow: ellipsis; }
+@media (max-width: 640px) {
+  .tk-search { gap: 4px; padding: 6px 6px 6px 12px; }
+  .tk-search input { font-size: 15px; }
+  .tk-search .tk-btn { padding: 0 14px; }
+}
+
+/* Tra cứu tương tác: khi gõ tên biệt dược, nhắc biệt dược đó chứa những hoạt chất nào */
+.ttt-thuoc-khop { margin: 0 0 18px; padding: 12px 18px; border-radius: var(--r-md); font-size: 14px; line-height: 1.6;
+  background: color-mix(in srgb, var(--pc, var(--c-rose)) 9%, #fff); border: 1px solid color-mix(in srgb, var(--pc, var(--c-rose)) 25%, transparent); }
+.ttt-thuoc-khop p { margin: 2px 0; }

@@ -1,20 +1,20 @@
 {% extends "base.html" %}
 {% from "_icons.html" import ic %}
 {% block title %}Tra cứu tương tác thuốc{% endblock %}
-{% block meta_mo_ta %}Tra cứu tương tác thuốc tại Khoa Dược BV Đa khoa Tâm Đức Cầu Quan: mức độ, cơ chế và hướng xử trí khi dùng đồng thời hai thuốc.{% endblock %}
+{% block meta_mo_ta %}Tra cứu tương tác thuốc tại Khoa Dược BV Đa khoa Tâm Đức Cầu Quan: mức độ, cơ chế và hướng xử trí khi dùng đồng thời hai hoạt chất.{% endblock %}
 
 {% block content %}
 <section class="tk-head"><div class="tk-wrap">
   <p class="tk-crumb">Tra cứu</p>
   <h1 class="tk-h1">Tương tác thuốc</h1>
-  <p class="tk-lead">Mức độ, cơ chế và hướng xử trí khi hai thuốc dùng đồng thời.</p>
+  <p class="tk-lead">Mức độ, cơ chế và hướng xử trí khi hai hoạt chất dùng đồng thời. Gõ tên hoạt chất hoặc tên biệt dược.</p>
 </div></section>
 {% set bl_ten = 'Tương tác thuốc' %}{% include "_bao_loi.html" %}
 
 <div class="tk-wrap tk-searchrow">
   <form class="tk-search" role="search" method="get">
     <svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-    <input aria-label="Tên thuốc" enterkeyhint="search" type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên thuốc">
+    <input aria-label="Tên hoạt chất hoặc biệt dược" enterkeyhint="search" type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên hoạt chất hoặc biệt dược">
     <button type="submit" class="tk-btn tk-btn--primary">Tra cứu</button>
   </form>
 </div>
@@ -22,12 +22,17 @@
 <div class="tk-wrap tk-results">
   {% if ket_qua %}
   {% set ds = ket_qua|list %}
+  {% if thuoc_khop %}
+  <div class="ttt-thuoc-khop">
+    {% for ten, hcs in thuoc_khop %}<p><strong>{{ ten }}</strong> chứa: {{ hcs|join(', ') }}.</p>{% endfor %}
+  </div>
+  {% endif %}
   {% set thu_tu = ['chong_chi_dinh', 'nang', 'trung_binh', 'nhe'] %}
-  {% set nhan = {'nhe':'Nhẹ','trung_binh':'Trung bình','nang':'Nặng','chong_chi_dinh':'Chống chỉ định'} %}
+  {% set nhan = {'nhe':'Nhẹ','trung_binh':'Trung bình','nang':'Nghiêm trọng','chong_chi_dinh':'Chống chỉ định'} %}
   {% set bac = {'nhe':1,'trung_binh':2,'nang':3,'chong_chi_dinh':4} %}
   {# Tóm tắt theo mức độ: nặng nhất đứng đầu; mỗi mức có thang 4 vạch + chữ (không chỉ dựa vào màu) #}
   <div class="ttt-summary" role="group" aria-label="Tóm tắt kết quả theo mức độ">
-    <strong class="ttt-total">{{ ds|length }} tương tác</strong>
+    <strong class="ttt-total">{{ tong if tong > ds|length else ds|length }} tương tác{% if tong > ds|length %} (hiển thị {{ ds|length }} nghiêm trọng nhất — hãy gõ cụ thể hơn){% endif %}</strong>
     {% for m in thu_tu %}{% set n = ds|selectattr('muc_do', 'equalto', m)|list|length %}{% if n %}
     <span class="ttt-chip lvl-{{ m }}"><span class="lv-meter lv-n{{ bac[m] }}" aria-hidden="true"><i></i><i></i><i></i><i></i></span>{{ n }} {{ nhan[m] }}</span>
     {% endif %}{% endfor %}
@@ -35,7 +40,7 @@
   <table class="result-table ttt-table">
     <thead>
       <tr>
-        <th scope="col">Cặp thuốc</th>
+        <th scope="col">Cặp hoạt chất</th>
         <th scope="col">Mức độ</th>
         <th scope="col">Hậu quả lâm sàng</th>
         <th scope="col">Xử trí</th>
@@ -45,7 +50,7 @@
       {% for m in thu_tu + ['__khac'] %}
       {% for item in ds if (item.muc_do == m) or (m == '__khac' and item.muc_do not in thu_tu) %}
       <tr class="ttt-row lvl-{{ item.muc_do }}">
-        <td data-nhan="Cặp thuốc" class="ttt-pair"><strong>{{ item.thuoc_a.ten_thuoc }}</strong><span class="ttt-plus" aria-label="kết hợp với">+</span><strong>{{ item.thuoc_b.ten_thuoc }}</strong></td>
+        <td data-nhan="Cặp hoạt chất" class="ttt-pair"><strong>{{ item.hoat_chat_a.ten_hoat_chat }}</strong><span class="ttt-plus" aria-label="kết hợp với">+</span><strong>{{ item.hoat_chat_b.ten_hoat_chat }}</strong></td>
         <td data-nhan="Mức độ"><span class="ttt-badge"><span class="lv-meter lv-n{{ bac.get(item.muc_do, 1) }}" aria-hidden="true"><i></i><i></i><i></i><i></i></span>{{ nhan.get(item.muc_do, item.muc_do) }}</span></td>
         <td data-nhan="Hậu quả lâm sàng" class="rich-content">{{ (item.hau_qua_lam_sang | safe) if item.hau_qua_lam_sang else '—' }}</td>
         <td data-nhan="Xử trí" class="rich-content">{{ (item.xu_tri | safe) if item.xu_tri else '—' }}</td>
@@ -62,7 +67,7 @@
   {% else %}
   <div class="empty-state">
     <div class="empty-state-icon">{{ ic('alert', 22) }}</div>
-    Nhập tên thuốc để xem các tương tác liên quan.
+    Nhập tên hoạt chất hoặc biệt dược để xem các tương tác liên quan.
   </div>
   {% endif %}
 </div>

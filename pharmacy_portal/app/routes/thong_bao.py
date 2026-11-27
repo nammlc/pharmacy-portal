@@ -12,7 +12,7 @@ from app.utils.thoi_gian import gio_vn
 
 bp = Blueprint("tb_api", __name__, url_prefix="/api/thong-bao")
 bp_admin = Blueprint("admin_thong_bao", __name__, url_prefix="/admin/thong-bao", cli_group=None)   # cli_group=None: lệnh flask nằm ở cấp cao nhất
-MOI_TRANG = 30
+MOI_TRANG = 10
 
 
 def _json(d, ma=200):
@@ -66,6 +66,7 @@ def danh_sach():
     if chi_chua_doc:
         q = q.filter_by(da_doc=False)
     tong = q.count()
+    trang = min(trang, max(1, -(-tong // MOI_TRANG)))     # trang vượt quá thì lùi về trang cuối
     muc = q.order_by(ThongBao.ngay_tao.desc(), ThongBao.id.desc()).offset((trang - 1) * MOI_TRANG).limit(MOI_TRANG).all()
     return render_template("admin/thong_bao.html", muc=muc, tong=tong, trang=trang, moi_trang=MOI_TRANG, chi_chua_doc=chi_chua_doc,
                            tra_loi=TB.trang_thai_tra_loi(muc, gio_vn),

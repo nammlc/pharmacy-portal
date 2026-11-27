@@ -27,7 +27,7 @@ from sqlalchemy.orm import Session
 from app import db
 from app.models.models import (
     BaiViet, DanhMucBaiViet, DanhMucThuoc, HoatChat, NguoiDung, NhaThuocBV, NhomThuoc, ThongTinBenhNhan,
-    ThongTinThuoc, Thuoc, ThuocTiemTruyen, ThungRac, TuongHopTuongKy, TuongTacThuoc, YKien,
+    ThongTinThuoc, Thuoc, ThuocTiemTruyen, ThungRac, TuongHopTuongKy, TuongTacHoatChat, YKien,
 )
 from app.utils.slug import tao_slug_duy_nhat
 
@@ -58,6 +58,10 @@ class Loai:
         self.nguoc = nguoc          # [(tên quan hệ, Model con, cột FK ở con)]: nối lại con sau khi khôi phục
 
 
+def _cap_hoat_chat(item):
+    return item.ten_cap
+
+
 def _cap(item):
     return f"{item.thuoc_a.ten_thuoc if item.thuoc_a else '?'} + {item.thuoc_b.ten_thuoc if item.thuoc_b else '?'}"
 
@@ -78,8 +82,9 @@ REGISTRY = {l.khoa: l for l in (
          bat_buoc=[("thuoc_id", Thuoc, "thuốc")]),
     Loai("tuong_hop", TuongHopTuongKy, "Tương hợp - Tương kỵ", _cap,
          bat_buoc=[("thuoc_a_id", Thuoc, "thuốc"), ("thuoc_b_id", Thuoc, "thuốc")]),
-    Loai("tuong_tac", TuongTacThuoc, "Tương tác thuốc", _cap,
-         bat_buoc=[("thuoc_a_id", Thuoc, "thuốc"), ("thuoc_b_id", Thuoc, "thuốc")]),
+    Loai("tuong_tac", TuongTacHoatChat, "Tương tác thuốc", _cap_hoat_chat,
+         bat_buoc=[("hoat_chat_a_id", HoatChat, "hoạt chất"), ("hoat_chat_b_id", HoatChat, "hoạt chất")],
+         duy_nhat=[(("hoat_chat_a_id", "hoat_chat_b_id"), "cặp hoạt chất này")]),
     Loai("thong_tin_thuoc", ThongTinThuoc, "Thông tin thuốc",
          lambda o: o.thuoc.ten_thuoc if o.thuoc else "Thông tin thuốc",
          bat_buoc=[("thuoc_id", Thuoc, "thuốc")], duy_nhat=[("thuoc_id", "thông tin của thuốc này")]),
@@ -260,8 +265,13 @@ def khoi_phuc(ban_ghi):
     ghi_chu = []
 
     for cot, nhan in loai.duy_nhat:
-        v = gia_tri.get(cot)
-        if v is not None and Model.query.filter(getattr(Model, cot) == v).first():
+        if isinstance(cot, tuple):          # ràng buộc duy nhất trên NHIỀU cột (vd cặp hoạt chất A,B)
+            vs = [gia_tri.get(c) for c in cot]
+            trung = None not in vs and Model.query.filter_by(**dict(zip(cot, vs))).first()
+        else:
+            v = gia_tri.get(cot)
+            trung = v is not None and Model.query.filter(getattr(Model, cot) == v).first()
+        if trung:
             return False, (f'Không khôi phục được "{ten}": đã có {nhan} trùng. '
                            f'Hãy đổi tên hoặc xoá bản đang có rồi khôi phục lại.'), "danger"
 

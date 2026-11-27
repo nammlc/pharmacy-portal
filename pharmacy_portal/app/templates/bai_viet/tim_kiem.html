@@ -1,24 +1,15 @@
 {% extends "base.html" %}
 {% from "_icons.html" import ic %}
+{% from "bai_viet/_the.html" import the %}
 {% block title %}Kết quả tìm kiếm - Bài viết{% endblock %}
+{% block head_extra %}<link rel="stylesheet" href="{{ url_for('static', filename='css/taste-bai-viet.css') }}">{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <div class="eyebrow">Tin tức &amp; thông báo</div>
-  <h1>Kết quả cho "{{ tu_khoa }}"</h1>
-  {% if phan_trang.total %}<p>{{ phan_trang.total }} bài viết phù hợp.</p>{% endif %}
-</div>
-
-{% if danh_sach_danh_muc %}
-<div class="bv-filter-bar">
-  <a href="{{ url_for('bv.index') }}" class="bv-filter-chip">Tất cả</a>
-  {% for dm in danh_sach_danh_muc %}
-  <a href="{{ url_for('bv.index', danh_muc=dm.slug) }}"
-     class="bv-filter-chip"
-     style="--chip-color: {{ dm.mau_sac or '#1a4d8f' }};">{{ dm.ten }}</a>
-  {% endfor %}
-</div>
-{% endif %}
+<section class="tk-head"><div class="tk-wrap">
+  <p class="tk-crumb">Tin tức &amp; thông báo</p>
+  <h1 class="tk-h1">Kết quả cho “{{ tu_khoa }}”</h1>
+  <p class="tk-lead">{% if phan_trang.total %}{{ phan_trang.total }} bài viết phù hợp.{% else %}Không có bài viết phù hợp.{% endif %}</p>
+</div></section>
 
 <div class="tk-wrap tk-searchrow">
   <form class="tk-search" role="search" method="get">
@@ -28,37 +19,22 @@
   </form>
 </div>
 
-<div class="tk-wrap tk-results">
+{% if danh_sach_danh_muc %}
+<nav class="tk-wrap bvx-chips" aria-label="Lọc theo chuyên mục">
+  <a href="{{ url_for('bv.index') }}" class="bvx-chip">Tất cả</a>
+  {% for dm in danh_sach_danh_muc %}
+  <a href="{{ url_for('bv.index', danh_muc=dm.slug) }}" class="bvx-chip" style="--cc: {{ dm.mau_sac or '#2c5877' }};">{{ dm.ten }}</a>
+  {% endfor %}
+</nav>
+{% endif %}
+
+<div class="tk-wrap bvx-main">
   {% if phan_trang.items %}
-  <div class="bv-grid">
-    {% for bv in phan_trang.items %}
-    <a class="bv-card" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
-      <div class="bv-card-thumb" {% if bv.anh_dai_dien %}style="background-image:url('{{ bv.anh_dai_dien }}');"{% endif %}>
-        {% if not bv.anh_dai_dien %}<span class="bv-card-thumb-fallback">{{ ic('newspaper', 22) }}</span>{% endif %}
-        {% if bv.ghim %}<span class="bv-card-pin">{{ ic('pin', 16) }} Ghim</span>{% endif %}
-      </div>
-      <div class="bv-card-body">
-        {% if bv.danh_muc %}
-        <span class="bv-card-tag" style="--chip-color: {{ bv.danh_muc.mau_sac or '#1a4d8f' }};">{{ bv.danh_muc.ten }}</span>
-        {% endif %}
-        <h3>{{ bv.tieu_de }}</h3>
-        {% if bv.mo_ta_ngan %}<p>{{ bv.mo_ta_ngan }}</p>{% endif %}
-        <div class="bv-card-meta">
-          <span>{{ (bv.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bv.ngay_xuat_ban else (bv.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}</span>
-          <span>{{ ic('eye', 16) }} {{ bv.luot_xem or 0 }}</span>
-        </div>
-      </div>
-    </a>
-    {% endfor %}
-  </div>
-  {% set endpoint = 'bv.index' %}
-  {% set args = {'q': tu_khoa} %}
+  <div class="bvx-grid">{% for bv in phan_trang.items %}{{ the(bv, ic) }}{% endfor %}</div>
+  {% set endpoint = 'bv.index' %}{% set args = {'q': tu_khoa} %}
   {% include "_phan_trang.html" with context %}
   {% else %}
-  <div class="empty-state">
-    <div class="empty-state-icon">{{ ic('search', 22) }}</div>
-    Không tìm thấy bài viết nào phù hợp với "{{ tu_khoa }}".
-  </div>
+  <div class="empty-state"><div class="empty-state-icon">{{ ic('search', 22) }}</div>Không tìm thấy bài viết nào phù hợp với “{{ tu_khoa }}”.</div>
   {% endif %}
 </div>
 {% endblock %}

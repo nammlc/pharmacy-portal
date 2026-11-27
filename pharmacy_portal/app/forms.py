@@ -157,14 +157,15 @@ class TuongHopTuongKyForm(FlaskForm):
     submit = SubmitField("Lưu")
 
 
-class TuongTacThuocForm(FlaskForm):
-    thuoc_a_id = SelectField("Thuốc A", coerce=int, validators=[DataRequired()])
-    thuoc_b_id = SelectField("Thuốc B", coerce=int, validators=[DataRequired()])
+class TuongTacHoatChatForm(FlaskForm):
+    """Tương tác giữa 2 HOẠT CHẤT. Việc chống trùng cặp (A,B)/(B,A) nằm ở app/utils/tuong_tac_hc.py."""
+    hoat_chat_a_id = SelectField("Hoạt chất thứ nhất", coerce=int, validators=[DataRequired(message="Hãy chọn hoạt chất.")])
+    hoat_chat_b_id = SelectField("Hoạt chất thứ hai", coerce=int, validators=[DataRequired(message="Hãy chọn hoạt chất.")])
     muc_do = SelectField(
         "Mức độ",
         choices=[
             ("nhe", "Nhẹ"), ("trung_binh", "Trung bình"),
-            ("nang", "Nặng"), ("chong_chi_dinh", "Chống chỉ định"),
+            ("nang", "Nghiêm trọng"), ("chong_chi_dinh", "Chống chỉ định"),
         ],
         validators=[DataRequired()],
     )
@@ -218,10 +219,9 @@ class BaiVietForm(FlaskForm):
         "Mức độ ưu tiên hiển thị (trang chủ Bài viết)",
         choices=[
             ("", "Không ưu tiên"),
-            ("1", "Mức 1 — cao nhất (slide đầu tiên)"),
-            ("2", "Mức 2"),
-            ("3", "Mức 3"),
-            ("4", "Mức 4"),
+            ("1", "Mức 1 — slide thứ nhất (cao nhất)"),
+            ("2", "Mức 2 — slide thứ hai"),
+            ("3", "Mức 3 — slide thứ ba"),
         ],
         validators=[Optional()],
     )

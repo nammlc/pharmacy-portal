@@ -59,6 +59,9 @@ def xoa(hc_id):
     if hc.danh_muc_thuoc_co_hoat_chat.first() or hc.nha_thuoc_bv_co_hoat_chat.first():
         flash(f'Không thể xoá "{hc.ten_hoat_chat}" vì vẫn còn thuốc gắn với hoạt chất này.', "danger")
         return redirect(url_for("admin_hoat_chat.danh_sach"))
+    if _con_tuong_tac(hc):
+        flash(f'Không thể xoá "{hc.ten_hoat_chat}" vì đang có tương tác thuốc dùng hoạt chất này. Hãy xoá các tương tác đó trước.', "danger")
+        return redirect(url_for("admin_hoat_chat.danh_sach"))
     ten = hc.ten_hoat_chat
     db.session.delete(hc)
     db.session.commit()
@@ -66,9 +69,18 @@ def xoa(hc_id):
     return redirect(url_for("admin_hoat_chat.danh_sach"))
 
 
+def _con_tuong_tac(hc):
+    from sqlalchemy import or_
+    from app.models.models import TuongTacHoatChat
+    return TuongTacHoatChat.query.filter(
+        or_(TuongTacHoatChat.hoat_chat_a_id == hc.id, TuongTacHoatChat.hoat_chat_b_id == hc.id)).first() is not None
+
+
 def _kiem_tra_hc_con_thuoc(hc):
     if hc.danh_muc_thuoc_co_hoat_chat.first() or hc.nha_thuoc_bv_co_hoat_chat.first():
         return "còn thuốc gắn với hoạt chất này"
+    if _con_tuong_tac(hc):
+        return "đang có tương tác thuốc dùng hoạt chất này"
     return None
 
 

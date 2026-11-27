@@ -1,0 +1,61 @@
+{% extends "admin/base.html" %}
+{% from "_icons.html" import ic %}
+{% block title %}Upload file — Tương tác thuốc{% endblock %}
+{% block admin_content %}
+<div class="admin-page-head">
+  <div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">
+      <a href="{{ url_for('admin_nhap_hang_loat.trang_chinh') }}">Nhập hàng loạt</a> › Tương tác thuốc
+    </div>
+    <h1>Nhập hàng loạt — Tương tác thuốc</h1>
+  </div>
+</div>
+
+<div class="admin-form-card" style="max-width:720px; margin-bottom:20px;">
+  <div style="font-size:13px; font-weight:700; margin-bottom:10px;">{{ ic('file', 16) }} Cột trong file Excel</div>
+  <table style="width:100%;font-size:13px;border-collapse:collapse;">
+    <tr style="background:var(--paper-0);">
+      <th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--line-200);">Tên cột</th>
+      <th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--line-200);">Mô tả</th>
+      <th style="padding:8px 12px;border-bottom:1px solid var(--line-200);">Bắt buộc?</th>
+    </tr>
+    {% for col, desc, req in [
+      ('Hoạt chất 1', 'Hoạt chất thứ nhất của cặp', '✓'),
+      ('Hoạt chất 2', 'Hoạt chất thứ hai (thứ tự A/B không quan trọng)', '✓'),
+      ('Mức độ', 'Chống chỉ định · Nghiêm trọng · Vừa phải · Nhẹ', '✓'),
+      ('Cơ chế', 'Cơ chế tương tác', ''),
+      ('Hậu quả', 'Hậu quả lâm sàng', ''),
+      ('Xử trí', 'Hướng xử trí (xuống dòng trong ô sẽ thành từng đoạn)', ''),
+      ('STT', 'Bỏ qua, không dùng', ''),
+    ] %}
+    <tr>
+      <td style="padding:8px 12px;border-bottom:1px solid var(--line-100);font-family:var(--font-mono);font-size:12px;">{{ col }}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid var(--line-100);color:var(--text-muted);">{{ desc }}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid var(--line-100);text-align:center;">{{ req }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p style="font-size:13px;color:var(--text-muted);margin:12px 0 0;line-height:1.6;">
+    Cặp bị <strong>trùng</strong> (trong file hoặc đã có trong hệ thống) được phát hiện ở bước xem trước, bạn quyết định cách xử lý
+    trước khi lưu. Hoạt chất chưa có sẽ được liệt kê để bạn ghép vào tên có sẵn hoặc tạo mới.
+  </p>
+  <div style="margin-top:12px;">
+    <a href="{{ url_for('admin_nhap_hang_loat.tai_mau_tuong_tac') }}" style="font-size:13px;color:var(--navy-600);font-weight:600;">⬇ Tải file mẫu Excel</a>
+  </div>
+</div>
+
+<div class="admin-form-card" style="max-width:480px;">
+  <form method="POST" enctype="multipart/form-data" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-row">
+      {{ form.file_du_lieu.label }}
+      {{ form.file_du_lieu(accept=".xlsx,.csv") }}
+      {% for e in form.file_du_lieu.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="form-actions">
+      {{ form.submit(class="btn btn-primary") }}
+      <a href="{{ url_for('admin_nhap_hang_loat.trang_chinh') }}" class="btn btn-outline">Quay lại</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

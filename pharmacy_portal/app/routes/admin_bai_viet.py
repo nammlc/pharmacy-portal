@@ -96,7 +96,7 @@ def sua(item_id):
     _nap_lua_chon(form)
     if request.method == "GET":
         form.danh_muc_id.data = bai_viet.danh_muc_id or 0
-        form.do_uu_tien.data = str(bai_viet.do_uu_tien) if bai_viet.do_uu_tien else ""
+        form.do_uu_tien.data = str(bai_viet.do_uu_tien) if bai_viet.do_uu_tien in (1, 2, 3) else ""   # mức 4 cũ không còn slide
     if form.validate_on_submit():
         trang_thai_cu = bai_viet.trang_thai
         form.populate_obj(bai_viet)

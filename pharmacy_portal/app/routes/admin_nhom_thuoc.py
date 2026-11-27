@@ -13,12 +13,16 @@ bp = Blueprint("admin_nhom_thuoc", __name__, url_prefix="/admin/nhom-thuoc")
 @login_required
 def danh_sach():
     trang = request.args.get("trang", 1, type=int)
-    phan_trang = (NhomThuoc.query
+    tu_khoa = request.args.get("q", "").strip()[:80]
+    query = NhomThuoc.query
+    if tu_khoa:
+        query = query.filter(NhomThuoc.ten_nhom.ilike(f"%{tu_khoa}%"))
+    phan_trang = (query
                   .order_by(NhomThuoc.loai, NhomThuoc.thu_tu, NhomThuoc.ten_nhom)
                   .paginate(page=trang, per_page=10, error_out=False))
     return render_template("admin/nhom_thuoc/danh_sach.html",
                            danh_sach_nhom=phan_trang.items,
-                           phan_trang=phan_trang)
+                           phan_trang=phan_trang, tu_khoa=tu_khoa)
 
 
 @bp.route("/them", methods=["GET", "POST"])

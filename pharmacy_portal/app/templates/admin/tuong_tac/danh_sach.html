@@ -1,28 +1,44 @@
 {% extends "admin/base.html" %}
-{% from "admin/_phan_trang.html" import render as pt %}
+{% from "admin/_phan_trang.html" import so_trang %}
 {% block title %}Tương tác thuốc{% endblock %}
 {% block admin_content %}
 <div class="admin-page-head">
   <div>
     <h1>Tương tác thuốc</h1>
-    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">{{ phan_trang.total }} cặp</p>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">{{ phan_trang.total }} cặp hoạt chất{% if tu_khoa %} khớp "{{ tu_khoa }}"{% endif %}</p>
   </div>
-  <a href="{{ url_for('admin_ttt.them') }}" class="btn btn-primary">+ Thêm</a>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <a href="{{ url_for('admin_nhap_hang_loat.upload_tuong_tac') }}" class="btn btn-outline">Nhập từ Excel</a>
+    <a href="{{ url_for('admin_ttt.them') }}" class="btn btn-primary">+ Thêm</a>
+  </div>
 </div>
+
+<form method="get" class="adm-search-row">
+  <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm theo tên hoạt chất">
+  <select name="muc" class="adm-select" aria-label="Lọc theo mức độ">
+    <option value="">Tất cả mức độ</option>
+    {% for k, v in nhan_muc.items() %}<option value="{{ k }}" {{ 'selected' if muc == k }}>{{ v }}</option>{% endfor %}
+  </select>
+  <button type="submit" class="btn btn-outline btn-sm">Tìm</button>
+  {% if tu_khoa or muc %}<a href="{{ url_for('admin_ttt.danh_sach') }}" class="btn btn-outline btn-sm">Xoá lọc</a>{% endif %}
+</form>
+
+{% set mau_url = url_for('admin_ttt.danh_sach', q=tu_khoa or None, muc=muc or None, trang='__P__') %}
 {% if items %}
+{{ so_trang(phan_trang.page, phan_trang.total, moi_trang, mau_url, 'cặp', True) }}
 <div class="adm-table-wrap">
   <table class="adm-table">
     <thead>
-      <tr><th style="width:40px;">#</th><th>Thuốc A</th><th>Thuốc B</th><th>Mức độ</th><th></th></tr>
+      <tr><th style="width:40px;">#</th><th>Hoạt chất thứ nhất</th><th>Hoạt chất thứ hai</th><th>Mức độ</th><th></th></tr>
     </thead>
     <tbody>
       {% set muc_map = {'nhe':'badge-nhe','trung_binh':'badge-trungbinh','nang':'badge-nang','chong_chi_dinh':'badge-chong_chi_dinh'} %}
       {% for item in items %}
       <tr>
         <td style="color:var(--text-muted);font-size:12px;">{{ phan_trang.per_page*(phan_trang.page-1)+loop.index }}</td>
-        <td class="col-title"><strong class="col-title-text" title="{{ item.thuoc_a.ten_thuoc }}">{{ item.thuoc_a.ten_thuoc }}</strong></td>
-        <td class="col-title"><strong class="col-title-text" title="{{ item.thuoc_b.ten_thuoc }}">{{ item.thuoc_b.ten_thuoc }}</strong></td>
-        <td><span class="badge-level {{ muc_map.get(item.muc_do, '') }}">{{ {'nhe':'Nhẹ','trung_binh':'Trung bình','nang':'Nặng','chong_chi_dinh':'Chống chỉ định'}.get(item.muc_do, item.muc_do) }}</span></td>
+        <td class="col-title"><strong class="col-title-text" title="{{ item.hoat_chat_a.ten_hoat_chat }}">{{ item.hoat_chat_a.ten_hoat_chat }}</strong></td>
+        <td class="col-title"><strong class="col-title-text" title="{{ item.hoat_chat_b.ten_hoat_chat }}">{{ item.hoat_chat_b.ten_hoat_chat }}</strong></td>
+        <td><span class="badge-level {{ muc_map.get(item.muc_do, '') }}">{{ nhan_muc.get(item.muc_do, item.muc_do) }}</span></td>
         <td class="td-actions">
           <div class="row-act">
             <a href="{{ url_for('admin_ttt.sua', item_id=item.id) }}">Sửa</a>
@@ -37,8 +53,10 @@
     </tbody>
   </table>
 </div>
-{{ pt(phan_trang, 'admin_ttt.danh_sach') }}
+{{ so_trang(phan_trang.page, phan_trang.total, moi_trang, mau_url, 'cặp', True) }}
 {% else %}
-<div class="admin-empty">Chưa có dữ liệu tương tác thuốc.</div>
+<div class="admin-empty">
+  {% if tu_khoa or muc %}Không có cặp nào khớp bộ lọc.{% else %}Chưa có dữ liệu tương tác thuốc. Bạn có thể <a href="{{ url_for('admin_nhap_hang_loat.upload_tuong_tac') }}">nhập từ Excel</a> hoặc thêm từng cặp.{% endif %}
+</div>
 {% endif %}
 {% endblock %}

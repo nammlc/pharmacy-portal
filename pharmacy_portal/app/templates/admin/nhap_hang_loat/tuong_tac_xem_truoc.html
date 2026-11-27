@@ -1,0 +1,255 @@
+{% extends "admin/base.html" %}
+{% block title %}Xem trước — Tương tác thuốc{% endblock %}
+{% block admin_content %}
+{% set sl = kh.so_lieu %}
+{% set nhan_tt = {'trung_giong': 'Trùng y hệt — gộp', 'loai_xung_dot': 'Xung đột — không dùng', 'thieu_muc_do': 'Thiếu mức độ — bỏ qua', 'loi': 'Lỗi', 'bo_qua_ten': 'Bỏ theo lựa chọn'} %}
+
+<div class="admin-page-head">
+  <div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">
+      <a href="{{ url_for('admin_nhap_hang_loat.trang_chinh') }}">Nhập hàng loạt</a> ›
+      <a href="{{ url_for('admin_nhap_hang_loat.upload_tuong_tac') }}">Tương tác thuốc</a> › Xem trước
+    </div>
+    <h1>Xem trước — Tương tác thuốc</h1>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">{{ sl.tong_dong }} dòng trong file. Chưa có gì được lưu cho tới khi bạn bấm «Xác nhận nhập».</p>
+  </div>
+</div>
+
+<form method="post" id="tt-xt" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="ttx-sum">
+    <div class="ttx-c ttx-ok"><strong>{{ sl.tao }}</strong><span>cặp sẽ thêm mới</span></div>
+    {% if sl.cap_nhat %}<div class="ttx-c ttx-ok"><strong>{{ sl.cap_nhat }}</strong><span>cặp sẽ ghi đè</span></div>{% endif %}
+    <div class="ttx-c ttx-ok"><strong>{{ sl.hoat_chat_moi }}</strong><span>hoạt chất sẽ tạo mới</span></div>
+    <div class="ttx-c"><strong>{{ sl.da_co_bo_qua }}</strong><span>cặp đã có — bỏ qua</span></div>
+    <div class="ttx-c"><strong>{{ sl.trung_giong }}</strong><span>dòng trùng y hệt — gộp</span></div>
+    <div class="ttx-c {{ 'ttx-warn' if sl.nhom_xung_dot }}"><strong>{{ sl.nhom_xung_dot }}</strong><span>nhóm xung đột cần chọn</span></div>
+    <div class="ttx-c {{ 'ttx-warn' if sl.thieu_muc_do }}"><strong>{{ sl.thieu_muc_do }}</strong><span>dòng thiếu mức độ (mặc định bỏ qua)</span></div>
+    <div class="ttx-c {{ 'ttx-bad' if sl.loi }}"><strong>{{ sl.loi }}</strong><span>dòng lỗi</span></div>
+  </div>
+
+  {# ── 1. Cặp đã có trong hệ thống ── #}
+  {% if sl.da_co_bo_qua or sl.cap_nhat %}
+  <section class="ttx-sec">
+    <h2>Cặp đã có trong hệ thống</h2>
+    <p class="ttx-note">Một số cặp trong file đã tồn tại (không phân biệt thứ tự hoạt chất). Bạn muốn xử lý thế nào?</p>
+    <label class="ttx-radio"><input type="radio" name="che_do_trung" value="bo_qua" {{ 'checked' if che_do != 'ghi_de' }}> <span><strong>Bỏ qua</strong> — giữ nguyên dữ liệu đang có</span></label>
+    <label class="ttx-radio"><input type="radio" name="che_do_trung" value="ghi_de" {{ 'checked' if che_do == 'ghi_de' }}> <span><strong>Ghi đè</strong> bằng nội dung trong file (ô trống trong file không xoá chữ cũ)</span></label>
+  </section>
+  {% else %}
+  <input type="hidden" name="che_do_trung" value="{{ che_do }}">
+  {% endif %}
+
+  {# ── 2. Xung đột trong file ── #}
+  {% if kh.nhom_xung_dot %}
+  <section class="ttx-sec">
+    <h2>Cùng một cặp nhưng nội dung khác nhau ({{ kh.nhom_xung_dot|length }})</h2>
+    <p class="ttx-note">Chọn dòng sẽ được dùng; các dòng còn lại trong nhóm bị bỏ. Mặc định là dòng đứng trước.</p>
+    {% for g in kh.nhom_xung_dot %}
+    {% set gi = loop.index0 %}
+    <div class="ttx-nhom">
+      <input type="hidden" name="xd_ma" value="{{ g.ma }}">
+      <div class="ttx-nhom-ten">{{ g.cap[0] }} + {{ g.cap[1] }}</div>
+      {% for so in g.cac_dong %}
+      {% set d = dong_theo_so[so] %}
+      <label class="ttx-ung">
+        <input type="radio" name="xd_{{ gi }}" value="{{ so }}" {{ 'checked' if so == g.dang_dung }}>
+        <span><strong>Dòng {{ so }}</strong> · {{ nhan_muc.get(d.muc_do, d.muc_do_goc or '—') }}
+          <em>{{ (d.xu_tri or d.hau_qua or d.co_che or '(không có nội dung)')|truncate(170) }}</em></span>
+      </label>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  {# ── 3. Dòng thiếu mức độ ── #}
+  {% set thieu = kh.ket_qua|selectattr('trang_thai', 'equalto', 'thieu_muc_do')|list %}
+  {% if thieu %}
+  <section class="ttx-sec">
+    <h2>Dòng thiếu mức độ ({{ thieu|length }})</h2>
+    <p class="ttx-note">Hệ thống không tự đoán mức độ. Chọn mức độ để nhập dòng đó, hoặc để «Bỏ qua».</p>
+    <div class="adm-table-wrap"><table class="adm-table">
+      <thead><tr><th style="width:70px;">Dòng</th><th>Cặp hoạt chất</th><th>Nội dung</th><th style="width:210px;">Mức độ</th></tr></thead>
+      <tbody>
+      {% for r in thieu %}
+      <tr>
+        <td>{{ r.dong.so_dong }}</td>
+        <td><strong>{{ r.dong.ten_a }}</strong> + <strong>{{ r.dong.ten_b }}</strong><div class="ttx-sub">{{ r.ly_do }}</div></td>
+        <td class="ttx-sub">{{ (r.dong.xu_tri or r.dong.hau_qua or r.dong.co_che or '(không có nội dung)')|truncate(120) }}</td>
+        <td>
+          <select name="md_{{ r.dong.so_dong }}" class="adm-select" style="width:100%;">
+            <option value="bo">— Bỏ qua dòng này —</option>
+            {% for k, v in nhan_muc.items() %}<option value="{{ k }}" {{ 'selected' if md_chon.get(r.dong.so_dong) == k }}>{{ v }}</option>{% endfor %}
+          </select>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+  </section>
+  {% endif %}
+
+  {# ── 4. Tên hoạt chất chưa có trong hệ thống ── #}
+  {% if ten_moi %}
+  {% set can_xem = ten_moi|selectattr('la')|list|length %}
+  <section class="ttx-sec">
+    <h2>Hoạt chất chưa có trong hệ thống ({{ ten_moi|length }})</h2>
+    <p class="ttx-note">
+      {% if so_hien_co %}Hệ thống đang có {{ so_hien_co }} hoạt chất. {% endif %}
+      Mặc định các tên dưới đây sẽ được <strong>tạo mới</strong>. Nếu một tên thực chất là hoạt chất đã có (viết khác, sai chính tả, lỗi ngắt dòng),
+      chọn «Ghép vào…» để không sinh ra bản trùng. Chỉ những tên thực sự dùng trong các cặp được nhập mới được tạo. Những tên có dấu hiệu lạ (thuốc phối hợp, ngoặc, gần giống tên khác) được xếp lên đầu.
+    </p>
+    <button type="button" class="btn btn-outline btn-sm" id="tt-bt-nut" style="margin-bottom:10px;"></button>
+    <div class="adm-table-wrap"><table class="adm-table ttx-ten-bang" id="tt-ten-bang" data-an="1">
+      <thead><tr><th>Tên trong file</th><th style="width:46%;">Cách xử lý</th></tr></thead>
+      <tbody>
+      {% for t in ten_moi %}
+      {% set i = loop.index0 %}
+      {% set q = qd.get(t.khoa, {}) %}
+      {% set lat = t.la or goi_y[t.khoa] %}
+      <tr class="{{ 'ttx-bt' if not lat else 'ttx-xem' }}">
+        <td>
+          <input type="hidden" name="ten_khoa" value="{{ t.khoa }}">
+          <strong>{{ t.ten }}</strong>
+          <div class="ttx-sub">{{ t.so_dong }} lần trong file{% if t.cac_dang|length > 1 %} · gộp từ: {{ t.cac_dang.keys()|join(' | ') }}{% endif %}</div>
+          {% for l in t.la %}<span class="ttx-tag">{{ l }}</span>{% endfor %}
+        </td>
+        <td>
+          <select name="hd_{{ i }}" class="adm-select tt-hd" data-i="{{ i }}">
+            <option value="tao" {{ 'selected' if q.get('hanh_dong', 'tao') == 'tao' }}>Tạo hoạt chất mới</option>
+            <option value="ghep" {{ 'selected' if q.get('hanh_dong') == 'ghep' }}>Ghép vào hoạt chất khác…</option>
+            <option value="bo" {{ 'selected' if q.get('hanh_dong') == 'bo' }}>Bỏ các dòng có tên này</option>
+          </select>
+          <input type="text" name="dich_{{ i }}" list="tt-ds" class="tt-dich" data-i="{{ i }}" value="{{ q.get('dich', '') }}" placeholder="Gõ tên hoạt chất để ghép vào" autocomplete="off">
+          {% if goi_y[t.khoa] %}
+          <div class="ttx-goiy">Gần giống:
+            {% for g in goi_y[t.khoa] %}<button type="button" class="ttx-chip" data-i="{{ i }}" data-v="{{ g }}">{{ g }}</button>{% endfor %}
+          </div>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+    <datalist id="tt-ds">{% for n in ds_ten_co_san %}<option value="{{ n }}">{% endfor %}</datalist>
+  </section>
+  {% endif %}
+
+  {# ── 5. Toàn bộ các dòng ── #}
+  <section class="ttx-sec">
+    <h2>Chi tiết từng dòng</h2>
+    <div class="ttx-loc" id="tt-loc">
+      <button type="button" class="ttx-chip on" data-nhom="">Tất cả</button>
+      <button type="button" class="ttx-chip" data-nhom="nhap">Sẽ nhập</button>
+      <button type="button" class="ttx-chip" data-nhom="bo">Đã có — bỏ qua</button>
+      <button type="button" class="ttx-chip" data-nhom="trung">Trùng / xung đột</button>
+      <button type="button" class="ttx-chip" data-nhom="can">Cần xem (thiếu mức độ, lỗi)</button>
+    </div>
+    <div class="adm-table-wrap"><table class="adm-table" id="tt-dong">
+      <thead><tr><th style="width:64px;">Dòng</th><th>Hoạt chất 1</th><th>Hoạt chất 2</th><th style="width:130px;">Mức độ</th><th style="width:34%;">Kết quả</th></tr></thead>
+      <tbody>
+      {% for r in kh.ket_qua %}
+      {% set ok = r.trang_thai == 'ok' %}
+      {% set nhom = ('nhap' if r.hanh_dong != 'bo' else 'bo') if ok else ('trung' if r.trang_thai in ['trung_giong', 'loai_xung_dot'] else 'can') %}
+      <tr data-nhom="{{ nhom }}">
+        <td>{{ r.dong.so_dong }}</td>
+        <td>{{ r.dong.ten_a }}</td>
+        <td>{{ r.dong.ten_b }}</td>
+        <td>{{ nhan_muc.get(r.muc_do_cuoi) or r.dong.muc_do_goc or '—' }}</td>
+        <td>
+          {% if ok and r.hanh_dong == 'tao' %}<span class="ttx-bd ttx-bd-ok">Mới</span>
+          {% elif ok and r.hanh_dong == 'cap_nhat' %}<span class="ttx-bd ttx-bd-ok">Ghi đè</span>
+          {% elif ok %}<span class="ttx-bd">Đã có — bỏ qua</span>
+          {% else %}<span class="ttx-bd {{ 'ttx-bd-bad' if r.trang_thai == 'loi' else ('ttx-bd-warn' if r.trang_thai == 'thieu_muc_do' else '') }}">{{ nhan_tt.get(r.trang_thai, r.trang_thai) }}</span>{% endif %}
+          {% if r.xung_dot %}<span class="ttx-bd ttx-bd-warn">Xung đột — đang dùng dòng này</span>{% endif %}
+          {% if r.ly_do and not ok %}<div class="ttx-sub">{{ r.ly_do }}</div>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+  </section>
+
+  <div class="ttx-bar">
+    <span id="tt-cu" class="ttx-sub" hidden>Bạn vừa đổi lựa chọn — bấm «Cập nhật xem trước» để xem kết quả mới trước khi nhập.</span>
+    <a href="{{ url_for('admin_nhap_hang_loat.upload_tuong_tac') }}" class="btn btn-outline">Tải file khác</a>
+    <button type="submit" class="btn btn-outline" formaction="{{ url_for('admin_nhap_hang_loat.xem_truoc_tuong_tac') }}">Cập nhật xem trước</button>
+    <button type="submit" class="btn btn-primary" id="tt-ok" formaction="{{ url_for('admin_nhap_hang_loat.xac_nhan_tuong_tac') }}" {{ 'disabled' if (sl.tao + sl.cap_nhat) == 0 }}>
+      Xác nhận nhập {{ sl.tao + sl.cap_nhat }} cặp
+    </button>
+  </div>
+</form>
+
+<style>
+.ttx-sum { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-bottom:22px; }
+.ttx-c { background:#fff; border:1px solid var(--line-200); border-radius:14px; padding:14px 16px; display:flex; flex-direction:column; gap:2px; }
+.ttx-c strong { font-size:24px; font-family:var(--font-display); }
+.ttx-c span { font-size:12.5px; color:var(--text-muted); }
+.ttx-ok { background:#e6f2e8; border-color:#b9dcbf; } .ttx-ok strong { color:#245a31; }
+.ttx-warn { background:#fbf0d9; border-color:#e9c98a; } .ttx-bad { background:#fbe9e5; border-color:#e8b4a8; }
+.ttx-sec { margin:0 0 26px; } .ttx-sec h2 { font-size:17px; margin:0 0 6px; }
+.ttx-note { font-size:13.5px; color:var(--text-muted); max-width:760px; line-height:1.6; margin:0 0 12px; }
+.ttx-sub { font-size:12.5px; color:var(--text-muted); margin-top:3px; }
+.ttx-radio, .ttx-ung { display:flex; gap:10px; align-items:flex-start; padding:8px 0; font-size:14px; cursor:pointer; }
+.ttx-nhom { background:#fff; border:1px solid var(--line-200); border-radius:12px; padding:12px 16px; margin-bottom:10px; max-width:820px; }
+.ttx-nhom-ten { font-weight:700; margin-bottom:4px; }
+.ttx-ung em { display:block; font-style:normal; font-size:12.5px; color:var(--text-muted); margin-top:2px; }
+.ttx-tag { display:inline-block; margin:4px 6px 0 0; padding:2px 8px; border-radius:999px; background:#fbf0d9; color:#6b4a0f; font-size:11.5px; }
+.ttx-ten-bang[data-an="1"] .ttx-bt { display:none; }
+.ttx-ten-bang .adm-select { width:auto; min-width:210px; } .tt-dich { width:100%; margin-top:8px; }
+.tt-dich[hidden] { display:none; }
+.ttx-goiy { margin-top:8px; font-size:12.5px; color:var(--text-muted); }
+.ttx-chip { border:1px solid var(--line-200); background:#fff; border-radius:999px; padding:4px 12px; font-size:12.5px; cursor:pointer; margin:2px 4px 2px 0; }
+.ttx-chip.on, .ttx-chip:hover { background:#17615c; color:#fff; border-color:#17615c; }
+.ttx-loc { margin-bottom:10px; }
+.ttx-bd { display:inline-block; padding:2px 10px; border-radius:999px; background:var(--paper-100,#ece8df); font-size:12px; margin-right:4px; }
+.ttx-bd-ok { background:#e6f2e8; color:#245a31; } .ttx-bd-warn { background:#fbf0d9; color:#6b4a0f; } .ttx-bd-bad { background:#fbe9e5; color:#7d2a1b; }
+.ttx-bar { position:sticky; bottom:0; display:flex; gap:10px; justify-content:flex-end; align-items:center; flex-wrap:wrap;
+  padding:14px 0; background:linear-gradient(to top, var(--paper-0,#f3f1ec) 70%, transparent); }
+.ttx-bar .ttx-sub { margin:0 auto 0 0; color:#6b4a0f; }
+</style>
+<script>
+(function () {
+  var f = document.getElementById('tt-xt'), ok = document.getElementById('tt-ok'), cu = document.getElementById('tt-cu');
+
+  // Hiện / ẩn các tên "bình thường" (mặc định chỉ hiện tên có dấu hiệu lạ)
+  var bang = document.getElementById('tt-ten-bang'), nut = document.getElementById('tt-bt-nut');
+  if (bang && nut) {
+    var nBt = bang.querySelectorAll('.ttx-bt').length;
+    function veNut() { var an = bang.dataset.an === '1'; nut.textContent = an ? 'Hiện thêm ' + nBt + ' tên bình thường' : 'Ẩn các tên bình thường'; }
+    if (!nBt) { nut.hidden = true; } else { veNut(); nut.addEventListener('click', function () { bang.dataset.an = bang.dataset.an === '1' ? '0' : '1'; veNut(); }); }
+  }
+
+  // Ô "ghép vào" chỉ hiện khi chọn Ghép
+  function veDich(sel) {
+    var i = sel.dataset.i, inp = f.querySelector('.tt-dich[data-i="' + i + '"]');
+    if (inp) inp.hidden = sel.value !== 'ghep';
+  }
+  f.querySelectorAll('.tt-hd').forEach(function (s) { veDich(s); s.addEventListener('change', function () { veDich(s); }); });
+  f.querySelectorAll('.ttx-goiy .ttx-chip').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var i = b.dataset.i, s = f.querySelector('.tt-hd[data-i="' + i + '"]'), inp = f.querySelector('.tt-dich[data-i="' + i + '"]');
+      s.value = 'ghep'; inp.value = b.dataset.v; veDich(s); danhDauCu();
+    });
+  });
+
+  // Đổi lựa chọn -> bắt buộc "Cập nhật xem trước" trước khi nhập (vì ghép tên có thể làm đổi kết quả trùng)
+  function danhDauCu() { if (ok) ok.disabled = true; if (cu) cu.hidden = false; }
+  f.addEventListener('change', function (e) { if (!e.target.closest('#tt-loc')) danhDauCu(); });
+  f.addEventListener('input', function (e) { if (e.target.classList.contains('tt-dich')) danhDauCu(); });
+
+  // Lọc bảng chi tiết theo nhóm
+  var loc = document.getElementById('tt-loc'), dong = document.querySelectorAll('#tt-dong tbody tr');
+  loc.querySelectorAll('.ttx-chip').forEach(function (b) {
+    var n = b.dataset.nhom ? document.querySelectorAll('#tt-dong tbody tr[data-nhom="' + b.dataset.nhom + '"]').length : dong.length;
+    b.textContent += ' (' + n + ')';
+    b.addEventListener('click', function () {
+      loc.querySelectorAll('.ttx-chip').forEach(function (x) { x.classList.toggle('on', x === b); });
+      dong.forEach(function (tr) { tr.hidden = !!b.dataset.nhom && tr.dataset.nhom !== b.dataset.nhom; });
+    });
+  });
+})();
+</script>
+{% endblock %}

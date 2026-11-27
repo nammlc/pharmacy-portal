@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+{% block title %}Kết quả nhập — Tương tác thuốc{% endblock %}
+{% block admin_content %}
+<div class="admin-page-head">
+  <div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">
+      <a href="{{ url_for('admin_nhap_hang_loat.trang_chinh') }}">Nhập hàng loạt</a> › Tương tác thuốc › Kết quả
+    </div>
+    <h1>Đã nhập xong</h1>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">Trong tổng số {{ kq.tong_dong }} dòng của file.</p>
+  </div>
+  <a href="{{ url_for('admin_ttt.danh_sach') }}" class="btn btn-primary">Xem danh sách tương tác</a>
+</div>
+
+<div class="ttk-grid">
+  <div class="ttk-card ttk-ok"><strong>{{ kq.tao }}</strong><span>cặp thêm mới</span></div>
+  {% if kq.cap_nhat %}<div class="ttk-card ttk-ok"><strong>{{ kq.cap_nhat }}</strong><span>cặp được ghi đè</span></div>{% endif %}
+  <div class="ttk-card ttk-ok"><strong>{{ kq.hoat_chat_moi }}</strong><span>hoạt chất mới tạo</span></div>
+  <div class="ttk-card"><strong>{{ kq.bo_qua }}</strong><span>cặp đã có — bỏ qua</span></div>
+  <div class="ttk-card"><strong>{{ kq.trung_giong }}</strong><span>dòng trùng y hệt — đã gộp</span></div>
+  <div class="ttk-card"><strong>{{ kq.loai_xung_dot }}</strong><span>dòng xung đột — không dùng</span></div>
+  <div class="ttk-card {{ 'ttk-warn' if kq.thieu_muc_do }}"><strong>{{ kq.thieu_muc_do }}</strong><span>dòng thiếu mức độ — bỏ qua</span></div>
+  <div class="ttk-card {{ 'ttk-bad' if kq.loi }}"><strong>{{ kq.loi }}</strong><span>dòng lỗi</span></div>
+  {% if kq.trung_luc_nhap %}<div class="ttk-card ttk-warn"><strong>{{ kq.trung_luc_nhap }}</strong><span>cặp vừa được người khác thêm trong lúc nhập — bỏ qua</span></div>{% endif %}
+</div>
+
+{% if co_bao_cao %}
+<p style="margin-top:22px;font-size:14px;">
+  Có {{ kq.khong_nhap }} dòng không được nhập.
+  <a href="{{ url_for('admin_nhap_hang_loat.tai_bao_cao_tuong_tac') }}" style="font-weight:600;">⬇ Tải danh sách kèm lý do (CSV)</a>
+  — sửa trong file rồi nhập lại phần còn thiếu.
+</p>
+{% endif %}
+<style>
+.ttk-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; max-width:860px; }
+.ttk-card { background:#fff; border:1px solid var(--line-200); border-radius:14px; padding:16px 18px; display:flex; flex-direction:column; gap:4px; }
+.ttk-card strong { font-size:26px; font-family:var(--font-display); }
+.ttk-card span { font-size:13px; color:var(--text-muted); }
+.ttk-ok { background:#e6f2e8; border-color:#b9dcbf; } .ttk-ok strong { color:#245a31; }
+.ttk-warn { background:#fbf0d9; border-color:#e9c98a; } .ttk-bad { background:#fbe9e5; border-color:#e8b4a8; }
+</style>
+{% endblock %}

@@ -1,0 +1,37 @@
+{# Thành phần dùng chung cho trang Bài viết: ngày, thẻ bài (dọc), hàng bài (ngang). Ảnh dùng <img> thật (alt rỗng vì tiêu đề đã đủ nghĩa). #}
+{% macro ngay(bv) %}{{ ((bv.ngay_xuat_ban or bv.ngay_tao) | gio_vn).strftime('%d/%m/%Y') }}{% endmacro %}
+
+{% macro nhan_dm(bv) %}
+  {% if bv.danh_muc %}<span class="bvx-cat" style="--cc: {{ bv.danh_muc.mau_sac or '#2c5877' }};">{{ bv.danh_muc.ten }}</span>{% endif %}
+{% endmacro %}
+
+{% macro anh(bv, icon_fn, uu_tien=False) %}
+  {% if bv.anh_dai_dien %}<img src="{{ bv.anh_dai_dien }}" alt="" {% if uu_tien %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async">
+  {% else %}<span class="bvx-pic__none" aria-hidden="true">{{ icon_fn('newspaper', 28) }}</span>{% endif %}
+{% endmacro %}
+
+{# Thẻ dọc: ảnh 16:10, nhãn danh mục, tiêu đề, tóm tắt, ngày #}
+{% macro the(bv, ic) %}
+<a class="bvx-card" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
+  <div class="bvx-pic">{{ anh(bv, ic) }}{% if bv.ghim %}<span class="bvx-pin">{{ ic('pin', 14) }} Ghim</span>{% endif %}</div>
+  <div class="bvx-card__body">
+    {{ nhan_dm(bv) }}
+    <h3 class="bvx-card__title">{{ bv.tieu_de }}</h3>
+    {% if bv.mo_ta_ngan %}<p class="bvx-card__sum">{{ bv.mo_ta_ngan }}</p>{% endif %}
+    <p class="bvx-meta">{{ ngay(bv) }}{% if bv.luot_xem %} · {{ bv.luot_xem }} lượt xem{% endif %}</p>
+  </div>
+</a>
+{% endmacro %}
+
+{# Hàng ngang: chữ trái, ảnh nhỏ phải (danh sách "Mới đăng") #}
+{% macro hang(bv, ic) %}
+<a class="bvx-row" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
+  <div class="bvx-row__text">
+    {{ nhan_dm(bv) }}
+    <h3 class="bvx-row__title">{{ bv.tieu_de }}</h3>
+    {% if bv.mo_ta_ngan %}<p class="bvx-row__sum">{{ bv.mo_ta_ngan }}</p>{% endif %}
+    <p class="bvx-meta">{{ ngay(bv) }}{% if bv.luot_xem %} · {{ bv.luot_xem }} lượt xem{% endif %}</p>
+  </div>
+  <div class="bvx-pic bvx-pic--sm">{{ anh(bv, ic) }}</div>
+</a>
+{% endmacro %}

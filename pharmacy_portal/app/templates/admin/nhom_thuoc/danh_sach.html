@@ -6,10 +6,16 @@
 <div class="admin-page-head">
   <div>
     <h1>Nhóm thuốc</h1>
-    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">{{ phan_trang.total }} nhóm</p>
+    <p style="color:var(--text-muted);font-size:13px;margin:2px 0 0;">{{ phan_trang.total }} nhóm{% if tu_khoa %} khớp "{{ tu_khoa }}"{% endif %}</p>
   </div>
   <a href="{{ url_for('admin_nhom_thuoc.them') }}" class="btn btn-primary">+ Thêm nhóm</a>
 </div>
+
+<form method="get" class="adm-search-row">
+  <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm theo tên nhóm thuốc">
+  <button type="submit" class="btn btn-outline btn-sm">Tìm</button>
+  {% if tu_khoa %}<a href="{{ url_for('admin_nhom_thuoc.danh_sach') }}" class="btn btn-outline btn-sm">Xoá</a>{% endif %}
+</form>
 
 {% if danh_sach_nhom %}
 <div class="adm-table-wrap">
@@ -58,8 +64,8 @@
     </tbody>
   </table>
 </div>
-{{ pt(phan_trang, 'admin_nhom_thuoc.danh_sach') }}
+{{ pt(phan_trang, 'admin_nhom_thuoc.danh_sach', tu_khoa) }}
 {% else %}
-<div class="admin-empty">Chưa có nhóm thuốc nào.</div>
+<div class="admin-empty">{% if tu_khoa %}Không có nhóm nào khớp "{{ tu_khoa }}".{% else %}Chưa có nhóm thuốc nào.{% endif %}</div>
 {% endif %}
 {% endblock %}

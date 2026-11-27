@@ -1,0 +1,98 @@
+/* ============================================================
+   TRANG CHỦ · lớp "sinh động" (tải SAU taste.css, chỉ trang chủ)
+   Thêm: bảng màu phụ theo từng mục tra cứu, nền hero có hình khối trôi nhẹ, dải số liệu đếm lên,
+   lưới bento có màu, khối "nguồn thông tin" nền tối, hiệu ứng xuất hiện khi cuộn (so le), thanh tiến độ cuộn.
+   Không dùng màu tím. Không có JS / bật "giảm chuyển động" thì mọi thứ hiện đủ, đứng yên.
+   ============================================================ */
+/* Bảng màu --c-* và lớp .c1…c8 nay nằm trong taste-mau.css (nạp ở base.html cho mọi trang). */
+
+/* ---------- thanh tiến độ cuộn ---------- */
+.sd-progress { position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 1300; pointer-events: none; }
+.sd-progress i { display: block; height: 100%; width: 100%; transform-origin: 0 50%; transform: scaleX(var(--sp, 0));
+  background: linear-gradient(90deg, var(--c-teal), var(--c-blue) 40%, var(--c-amber) 75%, var(--c-coral)); }
+
+/* ---------- nền trang trí (hình khối trôi nhẹ, khoá trong khung riêng nên không gây cuộn ngang) ---------- */
+.sd-hero, .sd-dark { position: relative; }
+.sd-deco { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.sd-hero > .tk-hero__grid, .sd-hero > .tk-hero__pic { position: relative; }
+.sd-hero > .tk-hero__pic { z-index: 1; }
+.sd-hero > .tk-hero__grid { z-index: 5; }      /* khung chữ + ô tìm kiếm phải nằm TRÊN ảnh, để danh sách gợi ý không bị ảnh đè */
+.sd-blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .32; will-change: transform; }
+.sd-blob--a { width: 520px; height: 520px; left: -140px; top: -120px; background: color-mix(in srgb, var(--c-teal) 55%, #fff); }
+.sd-blob--b { width: 460px; height: 460px; right: -120px; top: 40px; background: color-mix(in srgb, var(--c-amber) 50%, #fff); opacity: .26; }
+.sd-grad { background: linear-gradient(95deg, var(--c-blue), var(--c-teal) 70%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+
+/* ---------- dải số liệu ---------- */
+.sd-stats { position: relative; z-index: 2; margin-top: calc(var(--s-6) * -1); padding-bottom: var(--s-4); }
+.sd-stats__list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--gutter); }
+.sd-stat { position: relative; display: flex; flex-direction: column; gap: 4px; padding: var(--s-5) var(--s-5) var(--s-5) calc(var(--s-5) + 6px); background: #fff; border: 1px solid var(--tk-line); border-radius: var(--r-lg); overflow: hidden; }
+.sd-stat::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--c); }
+.sd-stat__num { font: 400 clamp(36px, 2.4vw + 20px, 56px)/1 var(--font-display); letter-spacing: -0.025em; color: var(--c); font-variant-numeric: tabular-nums; }
+.sd-stat > span { font-size: 15px; color: var(--p-muted); }
+
+/* ---------- lưới bento theo mục tra cứu ---------- */
+.sd-sec { position: relative; }
+.sd-bento { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gutter); }
+.sd-b { display: flex; }
+.sd-b--hero { grid-column: span 2; grid-row: span 2; }
+.sd-b--wide { grid-column: span 2; }
+.sd-card { --mx: 50%; --my: 0%; position: relative; display: flex; flex-direction: column; gap: 8px; width: 100%; min-height: 220px; padding: var(--s-5); overflow: hidden; isolation: isolate;
+  background: color-mix(in srgb, var(--c) 9%, #fff); border: 1px solid color-mix(in srgb, var(--c) 24%, transparent); border-radius: var(--r-lg);
+  transition: transform 180ms var(--ease), border-color 180ms var(--ease), box-shadow 180ms var(--ease); }
+.sd-card::before { content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0; transition: opacity 220ms var(--ease);
+  background: radial-gradient(360px circle at var(--mx) var(--my), color-mix(in srgb, var(--c) 22%, transparent), transparent 65%); }
+.sd-ico { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; background: var(--c); color: #fff; transition: transform 260ms var(--ease-enter); }
+.sd-card__name { margin-top: var(--s-3); font: 400 24px/1.2 var(--font-display); letter-spacing: -0.015em; color: var(--p-ink); text-wrap: balance; }
+.sd-card__desc { margin: 0; font-size: 16px; line-height: 1.5; color: color-mix(in srgb, var(--p-ink) 78%, var(--p-bg)); max-width: 44ch; }
+.sd-card__go { margin-top: auto; align-self: flex-end; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: #fff; color: var(--c); border: 1px solid color-mix(in srgb, var(--c) 30%, transparent); }
+.sd-b--hero .sd-card { min-height: 100%; }
+.sd-b--hero .sd-card__name { font-size: clamp(30px, 1.6vw + 20px, 42px); }
+.sd-card__big { margin-top: var(--s-4); font-size: 18px; color: var(--p-ink); }
+.sd-card__big b { display: block; font: 400 clamp(56px, 4vw + 24px, 96px)/1 var(--font-display); letter-spacing: -0.03em; color: var(--c); font-variant-numeric: tabular-nums; }
+@media (hover: hover) and (pointer: fine) {
+  .sd-card:hover { transform: translateY(-3px); border-color: var(--c); box-shadow: 0 14px 30px color-mix(in srgb, var(--c) 22%, transparent); }
+  .sd-card:hover::before { opacity: 1; }
+  .sd-card:hover .sd-ico { transform: rotate(-8deg) scale(1.08); }
+  .sd-card:hover .tk-arrow { transform: translateX(3px); }
+}
+.sd-card:focus-visible { outline: 2px solid var(--c); outline-offset: 3px; }
+@media (max-width: 1023px) { .sd-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sd-b--hero { grid-row: auto; } }
+@media (max-width: 640px) { .sd-bento { grid-template-columns: minmax(0, 1fr); } .sd-b--hero, .sd-b--wide { grid-column: auto; } .sd-card { min-height: 0; } }
+
+/* ---------- khối "nguồn thông tin" nền tối ---------- */
+.sd-dark { overflow: hidden; }
+.sd-dark__in { position: relative; z-index: 1; }
+.sd-blob--c { width: 460px; height: 460px; right: -100px; top: -140px; background: var(--c-teal); opacity: .28; }
+.sd-blob--d { width: 380px; height: 380px; left: -120px; bottom: -160px; background: var(--c-amber); opacity: .20; }
+.sd-dark .tk-statement { color: var(--p-inv-ink); max-width: 26ch; }
+.sd-dark .tk-statement strong { color: #86d8cd; }
+.sd-dark .tk-statement.is-live .w { color: color-mix(in srgb, var(--p-inv-ink) 30%, var(--p-inv-bg)); }
+.sd-dark .tk-statement.is-live .w.on { color: var(--p-inv-ink); }
+.sd-dark .tk-statement.is-live strong .w { color: color-mix(in srgb, #86d8cd 30%, var(--p-inv-bg)); }
+.sd-dark .tk-statement.is-live strong .w.on { color: #86d8cd; }
+
+/* ---------- thẻ bài viết, câu hỏi ---------- */
+.sd-news { position: relative; }
+.sd-news::before { content: ""; display: block; height: 5px; background: var(--c); transform-origin: 0 50%; transition: transform 700ms var(--ease-enter) 200ms; }
+.sd-faq { position: relative; padding-top: var(--s-4); border-top: 2px solid var(--tk-line); }
+.sd-faq::before { content: ""; position: absolute; left: 0; top: -2px; height: 2px; width: 100%; background: var(--c-teal); transform-origin: 0 50%; transform: scaleX(0); transition: transform 800ms var(--ease-enter) 150ms; }
+.sd-faq:nth-child(2)::before { background: var(--c-amber); } .sd-faq:nth-child(3)::before { background: var(--c-coral); }
+.sd-faq.is-in::before { transform: scaleX(1); }
+
+/* ---------- hiệu ứng xuất hiện khi cuộn (chỉ khi có JS và không giảm chuyển động) ---------- */
+html.sd-on [data-sd] { transition: opacity 650ms var(--ease-enter), transform 650ms var(--ease-enter); transition-delay: calc(var(--d, 0) * 80ms); }
+html.sd-on [data-sd="up"]:not(.is-in) { opacity: 0; transform: translateY(36px); }
+html.sd-on [data-sd="up"].is-in { opacity: 1; transform: none; }
+html.sd-on .sd-news:not(.is-in)::before { transform: scaleX(0); }
+/* dự phòng: nếu script không chạy (không có lớp sd-run), sau 3,5 giây vẫn hiện hết nội dung */
+html.sd-on:not(.sd-run) [data-sd]:not(.is-in) { animation: sd-safe 0s 3.5s forwards; }
+@keyframes sd-safe { to { opacity: 1; transform: none; } }
+
+@media (max-width: 900px) { .sd-blob { filter: blur(50px); } .sd-stats { margin-top: 0; padding-top: var(--s-5); } }
+@media (prefers-reduced-motion: reduce) {
+  html.sd-on [data-sd] { opacity: 1 !important; transform: none !important; transition: none; animation: none; }
+  .sd-card, .sd-ico { transition: none; } .sd-card:hover { transform: none; }
+  .sd-progress { display: none; }
+  .sd-dark .tk-statement.is-live .w, .sd-dark .tk-statement.is-live strong .w { color: var(--p-inv-ink) !important; }
+  .sd-dark .tk-statement.is-live strong .w { color: #86d8cd !important; }
+}

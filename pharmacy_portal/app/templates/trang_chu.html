@@ -4,14 +4,25 @@
 {% block og_tieu_de %}Tra cứu dược BVĐK Tâm Đức Cầu Quan — Khoa Dược Bệnh viện Đa khoa{% endblock %}
 {% block og_mo_ta %}Tra cứu thông tin thuốc, thuốc tiêm truyền, tương tác thuốc và tương hợp – tương kỵ tại Khoa Dược BVĐK Tâm Đức Cầu Quan.{% endblock %}
 
+{% block head_extra %}
+<script>if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.classList.add('sd-on');</script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/taste-sinh-dong.css') }}">
+{% endblock %}
+{% block scripts_extra %}<script src="{{ url_for('static', filename='js/taste-cuon.js') }}" defer></script>{% endblock %}
+
 {% block content %}{% from "_icons.html" import ic %}
 {% set so_thuoc = (('{:,}'.format(stat.dmt|int))|replace(',', '.')) if (stat and stat.get('dmt')) else '' %}
-<section class="tk-hero" data-enter>
+<div class="sd-progress" aria-hidden="true"><i></i></div>
+<section class="tk-hero sd-hero" data-enter>
+  <div class="sd-deco" aria-hidden="true">
+    <span class="sd-blob sd-blob--a" data-sd-par="-0.12"></span>
+    <span class="sd-blob sd-blob--b" data-sd-par="0.10"></span>
+  </div>
   <div class="tk-hero__grid">
     <div class="tk-hero__title">
       <h1 class="tk-h1">
         <span class="tk-line"><span style="--i:0">Tra cứu dược</span></span>
-        <span class="tk-line"><span style="--i:1">BVĐK Tâm Đức</span></span>
+        <span class="tk-line"><span style="--i:1" class="sd-grad">BVĐK Tâm Đức</span></span>
         <span class="tk-line"><span style="--i:2">Cầu Quan</span></span>
         {# SEO: giữ nguyên chữ mà Google đã lập chỉ mục. Ẩn khỏi mắt người xem nhưng vẫn có trong HTML và đọc được bằng trình đọc màn hình. Đừng xoá. #}
         <span class="sr-only"> – Cổng tra cứu thuốc Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan, thông tin thuốc nhanh chóng</span>
@@ -48,32 +59,46 @@
   {% endif %}
 </section>
 
-<section class="tk-section" id="tra-cuu" aria-labelledby="tk-tra-cuu">
+{% set the_so = [] %}
+{% if stat and stat.get('dmt') %}{% set _ = the_so.append((stat.dmt, 'Thuốc trong Danh mục thuốc', 'c1')) %}{% endif %}
+{% if stat and stat.get('ntbv') %}{% set _ = the_so.append((stat.ntbv, 'Thuốc tại Nhà thuốc bệnh viện', 'c2')) %}{% endif %}
+{% if stat and stat.get('thtk') %}{% set _ = the_so.append((stat.thtk, 'Cặp tương hợp – tương kỵ', 'c4')) %}{% endif %}
+{% if the_so %}
+<section class="sd-stats" aria-label="Số liệu hiện có">
   <div class="tk-wrap">
-    <div class="tk-sec-head">
+    <ul class="sd-stats__list" data-sd-group>
+      {% for so, nhan, mau in the_so %}
+      <li class="sd-stat {{ mau }}" data-sd="up"><b class="sd-stat__num" data-count="{{ so|int }}">{{ (('{:,}'.format(so|int))|replace(',', '.')) }}</b><span>{{ nhan }}</span></li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+
+<section class="tk-section sd-sec" id="tra-cuu" aria-labelledby="tk-tra-cuu">
+  <div class="tk-wrap">
+    <div class="tk-sec-head" data-sd="up">
       <h2 class="tk-h2" id="tk-tra-cuu">Các mục tra cứu</h2>
       <p class="tk-lead tk-measure" style="margin-top:16px;max-width:62ch">Đây là website <strong>tra cứu dược</strong> của <strong>Khoa Dược, Bệnh viện Đa khoa (BVĐK) Tâm Đức Cầu Quan</strong>. Cổng giúp nhân viên y tế và người bệnh tra cứu nhanh thông tin thuốc đang sử dụng tại bệnh viện, do Khoa Dược cập nhật và kiểm duyệt.</p>
     </div>
     {% set arrow %}<svg class="tk-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>{% endset %}
-    <div class="tk-cols">
-      <ul class="tk-rows">
-        <li><a class="tk-row" href="{{ url_for('dmt.index') }}"><span class="tk-row__name">Danh mục thuốc</span><p class="tk-row__desc">Tra theo nhóm dược lý, kèm chỉ định, chống chỉ định và liều dùng.</p><span class="tk-row__end">{% if so_thuoc %}<span class="tk-row__meta">{{ so_thuoc }} thuốc</span>{% endif %}{{ arrow }}</span></a></li>
-        <li><a class="tk-row" href="{{ url_for('ntbv.index') }}"><span class="tk-row__name">Nhà thuốc bệnh viện</span><p class="tk-row__desc">Thuốc bán tại Nhà thuốc Bệnh viện Đa khoa Tâm Đức Cầu Quan, tra theo nhóm và hoạt chất.</p><span class="tk-row__end">{{ arrow }}</span></a></li>
-        <li><a class="tk-row" href="{{ url_for('tttt.index') }}"><span class="tk-row__name">Thuốc tiêm truyền</span><p class="tk-row__desc">Dung môi pha loãng, tốc độ truyền, độ ổn định và thời hạn sau pha.</p><span class="tk-row__end">{{ arrow }}</span></a></li>
-        <li><a class="tk-row" href="{{ url_for('thtk.index') }}"><span class="tk-row__name">Tương hợp – tương kỵ</span><p class="tk-row__desc">Kiểm tra khả năng pha chung hai thuốc truyền tĩnh mạch.</p><span class="tk-row__end">{{ arrow }}</span></a></li>
-      </ul>
-      <ul class="tk-rows">
-        <li><a class="tk-row" href="{{ url_for('ttt.index') }}"><span class="tk-row__name">Tương tác thuốc</span><p class="tk-row__desc">Mức độ, cơ chế và hướng xử trí khi dùng đồng thời hai thuốc.</p><span class="tk-row__end">{{ arrow }}</span></a></li>
-        <li><a class="tk-row" href="{{ url_for('ttth.index') }}"><span class="tk-row__name">Thông tin thuốc</span><p class="tk-row__desc">Chỉ định, chống chỉ định, liều dùng theo đối tượng và tác dụng phụ.</p><span class="tk-row__end">{{ arrow }}</span></a></li>
-        <li><a class="tk-row" href="{{ url_for('ttbn.index') }}"><span class="tk-row__name">Thông tin bệnh nhân</span><p class="tk-row__desc">Hướng dẫn dùng thuốc tại nhà bằng ngôn ngữ đơn giản, dễ hiểu.</p><span class="tk-row__end">{{ arrow }}</span></a></li>
-        <li><a class="tk-row" href="{{ url_for('bv.index') }}"><span class="tk-row__name">Bài viết – Thông báo</span><p class="tk-row__desc">Tin tức, thông báo nội bộ và bài viết chuyên môn mới nhất từ Khoa Dược.</p><span class="tk-row__end">{{ arrow }}</span></a></li>
-      </ul>
-    </div>
+    <ul class="sd-bento" data-sd-group>
+      <li class="sd-b sd-b--hero c1" data-sd="up"><a class="sd-card" href="{{ url_for('dmt.index') }}"><span class="sd-ico">{{ ic('pill', 26) }}</span><span class="sd-card__name">Danh mục thuốc</span><p class="sd-card__desc">Tra theo nhóm dược lý, kèm chỉ định, chống chỉ định và liều dùng.</p>{% if so_thuoc %}<span class="sd-card__big"><b data-count="{{ stat.dmt|int }}">{{ so_thuoc }}</b> thuốc</span>{% endif %}<span class="sd-card__go">{{ arrow }}</span></a></li>
+      <li class="sd-b c2" data-sd="up"><a class="sd-card" href="{{ url_for('ntbv.index') }}"><span class="sd-ico">{{ ic('building', 24) }}</span><span class="sd-card__name">Nhà thuốc bệnh viện</span><p class="sd-card__desc">Thuốc bán tại Nhà thuốc Bệnh viện Đa khoa Tâm Đức Cầu Quan, tra theo nhóm và hoạt chất.</p><span class="sd-card__go">{{ arrow }}</span></a></li>
+      <li class="sd-b c3" data-sd="up"><a class="sd-card" href="{{ url_for('tttt.index') }}"><span class="sd-ico">{{ ic('syringe', 24) }}</span><span class="sd-card__name">Thuốc tiêm truyền</span><p class="sd-card__desc">Dung môi pha loãng, tốc độ truyền, độ ổn định và thời hạn sau pha.</p><span class="sd-card__go">{{ arrow }}</span></a></li>
+      <li class="sd-b c4" data-sd="up"><a class="sd-card" href="{{ url_for('thtk.index') }}"><span class="sd-ico">{{ ic('flask', 24) }}</span><span class="sd-card__name">Tương hợp – tương kỵ</span><p class="sd-card__desc">Kiểm tra khả năng pha chung hai thuốc truyền tĩnh mạch.</p><span class="sd-card__go">{{ arrow }}</span></a></li>
+      <li class="sd-b c5" data-sd="up"><a class="sd-card" href="{{ url_for('ttt.index') }}"><span class="sd-ico">{{ ic('alert', 24) }}</span><span class="sd-card__name">Tương tác thuốc</span><p class="sd-card__desc">Mức độ, cơ chế và hướng xử trí khi dùng đồng thời hai thuốc.</p><span class="sd-card__go">{{ arrow }}</span></a></li>
+      <li class="sd-b c6" data-sd="up"><a class="sd-card" href="{{ url_for('ttth.index') }}"><span class="sd-ico">{{ ic('file', 24) }}</span><span class="sd-card__name">Thông tin thuốc</span><p class="sd-card__desc">Chỉ định, chống chỉ định, liều dùng theo đối tượng và tác dụng phụ.</p><span class="sd-card__go">{{ arrow }}</span></a></li>
+      <li class="sd-b c7" data-sd="up"><a class="sd-card" href="{{ url_for('ttbn.index') }}"><span class="sd-ico">{{ ic('user', 24) }}</span><span class="sd-card__name">Thông tin bệnh nhân</span><p class="sd-card__desc">Hướng dẫn dùng thuốc tại nhà bằng ngôn ngữ đơn giản, dễ hiểu.</p><span class="sd-card__go">{{ arrow }}</span></a></li>
+      <li class="sd-b sd-b--wide c8" data-sd="up"><a class="sd-card" href="{{ url_for('bv.index') }}"><span class="sd-ico">{{ ic('newspaper', 24) }}</span><span class="sd-card__name">Bài viết – Thông báo</span><p class="sd-card__desc">Tin tức, thông báo nội bộ và bài viết chuyên môn mới nhất từ Khoa Dược.</p><span class="sd-card__go">{{ arrow }}</span></a></li>
+    </ul>
   </div>
 </section>
 
-<section class="tk-section tk-section--alt" id="nguon-thong-tin" aria-labelledby="tk-nguon">
-  <div class="tk-wrap">
+<section class="tk-section tk-section--dark sd-dark" id="nguon-thong-tin" aria-labelledby="tk-nguon">
+  <div class="sd-deco" aria-hidden="true"><span class="sd-blob sd-blob--c" data-sd-par="-0.15"></span><span class="sd-blob sd-blob--d" data-sd-par="0.12"></span></div>
+  <div class="tk-wrap sd-dark__in">
     <h2 class="tk-label" id="tk-nguon" style="margin:0 0 24px">Nguồn thông tin</h2>
     <p class="tk-statement" data-moment="word-highlight">Mọi nội dung do Dược sĩ lâm sàng <strong>cập nhật và kiểm duyệt</strong>. Luôn đối chiếu với dược thư và quy trình chuyên môn hiện hành trước khi dùng.</p>
   </div>
@@ -82,13 +107,13 @@
 {% if bai_viet_moi %}
 <section class="tk-section" id="bai-viet-moi" aria-labelledby="home-news-title">
   <div class="tk-wrap">
-    <div class="tk-sec-head" style="display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px">
+    <div class="tk-sec-head" data-sd="up" style="display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px">
       <h2 class="tk-h2" id="home-news-title">Bài viết – Thông báo mới của Khoa Dược</h2>
       <a class="tk-link" href="{{ url_for('bv.index') }}">Xem tất cả bài viết</a>
     </div>
-    <div class="tk-news">
+    <div class="tk-news" data-sd-group>
       {% for bv in bai_viet_moi if bv.slug %}
-      <a class="tk-card" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
+      <a class="tk-card sd-news c{{ (loop.index0 % 4) + 1 }}" data-sd="up" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
         <h3>{{ bv.tieu_de }}</h3>
         {% if bv.mo_ta_ngan %}<p>{{ bv.mo_ta_ngan|truncate(140, True, '…') }}</p>{% endif %}
         {% if bv.ngay_xuat_ban %}<time datetime="{{ bv.ngay_xuat_ban.strftime('%Y-%m-%d') }}">{{ bv.ngay_xuat_ban.strftime('%d/%m/%Y') }}</time>{% endif %}
@@ -101,17 +126,17 @@
 
 <section class="tk-section{% if not bai_viet_moi %} tk-section--alt{% endif %}" id="cau-hoi" aria-labelledby="home-faq-title">
   <div class="tk-wrap">
-    <h2 class="tk-h2 tk-sec-head" id="home-faq-title">Câu hỏi thường gặp</h2>
-    <dl class="tk-faq">
-      <div>
+    <h2 class="tk-h2 tk-sec-head" data-sd="up" id="home-faq-title">Câu hỏi thường gặp</h2>
+    <dl class="tk-faq" data-sd-group>
+      <div data-sd="up" class="sd-faq">
         <dt>Tra cứu dược Tâm Đức Cầu Quan là gì?</dt>
         <dd>Là trang tra cứu thông tin thuốc do Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan xây dựng, tập hợp danh mục thuốc, tương tác thuốc, thuốc tiêm truyền và tương hợp – tương kỵ.</dd>
       </div>
-      <div>
+      <div data-sd="up" class="sd-faq">
         <dt>Thông tin trên website có thay thế chỉ định của bác sĩ không?</dt>
         <dd>Không. Nội dung chỉ mang tính tham khảo, cần đối chiếu dược thư và quy trình chuyên môn hiện hành. Người bệnh dùng thuốc theo chỉ định của bác sĩ, dược sĩ.</dd>
       </div>
-      <div>
+      <div data-sd="up" class="sd-faq">
         <dt>Liên hệ Khoa Dược BVĐK Tâm Đức Cầu Quan bằng cách nào?</dt>
         <dd>Xem thông tin liên hệ tại trang <a class="tk-link" href="{{ url_for('main.ve_chung_toi') }}">Về chúng tôi</a>, hoặc gửi góp ý ở mục <a class="tk-link" href="{{ url_for('ho_tro.trang') }}">Hỗ trợ và góp ý</a>.</dd>
       </div>

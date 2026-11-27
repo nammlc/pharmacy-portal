@@ -106,17 +106,23 @@ CREATE TABLE tuong_hop_tuong_ky (
   FOREIGN KEY (thuoc_b_id) REFERENCES thuoc(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE tuong_tac_thuoc (
+-- Tương tác giữa 2 HOẠT CHẤT (thay cho bảng cũ tuong_tac_thuoc theo cặp thuốc).
+-- Luôn lưu hoat_chat_a_id < hoat_chat_b_id nên (A,B) và (B,A) là MỘT cặp; UNIQUE chặn trùng.
+CREATE TABLE tuong_tac_hoat_chat (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  thuoc_a_id INT NOT NULL,
-  thuoc_b_id INT NOT NULL,
+  hoat_chat_a_id INT NOT NULL,
+  hoat_chat_b_id INT NOT NULL,
   muc_do ENUM('nhe','trung_binh','nang','chong_chi_dinh') NOT NULL DEFAULT 'trung_binh',
   co_che TEXT,
   hau_qua_lam_sang TEXT,
   xu_tri TEXT,
   nguon_tham_khao VARCHAR(255),
-  FOREIGN KEY (thuoc_a_id) REFERENCES thuoc(id) ON DELETE CASCADE,
-  FOREIGN KEY (thuoc_b_id) REFERENCES thuoc(id) ON DELETE CASCADE
+  ngay_cap_nhat DATETIME NULL,
+  UNIQUE KEY uq_tuong_tac_hc_cap (hoat_chat_a_id, hoat_chat_b_id),
+  CONSTRAINT ck_tuong_tac_hc_thu_tu CHECK (hoat_chat_a_id < hoat_chat_b_id),
+  INDEX ix_tuong_tac_hc_b (hoat_chat_b_id),
+  FOREIGN KEY (hoat_chat_a_id) REFERENCES hoat_chat(id) ON DELETE CASCADE,
+  FOREIGN KEY (hoat_chat_b_id) REFERENCES hoat_chat(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE thong_tin_thuoc (

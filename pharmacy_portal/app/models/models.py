@@ -203,8 +203,53 @@ class TuongHopTuongKy(db.Model):
     thuoc_b = db.relationship("Thuoc", foreign_keys=[thuoc_b_id])
 
 
+class TuongTacHoatChat(db.Model):
+    """Tương tác giữa 2 HOẠT CHẤT khi dùng đồng thời (thay cho tương tác theo cặp thuốc).
+
+    Quy ước CHỐNG TRÙNG (quan trọng):
+    - Một cặp (A, B) và (B, A) là MỘT cặp: luôn lưu hoat_chat_a_id < hoat_chat_b_id
+      (dùng TuongTacHoatChat.sap_xep(a, b) trước khi lưu).
+    - CSDL tự chặn: UNIQUE(a, b) và CHECK(a < b), nên dù code sót cũng không thể có
+      2 dòng cho cùng một cặp hoặc một hoạt chất tự tương tác với chính nó.
+    """
+    __tablename__ = "tuong_tac_hoat_chat"
+    __table_args__ = (
+        db.UniqueConstraint("hoat_chat_a_id", "hoat_chat_b_id", name="uq_tuong_tac_hc_cap"),
+        db.CheckConstraint("hoat_chat_a_id < hoat_chat_b_id", name="ck_tuong_tac_hc_thu_tu"),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    hoat_chat_a_id = db.Column(db.Integer, db.ForeignKey("hoat_chat.id", ondelete="CASCADE"),
+                               nullable=False, index=True)
+    hoat_chat_b_id = db.Column(db.Integer, db.ForeignKey("hoat_chat.id", ondelete="CASCADE"),
+                               nullable=False, index=True)
+    muc_do = db.Column(db.Enum("nhe", "trung_binh", "nang", "chong_chi_dinh", name="muc_do_enum"),
+                       nullable=False, default="trung_binh")
+    co_che = db.Column(db.Text)
+    hau_qua_lam_sang = db.Column(db.Text)
+    xu_tri = db.Column(db.Text)
+    nguon_tham_khao = db.Column(db.String(255))
+    ngay_cap_nhat = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    hoat_chat_a = db.relationship("HoatChat", foreign_keys=[hoat_chat_a_id])
+    hoat_chat_b = db.relationship("HoatChat", foreign_keys=[hoat_chat_b_id])
+
+    @staticmethod
+    def sap_xep(a_id, b_id):
+        """(a, b) -> (nhỏ, lớn). Dùng cho mọi chỗ tạo / tìm / so sánh một cặp."""
+        return (a_id, b_id) if a_id < b_id else (b_id, a_id)
+
+    @property
+    def ten_cap(self):
+        ta = self.hoat_chat_a.ten_hoat_chat if self.hoat_chat_a else "?"
+        tb = self.hoat_chat_b.ten_hoat_chat if self.hoat_chat_b else "?"
+        return f"{ta} + {tb}"
+
+
 class TuongTacThuoc(db.Model):
-    """Tra cứu tương tác thuốc - thuốc khi dùng đồng thời."""
+    """[CŨ - KHÔNG DÙNG NỮA] Tương tác theo cặp THUỐC. Đã thay bằng TuongTacHoatChat.
+    Giữ lại class + bảng chỉ để dự phòng/quay lui; xoá bằng xoa_bang_tuong_tac_thuoc_cu.sql
+    sau khi đã kiểm tra dữ liệu mới."""
     __tablename__ = "tuong_tac_thuoc"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -293,7 +338,7 @@ class BaiViet(db.Model):
     )
     ghim = db.Column(db.Boolean, default=False)
     luot_xem = db.Column(db.Integer, default=0)
-    do_uu_tien = db.Column(db.Integer, nullable=True)  # 1..4 - mức ưu tiên hiển thị trang chủ Bài viết (None = không ưu tiên)
+    do_uu_tien = db.Column(db.Integer, nullable=True)  # 1..3 - mức ưu tiên = 3 slide đầu trang Bài viết (None = không ưu tiên)
 
     ngay_tao = db.Column(db.DateTime, default=datetime.utcnow)
     ngay_xuat_ban = db.Column(db.DateTime)

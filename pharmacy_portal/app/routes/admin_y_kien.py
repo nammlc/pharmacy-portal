@@ -14,7 +14,7 @@ from app.utils import kenh_ngoai as KN
 from app.utils.nhat_ky import ghi
 
 bp = Blueprint("admin_y_kien", __name__, url_prefix="/admin/y-kien")
-MOI_TRANG = 20
+MOI_TRANG = 10
 HANH_DONG = {"duyet": "da_duyet", "tu_choi": "tu_choi", "spam": "spam", "cho_duyet": "cho_duyet"}
 
 
@@ -81,6 +81,7 @@ def danh_sach():
         truy_van = truy_van.filter(db.or_(YKien.ten.ilike(like), YKien.so_dien_thoai.ilike(like),
                                           YKien.noi_dung.ilike(like), YKien.doi_tuong_ten.ilike(like)))
     tong = truy_van.count()
+    trang = min(trang, max(1, -(-tong // MOI_TRANG)))     # trang vượt quá thì lùi về trang cuối
     muc = truy_van.order_by(YKien.ngay_tao.desc(), YKien.id.desc()).offset((trang - 1) * MOI_TRANG).limit(MOI_TRANG).all()
     dem = dict(db.session.query(YKien.trang_thai, func.count(YKien.id)).group_by(YKien.trang_thai).all())
     # đếm theo trạng thái trả lời (không tính ý kiến đã từ chối / spam: không cần trả lời)

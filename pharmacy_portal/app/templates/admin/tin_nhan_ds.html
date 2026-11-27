@@ -27,7 +27,7 @@
 {% if dong %}
 <div class="adm-table-wrap">
   <table class="adm-table">
-    <thead><tr><th>Khách</th><th>Tin gần nhất</th><th style="width:150px;">Lúc</th><th style="width:130px;"></th></tr></thead>
+    <thead><tr><th>Khách</th><th>Tin gần nhất</th><th style="width:150px;">Lúc</th><th style="width:220px;"></th></tr></thead>
     <tbody>
     {% for k, tn in dong %}
       <tr>
@@ -40,25 +40,19 @@
           {% else %}<em style="color:var(--text-muted)">Chưa có tin nhắn</em>{% endif %}
         </td>
         <td>{% if tn %}{{ (tn.ngay_tao | gio_vn).strftime('%d/%m/%Y %H:%M') }}{% endif %}</td>
-        <td style="text-align:right;">
+        <td class="tn-act-cell"><div class="tn-act">
           {% if chua_doc.get(k.id) %}<span class="nav-badge" style="position:static;margin-right:6px;">{{ chua_doc[k.id] }} mới</span>{% endif %}
           {% if tn and tn.tu == 'khach' %}<span class="tl-badge tl-chua">⏳ Chờ trả lời</span>
           {% elif tn %}<span class="tl-badge tl-da" title="Tin cuối là của Khoa Dược">Đã trả lời{% if ten_admin.get(tn.admin_id) %} bởi {{ ten_admin[tn.admin_id] }}{% endif %}</span>{% endif %}
           <a href="{{ url_for('admin_tin_nhan.xem', khach_id=k.id) }}" class="btn btn-outline btn-sm">Mở</a>
-        </td>
+        </div></td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
 </div>
-{% set tong_trang = (tong // moi_trang) + (1 if tong % moi_trang else 0) %}
-{% if tong_trang > 1 %}
-<nav class="yk-pager" aria-label="Phân trang">
-  {% if trang > 1 %}<a href="{{ url_for('admin_tin_nhan.danh_sach', q=q, tt=tt, trang=trang - 1) }}">‹ Trước</a>{% endif %}
-  <span>Trang {{ trang }} / {{ tong_trang }}</span>
-  {% if trang < tong_trang %}<a href="{{ url_for('admin_tin_nhan.danh_sach', q=q, tt=tt, trang=trang + 1) }}">Sau ›</a>{% endif %}
-</nav>
-{% endif %}
+{% from "admin/_phan_trang.html" import so_trang %}
+{{ so_trang(trang, tong, moi_trang, url_for('admin_tin_nhan.danh_sach', q=q, tt=tt, trang='__P__'), 'khách') }}
 {% else %}
 <div class="adm-empty">Chưa có cuộc trò chuyện nào.</div>
 {% endif %}

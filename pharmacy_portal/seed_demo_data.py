@@ -11,7 +11,7 @@ Chạy: python seed_demo_data.py
 
 from app import create_app, db
 from app.models.models import (
-    Thuoc, ThuocTiemTruyen, TuongHopTuongKy, TuongTacThuoc,
+    Thuoc, ThuocTiemTruyen, TuongHopTuongKy, TuongTacHoatChat,
     ThongTinThuoc, ThongTinBenhNhan, NguoiDung,
     NhomThuoc, HoatChat, DanhMucThuoc, NhaThuocBV
 )
@@ -82,9 +82,14 @@ with app.app_context():
         mo_ta="[MẪU] Ví dụ minh hoạ hiển thị badge trạng thái tương kỵ."
     ))
 
-    # --- Tương tác thuốc mẫu ---
-    db.session.add(TuongTacThuoc(
-        thuoc_a_id=thuoc_a.id, thuoc_b_id=thuoc_b.id,
+    # --- Tương tác thuốc mẫu (giữa 2 HOẠT CHẤT) ---
+    hc_a = HoatChat.query.filter_by(ten_hoat_chat="[MẪU] Hoạt chất A").first() or HoatChat(ten_hoat_chat="[MẪU] Hoạt chất A")
+    hc_b = HoatChat.query.filter_by(ten_hoat_chat="[MẪU] Hoạt chất B").first() or HoatChat(ten_hoat_chat="[MẪU] Hoạt chất B")
+    db.session.add_all([hc_a, hc_b])
+    db.session.flush()
+    a_id, b_id = TuongTacHoatChat.sap_xep(hc_a.id, hc_b.id)
+    db.session.add(TuongTacHoatChat(
+        hoat_chat_a_id=a_id, hoat_chat_b_id=b_id,
         muc_do="trung_binh",
         hau_qua_lam_sang="[MẪU] Ví dụ minh hoạ hiển thị badge mức độ.",
         xu_tri="[MẪU] Theo dõi lâm sàng, tham khảo dược sĩ."

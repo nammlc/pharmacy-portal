@@ -1,5 +1,6 @@
 {% extends "admin/base.html" %}
 {% from "_icons.html" import ic %}
+{% from "admin/_phan_trang.html" import so_trang %}
 {% block title %}Hỏi đáp &amp; bình luận{% endblock %}
 {% block page_eyebrow %}Phản hồi{% endblock %}
 
@@ -52,6 +53,7 @@
   <button type="submit" class="btn btn-outline btn-sm" onclick="return confirm('Áp dụng cho các ý kiến đã chọn?')">Áp dụng</button>
 </form>
 
+{{ so_trang(trang, tong, moi_trang, trang_link('__P__'), 'ý kiến', True) }}
 <div class="yk-list">
   {% for y in muc %}
   <article class="yk-card yk-{{ y.trang_thai }}" id="yk-{{ y.id }}">
@@ -107,14 +109,7 @@
   {% endfor %}
 </div>
 
-{% set tong_trang = (tong // moi_trang) + (1 if tong % moi_trang else 0) %}
-{% if tong_trang > 1 %}
-<nav class="yk-pager" aria-label="Phân trang">
-  {% if trang > 1 %}<a href="{{ trang_link(trang - 1) }}">‹ Trước</a>{% endif %}
-  <span>Trang {{ trang }} / {{ tong_trang }} · {{ tong }} ý kiến</span>
-  {% if trang < tong_trang %}<a href="{{ trang_link(trang + 1) }}">Sau ›</a>{% endif %}
-</nav>
-{% endif %}
+{{ so_trang(trang, tong, moi_trang, trang_link('__P__'), 'ý kiến', True) }}
 {% else %}
 <div class="adm-empty">Không có ý kiến nào {% if trang_thai == 'cho_duyet' %}đang chờ duyệt{% else %}khớp bộ lọc{% endif %}.</div>
 {% endif %}

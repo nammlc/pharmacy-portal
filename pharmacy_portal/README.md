@@ -189,3 +189,16 @@ Vào menu **Khác → Thùng rác** để khôi phục hoặc xoá vĩnh viễn.
 Mã nguồn: `app/utils/thung_rac.py` (khai báo loại dữ liệu ở `REGISTRY`). Bảng `thung_rac` tự tạo khi khởi động
 (hoặc chạy `them_bang_thung_rac.sql`). Dọn thủ công/cron: `flask don-thung-rac`.
 Không đưa vào thùng rác: tài khoản chat khách và tin nhắn riêng (dữ liệu cá nhân).
+
+
+## Tương tác thuốc theo cặp HOẠT CHẤT
+
+Tương tác nay là giữa **2 hoạt chất** (bảng `tuong_tac_hoat_chat`), không còn theo cặp thuốc.
+
+- **Chống trùng:** (A,B) và (B,A) là một cặp. Luôn lưu id nhỏ trước; CSDL có `UNIQUE` và `CHECK (a < b)` làm chốt chặn cuối.
+  Thêm tay: form cảnh báo ngay khi chọn xong 2 hoạt chất + server kiểm tra lại (`app/utils/tuong_tac_hc.py`).
+  Nhập Excel: xem trước phát hiện cặp trùng trong file (giống hệt thì gộp, khác nội dung thì chọn dòng dùng) và cặp đã có (bỏ qua / ghi đè).
+- **Nhập hàng loạt:** Quản trị → Nhập hàng loạt → Tương tác thuốc. Logic thuần ở `app/utils/nhap_tuong_tac.py`.
+- **Triển khai lần đầu:** chạy `them_bang_tuong_tac_hoat_chat.sql` trên Neon (hoặc `python tao_bang_tuong_tac_hoat_chat.py`),
+  nhập Excel, kiểm tra, rồi mới chạy `xoa_bang_tuong_tac_thuoc_cu.sql` để xoá bảng cũ.
+- **Test:** `tests/test_nhap_tuong_tac_thuan.py` (không cần CSDL) và `tests/test_tuong_tac_hoat_chat.py`.

@@ -1,40 +1,73 @@
 {% extends "base.html" %}
 {% from "_icons.html" import ic %}
+{% from "bai_viet/_the.html" import the, ngay, nhan_dm %}
 {% block title %}{{ bai_viet.tieu_de }}{% endblock %}
+{% block meta_mo_ta %}{{ (bai_viet.mo_ta_ngan or bai_viet.tieu_de) | striptags | truncate(160, True) }}{% endblock %}
+{% block og_tieu_de %}{{ bai_viet.tieu_de }}{% endblock %}
+{% block head_extra %}<link rel="stylesheet" href="{{ url_for('static', filename='css/taste-bai-viet.css') }}">{% endblock %}
+{% block scripts_extra %}<script src="{{ url_for('static', filename='js/bai-viet.js') }}" defer></script>{% endblock %}
 
 {% block content %}
-<section class="tk-head"><div class="tk-wrap">
-  <p class="tk-crumb">{% if bai_viet.danh_muc %}<a class="tk-link" href="{{ url_for('bv.index', danh_muc=bai_viet.danh_muc.slug) }}">{{ bai_viet.danh_muc.ten }}</a>{% else %}<a class="tk-link" href="{{ url_for('bv.index') }}">Bài viết - Thông báo</a>{% endif %}</p>
-  <h1 class="tk-h1">{{ bai_viet.tieu_de }}</h1>
-  <p class="tk-label" style="margin-top:16px">{{ (bai_viet.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bai_viet.ngay_xuat_ban else (bai_viet.ngay_tao | gio_vn).strftime('%d/%m/%Y') }} · {{ bai_viet.luot_xem or 0 }} lượt xem{% if bai_viet.tac_gia %} · {{ bai_viet.tac_gia.ho_ten or bai_viet.tac_gia.ten_dang_nhap }}{% endif %}</p>
-</div></section>
+{% set tac_gia_ten = (bai_viet.tac_gia.ho_ten or bai_viet.tac_gia.ten_dang_nhap) if bai_viet.tac_gia else 'Khoa Dược' %}
+<article class="bvx-art">
+  <header class="tk-head bvx-art__head"><div class="tk-wrap">
+    <p class="tk-crumb">
+      <a class="tk-link" href="{{ url_for('bv.index') }}">Bài viết</a>
+      {% if bai_viet.danh_muc %}<span aria-hidden="true">/</span><a class="tk-link" href="{{ url_for('bv.index', danh_muc=bai_viet.danh_muc.slug) }}">{{ bai_viet.danh_muc.ten }}</a>{% endif %}
+    </p>
+    <h1 class="bvx-title">{{ bai_viet.tieu_de }}</h1>
+    {% if bai_viet.mo_ta_ngan %}<p class="bvx-stand">{{ bai_viet.mo_ta_ngan }}</p>{% endif %}
+    <div class="bvx-byline">
+      <span class="bvx-by"><span class="bvx-av" aria-hidden="true">{{ tac_gia_ten[:1] | upper }}</span><span><strong>{{ tac_gia_ten }}</strong><small>Khoa Dược</small></span></span>
+      <span class="bvx-byline__meta">
+        <time datetime="{{ ((bai_viet.ngay_xuat_ban or bai_viet.ngay_tao) | gio_vn).strftime('%Y-%m-%d') }}">{{ ngay(bai_viet) }}</time>
+        <span aria-hidden="true">·</span><span>{{ phut_doc }} phút đọc</span>
+        <span aria-hidden="true">·</span><span>{{ bai_viet.luot_xem or 0 }} lượt xem</span>
+      </span>
+      <span class="bvx-tools">
+        <button type="button" class="bvx-tool" data-act="copy" data-ok="Đã sao chép">{{ ic('link', 16) }}<span>Sao chép liên kết</span></button>
+        <button type="button" class="bvx-tool" data-act="print">{{ ic('printer', 16) }}<span>In bài</span></button>
+      </span>
+    </div>
+  </div></header>
 
-<div class="tk-wrap tk-results">
   {% if bai_viet.anh_dai_dien %}
-  <div class="tk-frame tk-article-pic"><img src="{{ bai_viet.anh_dai_dien }}" alt="{{ bai_viet.tieu_de }}" decoding="async"></div>
+  <figure class="bvx-fig"><img src="{{ bai_viet.anh_dai_dien }}" alt="{{ bai_viet.tieu_de }}" decoding="async" fetchpriority="high"></figure>
   {% endif %}
 
-  <div class="tk-rich bv-article-body">
-    {{ bai_viet.noi_dung | safe if bai_viet.noi_dung else '' }}
+  <div class="tk-wrap bvx-grid2">
+    <div class="bvx-col">
+      <div class="bvx-body" id="bvx-body">{{ bai_viet.noi_dung | safe if bai_viet.noi_dung else '' }}</div>
+
+      {% if bai_viet.file_dinh_kem %}
+      <a class="bvx-file" href="{{ bai_viet.file_dinh_kem }}" target="_blank" rel="noopener">
+        <span class="bvx-file__ic">{{ ic('paperclip', 20) }}</span>
+        <span class="bvx-file__t"><strong>Tệp đính kèm</strong><small>{{ bai_viet.ten_file or 'Tải xuống để xem' }}</small></span>
+        <span class="bvx-file__go">Tải về</span>
+      </a>
+      {% endif %}
+
+      <footer class="bvx-end">
+        {{ nhan_dm(bai_viet) }}
+        {% if bai_viet.ngay_cap_nhat and bai_viet.ngay_xuat_ban and (bai_viet.ngay_cap_nhat - bai_viet.ngay_xuat_ban).days >= 1 %}
+        <span class="bvx-meta">Cập nhật lần cuối {{ (bai_viet.ngay_cap_nhat | gio_vn).strftime('%d/%m/%Y') }}</span>
+        {% endif %}
+        <a class="tk-link bvx-back" href="{{ url_for('bv.index') }}">← Tất cả bài viết</a>
+      </footer>
+    </div>
+    <aside class="bvx-toc" id="bvx-toc" aria-label="Mục lục bài viết" hidden>
+      <p class="bvx-toc__h">Trong bài này</p>
+      <ol class="bvx-toc__list"></ol>
+    </aside>
   </div>
+</article>
 
-  {% if bai_viet.file_dinh_kem %}
-  <a href="{{ bai_viet.file_dinh_kem }}" target="_blank" rel="noopener" class="bv-attach">
-    {{ ic('paperclip', 16) }} Tải tệp đính kèm{{ ' — ' ~ bai_viet.ten_file if bai_viet.ten_file }}
-  </a>
-  {% endif %}
-
-  {% if bai_lien_quan %}
-  <div class="bv-related">
-    <h2 class="tk-h3" style="margin:var(--s-8) 0 var(--s-4)">Bài viết liên quan</h2>
-    <ul class="tk-rows">
-      {% for bv in bai_lien_quan %}
-      <li><a class="tk-row" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}"><span class="tk-row__name">{{ bv.tieu_de }}</span><span class="tk-row__end">{{ ic('chevron', 16) }}</span></a></li>
-      {% endfor %}
-    </ul>
-  </div>
-  {% endif %}
-</div>
+{% if bai_lien_quan %}
+<section class="tk-wrap bvx-related" aria-labelledby="bvx-lq">
+  <h2 class="bvx-h" id="bvx-lq">Bài viết liên quan</h2>
+  <div class="bvx-grid">{% for bv in bai_lien_quan %}{{ the(bv, ic) }}{% endfor %}</div>
+</section>
+{% endif %}
 
 {% set hd_loai = 'bv' %}{% set hd_id = bai_viet.id %}{% set hd_ten = bai_viet.tieu_de %}
 {% include "_hoi_dap.html" %}

@@ -23,7 +23,7 @@ def trang_chinh():
         UNION ALL
         SELECT 'tuong_hop_tuong_ky',          COUNT(*) FROM tuong_hop_tuong_ky
         UNION ALL
-        SELECT 'tuong_tac',                   COUNT(*) FROM tuong_tac_thuoc
+        SELECT 'tuong_tac',                   COUNT(*) FROM tuong_tac_hoat_chat
         UNION ALL
         SELECT 'thong_tin_thuoc',             COUNT(*) FROM thong_tin_thuoc
         UNION ALL

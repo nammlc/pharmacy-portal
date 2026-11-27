@@ -101,18 +101,37 @@ class PhanConLaiVaAdmin(Co):
         self.assertIn('tk-detail"', h); self.assertIn("Nhà thuốc BV", h)
         self.assertIn('id="hoat-chat"', h)
 
-    def test_articles_have_no_autoplay_slideshow_and_no_overlay_on_photos(self):
+    def test_articles_have_a_three_slide_carousel_with_pause_and_no_overlay_on_photos(self):
+        def tao():
+            from datetime import datetime
+            from app import db
+            from app.models.models import BaiViet, DanhMucBaiViet
+            dm = DanhMucBaiViet(ten="Thông báo", slug="thong-bao"); db.session.add(dm); db.session.flush()
+            for i in range(1, 6):          # 5 bài; chỉ mức 1-3 vào slide, mức 4 (dữ liệu cũ) bị bỏ qua
+                db.session.add(BaiViet(tieu_de=f"Bài số {i}", slug=f"bai-so-{i}", mo_ta_ngan="Tóm tắt", noi_dung="<h2>A</h2><p>x</p>",
+                                       trang_thai="da_xuat_ban", danh_muc_id=dm.id, do_uu_tien=i if i <= 4 else None,
+                                       ngay_xuat_ban=datetime.utcnow()))
+            db.session.commit()
+        self.q(tao)
         h = self.trang("/bai-viet/")
-        self.assertNotIn("bvSlideshow", h); self.assertNotIn("bv-slide-overlay", h)
+        self.assertIn("data-bvx-slider", h)
+        self.assertEqual(h.count('class="bvx-slide '), 3)                        # đúng 3 slide, không hơn
+        self.assertIn('aria-roledescription="carousel"', h)
+        self.assertIn('data-act="toggle"', h)                                    # có nút tạm dừng tự chuyển
+        self.assertNotIn("bvSlideshow", h); self.assertNotIn("bv-slide-overlay", h)   # không đè chữ lên ảnh
+        self.assertIn("Mới đăng", h)
+        d = self.trang("/bai-viet/bai-so-1")
+        self.assertIn('class="bvx-title"', d); self.assertIn("phút đọc", d); self.assertIn('id="bvx-body"', d)
 
     def test_interaction_table_is_sorted_by_severity_and_keeps_text_labels(self):
         def tao():
             from app import db
-            from app.models.models import Thuoc, TuongTacThuoc
-            a, b, c = Thuoc(ten_thuoc="Warfarin"), Thuoc(ten_thuoc="Aspirin"), Thuoc(ten_thuoc="Ibuprofen")
+            from app.models.models import HoatChat, TuongTacHoatChat
+            a, b, c = HoatChat(ten_hoat_chat="Warfarin"), HoatChat(ten_hoat_chat="Aspirin"), HoatChat(ten_hoat_chat="Ibuprofen")
             db.session.add_all([a, b, c]); db.session.flush()
             for y, m in ((b.id, "nhe"), (c.id, "chong_chi_dinh")):
-                db.session.add(TuongTacThuoc(thuoc_a_id=a.id, thuoc_b_id=y, muc_do=m, hau_qua_lam_sang="x", xu_tri="y"))
+                x, z = TuongTacHoatChat.sap_xep(a.id, y)
+                db.session.add(TuongTacHoatChat(hoat_chat_a_id=x, hoat_chat_b_id=z, muc_do=m, hau_qua_lam_sang="x", xu_tri="y"))
             db.session.commit()
         self.q(tao)
         h = self.trang("/tra-cuu-tuong-tac-thuoc/?q=Warfarin")

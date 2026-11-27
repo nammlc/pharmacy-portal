@@ -1,5 +1,7 @@
+import re
+
 from flask import Blueprint, render_template, request, abort, redirect, url_for
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 from app import db
 from app.models.models import BaiViet, DanhMucBaiViet
 from app.utils.tim_kiem import tim_bai_viet
@@ -7,9 +9,11 @@ from app.utils.tim_kiem import tim_bai_viet
 bp = Blueprint("bv", __name__, url_prefix="/bai-viet")
 
 SO_BAI_MOI_TRANG = 9      # số bài/trang khi xem theo 1 danh mục cụ thể
-SO_BAI_MOI_KHOI = 9       # số bài mỗi khối danh mục ở trang chủ Bài viết
-SO_BAI_PHU = 5            # số tiêu đề ở danh sách bên phải slideshow (vừa khít chiều cao ảnh 480px, thừa thì cuộn)
-SO_MUC_UU_TIEN = 4        # có 4 mức ưu tiên: 1, 2, 3, 4
+SO_BAI_MOI_KHOI = 6       # số bài mỗi khối danh mục ở trang chủ Bài viết (lưới 3 x 2)
+SO_BAI_PHU = 6            # số bài ở danh sách "Mới đăng" bên dưới slide
+SO_BAI_DOC_NHIEU = 5      # số bài ở khung "Đọc nhiều"
+SO_MUC_UU_TIEN = 3        # có 3 mức ưu tiên (1, 2, 3) = đúng 3 slide đầu trang
+TOC_DO_DOC = 200          # từ/phút, để ước tính "n phút đọc"
 
 
 def _lay_bai_phu(loai_tru_id_bai=None, loai_tru_danh_muc_ids=None, gioi_han=SO_BAI_PHU):
@@ -31,12 +35,13 @@ def _lay_bai_phu(loai_tru_id_bai=None, loai_tru_danh_muc_ids=None, gioi_han=SO_B
 def _xay_dung_trang_chu_bai_viet():
     """
     Dựng dữ liệu cho khối đầu trang "Bài viết" (không lọc danh mục, không tìm kiếm):
-    - slide_bai: tối đa 4 bài cho slideshow bên trái, lấy theo mức ưu tiên 1-2-3-4
+    - slide_bai: đúng tối đa 3 bài cho slide đầu trang, lấy theo mức ưu tiên 1-2-3
       (admin gán ở trang sửa bài viết). Mức nào chưa gán thì bù bằng bài ghim/mới nhất.
-    - bai_phu: danh sách tiêu đề bên phải, KHÔNG trùng bài trong slideshow và KHÁC
-      danh mục với bài ưu tiên mức 1.
+    - bai_phu: danh sách "Mới đăng", KHÔNG trùng bài trong slide.
+    - bai_doc_nhieu: top bài nhiều lượt xem nhất (khung bên phải).
+    - so_bai_theo_dm: {id danh mục: số bài đã xuất bản} cho khung "Chuyên mục".
     - danh_sach_khoi_danh_muc: các khối lưới 3 cột bên dưới, mỗi khối 1 danh mục,
-      tối đa 9 bài/khối. Thứ tự khối theo danh mục của các bài ưu tiên 1→2→3→4
+      tối đa 6 bài/khối. Thứ tự khối theo danh mục của các bài ưu tiên 1→2→3
       trước, các danh mục còn lại xếp sau theo thứ tự đã cấu hình.
     """
     da_xuat_ban = BaiViet.trang_thai == "da_xuat_ban"
@@ -51,7 +56,7 @@ def _xay_dung_trang_chu_bai_viet():
 
     slide_bai = [bai_uu_tien_theo_muc[m] for m in range(1, SO_MUC_UU_TIEN + 1) if m in bai_uu_tien_theo_muc]
 
-    # Bù cho đủ 4 slide nếu còn thiếu mức ưu tiên - lấy bài ghim/mới nhất chưa có.
+    # Bù cho đủ 3 slide nếu còn thiếu mức ưu tiên - lấy bài ghim/mới nhất chưa có.
     if len(slide_bai) < SO_MUC_UU_TIEN:
         ds_id_slide = [b.id for b in slide_bai]
         query_bu = BaiViet.query.filter(da_xuat_ban)
@@ -122,7 +127,16 @@ def _xay_dung_trang_chu_bai_viet():
     if bai_khong_danh_muc:
         danh_sach_khoi_danh_muc.append({"danh_muc": None, "bai_list": bai_khong_danh_muc})
 
-    return slide_bai, bai_phu, danh_sach_khoi_danh_muc
+    bai_doc_nhieu = (BaiViet.query
+                     .filter(da_xuat_ban, BaiViet.luot_xem > 0)
+                     .order_by(BaiViet.luot_xem.desc(), BaiViet.ngay_xuat_ban.desc())
+                     .limit(SO_BAI_DOC_NHIEU)
+                     .all())
+    so_bai_theo_dm = {dm_id: n for dm_id, n in (db.session.query(BaiViet.danh_muc_id, func.count(BaiViet.id))
+                                                .filter(da_xuat_ban, BaiViet.danh_muc_id.isnot(None))
+                                                .group_by(BaiViet.danh_muc_id).all())}
+
+    return slide_bai, bai_phu, danh_sach_khoi_danh_muc, bai_doc_nhieu, so_bai_theo_dm
 
 
 @bp.route("/")
@@ -130,8 +144,8 @@ def index():
     """
     - Có ?q= : trang kết quả tìm kiếm.
     - Có ?danh_muc= : lưới bài viết phẳng theo 1 danh mục, có phân trang (như cũ).
-    - Không có gì cả (trang chủ Bài viết): layout tạp chí - slideshow ưu tiên
-      bên trái, danh sách tiêu đề bên phải, các khối lưới 3 cột theo danh mục
+    - Không có gì cả (trang chủ Bài viết): layout tạp chí - slide 3 bài ưu tiên
+      ở đầu, danh sách "Mới đăng" + "Đọc nhiều", rồi các khối lưới 3 cột theo danh mục
       bên dưới (xem hàm _xay_dung_trang_chu_bai_viet).
     """
     tu_khoa = request.args.get("q", "").strip()
@@ -156,6 +170,7 @@ def index():
     bai_viet_list = []
     phan_trang = None
     slide_bai, bai_phu, danh_sach_khoi_danh_muc = [], [], []
+    bai_doc_nhieu, so_bai_theo_dm = [], {}
 
     if danh_muc_hien_tai:
         query = BaiViet.query.filter(
@@ -167,7 +182,7 @@ def index():
                       .paginate(page=trang, per_page=SO_BAI_MOI_TRANG, error_out=False))
         bai_viet_list = phan_trang.items
     elif trang == 1:
-        slide_bai, bai_phu, danh_sach_khoi_danh_muc = _xay_dung_trang_chu_bai_viet()
+        slide_bai, bai_phu, danh_sach_khoi_danh_muc, bai_doc_nhieu, so_bai_theo_dm = _xay_dung_trang_chu_bai_viet()
     else:
         # Trang chủ Bài viết (không lọc danh mục) không còn khái niệm "trang 2"
         # với layout tạp chí mới - quay lại trang 1.
@@ -182,6 +197,8 @@ def index():
         slide_bai=slide_bai,
         bai_phu=bai_phu,
         danh_sach_khoi_danh_muc=danh_sach_khoi_danh_muc,
+        bai_doc_nhieu=bai_doc_nhieu,
+        so_bai_theo_dm=so_bai_theo_dm,
     )
 
 
@@ -204,8 +221,23 @@ def chi_tiet(slug):
             BaiViet.danh_muc_id == bai_viet.danh_muc_id,
         )
         .order_by(BaiViet.ngay_xuat_ban.desc())
-        .limit(4)
+        .limit(3)
         .all()
     )
+    if len(bai_lien_quan) < 3:      # danh mục còn ít bài: bù bằng bài mới nhất khác để cuối bài không trống
+        da_co = [bai_viet.id] + [b.id for b in bai_lien_quan]
+        bai_lien_quan += (BaiViet.query
+                          .filter(BaiViet.trang_thai == "da_xuat_ban", BaiViet.id.notin_(da_co))
+                          .order_by(BaiViet.ngay_xuat_ban.desc(), BaiViet.ngay_tao.desc())
+                          .limit(3 - len(bai_lien_quan))
+                          .all())
 
-    return render_template("bai_viet/chi_tiet.html", bai_viet=bai_viet, bai_lien_quan=bai_lien_quan)
+    return render_template("bai_viet/chi_tiet.html", bai_viet=bai_viet, bai_lien_quan=bai_lien_quan,
+                           phut_doc=_phut_doc(bai_viet.noi_dung))
+
+
+def _phut_doc(html_noi_dung):
+    """Ước tính số phút đọc từ nội dung HTML (bỏ thẻ, đếm từ)."""
+    chu = re.sub(r"<[^>]+>", " ", html_noi_dung or "")
+    so_tu = len(chu.split())
+    return max(1, round(so_tu / TOC_DO_DOC))

@@ -1,5 +1,6 @@
 {% extends "admin/base.html" %}
 {% from "_icons.html" import ic %}
+{% from "admin/_phan_trang.html" import so_trang %}
 {% block title %}Thông báo{% endblock %}
 {% block page_eyebrow %}Phản hồi{% endblock %}
 
@@ -53,6 +54,7 @@
 </div>
 
 {% if muc %}
+{{ so_trang(trang, tong, moi_trang, url_for('admin_thong_bao.danh_sach', chua_doc=1 if chi_chua_doc else None, trang='__P__'), 'thông báo', True) }}
 <ul class="tb-page-list">
   {% for t in muc %}
   <li class="{{ '' if t.da_doc else 'tb-unread' }}">
@@ -65,19 +67,15 @@
         {% if tl %}{% if tl.da %}<span class="tl-badge tl-da">Đã trả lời{% if tl.boi %} bởi {{ tl.boi }}{% endif %}{% if tl.luc %} · {{ tl.luc }}{% endif %}</span>
         {% else %}<span class="tl-badge tl-chua">⏳ Chưa trả lời</span>{% endif %}{% endif %}
       </span>
-      <span class="tb-time">{{ (t.ngay_tao | gio_vn).strftime('%H:%M %d/%m/%Y') }}</span>
+      <span class="tb-side">
+        <span class="tb-time">{{ (t.ngay_tao | gio_vn).strftime('%H:%M %d/%m/%Y') }}</span>
+        <span class="tb-state {{ 'cu' if t.da_doc else 'moi' }}">{{ 'Đã đọc' if t.da_doc else 'Chưa đọc' }}</span>
+      </span>
     </a>
   </li>
   {% endfor %}
 </ul>
-{% set tong_trang = (tong // moi_trang) + (1 if tong % moi_trang else 0) %}
-{% if tong_trang > 1 %}
-<nav class="yk-pager" aria-label="Phân trang">
-  {% if trang > 1 %}<a href="{{ url_for('admin_thong_bao.danh_sach', chua_doc=1 if chi_chua_doc else None, trang=trang - 1) }}">‹ Trước</a>{% endif %}
-  <span>Trang {{ trang }} / {{ tong_trang }}</span>
-  {% if trang < tong_trang %}<a href="{{ url_for('admin_thong_bao.danh_sach', chua_doc=1 if chi_chua_doc else None, trang=trang + 1) }}">Sau ›</a>{% endif %}
-</nav>
-{% endif %}
+{{ so_trang(trang, tong, moi_trang, url_for('admin_thong_bao.danh_sach', chua_doc=1 if chi_chua_doc else None, trang='__P__'), 'thông báo', True) }}
 {% else %}
 <div class="adm-empty">Không có thông báo nào.</div>
 {% endif %}

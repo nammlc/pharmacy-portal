@@ -60,6 +60,7 @@ def danh_sach():
     elif tt == "da":
         truy_van = truy_van.filter(tn_cuoi.tu == "admin")
     tong = truy_van.count()
+    trang = min(trang, max(1, -(-tong // MOI_TRANG)))     # trang vượt quá thì lùi về trang cuối
     dong = (truy_van.order_by(tn_cuoi.ngay_tao.desc().nullslast(), KhachHang.id.desc()) if db.engine.dialect.name == "postgresql"
             else truy_van.order_by(KhachHang.lan_cuoi.desc(), KhachHang.id.desc()))
     dong = dong.offset((trang - 1) * MOI_TRANG).limit(MOI_TRANG).all()

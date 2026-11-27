@@ -10,6 +10,8 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/taste-fonts.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/taste.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/taste-mau.css') }}">
+{% block head_extra %}{% endblock %}
 <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
 <meta name="description" content="{% block meta_mo_ta %}Tra cứu thông tin thuốc tại Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan: danh mục thuốc, tương tác thuốc, thuốc tiêm truyền, tương hợp – tương kỵ và hướng dẫn sử dụng thuốc.{% endblock %}">
 <meta name="robots" content="{% block meta_robots %}index, follow{% endblock %}">
@@ -48,7 +50,9 @@
 </script>
 {% endif %}
 </head>
-<body>
+{# Màu của trang con = màu thẻ tương ứng ở trang chủ (c1 teal … c8 ochre). Trang chủ không gắn lớp "pg" vì có lớp màu riêng. #}
+{% set mau_trang = {'dmt':'c1','ntbv':'c2','tttt':'c3','thtk':'c4','ttt':'c5','ttth':'c6','ttbn':'c7','bv':'c8'}.get(request.blueprint or '', 'c1') %}
+<body{% if (request.endpoint or '') != 'main.trang_chu' %} class="pg {{ mau_trang }}"{% endif %}>
 <a class="skip-link" href="#main">Bỏ qua menu, tới nội dung chính</a>
 
 {% set ep = request.endpoint or '' %}{% set bp = request.blueprint or '' %}
@@ -149,6 +153,7 @@
 
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/taste.js') }}" defer></script>
+{% block scripts_extra %}{% endblock %}
 <script src="{{ url_for('static', filename='js/lightbox.js') }}"></script>
 <script src="{{ url_for('static', filename='js/goi_y_tim_kiem.js') }}"></script>
 <script src="{{ url_for('static', filename='js/dong_y_cookie.js') }}"></script>

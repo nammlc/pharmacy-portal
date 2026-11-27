@@ -1,15 +1,18 @@
 {% extends "base.html" %}
 {% from "_icons.html" import ic %}
+{% from "bai_viet/_the.html" import the, hang, ngay, nhan_dm, anh %}
 {% set la_trang_goc = (request.path == '/' and not danh_muc_hien_tai) %}
 {% block title %}{% if la_trang_goc %}Tra cứu dược Tâm Đức — Khoa Dược{% else %}{{ danh_muc_hien_tai.ten if danh_muc_hien_tai else 'Bài viết - Thông báo' }}{% endif %}{% endblock %}
 {% block meta_mo_ta %}{% if la_trang_goc %}Tra cứu dược Tâm Đức: thông tin thuốc, tương tác thuốc, tương hợp – tương kỵ, tin tức và thông báo từ Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan.{% else %}Thông báo nội bộ, tin tức dược phẩm, bài báo khoa học và hướng dẫn chuyên môn từ Khoa Dược Bệnh viện Đa khoa Tâm Đức Cầu Quan.{% endif %}{% endblock %}
 {% block og_tieu_de %}{% if la_trang_goc %}Tra cứu dược Tâm Đức — Khoa Dược BV Đa khoa Tâm Đức Cầu Quan{% else %}Bài viết - Thông báo – BV Đa khoa Tâm Đức Cầu Quan{% endif %}{% endblock %}
+{% block head_extra %}<link rel="stylesheet" href="{{ url_for('static', filename='css/taste-bai-viet.css') }}">{% endblock %}
+{% block scripts_extra %}{% if slide_bai and slide_bai|length > 1 %}<script src="{{ url_for('static', filename='js/bai-viet.js') }}" defer></script>{% endif %}{% endblock %}
 
 {% block content %}
 <section class="tk-head"><div class="tk-wrap">
   <p class="tk-crumb">Tin tức &amp; thông báo</p>
   <h1 class="tk-h1">{{ danh_muc_hien_tai.ten if danh_muc_hien_tai else 'Bài viết - Thông báo' }}</h1>
-  <p class="tk-lead">{{ danh_muc_hien_tai.mo_ta if danh_muc_hien_tai else 'Thông báo nội bộ, tin tức dược phẩm, bài báo khoa học và hướng dẫn chuyên môn từ Khoa Dược.' }}</p>
+  <p class="tk-lead">{{ danh_muc_hien_tai.mo_ta if danh_muc_hien_tai and danh_muc_hien_tai.mo_ta else 'Thông báo nội bộ, tin tức dược phẩm, bài báo khoa học và hướng dẫn chuyên môn từ Khoa Dược.' }}</p>
 </div></section>
 
 <div class="tk-wrap tk-searchrow">
@@ -21,134 +24,114 @@
 </div>
 
 {% if danh_sach_danh_muc %}
-<div class="tk-wrap bv-filter-bar">
-  <a href="{{ url_for('bv.index') }}" class="bv-filter-chip {{ 'is-active' if not danh_muc_hien_tai }}">Tất cả</a>
+<nav class="tk-wrap bvx-chips" aria-label="Lọc theo chuyên mục">
+  <a href="{{ url_for('bv.index') }}" class="bvx-chip {{ 'is-on' if not danh_muc_hien_tai }}" {% if not danh_muc_hien_tai %}aria-current="page"{% endif %}>Tất cả</a>
   {% for dm in danh_sach_danh_muc %}
-  <a href="{{ url_for('bv.index', danh_muc=dm.slug) }}"
-     class="bv-filter-chip {{ 'is-active' if danh_muc_hien_tai and danh_muc_hien_tai.id == dm.id }}"
-     style="--chip-color: {{ dm.mau_sac or '#1a4d8f' }};">{{ dm.ten }}</a>
+  <a href="{{ url_for('bv.index', danh_muc=dm.slug) }}" class="bvx-chip {{ 'is-on' if danh_muc_hien_tai and danh_muc_hien_tai.id == dm.id }}"
+     {% if danh_muc_hien_tai and danh_muc_hien_tai.id == dm.id %}aria-current="page"{% endif %} style="--cc: {{ dm.mau_sac or '#2c5877' }};">{{ dm.ten }}</a>
   {% endfor %}
+</nav>
+{% endif %}
+
+{% if danh_muc_hien_tai %}
+{# ===== Xem theo 1 chuyên mục: lưới thẻ + phân trang ===== #}
+<div class="tk-wrap bvx-main">
+  {% if bai_viet_list %}
+  <div class="bvx-grid">{% for bv in bai_viet_list %}{{ the(bv, ic) }}{% endfor %}</div>
+  {% set endpoint = 'bv.index' %}{% set args = {'danh_muc': danh_muc_hien_tai.slug} %}
+  {% include "_phan_trang.html" with context %}
+  {% else %}
+  <div class="empty-state"><div class="empty-state-icon">{{ ic('newspaper', 22) }}</div>Chưa có bài viết nào được đăng trong chuyên mục này.</div>
+  {% endif %}
+</div>
+
+{% else %}
+
+{# ===== Slide 3 bài ưu tiên: ảnh và chữ nằm cạnh nhau, không đè chữ lên ảnh ===== #}
+{% if slide_bai %}
+{% set n = slide_bai|length %}
+<section class="tk-wrap bvx-hero" aria-roledescription="carousel" aria-label="Bài viết nổi bật" data-bvx-slider data-ms="7000">
+  <div class="bvx-hero__stage" aria-live="off">
+    {% for bv in slide_bai %}
+    <article class="bvx-slide {{ 'is-active' if loop.first }}" role="group" aria-roledescription="slide" aria-label="{{ loop.index }} trên {{ n }}"
+             {% if not loop.first %}aria-hidden="true" inert{% endif %}>
+      <a class="bvx-slide__pic bvx-pic" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}" tabindex="-1" aria-hidden="true">{{ anh(bv, ic, loop.first) }}</a>
+      <div class="bvx-slide__text">
+        <p class="bvx-slide__no">0{{ loop.index }}<span> / 0{{ n }}</span></p>
+        {{ nhan_dm(bv) }}
+        <h2 class="bvx-slide__title"><a href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">{{ bv.tieu_de }}</a></h2>
+        {% if bv.mo_ta_ngan %}<p class="bvx-slide__sum">{{ bv.mo_ta_ngan }}</p>{% endif %}
+        <p class="bvx-meta">{{ ngay(bv) }}{% if bv.luot_xem %} · {{ bv.luot_xem }} lượt xem{% endif %}</p>
+        <a class="tk-btn tk-btn--primary bvx-slide__cta" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">Đọc bài viết <svg class="tk-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% if n > 1 %}
+  <div class="bvx-hero__bar">
+    <div class="bvx-dots">
+      {% for bv in slide_bai %}<button type="button" class="bvx-dot {{ 'is-active' if loop.first }}" data-i="{{ loop.index0 }}" aria-label="Xem bài {{ loop.index }}: {{ bv.tieu_de }}" {% if loop.first %}aria-current="true"{% endif %}><i></i></button>{% endfor %}
+    </div>
+    <div class="bvx-ctrl">
+      <button type="button" class="bvx-ctrl__btn" data-act="prev" aria-label="Bài trước"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="bvx-ctrl__btn" data-act="toggle" aria-label="Tạm dừng tự chuyển" data-pause="Tạm dừng tự chuyển" data-play="Tiếp tục tự chuyển">
+        <svg class="i-pause" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3.5" y="3" width="3" height="10" rx="1"/><rect x="9.5" y="3" width="3" height="10" rx="1"/></svg>
+        <svg class="i-play" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M4.5 3v10l8-5z"/></svg>
+      </button>
+      <button type="button" class="bvx-ctrl__btn" data-act="next" aria-label="Bài sau"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="m6 3 5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+{# ===== Mới đăng (trái) + Đọc nhiều / Chuyên mục (phải) ===== #}
+{% if bai_phu or bai_doc_nhieu %}
+<div class="tk-wrap bvx-split">
+  <section class="bvx-feed" aria-labelledby="bvx-moi">
+    <h2 class="bvx-h" id="bvx-moi">Mới đăng</h2>
+    {% if bai_phu %}<div class="bvx-rows">{% for bv in bai_phu %}{{ hang(bv, ic) }}{% endfor %}</div>
+    {% else %}<p class="tk-muted">Chưa có thêm bài viết nào.</p>{% endif %}
+  </section>
+  <aside class="bvx-aside">
+    {% if bai_doc_nhieu %}
+    <section aria-labelledby="bvx-nhieu">
+      <h2 class="bvx-h bvx-h--sm" id="bvx-nhieu">Đọc nhiều</h2>
+      <ol class="bvx-rank">
+        {% for bv in bai_doc_nhieu %}
+        <li><a href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}"><span class="bvx-rank__no" aria-hidden="true">{{ loop.index }}</span><span class="bvx-rank__t">{{ bv.tieu_de }}<small>{{ bv.luot_xem }} lượt xem</small></span></a></li>
+        {% endfor %}
+      </ol>
+    </section>
+    {% endif %}
+    {% if danh_sach_danh_muc %}
+    <section aria-labelledby="bvx-cm">
+      <h2 class="bvx-h bvx-h--sm" id="bvx-cm">Chuyên mục</h2>
+      <ul class="bvx-cats">
+        {% for dm in danh_sach_danh_muc %}
+        <li><a href="{{ url_for('bv.index', danh_muc=dm.slug) }}"><i style="background: {{ dm.mau_sac or '#2c5877' }};"></i>{{ dm.ten }}<span>{{ so_bai_theo_dm.get(dm.id, 0) }}</span></a></li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+  </aside>
 </div>
 {% endif %}
 
-<div class="tk-wrap tk-results">
-
-  {% if danh_muc_hien_tai %}
-
-  {# ===== Xem theo 1 danh mục cụ thể: lưới phẳng + phân trang (giống hệt
-       khối "Tin tức" ở trang chủ Bài viết — dùng chung class bv-lienquan-*) ===== #}
-  {% if bai_viet_list %}
-  <div class="bv-lienquan-grid bv-khoi-grid">
-    {% for bv in bai_viet_list %}
-    <a class="bv-lienquan-card" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
-      <div class="bv-lienquan-anh" {% if bv.anh_dai_dien %}style="background-image:url('{{ bv.anh_dai_dien }}');"{% endif %}>
-        {% if not bv.anh_dai_dien %}<span class="bv-card-thumb-fallback">{{ ic('newspaper', 22) }}</span>{% endif %}
-        {% if bv.ghim %}<span class="bv-card-pin">{{ ic('pin', 22) }}</span>{% endif %}
-      </div>
-      <span class="bv-lienquan-title">{{ bv.tieu_de }}</span>
-      <span style="font-size:12px; color:var(--text-muted);">
-        {{ (bv.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bv.ngay_xuat_ban else (bv.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}
-      </span>
-    </a>
-    {% endfor %}
-  </div>
-  {% set endpoint = 'bv.index' %}
-  {% set args = {'danh_muc': danh_muc_hien_tai.slug} %}
-  {% include "_phan_trang.html" with context %}
-  {% else %}
-  <div class="empty-state">
-    <div class="empty-state-icon">{{ ic('newspaper', 22) }}</div>
-    Chưa có bài viết nào được đăng trong danh mục này.
-  </div>
-  {% endif %}
-
-  {% else %}
-
-  {# ===== Trang chủ Bài viết: bài nổi bật (ảnh + chữ cạnh nhau, không đè chữ lên ảnh) + các bài khác theo hàng ===== #}
-  {% if slide_bai %}
-  {% set noi_bat = slide_bai[0] %}
-  <div class="tk-lead-story">
-    <a class="tk-card tk-lead-story__card" href="{{ url_for('bv.chi_tiet', slug=noi_bat.slug) }}">
-      <div class="tk-frame tk-lead-story__pic">{% if noi_bat.anh_dai_dien %}<img src="{{ noi_bat.anh_dai_dien }}" alt="" decoding="async" fetchpriority="high">{% endif %}</div>
-      <div class="tk-lead-story__text">
-        {% if noi_bat.danh_muc %}<span class="tk-label">{{ noi_bat.danh_muc.ten }}</span>{% endif %}
-        <h2 class="tk-h2">{{ noi_bat.tieu_de }}</h2>
-        {% if noi_bat.mo_ta_ngan %}<p class="tk-lead">{{ noi_bat.mo_ta_ngan }}</p>{% endif %}
-        <p class="tk-label">{{ (noi_bat.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if noi_bat.ngay_xuat_ban else (noi_bat.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}{% if noi_bat.luot_xem %} · {{ noi_bat.luot_xem }} lượt xem{% endif %}</p>
-      </div>
-    </a>
-  </div>
-  {% set khac = (slide_bai[1:] or []) + (bai_phu or []) %}
-  {% if khac %}
-  <h2 class="tk-h3" style="margin: var(--s-8) 0 var(--s-4)">Bài viết khác</h2>
-  <ul class="tk-rows">
-    {% for bv in khac %}
-    <li><a class="tk-row" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
-      <span class="tk-row__name">{{ bv.tieu_de }}</span>
-      <span class="tk-row__end">{% if bv.danh_muc %}<span class="tk-row__meta">{{ bv.danh_muc.ten }}</span>{% endif %}<svg class="tk-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-    </a></li>
-    {% endfor %}
-  </ul>
-  {% endif %}
-  {% endif %}
-
-  {# ===== Các khối lưới 3 cột theo danh mục, thứ tự theo bài ưu tiên ===== #}
-  {% if danh_sach_khoi_danh_muc %}
+{# ===== Các khối theo chuyên mục ===== #}
+<div class="tk-wrap bvx-main">
   {% for khoi in danh_sach_khoi_danh_muc %}
-  <div class="bv-khoi" style="margin-bottom:38px;">
-    <div class="tktg-section-head">
-      <div class="tktg-section-title">
-        {% if khoi.danh_muc %}
-        <span class="tktg-dot" style="background:{{ khoi.danh_muc.mau_sac or '#1a4d8f' }};"></span>
-        {{ khoi.danh_muc.ten }}
-        {% else %}
-        <span class="tktg-dot" style="background:var(--text-muted);"></span>
-        Khác
-        {% endif %}
-      </div>
-      {% if khoi.danh_muc %}
-      <a href="{{ url_for('bv.index', danh_muc=khoi.danh_muc.slug) }}" class="btn btn-outline btn-sm">Xem tất cả →</a>
-      {% endif %}
-    </div>
-    <div class="bv-lienquan-grid bv-khoi-grid">
-      {% for bv in khoi.bai_list %}
-      <a class="bv-lienquan-card" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">
-        <div class="bv-lienquan-anh" {% if bv.anh_dai_dien %}style="background-image:url('{{ bv.anh_dai_dien }}');"{% endif %}>
-          {% if not bv.anh_dai_dien %}<span class="bv-card-thumb-fallback">{{ ic('newspaper', 22) }}</span>{% endif %}
-          {% if bv.ghim %}<span class="bv-card-pin">{{ ic('pin', 22) }}</span>{% endif %}
-        </div>
-        <span class="bv-lienquan-title">{{ bv.tieu_de }}</span>
-        <span style="font-size:12px; color:var(--text-muted);">
-          {{ (bv.ngay_xuat_ban | gio_vn).strftime('%d/%m/%Y') if bv.ngay_xuat_ban else (bv.ngay_tao | gio_vn).strftime('%d/%m/%Y') }}
-        </span>
-      </a>
-      {% endfor %}
-    </div>
-  </div>
+  <section class="bvx-block" style="--cc: {{ (khoi.danh_muc.mau_sac if khoi.danh_muc else None) or '#2c5877' }};">
+    <header class="bvx-block__head">
+      <h2 class="bvx-h">{{ khoi.danh_muc.ten if khoi.danh_muc else 'Khác' }}</h2>
+      {% if khoi.danh_muc %}<a class="tk-link bvx-all" href="{{ url_for('bv.index', danh_muc=khoi.danh_muc.slug) }}">Xem tất cả</a>{% endif %}
+    </header>
+    <div class="bvx-grid">{% for bv in khoi.bai_list %}{{ the(bv, ic) }}{% endfor %}</div>
+  </section>
   {% endfor %}
-  {% elif not slide_bai %}
-  <div class="empty-state">
-    <div class="empty-state-icon">{{ ic('newspaper', 22) }}</div>
-    Chưa có bài viết nào được đăng.
-  </div>
-  {% endif %}
-
+  {% if not slide_bai and not danh_sach_khoi_danh_muc and not bai_phu %}
+  <div class="empty-state"><div class="empty-state-icon">{{ ic('newspaper', 22) }}</div>Chưa có bài viết nào được đăng.</div>
   {% endif %}
 </div>
-
-<style>
-.bv-khoi-grid { grid-template-columns: repeat(3, 1fr); }
-@media (max-width: 860px) { .bv-khoi-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 560px) { .bv-khoi-grid { grid-template-columns: 1fr 1fr; } }
-
-.tktg-section-head {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
-}
-.tktg-section-title {
-  display: flex; align-items: center; gap: 8px;
-  font-family: var(--font-display); font-size: 17px; font-weight: 700;
-}
-.tktg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-</style>
+{% endif %}
 {% endblock %}
