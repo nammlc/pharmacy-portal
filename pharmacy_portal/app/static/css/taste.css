@@ -410,7 +410,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--p-action); box-s
 @supports (background: color-mix(in srgb, red 10%, white)) { .ttt-badge { background: color-mix(in srgb, var(--lv) 8%, var(--p-bg)); } }
 
 /* thanh "Báo lỗi thông tin" nằm trong khung nội dung */
-.bao-loi-bar { width: min(100% - 2 * var(--gut), var(--wrap)); margin: 0 auto var(--s-5); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-3); padding: 0; background: transparent; border: 0; font-size: var(--t-small); color: var(--p-muted); }
+.bao-loi-bar { width: min(100% - 2 * var(--gut), var(--wrap)); max-width: none; margin: 0 auto var(--s-5); display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: var(--s-2) var(--s-4); padding: 0; background: transparent; border: 0; font-size: var(--t-small); color: var(--p-muted); }
 .btn-bao-loi { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border-radius: var(--r-btn); background: var(--p-surface); color: var(--p-ink); font: 500 14.5px/1 var(--font-text); border: 0; }
 
 /* hỗ trợ: biểu mẫu nằm trong khung nội dung, thẻ rộng vừa phải */

@@ -3,7 +3,6 @@
 {% block title %}Tra cứu tương tác thuốc{% endblock %}
 {% block meta_mo_ta %}Tra cứu tương tác thuốc tại Khoa Dược BV Đa khoa Tâm Đức Cầu Quan: mức độ, cơ chế và hướng xử trí khi dùng đồng thời hai hoạt chất.{% endblock %}
 {% block head_extra %}<link rel="stylesheet" href="{{ url_for('static', filename='css/taste-tuong-tac.css') }}">{% endblock %}
-{% block scripts_extra %}<script src="{{ url_for('static', filename='js/tuong-tac.js') }}" defer></script>{% endblock %}
 
 {% block content %}
 {% set thu_tu = ['chong_chi_dinh', 'nang', 'trung_binh', 'nhe'] %}
@@ -26,7 +25,7 @@
                data-goi-y-url="{{ url_for('ttt.goi_y') }}">
       </div>
     </div>
-    {# Ô thứ hai chỉ hiện khi đã có hoạt chất thứ nhất (server: có ?q=; trình duyệt: tuong-tac.js hiện ngay khi gõ) #}
+    {# Ô thứ hai chỉ hiện SAU KHI đã tra cứu (Enter hoặc nút Tra cứu → URL có ?q=), không hiện khi đang gõ #}
     <div class="ttt-field" data-goi-y-khung{% if not tu_khoa %} hidden{% endif %}>
       <label for="ttt-q2">Hoạt chất thứ hai <span class="ttt-opt">không bắt buộc</span></label>
       <div class="ttt-input">
@@ -66,31 +65,15 @@
   </div>
 
   {% if pt.items %}
-  {# Danh sách gọn: mỗi dòng chỉ có cặp hoạt chất + mức độ. Bấm vào dòng để sổ ra hậu quả, xử trí (details/summary gốc, dùng được bằng bàn phím) #}
+  {# Danh sách gọn: mỗi dòng là MỘT liên kết (cặp hoạt chất + mức độ) → bấm là sang thẳng trang chi tiết #}
   <ol class="ttx-list">
     {% for item in pt.items %}
     <li>
-      <details class="ttx-item lvl-{{ item.muc_do }}">
-        <summary>
-          <span class="ttx-pair"><strong>{{ item.hoat_chat_a.ten_hoat_chat }}</strong><span class="ttx-plus" aria-label="kết hợp với">+</span><strong>{{ item.hoat_chat_b.ten_hoat_chat }}</strong></span>
-          <span class="ttt-badge ttx-badge"><span class="lv-meter lv-n{{ bac.get(item.muc_do, 1) }}" aria-hidden="true"><i></i><i></i><i></i><i></i></span>{{ nhan.get(item.muc_do, item.muc_do) }}</span>
-          <span class="ttx-chev" aria-hidden="true">{{ ic('chevron', 20) }}</span>
-        </summary>
-        <div class="ttx-body">
-          <div class="ttx-cols">
-            {% if item.hau_qua_lam_sang %}
-            <div class="ttx-col"><h3>Hậu quả lâm sàng</h3><div class="rich-content">{{ item.hau_qua_lam_sang | safe }}</div></div>
-            {% endif %}
-            {% if item.xu_tri %}
-            <div class="ttx-col"><h3>Xử trí</h3><div class="rich-content">{{ item.xu_tri | safe }}</div></div>
-            {% endif %}
-            {% if not item.hau_qua_lam_sang and not item.xu_tri %}
-            <div class="ttx-col"><p class="ttt-note">Chưa có mô tả hậu quả và xử trí cho tương tác này.</p></div>
-            {% endif %}
-          </div>
-          <a class="tk-link ttx-more" href="{{ url_for('ttt.chi_tiet', tt_id=item.id, page=pt.page, **tham_so) }}">Xem chi tiết đầy đủ {{ ic('arrow', 16) }}</a>
-        </div>
-      </details>
+      <a class="ttx-row lvl-{{ item.muc_do }}" href="{{ url_for('ttt.chi_tiet', tt_id=item.id, page=pt.page, **tham_so) }}">
+        <span class="ttx-pair"><strong>{{ item.hoat_chat_a.ten_hoat_chat }}</strong><span class="ttx-plus" aria-hidden="true">+</span><strong>{{ item.hoat_chat_b.ten_hoat_chat }}</strong></span>
+        <span class="ttt-badge ttx-badge"><span class="lv-meter lv-n{{ bac.get(item.muc_do, 1) }}" aria-hidden="true"><i></i><i></i><i></i><i></i></span>{{ nhan.get(item.muc_do, item.muc_do) }}</span>
+        <span class="ttx-chev" aria-hidden="true">{{ ic('chevron', 20) }}</span>
+      </a>
     </li>
     {% endfor %}
   </ol>

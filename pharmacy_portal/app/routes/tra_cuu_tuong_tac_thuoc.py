@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, redirect, render_template, request, url_for
 from sqlalchemy.orm import joinedload
 
 from app import db
@@ -27,6 +27,11 @@ def _doc_bo_loc(nguon):
 def index():
     tu_khoa, tu_khoa2, muc_do = _doc_bo_loc(request.args)
     trang = request.args.get("page", 1, type=int) or 1
+
+    # Form GET luôn gửi cả ô trống (?q=...&q2=): chuyển về URL gọn, không đuôi rỗng
+    if any(k in request.args and not request.args[k].strip() for k in ("q", "q2", "muc_do")):
+        gon = {k: v for k, v in (("q", tu_khoa), ("q2", tu_khoa2), ("muc_do", muc_do)) if v}
+        return redirect(url_for("ttt.index", **gon))
 
     kq = (tim_tuong_tac(tu_khoa, tu_khoa2, muc_do, page=trang, per_page=SO_TUONG_TAC_MOI_TRANG)
           if tu_khoa else None)

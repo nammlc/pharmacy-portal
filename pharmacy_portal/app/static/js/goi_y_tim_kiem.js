@@ -158,7 +158,6 @@
       if (che_do_dien) {                       // điền vào ô, người dùng bấm "Tra cứu" sau
         input.value = it.ten;
         if (an_input) an_input.value = it.ten;
-        input.dispatchEvent(new Event("goi-y-chon", { bubbles: true }));   // để trang biết ô đã được điền
         dong();
         input.focus();
         return;
