@@ -175,8 +175,10 @@ def upload_anh_hero_mobile(file_object, url_cu: str | None = None) -> str | None
 
 
 def upload_anh_bai_viet(file_object, url_cu: str | None = None) -> str | None:
+    """Ảnh đại diện bài viết: GIỮ NGUYÊN TỈ LỆ, không cắt (chỉ thu nhỏ nếu cạnh dài hơn 1600px).
+    Trước đây dùng crop='fill' 1200x800 nên ảnh bị cắt về 3:2 ngay lúc upload và phần bị cắt mất vĩnh viễn."""
     return _upload_len_cloudinary(file_object, "pharmacy/bai_viet",
-                                   url_cu=url_cu, width=1200, height=800, crop="fill")
+                                   url_cu=url_cu, width=1600, height=1600, crop="limit")
 
 
 def upload_anh_noi_dung(file_object) -> str | None:

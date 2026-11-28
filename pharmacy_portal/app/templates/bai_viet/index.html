@@ -47,7 +47,7 @@
 
 {% else %}
 
-{# ===== Slide 3 bài ưu tiên: ảnh đại diện lớn; 1/3 phía dưới ảnh là lớp phủ chứa tiêu đề; nút ‹ › hai bên;
+{# ===== Slide 3 bài ưu tiên: ảnh hiển thị ĐẦY ĐỦ (không cắt, không phóng to), tiêu đề nằm DƯỚI ảnh (không lớp phủ); nút ‹ › hai bên ảnh;
         mỗi bài có một thanh thời gian chạy riêng. Cả slide bấm vào là mở bài. ===== #}
 {% if slide_bai %}
 {% set n = slide_bai|length %}
@@ -59,7 +59,7 @@
       <div class="bvx-slide__pic">{{ anh(bv, ic, loop.first) }}</div>
       <div class="bvx-slide__cap">
         <div class="bvx-slide__row">
-          {% if bv.danh_muc %}<span class="bvx-cat bvx-cat--dark">{{ bv.danh_muc.ten }}</span>{% endif %}
+          {{ nhan_dm(bv) }}
           <span class="bvx-slide__meta">{{ ngay(bv) }}{% if bv.luot_xem %} · {{ bv.luot_xem }} lượt xem{% endif %}</span>
         </div>
         <h2 class="bvx-slide__title"><a href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">{{ bv.tieu_de }}</a></h2>

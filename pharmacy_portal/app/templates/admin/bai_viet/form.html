@@ -77,7 +77,7 @@
       {% endif %}
 
       {{ form.file_anh(accept="image/png,image/jpeg,image/webp,image/gif", style="margin-top:4px;") }}
-      <div style="font-size:0.82em; color:#666; margin-top:4px;">Chấp nhận: PNG, JPG, JPEG, WEBP, GIF — tối đa 5 MB</div>
+      <div style="font-size:0.82em; color:#666; margin-top:4px;">Chấp nhận: PNG, JPG, JPEG, WEBP, GIF — tối đa 5 MB. Ảnh được giữ nguyên tỉ lệ và hiển thị đầy đủ, không bị cắt (tối đa 1600 px mỗi cạnh).</div>
       {% for e in form.file_anh.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
     </div>
 
