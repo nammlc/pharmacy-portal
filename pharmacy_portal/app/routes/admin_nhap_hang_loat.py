@@ -425,20 +425,15 @@ def xem_truoc_tuong_tac():
         kh = nt.lap_ke_hoach(dongs, hc_hien_co, tthc.tai_cap_hien_co())
         qd, md_chon, che_do = {}, {}, nt.CHE_DO_BO_QUA
 
-    ung_vien = {k: v[1] for k, v in hc_hien_co.items()}
-    ung_vien.update({k: t.ten for k, t in kh.ten_file.items()})
-    ten_moi = [t for k, t in kh.ten_file.items() if k not in hc_hien_co]
-    goi_y = {t.khoa: nt.goi_y_ghep(t.khoa, ung_vien) for t in ten_moi}
-    ten_moi.sort(key=lambda t: (not (t.la or goi_y[t.khoa]), t.ten.lower()))
-    chon_xd = {}
-    for i, ma in enumerate(request.form.getlist("xd_ma") if request.method == "POST" else []):
-        v = request.form.get(f"xd_{i}", type=int)
-        if v:
-            chon_xd[ma] = v
+    ten_moi = sorted((t for k, t in kh.ten_file.items() if k not in hc_hien_co), key=lambda t: t.ten.lower())
+    # Chỉ khớp tên GIỐNG HỆT (đã bỏ hoa/thường, dấu, khoảng trắng thừa). Tên khác -> tự thêm mới, không gợi ý/ghép.
+    ten_khop = sorted(((t.ten, hc_hien_co[k][1]) for k, t in kh.ten_file.items() if k in hc_hien_co), key=lambda x: x[0].lower())
+    post = request.method == "POST"
+    ui = {"nhom_dong": request.form.get("nhom_dong", "") if post else "",       # nhớ nhóm lọc + trang của bảng chi tiết
+          "trang_dong": request.form.get("trang_dong", type=int) if post else None}
     return render_template("admin/nhap_hang_loat/tuong_tac_xem_truoc.html",
-                           kh=kh, dong_theo_so={d.so_dong: d for d in dongs}, ten_moi=ten_moi, goi_y=goi_y,
+                           kh=kh, dong_theo_so={d.so_dong: d for d in dongs}, ten_moi=ten_moi, ten_khop=ten_khop, ui=ui,
                            qd=qd, md_chon=md_chon, che_do=che_do, nhan_muc=nt.NHAN_MUC_DO,
-                           ds_ten_co_san=sorted(set(ung_vien.values()), key=str.lower),
                            so_hien_co=len(hc_hien_co), nt=nt)
 
 

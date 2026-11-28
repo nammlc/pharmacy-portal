@@ -127,6 +127,25 @@ class TuongTacHoatChatTest(unittest.TestCase):
         with self.app.app_context():
             self.assertIsNotNone(db.session.get(HoatChat, self.id["Warfarin"]))
 
+    def test_them_nhanh_hoat_chat_khong_tao_trung(self):
+        url = f"{U}/hoat-chat-moi"
+        r = self.c.post(url, data={"ten": "  Ceftriaxon   1g "})
+        self.assertEqual(r.status_code, 201); d = r.get_json()
+        self.assertEqual((d["ten"], d["da_co"]), ("Ceftriaxon 1g", False))
+        r = self.c.post(url, data={"ten": "ceftriaxon 1G"})                       # khác hoa/thường -> trả về chính cái đã có
+        self.assertEqual(r.status_code, 200); self.assertTrue(r.get_json()["da_co"]); self.assertEqual(r.get_json()["id"], d["id"])
+        r = self.c.post(url, data={"ten": "warfarin"})                           # đã có từ setUp
+        self.assertTrue(r.get_json()["da_co"]); self.assertEqual(r.get_json()["id"], self.id["Warfarin"])
+        self.assertEqual(self.c.post(url, data={"ten": "   "}).status_code, 400)
+        self.assertEqual(self.c.post(url, data={"ten": "x" * 300}).status_code, 400)
+        with self.app.app_context():
+            self.assertEqual(HoatChat.query.filter(HoatChat.ten_hoat_chat.ilike("ceftriaxon%")).count(), 1)
+
+    def test_hoat_chat_vua_them_nhanh_dung_duoc_ngay_trong_form(self):
+        d = self.c.post(f"{U}/hoat-chat-moi", data={"ten": "Hoạt chất mới X"}).get_json()
+        r = self.c.post(f"{U}/them", data={"hoat_chat_a_id": d["id"], "hoat_chat_b_id": self.id["Aspirin"], "muc_do": "nang"})
+        self.assertEqual(r.status_code, 302); self.assertEqual(self.so_cap(), 1)
+
     # ---------- nhập Excel ----------
     FILE = [
         (1, "Methotrexat", "Aspirin ", "Chống chỉ định", "cc", "hq", "1. a\n2. b"),

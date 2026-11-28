@@ -131,6 +131,21 @@ class MucDoThieu(unittest.TestCase):
         self.assertEqual(kh.ket_qua[0].trang_thai, nt.THIEU_MUC_DO)
 
 
+class GoiY(unittest.TestCase):
+    def test_goi_y_ten_csdl_bat_dau_bang_ten_trong_file_va_ten_go_sai(self):
+        uv = {nt.khoa_ten(t): t for t in ["Allopurinol 100mg", "Allopurinol 300MG", "Ciprofloxacin", "Amlodipine 5mg"]}
+        self.assertEqual(nt.goi_y_ghep(nt.khoa_ten("Allopurinol"), uv), ["Allopurinol 100mg", "Allopurinol 300MG"])
+        self.assertEqual(nt.goi_y_ghep(nt.khoa_ten("Ciprofoxacin"), uv), ["Ciprofloxacin"])     # gõ sai chính tả
+        self.assertEqual(nt.goi_y_ghep(nt.khoa_ten("Warfarin"), uv), [])
+
+    def test_goi_y_kem_do_giong_phan_tram(self):
+        uv = {nt.khoa_ten(t): t for t in ["Allopurinol 100mg", "Ciprofloxacin"]}
+        ten, diem, tien_to = nt.goi_y_ghep_diem(nt.khoa_ten("Ciprofoxacin"), uv)[0]
+        self.assertEqual((ten, tien_to), ("Ciprofloxacin", "")); self.assertTrue(90 <= diem <= 100)
+        ten, diem, tien_to = nt.goi_y_ghep_diem(nt.khoa_ten("Allopurinol"), uv)[0]
+        self.assertEqual((ten, tien_to), ("Allopurinol 100mg", "hamluong")); self.assertTrue(0 < diem < 100)
+
+
 class BoQuaTen(unittest.TestCase):
     def test_chon_bo_mot_hoat_chat_thi_bo_cac_dong_co_ten_do(self):
         qd = {nt.khoa_ten("A"): {"hanh_dong": "bo"}}

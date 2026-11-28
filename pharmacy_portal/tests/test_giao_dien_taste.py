@@ -101,7 +101,7 @@ class PhanConLaiVaAdmin(Co):
         self.assertIn('tk-detail"', h); self.assertIn("Nhà thuốc BV", h)
         self.assertIn('id="hoat-chat"', h)
 
-    def test_articles_have_a_three_slide_carousel_with_pause_and_no_overlay_on_photos(self):
+    def test_articles_have_a_three_slide_image_carousel_with_title_overlay_arrows_and_timer(self):
         def tao():
             from datetime import datetime
             from app import db
@@ -118,7 +118,10 @@ class PhanConLaiVaAdmin(Co):
         self.assertEqual(h.count('class="bvx-slide '), 3)                        # đúng 3 slide, không hơn
         self.assertIn('aria-roledescription="carousel"', h)
         self.assertIn('data-act="toggle"', h)                                    # có nút tạm dừng tự chuyển
-        self.assertNotIn("bvSlideshow", h); self.assertNotIn("bv-slide-overlay", h)   # không đè chữ lên ảnh
+        self.assertNotIn("bvSlideshow", h)                                       # không dùng slideshow cũ
+        self.assertEqual(h.count('class="bvx-slide__cap"'), 3)                  # lớp phủ chứa tiêu đề ở mỗi slide
+        self.assertIn('data-act="prev"', h); self.assertIn('data-act="next"', h)  # 2 nút hai bên
+        self.assertEqual(h.count('class="bvx-dot '), 3)                         # thanh thời gian riêng cho từng bài
         self.assertIn("Mới đăng", h)
         d = self.trang("/bai-viet/bai-so-1")
         self.assertIn('class="bvx-title"', d); self.assertIn("phút đọc", d); self.assertIn('id="bvx-body"', d)

@@ -179,3 +179,31 @@ nav.adm-pt { flex-wrap: wrap; row-gap: 10px; }
 .tb-page-list li.tb-unread .tb-time { color: #17615c; font-weight: 600; }
 
 nav.adm-pt { margin: 14px 0; }
+
+/* ===== Ô chọn hoạt chất có tìm kiếm trong khung sổ xuống (hoat-chat-chon.js) ===== */
+.hcc { position: relative; }
+.hcc-btn { width: 100%; min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 14px; text-align: left;
+  border: 1px solid var(--tk-line-strong); border-radius: 12px; background: #fff; color: var(--p-ink); font: inherit; font-size: 15px; cursor: pointer; }
+.hcc-btn:hover { border-color: #b3ad9f; }
+.hcc-btn:focus-visible, .hcc-btn[aria-expanded="true"] { outline: 0; border-color: var(--p-action, #2c5877); box-shadow: 0 0 0 3px rgba(44, 88, 119, .18); }
+.hcc-val { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hcc-val.is-empty { color: var(--p-muted); }
+.hcc-chev { flex: none; color: var(--p-muted); transition: transform .15s ease; }
+.hcc-btn[aria-expanded="true"] .hcc-chev { transform: rotate(180deg); }
+.hcc-pop { position: absolute; z-index: 70; left: 0; right: 0; top: calc(100% + 6px); background: #fff; border: 1px solid var(--tk-line-strong); border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(29, 37, 48, .16); overflow: hidden; }
+.hcc-pop[hidden] { display: none; }
+.hcc-search { position: relative; border-bottom: 1px solid #e4e0d6; }
+.hcc-search svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--p-muted); pointer-events: none; }
+.hcc .hcc-search .hcc-q { display: block; width: 100%; height: 48px; padding: 0 14px 0 42px !important; margin: 0; border: 0 !important; border-radius: 0 !important; background: transparent !important; font: inherit; font-size: 15px; color: var(--p-ink); box-shadow: none !important; }
+.hcc .hcc-search .hcc-q:focus { outline: 0; box-shadow: none !important; }
+.hcc-list { max-height: min(320px, 46vh); overflow-y: auto; margin: 0; padding: 6px; list-style: none; }
+.hcc-opt { padding: 9px 12px; border-radius: 8px; font-size: 15px; line-height: 1.35; cursor: pointer; overflow-wrap: anywhere; }
+.hcc-opt.is-active { background: #eaf1f6; }
+.hcc-opt.is-selected { font-weight: 600; }
+.hcc-opt.is-selected::after { content: "✓"; float: right; color: #1f8a83; }
+.hcc-opt.is-other { color: var(--p-muted); }
+.hcc-add { margin-top: 4px; border-top: 1px dashed var(--tk-line-strong); border-radius: 0 0 8px 8px; font-weight: 600; color: #17615c; }
+.hcc-add.is-active { background: #e3f1ef; }
+.hcc-none { padding: 14px 12px; font-size: 14px; color: var(--p-muted); }
+.hcc-foot { padding: 8px 14px; border-top: 1px solid var(--tk-line); font-size: 12.5px; color: var(--p-muted); background: #faf9f6; }

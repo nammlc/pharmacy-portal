@@ -3,6 +3,10 @@
 // thuốc) hoặc "ntbv" (Nhà thuốc BV). Gọi API /api/goi-y-tim-kiem, click 1 gợi ý
 // sẽ đi thẳng tới trang chi tiết thuốc đó; Enter khi chưa chọn gợi ý nào thì để
 // form submit như tìm kiếm bình thường.
+// Thuộc tính tuỳ chọn (trang Tương tác thuốc, có 2 ô tìm trong cùng 1 form):
+//   data-goi-y-url   : API gợi ý riêng (thay cho /api/goi-y-tim-kiem); API nhận ?q=
+//   data-goi-y-dien  : chọn gợi ý thì ĐIỀN tên vào ô (không chuyển trang)
+//   data-goi-y-khung : đặt trên phần tử bọc riêng của ô này — dropdown rộng bằng khung đó thay vì cả form
 (function () {
   function thoat_html(s) {
     return (s || "").replace(/[&<>"']/g, function (c) {
@@ -43,6 +47,7 @@
     // submit form.
     var form = input.closest("form");
     var ten_that = input.getAttribute("name");
+    var an_input = null;
     if (form && ten_that) {
       input.removeAttribute("name");
       var an = document.createElement("input");
@@ -50,6 +55,7 @@
       an.name = ten_that;
       an.value = input.value;
       form.appendChild(an);
+      an_input = an;
       input.addEventListener("input", function () { an.value = input.value; });
       form.addEventListener("submit", function () { an.value = input.value; });
     }
@@ -58,7 +64,9 @@
 
     // Dropdown rộng đúng bằng cả thanh tìm kiếm (form, gồm cả nút "Tra cứu"), không chỉ bằng ô nhập:
     // đánh dấu form để CSS lấy form làm khung định vị cho dropdown.
-    if (form) form.classList.add("goi-y-form");
+    var khung = input.closest("[data-goi-y-khung]") || form;
+    if (khung) khung.classList.add("goi-y-form");
+    var che_do_dien = input.hasAttribute("data-goi-y-dien");
 
     var wrap = document.createElement("div");
     wrap.className = "goi-y-wrap";
@@ -146,20 +154,32 @@
 
     function chon(i) {
       var it = danh_sach[i];
-      if (it) window.location.href = it.url;
+      if (!it) return;
+      if (che_do_dien) {                       // điền vào ô, người dùng bấm "Tra cứu" sau
+        input.value = it.ten;
+        if (an_input) an_input.value = it.ten;
+        input.dispatchEvent(new Event("goi-y-chon", { bubbles: true }));   // để trang biết ô đã được điền
+        dong();
+        input.focus();
+        return;
+      }
+      window.location.href = it.url;
     }
 
     hop.addEventListener("mousedown", function (e) {
       // mousedown (không phải click) để chạy trước khi input mất focus và đóng dropdown
       var el = e.target.closest(".goi-y-item");
-      if (el) chon(parseInt(el.dataset.idx, 10));
+      if (!el) return;
+      if (che_do_dien) e.preventDefault();     // không để ô nhập mất focus
+      chon(parseInt(el.dataset.idx, 10));
     });
 
     var tim = debounce(function () {
       var q = input.value.trim();
       if (q.length < 2) { dong(); return; }
       var luot = ++bo_dem;
-      fetch("/api/goi-y-tim-kiem?scope=" + encodeURIComponent(pham_vi) + "&q=" + encodeURIComponent(q))
+      var api = input.dataset.goiYUrl || ("/api/goi-y-tim-kiem?scope=" + encodeURIComponent(pham_vi));
+      fetch(api + (api.indexOf("?") === -1 ? "?" : "&") + "q=" + encodeURIComponent(q))
         .then(function (r) { return r.ok ? r.json() : []; })
         .then(function (ds) {
           if (luot !== bo_dem) return; // bỏ kết quả cũ trả về muộn

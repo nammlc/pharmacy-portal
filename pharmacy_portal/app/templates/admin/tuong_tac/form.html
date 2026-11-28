@@ -21,7 +21,6 @@
     {% for f in [form.hoat_chat_a_id, form.hoat_chat_b_id] %}
     <div class="form-row">
       {{ f.label }}
-      <input type="search" class="tt-loc" data-cho="{{ f.id }}" placeholder="Gõ để lọc danh sách hoạt chất…" autocomplete="off" aria-label="Lọc danh sách {{ f.label.text }}">
       {{ f() }}
       {% for e in f.errors %}<div class="field-errors">{{ e }}</div>{% endfor %}
     </div>
@@ -40,8 +39,8 @@
   </form>
 </div>
 
+<script src="{{ url_for('static', filename='js/hoat-chat-chon.js') }}"></script>
 <style>
-.tt-loc { width:100%; margin-bottom:8px; }
 .tt-canh-bao { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; padding:12px 16px; border-radius:12px;
   border:1px solid #e9c98a; background:#fbf0d9; color:#6b4a0f; margin:0 0 18px; font-size:14px; }
 .tt-canh-bao[hidden] { display:none; }
@@ -51,6 +50,7 @@
 <script>
 (function () {
   var form = document.getElementById('tt-form');
+  var csrf = (form.querySelector('input[name="csrf_token"]') || {}).value || '';
   var selA = document.getElementById('{{ form.hoat_chat_a_id.id }}');
   var selB = document.getElementById('{{ form.hoat_chat_b_id.id }}');
   var box = document.getElementById('tt-canh-bao');
@@ -58,23 +58,7 @@
   var boQua = {{ item.id if item else 0 }};
   var url = {{ url_for('admin_ttt.kiem_tra_cap')|tojson }};
   if (!form || !selA || !selB) return;
-
-  function bd(s) { return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').toLowerCase(); }
-
-  // Ô gõ để lọc danh sách (không phân biệt dấu / hoa thường)
-  document.querySelectorAll('.tt-loc').forEach(function (inp) {
-    var sel = document.getElementById(inp.dataset.cho);
-    var goc = Array.prototype.map.call(sel.options, function (o) { return { v: o.value, t: o.text }; });
-    inp.addEventListener('input', function () {
-      var k = bd(inp.value.trim()), giu = sel.value;
-      sel.innerHTML = '';
-      goc.forEach(function (o) {
-        if (!k || o.v === '0' || o.v === giu || bd(o.t).indexOf(k) !== -1) {
-          var op = document.createElement('option'); op.value = o.v; op.text = o.t; if (o.v === giu) op.selected = true; sel.appendChild(op);
-        }
-      });
-    });
-  });
+  if (window.HcChon) HcChon.init([selA, selB], { themUrl: {{ url_for('admin_ttt.hoat_chat_moi')|tojson }}, csrf: csrf });
 
   var dangGoi = 0;
   function hien(loai, noiDung, link) {

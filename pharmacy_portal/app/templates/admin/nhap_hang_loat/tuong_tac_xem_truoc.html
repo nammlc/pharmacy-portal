@@ -21,7 +21,8 @@
   <div class="ttx-sum">
     <div class="ttx-c ttx-ok"><strong>{{ sl.tao }}</strong><span>cặp sẽ thêm mới</span></div>
     {% if sl.cap_nhat %}<div class="ttx-c ttx-ok"><strong>{{ sl.cap_nhat }}</strong><span>cặp sẽ ghi đè</span></div>{% endif %}
-    <div class="ttx-c ttx-ok"><strong>{{ sl.hoat_chat_moi }}</strong><span>hoạt chất sẽ tạo mới</span></div>
+    <div class="ttx-c"><strong>{{ ten_khop|length }}</strong><span>hoạt chất trong file đã có trong CSDL</span></div>
+    <div class="ttx-c ttx-ok"><strong>{{ sl.hoat_chat_moi }}</strong><span>hoạt chất chưa có — sẽ thêm vào CSDL</span></div>
     <div class="ttx-c"><strong>{{ sl.da_co_bo_qua }}</strong><span>cặp đã có — bỏ qua</span></div>
     <div class="ttx-c"><strong>{{ sl.trung_giong }}</strong><span>dòng trùng y hệt — gộp</span></div>
     <div class="ttx-c {{ 'ttx-warn' if sl.nhom_xung_dot }}"><strong>{{ sl.nhom_xung_dot }}</strong><span>nhóm xung đột cần chọn</span></div>
@@ -71,7 +72,7 @@
     <h2>Dòng thiếu mức độ ({{ thieu|length }})</h2>
     <p class="ttx-note">Hệ thống không tự đoán mức độ. Chọn mức độ để nhập dòng đó, hoặc để «Bỏ qua».</p>
     <div class="adm-table-wrap"><table class="adm-table">
-      <thead><tr><th style="width:70px;">Dòng</th><th>Cặp hoạt chất</th><th>Nội dung</th><th style="width:210px;">Mức độ</th></tr></thead>
+      <thead><tr><th style="width:70px;">Dòng</th><th>Cặp hoạt chất</th><th>Nội dung</th><th style="width:240px;">Mức độ</th></tr></thead>
       <tbody>
       {% for r in thieu %}
       <tr>
@@ -79,8 +80,8 @@
         <td><strong>{{ r.dong.ten_a }}</strong> + <strong>{{ r.dong.ten_b }}</strong><div class="ttx-sub">{{ r.ly_do }}</div></td>
         <td class="ttx-sub">{{ (r.dong.xu_tri or r.dong.hau_qua or r.dong.co_che or '(không có nội dung)')|truncate(120) }}</td>
         <td>
-          <select name="md_{{ r.dong.so_dong }}" class="adm-select" style="width:100%;">
-            <option value="bo">— Bỏ qua dòng này —</option>
+          <select name="md_{{ r.dong.so_dong }}" class="adm-select ttx-md">
+            <option value="bo">Bỏ qua dòng này</option>
             {% for k, v in nhan_muc.items() %}<option value="{{ k }}" {{ 'selected' if md_chon.get(r.dong.so_dong) == k }}>{{ v }}</option>{% endfor %}
           </select>
         </td>
@@ -91,54 +92,48 @@
   </section>
   {% endif %}
 
-  {# ── 4. Tên hoạt chất chưa có trong hệ thống ── #}
+  {# ── 4. Hoạt chất chưa có trong hệ thống: chỉ khớp tên GIỐNG HỆT, còn lại tự thêm mới ── #}
   {% if ten_moi %}
-  {% set can_xem = ten_moi|selectattr('la')|list|length %}
   <section class="ttx-sec">
-    <h2>Hoạt chất chưa có trong hệ thống ({{ ten_moi|length }})</h2>
-    <p class="ttx-note">
-      {% if so_hien_co %}Hệ thống đang có {{ so_hien_co }} hoạt chất. {% endif %}
-      Mặc định các tên dưới đây sẽ được <strong>tạo mới</strong>. Nếu một tên thực chất là hoạt chất đã có (viết khác, sai chính tả, lỗi ngắt dòng),
-      chọn «Ghép vào…» để không sinh ra bản trùng. Chỉ những tên thực sự dùng trong các cặp được nhập mới được tạo. Những tên có dấu hiệu lạ (thuốc phối hợp, ngoặc, gần giống tên khác) được xếp lên đầu.
-    </p>
-    <button type="button" class="btn btn-outline btn-sm" id="tt-bt-nut" style="margin-bottom:10px;"></button>
-    <div class="adm-table-wrap"><table class="adm-table ttx-ten-bang" id="tt-ten-bang" data-an="1">
-      <thead><tr><th>Tên trong file</th><th style="width:46%;">Cách xử lý</th></tr></thead>
-      <tbody>
-      {% for t in ten_moi %}
-      {% set i = loop.index0 %}
-      {% set q = qd.get(t.khoa, {}) %}
-      {% set lat = t.la or goi_y[t.khoa] %}
-      <tr class="{{ 'ttx-bt' if not lat else 'ttx-xem' }}">
-        <td>
-          <input type="hidden" name="ten_khoa" value="{{ t.khoa }}">
-          <strong>{{ t.ten }}</strong>
-          <div class="ttx-sub">{{ t.so_dong }} lần trong file{% if t.cac_dang|length > 1 %} · gộp từ: {{ t.cac_dang.keys()|join(' | ') }}{% endif %}</div>
-          {% for l in t.la %}<span class="ttx-tag">{{ l }}</span>{% endfor %}
-        </td>
-        <td>
-          <select name="hd_{{ i }}" class="adm-select tt-hd" data-i="{{ i }}">
-            <option value="tao" {{ 'selected' if q.get('hanh_dong', 'tao') == 'tao' }}>Tạo hoạt chất mới</option>
-            <option value="ghep" {{ 'selected' if q.get('hanh_dong') == 'ghep' }}>Ghép vào hoạt chất khác…</option>
-            <option value="bo" {{ 'selected' if q.get('hanh_dong') == 'bo' }}>Bỏ các dòng có tên này</option>
-          </select>
-          <input type="text" name="dich_{{ i }}" list="tt-ds" class="tt-dich" data-i="{{ i }}" value="{{ q.get('dich', '') }}" placeholder="Gõ tên hoạt chất để ghép vào" autocomplete="off">
-          {% if goi_y[t.khoa] %}
-          <div class="ttx-goiy">Gần giống:
-            {% for g in goi_y[t.khoa] %}<button type="button" class="ttx-chip" data-i="{{ i }}" data-v="{{ g }}">{{ g }}</button>{% endfor %}
-          </div>
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-      </tbody>
-    </table></div>
-    <datalist id="tt-ds">{% for n in ds_ten_co_san %}<option value="{{ n }}">{% endfor %}</datalist>
+    <details class="ttx-khop">
+      <summary>Hoạt chất chưa có — sẽ tự thêm mới khi nhập ({{ ten_moi|length }})</summary>
+      <p class="ttx-note">
+        Hệ thống chỉ coi là «đã có» khi tên <strong>giống hệt</strong> hoạt chất đang có ({{ so_hien_co }} hoạt chất; không phân biệt hoa/thường, dấu và khoảng trắng thừa).
+        Tên nào khác dù chỉ một chữ sẽ được <strong>thêm mới</strong> vào cơ sở dữ liệu khi bạn bấm «Xác nhận nhập» — hệ thống không tự đoán hay ghép.
+        Nếu thấy tên sai chính tả hoặc bị tách chữ, hãy sửa file Excel rồi tải lại.
+        Chỉ những tên thực sự dùng trong các cặp được nhập mới được tạo.
+      </p>
+      <div class="adm-table-wrap ttx-cuon"><table class="adm-table">
+        <thead><tr><th>Tên trong file</th><th style="width:130px;">Số lần dùng</th><th style="width:34%;">Lưu ý</th></tr></thead>
+        <tbody>
+        {% for t in ten_moi %}
+        <tr>
+          <td><strong>{{ t.ten }}</strong>{% if t.cac_dang|length > 1 %}<div class="ttx-sub">gộp từ: {{ t.cac_dang.keys()|join(' | ') }}</div>{% endif %}</td>
+          <td>{{ t.so_dong }}</td>
+          <td>{% for l in t.la %}<span class="ttx-tag">{{ l }}</span>{% endfor %}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table></div>
+    </details>
+  </section>
+  {% endif %}
+
+  {# ── 4b. Hoạt chất trong file đã có trong CSDL ── #}
+  {% if ten_khop %}
+  <section class="ttx-sec">
+    <details class="ttx-khop">
+      <summary>Hoạt chất trong file đã có trong hệ thống — dùng luôn ({{ ten_khop|length }})</summary>
+      <div class="adm-table-wrap"><table class="adm-table">
+        <thead><tr><th>Tên trong file</th><th>Hoạt chất trong hệ thống</th></tr></thead>
+        <tbody>{% for tf, tdb in ten_khop %}<tr><td>{{ tf }}</td><td>{{ tdb }}{% if tdb != tf %} <span class="ttx-tag">khác cách viết, vẫn khớp</span>{% endif %}</td></tr>{% endfor %}</tbody>
+      </table></div>
+    </details>
   </section>
   {% endif %}
 
   {# ── 5. Toàn bộ các dòng ── #}
-  <section class="ttx-sec">
+  <section class="ttx-sec" id="tt-dong-sec" data-nhom="{{ ui.nhom_dong or '' }}" data-trang="{{ ui.trang_dong or 1 }}">
     <h2>Chi tiết từng dòng</h2>
     <div class="ttx-loc" id="tt-loc">
       <button type="button" class="ttx-chip on" data-nhom="">Tất cả</button>
@@ -147,6 +142,7 @@
       <button type="button" class="ttx-chip" data-nhom="trung">Trùng / xung đột</button>
       <button type="button" class="ttx-chip" data-nhom="can">Cần xem (thiếu mức độ, lỗi)</button>
     </div>
+    <div class="ttx-pager" id="tt-dong-pager-top"></div>
     <div class="adm-table-wrap"><table class="adm-table" id="tt-dong">
       <thead><tr><th style="width:64px;">Dòng</th><th>Hoạt chất 1</th><th>Hoạt chất 2</th><th style="width:130px;">Mức độ</th><th style="width:34%;">Kết quả</th></tr></thead>
       <tbody>
@@ -170,6 +166,9 @@
       {% endfor %}
       </tbody>
     </table></div>
+    <div class="ttx-pager" id="tt-dong-pager"></div>
+    <input type="hidden" name="nhom_dong" id="tt-in-nhom-dong" value="{{ ui.nhom_dong or '' }}">
+    <input type="hidden" name="trang_dong" id="tt-in-trang-dong" value="{{ ui.trang_dong or 1 }}">
   </section>
 
   <div class="ttx-bar">
@@ -196,11 +195,9 @@
 .ttx-nhom { background:#fff; border:1px solid var(--line-200); border-radius:12px; padding:12px 16px; margin-bottom:10px; max-width:820px; }
 .ttx-nhom-ten { font-weight:700; margin-bottom:4px; }
 .ttx-ung em { display:block; font-style:normal; font-size:12.5px; color:var(--text-muted); margin-top:2px; }
+.ttx-khop > summary { cursor: pointer; font-weight: 600; font-size: 15px; padding: 6px 0; margin-bottom: 10px; }
 .ttx-tag { display:inline-block; margin:4px 6px 0 0; padding:2px 8px; border-radius:999px; background:#fbf0d9; color:#6b4a0f; font-size:11.5px; }
-.ttx-ten-bang[data-an="1"] .ttx-bt { display:none; }
-.ttx-ten-bang .adm-select { width:auto; min-width:210px; } .tt-dich { width:100%; margin-top:8px; }
-.tt-dich[hidden] { display:none; }
-.ttx-goiy { margin-top:8px; font-size:12.5px; color:var(--text-muted); }
+.ttx-md { width:100%; min-width:200px; font-size:14px; text-overflow:ellipsis; }
 .ttx-chip { border:1px solid var(--line-200); background:#fff; border-radius:999px; padding:4px 12px; font-size:12.5px; cursor:pointer; margin:2px 4px 2px 0; }
 .ttx-chip.on, .ttx-chip:hover { background:#17615c; color:#fff; border-color:#17615c; }
 .ttx-loc { margin-bottom:10px; }
@@ -209,47 +206,76 @@
 .ttx-bar { position:sticky; bottom:0; display:flex; gap:10px; justify-content:flex-end; align-items:center; flex-wrap:wrap;
   padding:14px 0; background:linear-gradient(to top, var(--paper-0,#f3f1ec) 70%, transparent); }
 .ttx-bar .ttx-sub { margin:0 auto 0 0; color:#6b4a0f; }
+.ttx-pager { margin-top:12px; }
+.ttx-cuon { max-height:380px; overflow:auto; }
+#tt-dong-sec { scroll-margin-top:76px; }
+#tt-dong-pager-top { margin:0 0 10px; }
+.ttx-pager .adm-pt { margin:0; }
 </style>
 <script>
 (function () {
   var f = document.getElementById('tt-xt'), ok = document.getElementById('tt-ok'), cu = document.getElementById('tt-cu');
 
-  // Hiện / ẩn các tên "bình thường" (mặc định chỉ hiện tên có dấu hiệu lạ)
-  var bang = document.getElementById('tt-ten-bang'), nut = document.getElementById('tt-bt-nut');
-  if (bang && nut) {
-    var nBt = bang.querySelectorAll('.ttx-bt').length;
-    function veNut() { var an = bang.dataset.an === '1'; nut.textContent = an ? 'Hiện thêm ' + nBt + ' tên bình thường' : 'Ẩn các tên bình thường'; }
-    if (!nBt) { nut.hidden = true; } else { veNut(); nut.addEventListener('click', function () { bang.dataset.an = bang.dataset.an === '1' ? '0' : '1'; veNut(); }); }
-  }
-
-  // Ô "ghép vào" chỉ hiện khi chọn Ghép
-  function veDich(sel) {
-    var i = sel.dataset.i, inp = f.querySelector('.tt-dich[data-i="' + i + '"]');
-    if (inp) inp.hidden = sel.value !== 'ghep';
-  }
-  f.querySelectorAll('.tt-hd').forEach(function (s) { veDich(s); s.addEventListener('change', function () { veDich(s); }); });
-  f.querySelectorAll('.ttx-goiy .ttx-chip').forEach(function (b) {
-    b.addEventListener('click', function () {
-      var i = b.dataset.i, s = f.querySelector('.tt-hd[data-i="' + i + '"]'), inp = f.querySelector('.tt-dich[data-i="' + i + '"]');
-      s.value = 'ghep'; inp.value = b.dataset.v; veDich(s); danhDauCu();
-    });
-  });
-
   // Đổi lựa chọn -> bắt buộc "Cập nhật xem trước" trước khi nhập (vì ghép tên có thể làm đổi kết quả trùng)
   function danhDauCu() { if (ok) ok.disabled = true; if (cu) cu.hidden = false; }
   f.addEventListener('change', function (e) { if (!e.target.closest('#tt-loc')) danhDauCu(); });
-  f.addEventListener('input', function (e) { if (e.target.classList.contains('tt-dich')) danhDauCu(); });
 
-  // Lọc bảng chi tiết theo nhóm
-  var loc = document.getElementById('tt-loc'), dong = document.querySelectorAll('#tt-dong tbody tr');
+  // Chi tiết từng dòng: lọc theo nhóm + phân trang (các hàng ẩn không có ô nhập nên không ảnh hưởng form)
+  var secD = document.getElementById('tt-dong-sec'), loc = document.getElementById('tt-loc'),
+      dong = [].slice.call(document.querySelectorAll('#tt-dong tbody tr')),
+      pagers = [document.getElementById('tt-dong-pager-top'), document.getElementById('tt-dong-pager')],
+      inNhomD = document.getElementById('tt-in-nhom-dong'), inTrangD = document.getElementById('tt-in-trang-dong'),
+      PER_D = 25, sd = { nhom: secD.dataset.nhom || '', trang: parseInt(secD.dataset.trang, 10) || 1 };
+
+  function dungNav(box, tong, trang, per) {
+    box.innerHTML = '';
+    if (!tong) { var p0 = document.createElement('p'); p0.className = 'ttx-sub'; p0.textContent = 'Không có dòng nào ở nhóm này.'; box.appendChild(p0); return; }
+    var soTrang = Math.ceil(tong / per), tu = (trang - 1) * per, den = Math.min(tu + per, tong);
+    var nav = document.createElement('nav'); nav.className = 'adm-pt'; nav.setAttribute('aria-label', 'Phân trang chi tiết từng dòng');
+    var info = document.createElement('span'); info.className = 'adm-pt-info';
+    info.textContent = 'Hiển thị ' + (tu + 1) + '–' + den + ' / ' + tong + ' dòng';
+    nav.appendChild(info);
+    if (soTrang > 1) {
+      var btns = document.createElement('div'); btns.className = 'adm-pt-btns';
+      var nut = function (txt, toi, cls, label) {
+        var b = document.createElement(toi ? 'button' : 'span'); b.className = 'adm-pt-btn ' + (cls || ''); b.textContent = txt;
+        if (label) b.setAttribute('aria-label', label);
+        if (toi) { b.type = 'button'; b.addEventListener('click', function () { sd.trang = toi; veDong(true); }); }
+        btns.appendChild(b); return b;
+      };
+      if (trang > 1) nut('‹', trang - 1, '', 'Trang trước'); else nut('‹', 0, 'adm-pt-dis');
+      var truoc = 0;
+      for (var p = 1; p <= soTrang; p++) {
+        if (!(p === 1 || p === soTrang || Math.abs(p - trang) <= 1)) continue;
+        if (truoc && p - truoc > 1) { var e = document.createElement('span'); e.className = 'adm-pt-ell'; e.textContent = '…'; btns.appendChild(e); }
+        if (p === trang) nut(String(p), 0, 'adm-pt-cur').setAttribute('aria-current', 'page'); else nut(String(p), p, '', 'Trang ' + p);
+        truoc = p;
+      }
+      if (trang < soTrang) nut('›', trang + 1, '', 'Trang sau'); else nut('›', 0, 'adm-pt-dis');
+      nav.appendChild(btns);
+    }
+    box.appendChild(nav);
+  }
+
+  function veDong(cuon) {
+    var ds = dong.filter(function (tr) { return !sd.nhom || tr.dataset.nhom === sd.nhom; });
+    var soTrang = Math.max(1, Math.ceil(ds.length / PER_D));
+    sd.trang = Math.min(Math.max(sd.trang, 1), soTrang);
+    var tu = (sd.trang - 1) * PER_D;
+    dong.forEach(function (tr) { tr.hidden = true; });
+    ds.slice(tu, tu + PER_D).forEach(function (tr) { tr.hidden = false; });
+    loc.querySelectorAll('.ttx-chip').forEach(function (x) { x.classList.toggle('on', (x.dataset.nhom || '') === sd.nhom); });
+    inNhomD.value = sd.nhom; inTrangD.value = sd.trang;
+    pagers.forEach(function (box) { dungNav(box, ds.length, sd.trang, PER_D); });
+    if (cuon) secD.scrollIntoView({ block: 'start' });
+  }
+
   loc.querySelectorAll('.ttx-chip').forEach(function (b) {
-    var n = b.dataset.nhom ? document.querySelectorAll('#tt-dong tbody tr[data-nhom="' + b.dataset.nhom + '"]').length : dong.length;
+    var n = b.dataset.nhom ? dong.filter(function (tr) { return tr.dataset.nhom === b.dataset.nhom; }).length : dong.length;
     b.textContent += ' (' + n + ')';
-    b.addEventListener('click', function () {
-      loc.querySelectorAll('.ttx-chip').forEach(function (x) { x.classList.toggle('on', x === b); });
-      dong.forEach(function (tr) { tr.hidden = !!b.dataset.nhom && tr.dataset.nhom !== b.dataset.nhom; });
-    });
+    b.addEventListener('click', function () { sd.nhom = b.dataset.nhom || ''; sd.trang = 1; veDong(false); });
   });
+  veDong(false);
 })();
 </script>
 {% endblock %}

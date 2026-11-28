@@ -2,67 +2,123 @@
 {% from "_icons.html" import ic %}
 {% block title %}Tra cứu tương tác thuốc{% endblock %}
 {% block meta_mo_ta %}Tra cứu tương tác thuốc tại Khoa Dược BV Đa khoa Tâm Đức Cầu Quan: mức độ, cơ chế và hướng xử trí khi dùng đồng thời hai hoạt chất.{% endblock %}
+{% block head_extra %}<link rel="stylesheet" href="{{ url_for('static', filename='css/taste-tuong-tac.css') }}">{% endblock %}
+{% block scripts_extra %}<script src="{{ url_for('static', filename='js/tuong-tac.js') }}" defer></script>{% endblock %}
 
 {% block content %}
-<section class="tk-head"><div class="tk-wrap">
+{% set thu_tu = ['chong_chi_dinh', 'nang', 'trung_binh', 'nhe'] %}
+{% set nhan = {'nhe':'Nhẹ','trung_binh':'Trung bình','nang':'Nghiêm trọng','chong_chi_dinh':'Chống chỉ định'} %}
+{% set bac = {'nhe':1,'trung_binh':2,'nang':3,'chong_chi_dinh':4} %}
+<section class="tk-head ttt-head"><div class="tk-wrap">
   <p class="tk-crumb">Tra cứu</p>
   <h1 class="tk-h1">Tương tác thuốc</h1>
   <p class="tk-lead">Mức độ, cơ chế và hướng xử trí khi hai hoạt chất dùng đồng thời. Gõ tên hoạt chất hoặc tên biệt dược.</p>
 </div></section>
-{% set bl_ten = 'Tương tác thuốc' %}{% include "_bao_loi.html" %}
 
 <div class="tk-wrap tk-searchrow">
-  <form class="tk-search" role="search" method="get">
-    <svg class="ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-    <input aria-label="Tên hoạt chất hoặc biệt dược" enterkeyhint="search" type="text" name="q" value="{{ tu_khoa }}" placeholder="Tên hoạt chất hoặc biệt dược">
-    <button type="submit" class="tk-btn tk-btn--primary">Tra cứu</button>
+  <form class="ttt-form" role="search" method="get" action="{{ url_for('ttt.index') }}#ket-qua">
+    <div class="ttt-field" data-goi-y-khung>
+      <label for="ttt-q">Hoạt chất hoặc biệt dược</label>
+      <div class="ttt-input">
+        {{ ic('search', 20) }}
+        <input id="ttt-q" type="text" name="q" value="{{ tu_khoa }}" maxlength="120" enterkeyhint="search"
+               placeholder="Ví dụ: acid tranexamic" data-goi-y="hoat-chat" data-goi-y-dien
+               data-goi-y-url="{{ url_for('ttt.goi_y') }}">
+      </div>
+    </div>
+    {# Ô thứ hai chỉ hiện khi đã có hoạt chất thứ nhất (server: có ?q=; trình duyệt: tuong-tac.js hiện ngay khi gõ) #}
+    <div class="ttt-field" data-goi-y-khung{% if not tu_khoa %} hidden{% endif %}>
+      <label for="ttt-q2">Hoạt chất thứ hai <span class="ttt-opt">không bắt buộc</span></label>
+      <div class="ttt-input">
+        {{ ic('plus', 20) }}
+        <input id="ttt-q2" type="text" name="q2" value="{{ tu_khoa2 }}" maxlength="120" enterkeyhint="search"
+               placeholder="Chỉ xem tương tác với hoạt chất này" data-goi-y="hoat-chat" data-goi-y-dien
+               data-goi-y-url="{{ url_for('ttt.goi_y') }}">
+      </div>
+    </div>
+    <div class="ttt-actions">
+      <button type="submit" class="tk-btn tk-btn--primary">Tra cứu</button>
+      {% if tu_khoa or tu_khoa2 %}<a class="tk-link ttt-reset" href="{{ url_for('ttt.index') }}">Xóa tìm kiếm</a>{% endif %}
+    </div>
   </form>
 </div>
 
-<div class="tk-wrap tk-results">
-  {% if ket_qua %}
-  {% set ds = ket_qua|list %}
-  {% if thuoc_khop %}
-  <div class="ttt-thuoc-khop">
-    {% for ten, hcs in thuoc_khop %}<p><strong>{{ ten }}</strong> chứa: {{ hcs|join(', ') }}.</p>{% endfor %}
-  </div>
-  {% endif %}
-  {% set thu_tu = ['chong_chi_dinh', 'nang', 'trung_binh', 'nhe'] %}
-  {% set nhan = {'nhe':'Nhẹ','trung_binh':'Trung bình','nang':'Nghiêm trọng','chong_chi_dinh':'Chống chỉ định'} %}
-  {% set bac = {'nhe':1,'trung_binh':2,'nang':3,'chong_chi_dinh':4} %}
-  {# Tóm tắt theo mức độ: nặng nhất đứng đầu; mỗi mức có thang 4 vạch + chữ (không chỉ dựa vào màu) #}
-  <div class="ttt-summary" role="group" aria-label="Tóm tắt kết quả theo mức độ">
-    <strong class="ttt-total">{{ tong if tong > ds|length else ds|length }} tương tác{% if tong > ds|length %} (hiển thị {{ ds|length }} nghiêm trọng nhất — hãy gõ cụ thể hơn){% endif %}</strong>
-    {% for m in thu_tu %}{% set n = ds|selectattr('muc_do', 'equalto', m)|list|length %}{% if n %}
-    <span class="ttt-chip lvl-{{ m }}"><span class="lv-meter lv-n{{ bac[m] }}" aria-hidden="true"><i></i><i></i><i></i><i></i></span>{{ n }} {{ nhan[m] }}</span>
+<div class="tk-wrap tk-results" id="ket-qua">
+  {% if kq and kq.tong %}
+  {% set pt = kq.phan_trang %}
+  {% for ten, hcs in kq.thuoc_khop + kq.thuoc_khop2 %}
+  {% if loop.first %}<div class="ttt-thuoc-khop">{% endif %}
+    <p><strong>{{ ten }}</strong> chứa: {{ hcs|join(', ') }}.</p>
+  {% if loop.last %}</div>{% endif %}
+  {% endfor %}
+
+  {# Bộ lọc mức độ: mỗi chip là một liên kết (giữ nguyên ô tìm kiếm), có thang 4 vạch + chữ, không chỉ dựa vào màu #}
+  <div class="ttt-summary" role="group" aria-label="Lọc kết quả theo mức độ">
+    <strong class="ttt-total" role="status">
+      {% if muc_do %}{{ pt.total }} tương tác mức {{ nhan[muc_do]|lower }}{% else %}{{ kq.tong }} tương tác{% endif %}
+    </strong>
+    <a class="ttt-chip{% if not muc_do %} is-on{% endif %}" {% if not muc_do %}aria-current="true"{% endif %}
+       href="{{ url_for('ttt.index', _anchor='ket-qua', **tham_so_goc) }}">Tất cả <span class="ttt-n">{{ kq.tong }}</span></a>
+    {% for m in thu_tu %}{% set n = kq.dem_muc_do.get(m, 0) %}{% if n %}
+    <a class="ttt-chip lvl-{{ m }}{% if muc_do == m %} is-on{% endif %}" {% if muc_do == m %}aria-current="true"{% endif %}
+       href="{{ url_for('ttt.index', muc_do=m, _anchor='ket-qua', **tham_so_goc) }}"><span class="lv-meter lv-n{{ bac[m] }}" aria-hidden="true"><i></i><i></i><i></i><i></i></span>{{ nhan[m] }} <span class="ttt-n">{{ n }}</span></a>
     {% endif %}{% endfor %}
   </div>
-  <table class="result-table ttt-table">
-    <thead>
-      <tr>
-        <th scope="col">Cặp hoạt chất</th>
-        <th scope="col">Mức độ</th>
-        <th scope="col">Hậu quả lâm sàng</th>
-        <th scope="col">Xử trí</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for m in thu_tu + ['__khac'] %}
-      {% for item in ds if (item.muc_do == m) or (m == '__khac' and item.muc_do not in thu_tu) %}
-      <tr class="ttt-row lvl-{{ item.muc_do }}">
-        <td data-nhan="Cặp hoạt chất" class="ttt-pair"><strong>{{ item.hoat_chat_a.ten_hoat_chat }}</strong><span class="ttt-plus" aria-label="kết hợp với">+</span><strong>{{ item.hoat_chat_b.ten_hoat_chat }}</strong></td>
-        <td data-nhan="Mức độ"><span class="ttt-badge"><span class="lv-meter lv-n{{ bac.get(item.muc_do, 1) }}" aria-hidden="true"><i></i><i></i><i></i><i></i></span>{{ nhan.get(item.muc_do, item.muc_do) }}</span></td>
-        <td data-nhan="Hậu quả lâm sàng" class="rich-content">{{ (item.hau_qua_lam_sang | safe) if item.hau_qua_lam_sang else '—' }}</td>
-        <td data-nhan="Xử trí" class="rich-content">{{ (item.xu_tri | safe) if item.xu_tri else '—' }}</td>
-      </tr>
-      {% endfor %}
-      {% endfor %}
-    </tbody>
-  </table>
+
+  {% if pt.items %}
+  {# Danh sách gọn: mỗi dòng chỉ có cặp hoạt chất + mức độ. Bấm vào dòng để sổ ra hậu quả, xử trí (details/summary gốc, dùng được bằng bàn phím) #}
+  <ol class="ttx-list">
+    {% for item in pt.items %}
+    <li>
+      <details class="ttx-item lvl-{{ item.muc_do }}">
+        <summary>
+          <span class="ttx-pair"><strong>{{ item.hoat_chat_a.ten_hoat_chat }}</strong><span class="ttx-plus" aria-label="kết hợp với">+</span><strong>{{ item.hoat_chat_b.ten_hoat_chat }}</strong></span>
+          <span class="ttt-badge ttx-badge"><span class="lv-meter lv-n{{ bac.get(item.muc_do, 1) }}" aria-hidden="true"><i></i><i></i><i></i><i></i></span>{{ nhan.get(item.muc_do, item.muc_do) }}</span>
+          <span class="ttx-chev" aria-hidden="true">{{ ic('chevron', 20) }}</span>
+        </summary>
+        <div class="ttx-body">
+          <div class="ttx-cols">
+            {% if item.hau_qua_lam_sang %}
+            <div class="ttx-col"><h3>Hậu quả lâm sàng</h3><div class="rich-content">{{ item.hau_qua_lam_sang | safe }}</div></div>
+            {% endif %}
+            {% if item.xu_tri %}
+            <div class="ttx-col"><h3>Xử trí</h3><div class="rich-content">{{ item.xu_tri | safe }}</div></div>
+            {% endif %}
+            {% if not item.hau_qua_lam_sang and not item.xu_tri %}
+            <div class="ttx-col"><p class="ttt-note">Chưa có mô tả hậu quả và xử trí cho tương tác này.</p></div>
+            {% endif %}
+          </div>
+          <a class="tk-link ttx-more" href="{{ url_for('ttt.chi_tiet', tt_id=item.id, page=pt.page, **tham_so) }}">Xem chi tiết đầy đủ {{ ic('arrow', 16) }}</a>
+        </div>
+      </details>
+    </li>
+    {% endfor %}
+  </ol>
+  {% set phan_trang = pt %}
+  {% set endpoint = 'ttt.index' %}
+  {% set args = tham_so_trang %}
+  {% include "_phan_trang.html" with context %}
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">{{ ic('search', 22) }}</div>
+    Không có tương tác mức này trong kết quả. <a class="tk-link" href="{{ url_for('ttt.index', _anchor='ket-qua', **tham_so_goc) }}">Xem tất cả mức độ</a>
+  </div>
+  {% endif %}
+
   {% elif tu_khoa %}
   <div class="empty-state">
     <div class="empty-state-icon">{{ ic('search', 22) }}</div>
-    Không tìm thấy tương tác nào liên quan đến "{{ tu_khoa }}".
+    {% if not kq.hoat_chat_khop %}
+    Không tìm thấy hoạt chất hoặc biệt dược "{{ tu_khoa }}".
+    {% elif tu_khoa2 and not kq.hoat_chat_khop2 %}
+    Không tìm thấy hoạt chất hoặc biệt dược "{{ tu_khoa2 }}".
+    {% elif tu_khoa2 %}
+    Chưa ghi nhận tương tác giữa "{{ tu_khoa }}" và "{{ tu_khoa2 }}".
+    <p class="ttt-note">Chưa có dữ liệu không có nghĩa là không có tương tác. Hãy đối chiếu dược thư hiện hành.</p>
+    {% else %}
+    Chưa ghi nhận tương tác nào cho "{{ tu_khoa }}".
+    <p class="ttt-note">Chưa có dữ liệu không có nghĩa là không có tương tác. Hãy đối chiếu dược thư hiện hành.</p>
+    {% endif %}
   </div>
   {% else %}
   <div class="empty-state">
@@ -71,4 +127,5 @@
   </div>
   {% endif %}
 </div>
+{% set bl_ten = 'Tương tác thuốc' %}{% include "_bao_loi.html" %}
 {% endblock %}

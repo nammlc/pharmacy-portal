@@ -47,7 +47,8 @@
 
 {% else %}
 
-{# ===== Slide 3 bài ưu tiên: ảnh và chữ nằm cạnh nhau, không đè chữ lên ảnh ===== #}
+{# ===== Slide 3 bài ưu tiên: ảnh đại diện lớn; 1/3 phía dưới ảnh là lớp phủ chứa tiêu đề; nút ‹ › hai bên;
+        mỗi bài có một thanh thời gian chạy riêng. Cả slide bấm vào là mở bài. ===== #}
 {% if slide_bai %}
 {% set n = slide_bai|length %}
 <section class="tk-wrap bvx-hero" aria-roledescription="carousel" aria-label="Bài viết nổi bật" data-bvx-slider data-ms="7000">
@@ -55,33 +56,30 @@
     {% for bv in slide_bai %}
     <article class="bvx-slide {{ 'is-active' if loop.first }}" role="group" aria-roledescription="slide" aria-label="{{ loop.index }} trên {{ n }}"
              {% if not loop.first %}aria-hidden="true" inert{% endif %}>
-      <a class="bvx-slide__pic bvx-pic" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}" tabindex="-1" aria-hidden="true">{{ anh(bv, ic, loop.first) }}</a>
-      <div class="bvx-slide__text">
-        <p class="bvx-slide__no">0{{ loop.index }}<span> / 0{{ n }}</span></p>
-        {{ nhan_dm(bv) }}
+      <div class="bvx-slide__pic">{{ anh(bv, ic, loop.first) }}</div>
+      <div class="bvx-slide__cap">
+        <div class="bvx-slide__row">
+          {% if bv.danh_muc %}<span class="bvx-cat bvx-cat--dark">{{ bv.danh_muc.ten }}</span>{% endif %}
+          <span class="bvx-slide__meta">{{ ngay(bv) }}{% if bv.luot_xem %} · {{ bv.luot_xem }} lượt xem{% endif %}</span>
+        </div>
         <h2 class="bvx-slide__title"><a href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">{{ bv.tieu_de }}</a></h2>
-        {% if bv.mo_ta_ngan %}<p class="bvx-slide__sum">{{ bv.mo_ta_ngan }}</p>{% endif %}
-        <p class="bvx-meta">{{ ngay(bv) }}{% if bv.luot_xem %} · {{ bv.luot_xem }} lượt xem{% endif %}</p>
-        <a class="tk-btn tk-btn--primary bvx-slide__cta" href="{{ url_for('bv.chi_tiet', slug=bv.slug) }}">Đọc bài viết <svg class="tk-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       </div>
     </article>
     {% endfor %}
-  </div>
-  {% if n > 1 %}
-  <div class="bvx-hero__bar">
-    <div class="bvx-dots">
-      {% for bv in slide_bai %}<button type="button" class="bvx-dot {{ 'is-active' if loop.first }}" data-i="{{ loop.index0 }}" aria-label="Xem bài {{ loop.index }}: {{ bv.tieu_de }}" {% if loop.first %}aria-current="true"{% endif %}><i></i></button>{% endfor %}
+
+    {% if n > 1 %}
+    <button type="button" class="bvx-nav bvx-nav--prev" data-act="prev" aria-label="Bài trước"><svg viewBox="0 0 16 16" width="20" height="20" fill="none" aria-hidden="true"><path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button type="button" class="bvx-nav bvx-nav--next" data-act="next" aria-label="Bài sau"><svg viewBox="0 0 16 16" width="20" height="20" fill="none" aria-hidden="true"><path d="m6 3 5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button type="button" class="bvx-play" data-act="toggle" aria-label="Tạm dừng tự chuyển" data-pause="Tạm dừng tự chuyển" data-play="Tiếp tục tự chuyển">
+      <svg class="i-pause" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3.5" y="3" width="3" height="10" rx="1"/><rect x="9.5" y="3" width="3" height="10" rx="1"/></svg>
+      <svg class="i-play" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M4.5 3v10l8-5z"/></svg>
+    </button>
+    {# thanh thời gian: mỗi bài một đoạn, đoạn của bài đang hiện sẽ chạy đầy trong 7 giây rồi tự sang bài kế #}
+    <div class="bvx-timer">
+      {% for bv in slide_bai %}<button type="button" class="bvx-dot {{ 'is-active' if loop.first }}" data-i="{{ loop.index0 }}" aria-label="Xem bài {{ loop.index }}: {{ bv.tieu_de }}" {% if loop.first %}aria-current="true"{% endif %}><span class="bvx-dot__n" aria-hidden="true">0{{ loop.index }}</span><i></i></button>{% endfor %}
     </div>
-    <div class="bvx-ctrl">
-      <button type="button" class="bvx-ctrl__btn" data-act="prev" aria-label="Bài trước"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <button type="button" class="bvx-ctrl__btn" data-act="toggle" aria-label="Tạm dừng tự chuyển" data-pause="Tạm dừng tự chuyển" data-play="Tiếp tục tự chuyển">
-        <svg class="i-pause" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3.5" y="3" width="3" height="10" rx="1"/><rect x="9.5" y="3" width="3" height="10" rx="1"/></svg>
-        <svg class="i-play" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M4.5 3v10l8-5z"/></svg>
-      </button>
-      <button type="button" class="bvx-ctrl__btn" data-act="next" aria-label="Bài sau"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true"><path d="m6 3 5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    </div>
+    {% endif %}
   </div>
-  {% endif %}
 </section>
 {% endif %}
 

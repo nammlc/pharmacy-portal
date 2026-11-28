@@ -252,18 +252,38 @@ def gom_ten(dongs: list[DongNhap]) -> dict[str, TenFile]:
     return ket
 
 
-def goi_y_ghep(khoa: str, ung_vien: dict[str, str], toi_da: int = 3, nguong: float = 0.86) -> list[str]:
-    """Gợi ý tên 'gần giống' để người nhập cân nhắc ghép (bắt lỗi chính tả / lỗi ngắt dòng).
-    ung_vien: khoá -> tên hiển thị. Chỉ so các tên cùng 3 ký tự đầu và độ dài gần nhau để chạy nhanh."""
-    kq = []
+def goi_y_ghep_diem(khoa: str, ung_vien: dict[str, str], toi_da: int = 5, nguong: float = 0.86) -> list[tuple[str, int, str]]:
+    """Gợi ý hoạt chất đang có để người nhập cân nhắc ghép (không tự ghép), KÈM ĐỘ GIỐNG.
+    Trả về [(tên, độ giống %, loại)] với loại = '' (gần giống) | 'hamluong' | 'phoihop' | 'ngoac' | 'khac' (4 loại sau = tên trong
+    CSDL BẮT ĐẦU bằng tên trong file), sắp theo: 'bắt đầu bằng' trước, rồi độ giống giảm dần.
+      - 'bắt đầu bằng': tên trong CSDL bắt đầu bằng tên trong file (CSDL thường ghi kèm hàm lượng:
+        'allopurinol' -> 'Allopurinol 100mg');
+      - gần giống: độ giống chữ >= nguong (bắt lỗi chính tả / lỗi ngắt dòng); chỉ so các tên cùng 3 ký tự đầu
+        và độ dài gần nhau để chạy nhanh.
+    Độ giống % = tỉ lệ giống nhau của hai chuỗi (đã bỏ dấu, hoa/thường) - chỉ để tham khảo."""
+    tien_to, gan = [], []
     for k, ten in ung_vien.items():
-        if k == khoa or k[:3] != khoa[:3] or abs(len(k) - len(khoa)) > 6:
+        if k == khoa:
+            continue
+        if k.startswith(khoa + " ") or k.startswith(khoa + "/") or k.startswith(khoa + "("):
+            phan_con = k[len(khoa):]
+            loai = ("phoihop" if phan_con.startswith("/") else "ngoac" if phan_con.startswith("(")
+                    else "hamluong" if phan_con.strip()[:1].isdigit() else "khac")
+            tien_to.append((ten, round(difflib.SequenceMatcher(None, khoa, k).ratio() * 100), loai))
+            continue
+        if k[:3] != khoa[:3] or abs(len(k) - len(khoa)) > 6:
             continue
         r = difflib.SequenceMatcher(None, khoa, k).ratio()
         if r >= nguong:
-            kq.append((r, ten))
-    kq.sort(key=lambda x: -x[0])
-    return [t for _, t in kq[:toi_da]]
+            gan.append((ten, round(r * 100), ""))
+    tien_to.sort(key=lambda x: (-x[1], x[0].lower()))
+    gan.sort(key=lambda x: (-x[1], x[0].lower()))
+    return (tien_to + gan)[:toi_da]
+
+
+def goi_y_ghep(khoa: str, ung_vien: dict[str, str], toi_da: int = 5, nguong: float = 0.86) -> list[str]:
+    """Như goi_y_ghep_diem nhưng chỉ trả về tên."""
+    return [t for t, _, _ in goi_y_ghep_diem(khoa, ung_vien, toi_da, nguong)]
 
 
 # ---------------------------------------------------------------------------

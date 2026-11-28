@@ -13,8 +13,10 @@ from sqlalchemy.orm import aliased
 from app import db
 from app.models.models import TuongTacHoatChat, HoatChat
 from app.forms import TuongTacHoatChatForm
-from app.utils.nhap_tuong_tac import NHAN_MUC_DO
-from app.utils.tuong_tac_hc import luu_tay, tim_cap
+from sqlalchemy.exc import IntegrityError
+
+from app.utils.nhap_tuong_tac import NHAN_MUC_DO, khoa_ten, lam_sach_ten
+from app.utils.tuong_tac_hc import luu_tay, tim_cap, tai_hoat_chat_hien_co
 from app.utils.xoa_hang_loat_crud import lay_id_tu_form, xoa_theo_danh_sach_id, xoa_toan_bo, flash_ket_qua_xoa
 
 bp = Blueprint("admin_ttt", __name__, url_prefix="/admin/tuong-tac-thuoc")
@@ -65,6 +67,33 @@ def kiem_tra_cap():
         return jsonify(trang_thai="chua_co")
     return jsonify(trang_thai="da_co", id=trung.id, sua_url=url_for("admin_ttt.sua", item_id=trung.id),
                    cap=trung.ten_cap, muc_do=NHAN_MUC_DO.get(trung.muc_do, trung.muc_do))
+
+
+@bp.route("/hoat-chat-moi", methods=["POST"])
+@login_required
+def hoat_chat_moi():
+    """Thêm nhanh một hoạt chất chưa có (gọi từ ô chọn hoạt chất ở form). Không tạo trùng:
+    tên khác hoa/thường/dấu/khoảng trắng với hoạt chất đã có thì trả về chính hoạt chất đó (da_co=True)."""
+    ten = lam_sach_ten(request.form.get("ten", ""))
+    if not ten:
+        return jsonify(loi="Hãy nhập tên hoạt chất."), 400
+    if len(ten) > 255:
+        return jsonify(loi="Tên hoạt chất quá dài (tối đa 255 ký tự)."), 400
+    khoa = khoa_ten(ten)
+    co = tai_hoat_chat_hien_co().get(khoa)
+    if co:
+        return jsonify(id=co[0], ten=co[1], da_co=True)
+    hc = HoatChat(ten_hoat_chat=ten)
+    db.session.add(hc)
+    try:
+        db.session.commit()
+    except IntegrityError:                 # người khác vừa thêm đúng tên này
+        db.session.rollback()
+        co = tai_hoat_chat_hien_co().get(khoa)
+        if co:
+            return jsonify(id=co[0], ten=co[1], da_co=True)
+        return jsonify(loi="Không thêm được hoạt chất. Vui lòng thử lại."), 409
+    return jsonify(id=hc.id, ten=hc.ten_hoat_chat, da_co=False), 201
 
 
 def _xu_ly_form(form, item=None):

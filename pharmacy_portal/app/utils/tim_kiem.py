@@ -298,24 +298,19 @@ def tim_thuoc_tiem_truyen(tu_khoa: str, per_page: int = 15, page: int = 1):
     return _FakePagination(items, total, page, per_page)
 
 
-def tim_tuong_tac(tu_khoa: str, limit: int = 60):
-    """Tra cứu tương tác theo HOẠT CHẤT.
+MUC_DO_TUONG_TAC = ("chong_chi_dinh", "nang", "trung_binh", "nhe")   # nặng nhất → nhẹ nhất
 
-    Gõ tên hoạt chất, HOẶC tên biệt dược (lấy các hoạt chất của biệt dược đó rồi tìm tương tác của chúng).
-    Trả về SimpleNamespace(cap, tong, hoat_chat_khop, thuoc_khop):
-      cap            : các cặp tương tác (nặng nhất lên đầu, tối đa `limit`)
-      tong           : tổng số cặp khớp (có thể lớn hơn len(cap))
-      hoat_chat_khop : các hoạt chất được tìm thấy theo tên
-      thuoc_khop     : [(tên biệt dược, [tên các hoạt chất])] khi người dùng gõ tên biệt dược
-    """
-    from types import SimpleNamespace
-    from sqlalchemy import case
-    from app.models.models import HoatChat, TuongTacHoatChat, DanhMucThuoc, NhaThuocBV
 
-    ket = SimpleNamespace(cap=[], tong=0, hoat_chat_khop=[], thuoc_khop=[])
-    q = tu_khoa.strip()
+def _giai_hoat_chat(tu_khoa: str):
+    """Từ khoá → ({id: HoatChat}, [(tên biệt dược, [tên các hoạt chất])]).
+
+    Gõ tên hoạt chất, HOẶC tên biệt dược (lấy các hoạt chất của biệt dược đó);
+    không khớp trực tiếp thì thử gần đúng (pg_trgm) để bắt lỗi chính tả."""
+    from app.models.models import HoatChat, DanhMucThuoc, NhaThuocBV
+
+    q = (tu_khoa or "").strip()
     if not q:
-        return ket
+        return {}, []
 
     hc = {h.id: h for h in HoatChat.query.filter(HoatChat.ten_hoat_chat.ilike(f"%{q}%")).limit(200).all()}
 
@@ -330,24 +325,115 @@ def tim_tuong_tac(tu_khoa: str, limit: int = 60):
             for h in ds:
                 hc.setdefault(h.id, h)
 
-    if not hc:                                    # không khớp trực tiếp -> thử gần đúng (bắt lỗi chính tả)
+    if not hc:
         ids = _trgm_ids_hoat_chat(q)
         if ids:
             hc = {h.id: h for h in HoatChat.query.filter(HoatChat.id.in_(ids)).all()}
-    if not hc:
+    return hc, thuoc_khop
+
+
+def tim_tuong_tac(tu_khoa: str, tu_khoa2: str = "", muc_do: str = "", page: int = 1, per_page: int = 15):
+    """Tra cứu tương tác theo HOẠT CHẤT, có lọc và phân trang.
+
+    tu_khoa  : hoạt chất / biệt dược thứ nhất (bắt buộc)
+    tu_khoa2 : hoạt chất / biệt dược thứ hai (tuỳ chọn) — chỉ giữ các cặp giữa hai nhóm này
+    muc_do   : lọc theo mức độ ('' = tất cả; hoặc một giá trị của MUC_DO_TUONG_TAC)
+
+    Trả về SimpleNamespace:
+      phan_trang      : Pagination các cặp (nặng nhất lên đầu); None khi không có hoạt chất nào khớp
+      tong            : tổng số cặp khớp (CHƯA áp bộ lọc mức độ)
+      dem_muc_do      : {mức độ: số cặp} (CHƯA áp bộ lọc mức độ, để chip hiển thị đúng số)
+      hoat_chat_khop / hoat_chat_khop2 : các hoạt chất tìm thấy theo ô 1 / ô 2
+      thuoc_khop / thuoc_khop2         : [(tên biệt dược, [hoạt chất])] khi người dùng gõ tên biệt dược
+    """
+    from types import SimpleNamespace
+    from sqlalchemy import case, func
+    from sqlalchemy.orm import joinedload
+    from app.models.models import TuongTacHoatChat as TT
+
+    ket = SimpleNamespace(phan_trang=None, tong=0, dem_muc_do={m: 0 for m in MUC_DO_TUONG_TAC},
+                          hoat_chat_khop=[], hoat_chat_khop2=[], thuoc_khop=[], thuoc_khop2=[])
+    q1, q2 = (tu_khoa or "").strip(), (tu_khoa2 or "").strip()
+    if not q1:
         return ket
 
-    ids = list(hc)[:300]
-    goc = TuongTacHoatChat.query.filter(or_(TuongTacHoatChat.hoat_chat_a_id.in_(ids),
-                                            TuongTacHoatChat.hoat_chat_b_id.in_(ids)))
-    nang_nhat = case((TuongTacHoatChat.muc_do == "chong_chi_dinh", 0),
-                     (TuongTacHoatChat.muc_do == "nang", 1),
-                     (TuongTacHoatChat.muc_do == "trung_binh", 2), else_=3)
-    ket.tong = goc.count()
-    ket.cap = goc.order_by(nang_nhat, TuongTacHoatChat.id).limit(limit).all()
-    ket.hoat_chat_khop = sorted(hc.values(), key=lambda h: h.ten_hoat_chat.lower())
-    ket.thuoc_khop = thuoc_khop
+    hc1, ket.thuoc_khop = _giai_hoat_chat(q1)
+    ket.hoat_chat_khop = sorted(hc1.values(), key=lambda h: h.ten_hoat_chat.lower())
+    if not hc1:
+        return ket
+    ids1 = list(hc1)[:300]
+
+    if q2:
+        hc2, ket.thuoc_khop2 = _giai_hoat_chat(q2)
+        ket.hoat_chat_khop2 = sorted(hc2.values(), key=lambda h: h.ten_hoat_chat.lower())
+        if not hc2:
+            return ket
+        ids2 = list(hc2)[:300]
+        dk = or_(and_(TT.hoat_chat_a_id.in_(ids1), TT.hoat_chat_b_id.in_(ids2)),
+                 and_(TT.hoat_chat_a_id.in_(ids2), TT.hoat_chat_b_id.in_(ids1)))
+    else:
+        dk = or_(TT.hoat_chat_a_id.in_(ids1), TT.hoat_chat_b_id.in_(ids1))
+
+    dem = dict(db.session.query(TT.muc_do, func.count(TT.id)).filter(dk).group_by(TT.muc_do).all())
+    ket.dem_muc_do = {m: dem.get(m, 0) for m in MUC_DO_TUONG_TAC}
+    ket.tong = sum(ket.dem_muc_do.values())
+
+    truy_van = TT.query.filter(dk)
+    if muc_do in MUC_DO_TUONG_TAC:
+        truy_van = truy_van.filter(TT.muc_do == muc_do)
+    nang_nhat = case((TT.muc_do == "chong_chi_dinh", 0), (TT.muc_do == "nang", 1),
+                     (TT.muc_do == "trung_binh", 2), else_=3)
+    truy_van = (truy_van.options(joinedload(TT.hoat_chat_a), joinedload(TT.hoat_chat_b))
+                .order_by(nang_nhat, TT.id))
+    pt = truy_van.paginate(page=max(page, 1), per_page=per_page, error_out=False)
+    if pt.total and not pt.items and pt.pages:           # ?page= vượt quá trang cuối → về trang cuối
+        pt = truy_van.paginate(page=pt.pages, per_page=per_page, error_out=False)
+    ket.phan_trang = pt
     return ket
+
+
+def goi_y_hoat_chat(tu_khoa: str, gioi_han: int = 8):
+    """Gợi ý dropdown khi gõ ô hoạt chất ở trang Tương tác thuốc.
+
+    Trả về list[dict] cùng dạng với /api/goi-y-tim-kiem: hoạt chất (kèm số tương tác đã ghi nhận)
+    đứng trước, sau đó tối đa 4 biệt dược (kèm hoạt chất chứa trong đó)."""
+    from sqlalchemy import case, func
+    from app.models.models import HoatChat, TuongTacHoatChat as TT, DanhMucThuoc, NhaThuocBV
+
+    q = (tu_khoa or "").strip()
+    if len(q) < 2:
+        return []
+
+    nhom = (HoatChat.query.filter(HoatChat.ten_hoat_chat.ilike(f"%{q}%"))
+            .order_by(case((HoatChat.ten_hoat_chat.ilike(f"{q}%"), 0), else_=1), func.lower(HoatChat.ten_hoat_chat))
+            .limit(gioi_han).all())
+    if not nhom:                                          # gõ sai chính tả → gần đúng
+        ids = _trgm_ids_hoat_chat(q, limit=6)
+        if ids:
+            nhom = HoatChat.query.filter(HoatChat.id.in_(ids)).order_by(func.lower(HoatChat.ten_hoat_chat)).all()
+
+    dem = {}
+    if nhom:
+        ids = [h.id for h in nhom]
+        for cot in (TT.hoat_chat_a_id, TT.hoat_chat_b_id):   # a < b nên mỗi cặp chỉ tính một lần cho mỗi hoạt chất
+            for hid, n in db.session.query(cot, func.count(TT.id)).filter(cot.in_(ids)).group_by(cot).all():
+                dem[hid] = dem.get(hid, 0) + n
+
+    ket = [{"ten": h.ten_hoat_chat,
+            "phu": f"{dem[h.id]} tương tác đã ghi nhận" if dem.get(h.id) else "Chưa có tương tác ghi nhận",
+            "anh": "", "url": "", "loai": "Hoạt chất"} for h in nhom]
+
+    da_co = set()
+    for Model in (DanhMucThuoc, NhaThuocBV):
+        for t in Model.query.filter(Model.ten_biet_duoc.ilike(f"%{q}%")).limit(4).all():
+            ds = [h.ten_hoat_chat for h in t.hoat_chat_list]
+            khoa = t.ten_biet_duoc.lower()
+            if not ds or khoa in da_co or len(da_co) >= 4:
+                continue
+            da_co.add(khoa)
+            ket.append({"ten": t.ten_biet_duoc, "phu": "Chứa: " + ", ".join(ds),
+                        "anh": "", "url": "", "loai": "Biệt dược"})
+    return ket[:12]
 
 
 def tim_tuong_hop_tuong_ky(thuoc_a: str, thuoc_b: str = "", limit: int = 50):

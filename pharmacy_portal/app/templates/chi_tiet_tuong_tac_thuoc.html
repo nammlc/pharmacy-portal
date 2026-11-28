@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% from "_icons.html" import ic %}
+{% set a = tt.hoat_chat_a.ten_hoat_chat %}
+{% set b = tt.hoat_chat_b.ten_hoat_chat %}
+{% set nhan = {'nhe':'Nhẹ','trung_binh':'Trung bình','nang':'Nghiêm trọng','chong_chi_dinh':'Chống chỉ định'} %}
+{% set bac = {'nhe':1,'trung_binh':2,'nang':3,'chong_chi_dinh':4} %}
+{% block title %}Tương tác {{ a }} + {{ b }}{% endblock %}
+{% block meta_mo_ta %}Tương tác giữa {{ a }} và {{ b }} (mức {{ nhan.get(tt.muc_do, tt.muc_do)|lower }}): cơ chế, hậu quả lâm sàng và hướng xử trí. Khoa Dược BV Đa khoa Tâm Đức Cầu Quan.{% endblock %}
+{% block head_extra %}<link rel="stylesheet" href="{{ url_for('static', filename='css/taste-tuong-tac.css') }}">{% endblock %}
+
+{% block content %}
+{% set cac_muc = [('Cơ chế', tt.co_che), ('Hậu quả lâm sàng', tt.hau_qua_lam_sang), ('Xử trí', tt.xu_tri)] %}
+<section class="tk-head ttd-head"><div class="tk-wrap">
+  <p class="tk-crumb"><a href="{{ url_for('ttt.index') }}">Tương tác thuốc</a></p>
+  <h1 class="tk-h1 ttd-title"><span>{{ a }}</span><span class="ttd-plus" aria-label="kết hợp với">+</span><span>{{ b }}</span></h1>
+  <div class="ttd-level lvl-{{ tt.muc_do }}">
+    <span class="ttt-badge ttt-badge--lg"><span class="lv-meter lv-n{{ bac.get(tt.muc_do, 1) }}" aria-hidden="true"><i></i><i></i><i></i><i></i></span>{{ nhan.get(tt.muc_do, tt.muc_do) }}</span>
+  </div>
+</div></section>
+{% set bl_ten = 'Tương tác: ' ~ a ~ ' + ' ~ b %}{% include "_bao_loi.html" %}
+
+<div class="tk-wrap ttd-body">
+  <article class="ttd-main">
+    {% set co_noi_dung = namespace(v=false) %}
+    {% for tieu_de, noi_dung in cac_muc if noi_dung %}
+    {% set co_noi_dung.v = true %}
+    <section class="ttd-sec">
+      <h2 class="tk-h3">{{ tieu_de }}</h2>
+      <div class="rich-content">{{ noi_dung | safe }}</div>
+    </section>
+    {% endfor %}
+    {% if not co_noi_dung.v %}
+    <div class="empty-state">
+      <div class="empty-state-icon">{{ ic('info', 22) }}</div>
+      Chưa có mô tả chi tiết cho tương tác này.
+    </div>
+    {% endif %}
+  </article>
+
+  <aside class="ttd-side" aria-label="Thông tin kèm theo">
+    <h2 class="tk-label">Xem thêm theo hoạt chất</h2>
+    <ul class="ttd-links">
+      <li><a class="tk-link" href="{{ url_for('ttt.index', q=a) }}">Mọi tương tác của {{ a }}</a></li>
+      <li><a class="tk-link" href="{{ url_for('ttt.index', q=b) }}">Mọi tương tác của {{ b }}</a></li>
+    </ul>
+    <dl class="ttd-meta">
+      {% if tt.nguon_tham_khao %}<div><dt>Nguồn tham khảo</dt><dd>{{ tt.nguon_tham_khao }}</dd></div>{% endif %}
+      {% if tt.ngay_cap_nhat %}<div><dt>Cập nhật lần cuối</dt><dd>{{ (tt.ngay_cap_nhat | gio_vn).strftime('%d/%m/%Y') }}</dd></div>{% endif %}
+    </dl>
+  </aside>
+</div>
+
+<div class="tk-wrap ttd-back">
+  <a class="tk-btn tk-btn--secondary" href="{{ url_for('ttt.index', _anchor='ket-qua', **tham_so_quay_lai) if tham_so_quay_lai.get('q') else url_for('ttt.index') }}">{{ 'Quay lại kết quả tìm kiếm' if tham_so_quay_lai.get('q') else 'Tra cứu tương tác khác' }}</a>
+</div>
+{% endblock %}
